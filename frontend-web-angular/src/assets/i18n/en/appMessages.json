@@ -1,0 +1,55 @@
+{
+  "redirection": {
+    "toHome": "Redirecting to home page..."
+  },
+  "network": {
+    "error": "Oops! Something went wrong while processing your request."
+  },
+  "http": {
+    "error400BadRequest": {
+      "status": 400,
+      "shortMessage": "Bad Request",
+      "longMessage": "The server cannot process the request. Please check the data and try again."
+    },
+    "error401Unauthorized": {
+      "status": 401,
+      "shortMessage": "Unauthorized",
+      "longMessage": "You are not authorized to perform this action."
+    },
+    "error403Forbidden": {
+      "status": 403,
+      "shortMessage": "Forbidden",
+      "longMessage": "Access to this resource is forbidden."
+    },
+    "error404NotFound": {
+      "status": 404,
+      "shortMessage": "Not Found",
+      "longMessage": "The requested resource was not found."
+    },
+    "error408Timeout": {
+      "status": 408,
+      "shortMessage": "Request Timeout",
+      "longMessage": "The request timed out. Please check your internet connection and try again."
+    },
+    "error409Conflict": {
+      "status": 409,
+      "shortMessage": "Conflict",
+      "longMessage": "The data you're trying to submit conflicts with an existing record."
+    },
+    "error429TooManyRequests": {
+      "status": 429,
+      "shortMessage": "Too Many Requests",
+      "longMessage": "You have made too many requests in a short period. Please try again later."
+    },
+    "error500ServerError": {
+      "status": 500,
+      "shortMessage": "Internal Server Error",
+      "longMessage": "A server error occurred. Please contact support if the problem persists."
+    },
+    "error503ServiceUnavailable": {
+      "status": 503,
+      "shortMessage": "Service Unavailable",
+      "longMessage": "There was a problem reaching the server. Please try again later."
+    }
+  }
+}
