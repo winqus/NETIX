@@ -15,6 +15,7 @@ export const routes: Routes = [
     path: 'error',
     component: EmptyLayoutComponent,
     children: [
+      { path: '', redirectTo: '/error/404', pathMatch: 'full' },
       {
         path: '403',
         component: ErrorPageComponent,
