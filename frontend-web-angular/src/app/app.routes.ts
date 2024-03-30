@@ -10,6 +10,9 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [{ path: '', component: ExampleComponent }],
+    // path: '',
+    // component: MainLayoutComponent,
+    // children: [{ path: '', component: MainPageComponent }],
   },
   {
     path: 'error',

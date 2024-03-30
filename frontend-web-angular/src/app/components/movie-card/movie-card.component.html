@@ -1,0 +1,14 @@
+<div class="card card-compact h-full w-full group relative rounded-md">
+  @if (!isLoading) {
+    <img [src]="_video?.thumbnails?.default" [alt]="_video?.title" class="w-fit object-center rounded-md" />
+    <div class="card-body rounded-md bg-black-to-transparent absolute bottom-0 w-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <h2 class="card-title">{{ _video?.title }}</h2>
+      <div class="flex w-full">
+        <h3 class="content-start w-full">{{ publishedDate }}</h3>
+        <h3 class="content-end">{{ formattedDuration }}</h3>
+      </div>
+    </div>
+  } @else {
+    <div class="skeleton w-full h-full bg-slate-950 rounded-md"></div>
+  }
+</div>
