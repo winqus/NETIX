@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, HostListener, Input } from '@angular/core';
 import { Video } from '../../models/video';
 
 @Component({
@@ -9,21 +9,33 @@ import { Video } from '../../models/video';
   styleUrl: './movie-card.component.scss',
 })
 export class MovieCardComponent {
-  public _video?: Video;
-
+  video?: Video;
   isLoading: boolean = true;
+  isMobile: boolean = false;
+
+  constructor() {
+    this.checkScreenSize();
+  }
 
   @Input()
-  set video(value: Video) {
-    this._video = value;
+  set videoData(value: Video) {
+    this.video = value;
     this.isLoading = !value;
   }
-  get title(): string {
-    return this._video?.title || '-';
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkScreenSize();
   }
+
+  private checkScreenSize() {
+    // Consider "mobile" as any screen less than 768 pixels in width
+    this.isMobile = window.innerWidth < 768;
+  }
+
   get publishedDate(): string {
-    if (!this._video || !this._video.publishedAt) return 'N/D';
-    const date = this._video?.publishedAt;
+    if (!this.video || !this.video.publishedAt) return 'N/D';
+    const date = this.video?.publishedAt;
 
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -31,9 +43,10 @@ export class MovieCardComponent {
     return `${year}`;
     return `${year}-${month}-${day}`;
   }
+
   get formattedDuration(): string {
-    if (!this._video || !this._video.duration) return '00:00:00';
-    const duration = this._video.duration;
+    if (!this.video || !this.video.duration) return '00:00:00';
+    const duration = this.video.duration;
     const hours = Math.floor(duration / 3600)
       .toString()
       .padStart(2, '0');

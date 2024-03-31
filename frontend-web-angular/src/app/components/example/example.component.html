@@ -1,8 +1,14 @@
 <main class="main">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 p-5">
-    @for (movie of movies; track movie.id) {
-      <app-movie-card [video]="movie"></app-movie-card>
+  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
+    <!-- <div class="grid"> -->
+    @if (!isLoadingMovies) {
+      @for (movie of movies; track movie.id) {
+        <app-movie-card [videoData]="movie"></app-movie-card>
+      }
+    } @else {
+      @for (skeleton of skeletonNumber; track skeleton; let count = $count) {
+        <app-movie-card></app-movie-card>
+      }
     }
-    <app-movie-card></app-movie-card>
   </div>
 </main>

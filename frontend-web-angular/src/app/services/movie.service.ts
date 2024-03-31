@@ -55,10 +55,19 @@ export class MovieService {
           default: 'https://fastly.picsum.photos/id/344/700/900.jpg?hmac=XwfWpOhCSDOwm7KOpSCD8s7dZCJMTInlxl2k48xQNow',
         },
       },
+      {
+        id: '6',
+        title: 'London will fall with the human race',
+        publishedAt: new Date('2017-11-07'),
+        duration: 9890,
+        thumbnails: {
+          default: 'https://fastly.picsum.photos/id/690/700/800.jpg?hmac=11qu0nO1sNp6VYfM9qhziv8t9It_5KC2zFe5rwMBY4I',
+        },
+      },
     ];
 
     return of(movies).pipe(
-      delay(5000) // Simulates a network delay of 1 second
+      delay(1000) // Simulates a network delay of 1 second
     );
   }
 }

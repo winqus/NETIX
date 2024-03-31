@@ -11,15 +11,18 @@ import { MovieService } from '../../services/movie.service';
 })
 export class ExampleComponent {
   title = 'netix';
+
+  skeletonNumber: number[] = Array.from({ length: 20 }, (_, i) => i);
   movies: Video[] = [];
 
+  isLoadingMovies: boolean = true;
   constructor(private movieService: MovieService) {}
 
   // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
-  ngOnInit() {
+  ngAfterViewInit() {
     this.movieService.getMovies().subscribe((movies) => {
       this.movies = movies;
-      console.log('Logging an object:', movies);
+      this.isLoadingMovies = false;
     });
   }
 }
