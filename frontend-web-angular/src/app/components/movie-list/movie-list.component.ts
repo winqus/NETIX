@@ -6,10 +6,10 @@ import { MovieService } from '../../services/movie.service';
 @Component({
   selector: 'app-example',
   standalone: true,
-  templateUrl: './example.component.html',
+  templateUrl: './movie-list.component.html',
   imports: [MovieCardComponent],
 })
-export class ExampleComponent {
+export class MovieListComponent {
   title = 'netix';
 
   skeletonNumber: number[] = Array.from({ length: 20 }, (_, i) => i);

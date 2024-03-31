@@ -3,13 +3,13 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
 import { EmptyLayoutComponent } from './layouts/empty-layout/empty-layout.component';
 import { ErrorPageComponent } from './components/error-page/error-page.component';
 import appMessages from '../assets/i18n/en/appMessages.json';
-import { ExampleComponent } from './components/example/example.component';
+import { MovieListComponent } from './components/movie-list/movie-list.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    children: [{ path: '', component: ExampleComponent }],
+    children: [{ path: '', component: MovieListComponent }],
     // path: '',
     // component: MainLayoutComponent,
     // children: [{ path: '', component: MainPageComponent }],
