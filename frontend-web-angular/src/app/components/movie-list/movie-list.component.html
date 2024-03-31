@@ -3,11 +3,11 @@
     <!-- <div class="grid"> -->
     @if (!isLoadingMovies) {
       @for (movie of movies; track movie.id) {
-        <app-movie-card [videoData]="movie"></app-movie-card>
+        <app-movie-card [movieData]="movie"></app-movie-card>
       }
     } @else {
       @for (skeleton of skeletonNumber; track skeleton; let count = $count) {
-        <app-movie-card></app-movie-card>
+        <app-movie-card-skeleton></app-movie-card-skeleton>
       }
     }
   </div>

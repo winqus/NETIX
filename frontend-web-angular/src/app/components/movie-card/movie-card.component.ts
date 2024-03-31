@@ -1,5 +1,5 @@
 import { Component, HostListener, Input } from '@angular/core';
-import { Video } from '../../models/video';
+import { MediaItem } from '../../models/mediaItem';
 
 @Component({
   selector: 'app-movie-card',
@@ -8,8 +8,8 @@ import { Video } from '../../models/video';
   templateUrl: './movie-card.component.html',
 })
 export class MovieCardComponent {
-  video?: Video;
-  isLoading: boolean = true;
+  movie!: MediaItem;
+
   isMobile: boolean = false;
 
   constructor() {
@@ -17,9 +17,8 @@ export class MovieCardComponent {
   }
 
   @Input()
-  set videoData(value: Video) {
-    this.video = value;
-    this.isLoading = !value;
+  set movieData(value: MediaItem) {
+    this.movie = value;
   }
 
   @HostListener('window:resize', ['$event'])
@@ -28,24 +27,20 @@ export class MovieCardComponent {
   }
 
   private checkScreenSize() {
-    // Consider "mobile" as any screen less than 768 pixels in width
     this.isMobile = window.innerWidth < 768;
   }
 
   get publishedDate(): string {
-    if (!this.video || !this.video.publishedAt) return 'N/D';
-    const date = this.video?.publishedAt;
+    if (!this.movie || !this.movie.publishedAt) return '0000';
+    const date = this.movie.publishedAt;
 
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${year}`;
-    return `${year}-${month}-${day}`;
   }
 
   get formattedDuration(): string {
-    if (!this.video || !this.video.duration) return '00:00:00';
-    const duration = this.video.duration;
+    if (!this.movie || !this.movie.duration) return '00:00:00';
+    const duration = this.movie.duration;
     const hours = Math.floor(duration / 3600)
       .toString()
       .padStart(2, '0');

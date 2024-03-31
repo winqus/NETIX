@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
 import { MovieCardComponent } from '../movie-card/movie-card.component';
-import { Video } from '../../models/video';
+import { MovieCardSkeletonComponent } from '../movie-card-skeleton/movie-card-skeleton.component';
+import { MediaItem } from '../../models/mediaItem';
 import { MovieService } from '../../services/movie.service';
 
 @Component({
   selector: 'app-example',
   standalone: true,
   templateUrl: './movie-list.component.html',
-  imports: [MovieCardComponent],
+  imports: [MovieCardComponent, MovieCardSkeletonComponent],
 })
 export class MovieListComponent {
   title = 'netix';
 
   skeletonNumber: number[] = Array.from({ length: 20 }, (_, i) => i);
-  movies: Video[] = [];
+  movies: MediaItem[] = [];
 
   isLoadingMovies: boolean = true;
   constructor(private movieService: MovieService) {}

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { Video } from '../models/video';
+import { MediaItem } from '../models/mediaItem';
+import { MediaItemMapper } from '../mappers/mediaItemMapper';
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +9,8 @@ import { Video } from '../models/video';
 export class MovieService {
   constructor() {}
 
-  getMovies(): Observable<Video[]> {
-    const movies: Video[] = [
+  getMovies(): Observable<MediaItem[]> {
+    const raw: any[] = [
       {
         id: '1',
         title: 'Inception',
@@ -66,7 +67,7 @@ export class MovieService {
       },
     ];
 
-    return of(movies).pipe(
+    return of(MediaItemMapper.toMediaItemList(raw)).pipe(
       delay(1000) // Simulates a network delay of 1 second
     );
   }

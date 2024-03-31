@@ -1,31 +1,31 @@
-interface SeriesInfo {
-  seriesId: string;
-  seriesTitle: string;
-  seasons: SeasonInfo[];
-}
+// interface SeriesInfo {
+//   seriesId: string;
+//   seriesTitle: string;
+//   seasons: SeasonInfo[];
+// }
 
-interface SeasonInfo {
-  seasonId: string;
-  seasonNumber: number;
-  episodeNumber: number;
-}
+// interface SeasonInfo {
+//   seasonId: string;
+//   seasonNumber: number;
+//   episodeNumber: number;
+// }
 
-export interface Video {
+export interface MediaItem {
   id: string;
   title: string;
-  // description: string;
+  description: string;
   duration: number; // Duration in seconds
-  // creator: {
-  //   id: string;
-  //   name: string;
-  // };
+  creator: {
+    id: string;
+    name: string;
+  };
   thumbnails: {
     default: string;
     medium?: string;
     high?: string;
   };
-  // tags: string[];
-  // categories: string[];
+  tags: string[];
+  categories: string[];
   publishedAt: Date;
   updatedAt?: Date;
   // statistics: {
@@ -46,5 +46,5 @@ export interface Video {
   //   hlsUrl?: string;
   //   dashUrl?: string;
   // };
-  series?: SeriesInfo[]; // Optional property to accommodate videos not part of any series
+  // series?: SeriesInfo[]; // Optional property to accommodate videos not part of any series
 }
