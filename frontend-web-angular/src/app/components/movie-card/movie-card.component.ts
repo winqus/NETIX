@@ -6,7 +6,6 @@ import { Video } from '../../models/video';
   standalone: true,
   imports: [],
   templateUrl: './movie-card.component.html',
-  styleUrl: './movie-card.component.scss',
 })
 export class MovieCardComponent {
   video?: Video;
