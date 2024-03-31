@@ -5,7 +5,11 @@
 module.exports = {
   content: ["./src/**/*.{html,js,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'black-to-transparent': 'linear-gradient(to bottom, transparent, black)',
+      },
+    },
   },
   plugins: [require("daisyui")],
   daisyui: {

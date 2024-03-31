@@ -1,0 +1,25 @@
+@if (isMobile) {
+  <div class="card card-compact aspect-[4/1] flex-row bg-slate-950 rounded-md text-white">
+    <div class="flex-none">
+      <img [src]="movie.thumbnails.default" [alt]="movie.title" class="object-cover h-full w-[19vw] rounded-s-md" />
+    </div>
+    <div class="flex-1 flex flex-col justify-between px-5 py-2">
+      <h2 class="card-title">{{ movie.title }}</h2>
+      <div class="flex justify-between">
+        <h3>{{ publishedDate }}</h3>
+        <h3>{{ formattedDuration }}</h3>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="card card-compact aspect-[3/4] group relative rounded-md shadow-xl dark:shadow-gray-950 text-white">
+    <img [src]="movie.thumbnails.default" [alt]="movie.title" class="object-cover h-full w-full rounded-md" />
+    <div class="card-body rounded-md bg-black-to-transparent absolute bottom-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <h2 class="card-title">{{ movie.title }}</h2>
+      <div class="flex justify-between">
+        <h3>{{ publishedDate }}</h3>
+        <h3>{{ formattedDuration }}</h3>
+      </div>
+    </div>
+  </div>
+}
