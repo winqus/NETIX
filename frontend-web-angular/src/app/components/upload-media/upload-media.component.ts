@@ -4,6 +4,7 @@ enum UploadSteps {
   FileSelection,
   DetailsFilling,
   ThumbNailSelection,
+  Uploading,
 }
 
 @Component({
@@ -16,16 +17,18 @@ export class UploadMediaComponent {
   UploadSteps = UploadSteps;
   currentStep: UploadSteps = UploadSteps.FileSelection;
   isDraggingOver: boolean = false;
-  allowedFormats: string[] = ['video/mp4', 'video/mov', 'video/mkv', 'video/hevc'];
+  allowedMediaFormats: string[] = ['video/mp4', 'video/mov', 'video/mkv', 'video/hevc'];
+  allowedThumbnailFormats: string[] = ['image/PNG', 'image/jpg', 'image/JPEG'];
 
-  videoFile: File | null = null;
-  // mediaItem?: MediaItem;
+  mediaFile: File | null = null;
+  mediaThumbnail: File | null = null;
   mediaTitle: string = '';
+  mediaDescription: string = '';
   mediaDate!: Date;
   mediaUpdatedAt!: Date;
 
   //file upload
-  onFileSelected(event: Event) {
+  onFileSelected(event: Event, _isMedia: boolean = false, _isThumbnail: boolean = false) {
     const input = event.target as HTMLInputElement;
 
     if (!input.files?.length) {
@@ -33,7 +36,8 @@ export class UploadMediaComponent {
     }
 
     const file = input.files[0];
-    this.setFile(file);
+    if (_isMedia) this.setMediaFile(file);
+    if (_isThumbnail) this.setThumbFile(file);
   }
 
   dragOverHandler(event: DragEvent) {
@@ -41,14 +45,16 @@ export class UploadMediaComponent {
     this.isDraggingOver = true;
   }
 
-  dropHandler(event: DragEvent) {
+  dropHandler(event: DragEvent, _isMedia: boolean = false, _isThumbnail: boolean = false) {
     event.preventDefault();
     event.stopPropagation();
     this.isDraggingOver = false;
 
     if (event.dataTransfer && event.dataTransfer.files.length) {
       const file = event.dataTransfer.files[0];
-      this.setFile(file);
+
+      if (_isMedia) this.setMediaFile(file);
+      if (_isThumbnail) this.setThumbFile(file);
     }
   }
 
@@ -57,17 +63,28 @@ export class UploadMediaComponent {
     this.isDraggingOver = false;
   }
 
-  setFile(file: File) {
-    if (this.isValidFormat(file)) {
-      this.videoFile = file;
+  setMediaFile(file: File) {
+    if (this.isValidMediaFormat(file)) {
+      this.mediaFile = file;
     } else {
       alert('Invalid file format. Please upload a valid video file.');
     }
   }
 
-  isValidFormat(file: File): boolean {
-    return this.allowedFormats.includes(file.type);
+  isValidMediaFormat(file: File): boolean {
+    return this.allowedMediaFormats.includes(file.type);
   }
+  setThumbFile(file: File) {
+    if (this.isValidThumbnailFormat(file)) {
+      this.mediaThumbnail = file;
+    } else {
+      alert('Invalid file format. Please upload a valid image file.');
+    }
+  }
+  isValidThumbnailFormat(file: File): boolean {
+    return this.allowedThumbnailFormats.includes(file.type);
+  }
+
   // ----
 
   goToFileSelection() {
@@ -80,6 +97,9 @@ export class UploadMediaComponent {
   goToThumnNailSelection() {
     this.currentStep = UploadSteps.ThumbNailSelection;
   }
+  goToUploading() {
+    this.currentStep = UploadSteps.Uploading;
+  }
 
   onChangeTitle(event: Event) {
     const newValue = (event.target as HTMLInputElement).value;
@@ -89,7 +109,20 @@ export class UploadMediaComponent {
   onChangeDate(event: Event) {
     const newValue = (event.target as HTMLInputElement).value;
     this.mediaDate = new Date(newValue);
-    console.log(this.mediaDate);
+  }
+
+  onChangeDescription(event: Event) {
+    const newValue = (event.target as HTMLInputElement).value;
+    this.mediaDescription = newValue;
+  }
+
+  mediaDateToSimpleDateFormat(): string {
+    if (this.mediaDate == null) return '';
+    const year: string = this.mediaDate.getFullYear().toString();
+    const month: string = this.mediaDate.getMonth().toString().padStart(2, '0');
+    const day: string = this.mediaDate.getDay().toString().padStart(2, '0');
+
+    return year + '-' + month + '-' + day;
   }
 
   calculateProgress(): any {
@@ -97,9 +130,11 @@ export class UploadMediaComponent {
       case UploadSteps.FileSelection:
         return '0';
       case UploadSteps.DetailsFilling:
-        return '50';
+        return '33.333';
       case UploadSteps.ThumbNailSelection:
-        return '60';
+        return '66.666';
+      case UploadSteps.Uploading:
+        return '100';
       default:
         return '0';
     }

@@ -31,8 +31,8 @@ export class MovieCardComponent {
   }
 
   get publishedDate(): string {
-    if (!this.movie || !this.movie.publishedAt) return '0000';
-    const date = this.movie.publishedAt;
+    if (!this.movie || !this.movie.releaseDate) return '0000';
+    const date = this.movie.releaseDate;
 
     const year = date.getFullYear();
     return `${year}`;

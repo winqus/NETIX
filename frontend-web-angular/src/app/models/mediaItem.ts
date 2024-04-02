@@ -15,6 +15,7 @@ export interface MediaItem {
   title: string;
   description: string;
   duration: number; // Duration in seconds
+  releaseDate: Date;
   creator: {
     id: string;
     name: string;
@@ -26,7 +27,7 @@ export interface MediaItem {
   };
   tags: string[];
   categories: string[];
-  publishedAt: Date;
+  createdAt: Date;
   updatedAt?: Date;
   // statistics: {
   //   viewCount: number;
