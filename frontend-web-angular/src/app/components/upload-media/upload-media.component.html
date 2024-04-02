@@ -25,7 +25,7 @@
         } @else {
           <p class="text-ellipsis overflow-hidden w-full mb-2 text-sm text-center"><span class="font-semibold">Uploaded</span> {{ this.mediaFile.name }}</p>
         }
-        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, true)" accept="video/mp4,video/mov,video/mkv,video/hevc" />
+        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, true)" accept="video/mp4,video/mov,video/x-matroska,video/hevc" />
       </label>
     </div>
     <div class="flex-[1] content-center">
@@ -91,7 +91,7 @@
       <div class="flex justify-center items-end">
         <div class="flex flex-row justify-between w-[40%] gap-10">
           <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Back</button>
-          <button class="btn btn-primary rounded-md" (click)="goToUploading()">Upload</button>
+          <button class="btn btn-info rounded-md" (click)="goToUploading()">Confirm</button>
         </div>
       </div>
     </div>

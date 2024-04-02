@@ -1,4 +1,9 @@
+// TODO there is no indicator for when users files are uploading from their pc, can be a problem when huge files are being uploaded
+// TODO limit acces when steps are not completed
+// TODO error handeling
+
 import { Component } from '@angular/core';
+import { UploadMediaService } from '../../services/upload-media.service';
 
 enum UploadSteps {
   FileSelection,
@@ -14,10 +19,12 @@ enum UploadSteps {
   templateUrl: './upload-media.component.html',
 })
 export class UploadMediaComponent {
+  constructor(private uploadMediaService: UploadMediaService) {}
+
   UploadSteps = UploadSteps;
   currentStep: UploadSteps = UploadSteps.FileSelection;
   isDraggingOver: boolean = false;
-  allowedMediaFormats: string[] = ['video/mp4', 'video/mov', 'video/mkv', 'video/hevc'];
+  allowedMediaFormats: string[] = ['video/mp4', 'video/mov', 'video/x-matroska', 'video/hevc'];
   allowedThumbnailFormats: string[] = ['image/PNG', 'image/jpg', 'image/JPEG'];
 
   mediaFile: File | null = null;
@@ -99,6 +106,8 @@ export class UploadMediaComponent {
   }
   goToUploading() {
     this.currentStep = UploadSteps.Uploading;
+    this.uploadMediaService.uploadFile(this.mediaFile!, '');
+    // this.uploadMediaService.uploadSmallFile(this.mediaFile!, '');
   }
 
   onChangeTitle(event: Event) {
