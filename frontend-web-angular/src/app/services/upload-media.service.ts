@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
 // import { HttpRequest } from '@angular/common/http';
-
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UploadMediaService {
+  // chunkProgress: number = 0;
+  totalProgress: number = 0;
+  CHUNK_SIZE = 150 * 1024 * 1024; // 100MB chunk size
+  totalChunks?: number;
+  fileMediaName?: string;
   constructor(private http: HttpClient) {}
 
   uploadSmallFile(file: File, url: string): Observable<HttpEvent<any>> {
@@ -24,32 +28,34 @@ export class UploadMediaService {
     return this.http.request(req);
   }
 
-  async uploadFile(file: File, url: string): Promise<Observable<HttpEvent<any>>[]> {
-    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB chunk size
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-    // const chunkProgress = 100 / totalChunks;
-    // Random identifier if user uploads the same named file
-    const fileName = Math.random().toString(36).slice(-6) + file.name;
+  uploadFile(file: File) {
+    this.totalChunks = Math.ceil(file.size / this.CHUNK_SIZE);
+    this.fileMediaName = Math.random().toString(36).slice(-6) + file.name;
+  }
 
-    const requests: Observable<HttpEvent<any>>[] = [];
-
-    for (let chunk = 0; chunk < totalChunks; chunk++) {
-      const CHUNK = file.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE);
+  uploadFileChunk(file: File, url: string, chunk: number): Observable<HttpEvent<any>> {
+    if (this.totalChunks != null && this.fileMediaName != null) {
+      const CHUNK = file.slice(chunk * this.CHUNK_SIZE, (chunk + 1) * this.CHUNK_SIZE);
       const formData: FormData = new FormData();
+
       formData.append('file', CHUNK);
       formData.append('chunk', String(chunk));
-      formData.append('chunks', String(totalChunks));
-      formData.append('originalname', fileName);
+      formData.append('chunks', String(this.totalChunks));
+      formData.append('originalname', this.fileMediaName);
 
       const req = new HttpRequest('POST', url, formData, {
         reportProgress: true,
         responseType: 'json',
       });
-      console.log((chunk + 1).toString() + '/' + totalChunks.toString());
-      console.log(req);
-
-      requests.push(this.http.request(req));
+      return new Observable((subscriber) => {
+        const subscription = this.http.request(req).subscribe({
+          next: (event) => subscriber.next(event),
+          error: (error) => subscriber.error(error),
+          complete: () => subscriber.complete(),
+        });
+        return () => subscription.unsubscribe();
+      });
     }
-    return requests;
+    return throwError(() => new Error('Total chunks or file media name is not set.'));
   }
 }

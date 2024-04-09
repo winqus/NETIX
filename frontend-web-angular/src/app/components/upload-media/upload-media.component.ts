@@ -19,7 +19,7 @@ enum UploadSteps {
   templateUrl: './upload-media.component.html',
 })
 export class UploadMediaComponent {
-  constructor(private uploadMediaService: UploadMediaService) {}
+  constructor(public uploadMediaService: UploadMediaService) {}
 
   UploadSteps = UploadSteps;
   currentStep: UploadSteps = UploadSteps.FileSelection;
@@ -33,6 +33,8 @@ export class UploadMediaComponent {
   mediaDescription: string = '';
   mediaDate!: Date;
   mediaUpdatedAt!: Date;
+
+  mediaUploadProgress: number = 0;
 
   //file upload
   onFileSelected(event: Event, _isMedia: boolean = false, _isThumbnail: boolean = false) {
@@ -72,6 +74,7 @@ export class UploadMediaComponent {
 
   setMediaFile(file: File) {
     if (this.isValidMediaFormat(file)) {
+      console.log(file);
       this.mediaFile = file;
     } else {
       alert('Invalid file format. Please upload a valid video file.');
@@ -106,8 +109,7 @@ export class UploadMediaComponent {
   }
   goToUploading() {
     this.currentStep = UploadSteps.Uploading;
-    this.uploadMediaService.uploadFile(this.mediaFile!, '');
-    // this.uploadMediaService.uploadSmallFile(this.mediaFile!, '');
+    this.uploadMedia();
   }
 
   onChangeTitle(event: Event) {
@@ -146,6 +148,18 @@ export class UploadMediaComponent {
         return '100';
       default:
         return '0';
+    }
+  }
+  mediaFormats(formats: string[]): string {
+    return formats.join(',');
+  }
+
+  async uploadMedia() {
+    this.uploadMediaService.uploadFile(this.mediaFile!);
+    const progressChunk = 100 / this.uploadMediaService.totalChunks!;
+    for (let chunk = 0; chunk < this.uploadMediaService.totalChunks!; chunk++) {
+      this.mediaUploadProgress += progressChunk;
+      this.uploadMediaService.uploadFileChunk(this.mediaFile!, '', chunk).subscribe();
     }
   }
 }

@@ -25,7 +25,7 @@
         } @else {
           <p class="text-ellipsis overflow-hidden w-full mb-2 text-sm text-center"><span class="font-semibold">Uploaded</span> {{ this.mediaFile.name }}</p>
         }
-        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, true)" accept="video/mp4,video/mov,video/x-matroska,video/hevc" />
+        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, true)" [accept]="mediaFormats(allowedMediaFormats)" />
       </label>
     </div>
     <div class="flex-[1] content-center">
@@ -84,7 +84,7 @@
         } @else {
           <p class="text-ellipsis overflow-hidden w-full mb-2 text-sm text-center"><span class="font-semibold">Uploaded</span> {{ this.mediaThumbnail.name }}</p>
         }
-        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, false, true)" accept="image/PNG, image/jpg, image/JPEG" />
+        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, false, true)" [accept]="mediaFormats(allowedThumbnailFormats)" />
       </label>
     </div>
     <div class="flex-[1] content-center">
@@ -95,5 +95,9 @@
         </div>
       </div>
     </div>
-  } @else if (currentStep === UploadSteps.Uploading) {}
+  } @else if (currentStep === UploadSteps.Uploading) {
+    <progress class="progress progress-info w-[80%] m-12" [value]="mediaUploadProgress" max="100"></progress>
+
+    <h1>{{ mediaUploadProgress }}/ 100</h1>
+  }
 </div>
