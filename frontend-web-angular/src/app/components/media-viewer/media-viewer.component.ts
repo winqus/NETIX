@@ -26,7 +26,10 @@ export class MediaViewerComponent implements OnDestroy {
 
   setupPlayer() {
     const video = this.videoElement.nativeElement;
-    const src = 'http://127.0.0.1:8080/streams/myMovieOutputFolder1080p/output.m3u8'; // HLS source
+    // const src = 'http://127.0.0.1:8080/streams/myMovieOutputFolder1080p/output.m3u8'; // HLS source
+    // const src = 'http://127.0.0.1:8080/streams/soloOutput2SameRes/output.m3u8'; // HLS source
+    // const src = '/api/streams/soloOutput2SameRes/output.m3u8'; // HLS source
+    const src = '/api/streams/myMovieOutputFolder1080p/output.m3u8'; // HLS source
 
     if (Hls.isSupported()) {
       this.hls = new Hls();
