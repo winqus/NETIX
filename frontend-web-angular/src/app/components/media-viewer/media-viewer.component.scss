@@ -1,0 +1,8 @@
+.plyr-video {
+  width: 100% !important; /* Fill the width of its container */
+  height: auto !important; /* Maintain aspect ratio */
+  max-height: 100%; /* Ensure it doesn't overflow its container */
+
+  /* Use object-fit to ensure the video content fits within the player frame */
+  object-fit: contain !important;
+}
