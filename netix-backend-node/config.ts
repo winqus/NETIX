@@ -18,6 +18,27 @@ interface AppConfig {
   api: {
     prefix: string;
   };
+  upload: {
+    video: {
+      maxDurationSeconds: number;
+      maxSizeBytes: number;
+      allowedMimeTypes: string[];
+      resolution: {
+        minWidth: number;
+        minHeight: number;
+        maxWidth: number;
+        maxHeight: number;
+      };
+    };
+    thumbnail: {
+      maxSizeBytes: number;
+      allowedMimeTypes: string[];
+      aspectRatio: {
+        width: number;
+        height: number;
+      };
+    };
+  };
 }
 
 const envFound = dotenv.config();
@@ -37,7 +58,29 @@ const config: AppConfig = {
   port: parseInt(env.PORT, 10) || 3055,
 
   api: {
-    prefix: '/api/v1',
+    prefix: '/api',
+  },
+
+  upload: {
+    video: {
+      maxDurationSeconds: 10 * 3600, // 10 hours
+      maxSizeBytes: 20 * 1073741824, // 20 GB
+      allowedMimeTypes: ['video/mp4', 'video/quicktime', 'video/x-matroska'],
+      resolution: {
+        minWidth: 640,
+        minHeight: 360,
+        maxWidth: 1920,
+        maxHeight: 1080,
+      },
+    },
+    thumbnail: {
+      maxSizeBytes: 50 * 1024, // 50 KB
+      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      aspectRatio: {
+        width: 12,
+        height: 17,
+      },
+    },
   },
 };
 export default config;
