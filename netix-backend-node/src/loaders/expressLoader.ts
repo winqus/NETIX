@@ -1,9 +1,9 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
-import config from '../../config';
 import celebrateErrorHandler from '../api/middlewares/celebrateErrorHandler';
 import routes from '../api/routes';
+import config from '../config';
 import ErrorResponse from '../models/errorResponse.model';
 import { wLoggerInstance as logger, morganMiddleware } from './logger';
 
