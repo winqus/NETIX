@@ -17,12 +17,16 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
 
   /* More about different options at https://videojs.com/guides/options/ */
   options = {
-    fluid: true,
-    aspectRatio: '16:9',
-    autoplay: true,
+    // fluid: true,
+    fill: true,
+    // aspectRatio: '1:3',
+    // autoplay: true,
+    // responsive: true,
     sources: [
       {
-        src: '/api/streams/soloOutput2SameRes/output.m3u8',
+        // src: '/api/streams/meme/output.m3u8',
+        src: '/api/streams/meme2/output.m3u8',
+        // src: '/api/streams/dune/output.m3u8',
         // src: '/api/streams/myMovieOutputFolder/output.m3u8',
         // src: '/api/streams/meme/output.m3u8',
         type: 'application/vnd.apple.mpegurl',
