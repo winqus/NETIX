@@ -9,7 +9,9 @@
     "inspect": "nodemon --inspect src/index.ts",
     "start-dist": "node dist/index.js",
     "lint": "eslint src/**/*.ts",
-    "format": "eslint src/**/*.ts --fix"
+    "format": "eslint src/**/*.ts --fix",
+    "docker-compose-up": "docker-compose up -d",
+    "docker-compose-down": "docker-compose down"
   },
   "keywords": [],
   "author": "",
@@ -18,14 +20,18 @@
     "@types/uuid": "^9.0.8",
     "axios": "^1.6.8",
     "body-parser": "^1.20.2",
+    "bullmq": "^5.7.1",
     "celebrate": "^15.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "ioredis": "^5.3.2",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.1",
     "morgan": "^1.10.0",
-    "uuid": "^9.0.1",
     "reflect-metadata": "^0.2.2",
     "typedi": "^0.10.0",
+    "uuid": "^9.0.1",
     "winston": "^3.13.0"
   },
   "devDependencies": {
