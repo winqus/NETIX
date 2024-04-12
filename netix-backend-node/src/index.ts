@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
-import config from '../config';
+import 'reflect-metadata';
+import config from './config';
 import loaders from './loaders';
 import { wLoggerInstance as logger } from './loaders/logger';
 

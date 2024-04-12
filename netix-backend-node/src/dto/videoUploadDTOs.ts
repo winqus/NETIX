@@ -4,8 +4,8 @@ export interface VideoUploadConstraintsDTO {
 }
 
 export interface VideoFileUploadContraintsDTO {
-  maxDurationInSeconds: number;
-  maxSizeInBytes: number;
+  durationInSeconds: { min: number; max: number };
+  sizeInBytes: { min: number; max: number };
   allowedMimeTypes: string[];
   resolution: {
     minWidth: number;
@@ -16,7 +16,7 @@ export interface VideoFileUploadContraintsDTO {
 }
 
 export interface VideoThumbnailUploadConstraintsDTO {
-  maxSizeInBytes: number;
+  maxSizeBytes: number;
   allowedMimeTypes: string[];
   resolution: {
     minWidth: number;

@@ -15,6 +15,12 @@ export interface VideoConfig {
   thumbnail: {
     maxSizeBytes: number;
     allowedMimeTypes: string[];
+    resolution: {
+      minWidth: number;
+      minHeight: number;
+      maxWidth: number;
+      maxHeight: number;
+    };
     aspectRatio: {
       width: number;
       height: number;
@@ -39,6 +45,12 @@ export const config: VideoConfig = {
   thumbnail: {
     maxSizeBytes: 50 * 1024, // 50 KB
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    resolution: {
+      minWidth: 100,
+      minHeight: 100,
+      maxWidth: 1920,
+      maxHeight: 1080,
+    },
     aspectRatio: {
       width: 12,
       height: 17,

@@ -31,11 +31,12 @@ export default (app: express.Application) => {
   // Load API routes
   app.use(config.api.prefix, routes());
 
-  // Catch other not matched routes (404) and forward to error handler
-  app.use((_req: Request, _res: Response, next) => {
-    const error: any = new Error('Not Found');
-    error['status'] = 404;
-    next(error);
+  // Catch other not matched routes (404)
+  app.use((_req: Request, res: Response, _next: NextFunction) => {
+    logger.error(`[server]: Not Found`);
+    res.status(404);
+    const response: ErrorResponse = { message: 'Not Found' };
+    res.json(response);
   });
 
   /*
