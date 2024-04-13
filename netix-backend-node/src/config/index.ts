@@ -17,6 +17,7 @@ interface AppEnvironment extends NodeJS.ProcessEnv {
 interface AppConfig {
   environment: EnvironmentType;
   port: number;
+  mongoDbUri: string;
   api: {
     prefix: string;
   };
@@ -41,6 +42,8 @@ const config: AppConfig = {
   environment: getCurrentEnvironment(env.NODE_ENV),
 
   port: parseInt(env.PORT, 10) || 3055,
+
+  mongoDbUri: env.MONGODB_URI || 'mongodb://127.0.0.1:27017/test',
 
   api: {
     prefix: '/api',
