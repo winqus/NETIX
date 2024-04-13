@@ -42,7 +42,7 @@
     "lines-between-class-members": [
       "error",
       {
-        "enforce": [{ "blankLine": "never", "prev": "method", "next": "method" }]
+        "enforce": [{ "blankLine": "always", "prev": "method", "next": "method" }]
       }
     ],
     "arrow-parens": ["error", "always"],

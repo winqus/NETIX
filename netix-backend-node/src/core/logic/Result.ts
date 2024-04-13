@@ -19,6 +19,7 @@ export class Result<T> {
 
     Object.freeze(this);
   }
+
   public getValue(): T {
     if (!this.isSuccess) {
       console.error(this.error);
@@ -31,15 +32,19 @@ export class Result<T> {
 
     return this._value;
   }
+
   public errorValue(): T | string | null {
     return this.error;
   }
+
   public static ok<U>(value?: U): Result<U> {
     return new Result<U>(true, undefined, value);
   }
+
   public static fail<U>(error: any): Result<U> {
     return new Result<U>(false, error);
   }
+
   public static combine(results: Result<any>[]): Result<any> {
     for (const result of results) {
       if (result.isFailure) {
