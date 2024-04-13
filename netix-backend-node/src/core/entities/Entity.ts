@@ -1,14 +1,16 @@
 import UniqueEntityID from './UniqueEntityID';
 
 export default abstract class Entity<T> {
-  protected readonly uuid: UniqueEntityID;
-  protected readonly createdAt: Date;
-  public readonly props: T;
+  public uuid: UniqueEntityID;
+  public props: T;
+  public createdAt: Date;
+  public updatedAt: Date;
 
-  constructor(props: T, uuid?: UniqueEntityID) {
+  constructor(props: T, uuid?: UniqueEntityID, createdAt?: Date, updatedAt?: Date) {
     this.props = props;
     this.uuid = uuid || new UniqueEntityID();
-    this.createdAt = new Date();
+    this.createdAt = createdAt || new Date();
+    this.updatedAt = updatedAt || this.createdAt;
   }
 
   public equals(object?: Entity<T>): boolean {
