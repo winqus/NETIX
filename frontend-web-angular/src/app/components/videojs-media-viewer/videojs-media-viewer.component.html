@@ -12,9 +12,10 @@
     <!-- <div> -->
     <div #timeline class="timeline-container flex items-center h-[8px] cursor-pointer" (mouseenter)="onMouseEnter()" (mousedown)="onMouseDown($event)" (mouseleave)="onMouseLeave($event)">
       <div [style.--preview-position]="previewProgress()" [style.--progress-position]="progress()" class="timeline-b h-[4px] hover:h-full w-full bg-slate-600 rounded-md relative before:rounded-md">
-        <div class="thumb-indicator">
-          <div class="time-tooltip absolute -mt-8 bg-black text-white text-xs rounded py-1 px-2 hidden" [style.left.px]="tooltipPosition" [innerText]="currentTooltipTime"></div>
-        </div>
+        <div class="thumb-indicator"></div>
+      </div>
+      <div class="absolute bottom-20 text-center w-32" [style.visibility]="isInTimeline ? 'visible' : 'hidden'" [style.left.px]="tooltipPosition">
+        <div class="text-white" [innerText]="currentTooltipTime"></div>
       </div>
     </div>
 

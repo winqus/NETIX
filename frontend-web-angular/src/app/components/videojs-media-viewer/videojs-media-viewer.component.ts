@@ -204,8 +204,36 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     const newProgress = ((event.clientX - rect.left) * 100) / rect.width;
     if (newProgress >= 0 && newProgress <= 100 && this.duration != undefined) {
       this.newTime = (newProgress * this.duration) / 100;
+      this.currentTooltipTime = this.convertToTime(this.newTime);
+      this.tooltipPosition = event.clientX - 64;
       // console.log(newProgress + ' ' + this.currentTime! + ' ' + this.newTime + ' ' + this.duration);
       // this.player.currentTime((this.newTime * this.duration) / 100);
     }
   }
+  // thumb tool tip
+  tooltipPosition: number = 0;
+  currentTooltipTime: string = '';
+
+  // updateTooltip(event: MouseEvent): void {
+  //   const timelineRect = this.videoTimeline.nativeElement.getBoundingClientRect();
+  //   const position = event.clientX - timelineRect.left; // Position within the timeline
+  //   this.tooltipPosition = position;
+  //   const time = this.calculateTimeFromPosition(position);
+  //   this.currentTooltipTime = this.formatTime(time);
+  // }
+
+  // calculateTimeFromPosition(position: number): number {
+  //   // Assuming the max position is the width of the timeline
+  //   const timelineWidth = this.videoTimeline.nativeElement.offsetWidth;
+  //   const time = (position / timelineWidth) * this.duration!; // Calculate time based on position
+  //   return time;
+  // }
+
+  // formatTime(seconds: number): string {
+  //   // Format seconds into a time string (HH:MM:SS or MM:SS)
+  //   const date = new Date(0);
+  //   date.setSeconds(seconds); // Set the seconds
+  //   const timeString = date.toISOString().substr(11, 8);
+  //   return timeString.startsWith('00:') ? timeString.substr(3) : timeString;
+  // }
 }
