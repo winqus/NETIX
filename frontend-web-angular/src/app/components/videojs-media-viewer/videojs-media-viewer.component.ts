@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
 import { FormsModule } from '@angular/forms';
@@ -12,15 +12,17 @@ import { FormsModule } from '@angular/forms';
 })
 export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   @ViewChild('videoPlayer', { static: true }) videoPlayerElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('timeline', { static: true }) videoTimeline!: ElementRef<HTMLElement>;
 
   player!: Player;
 
   options = {
     fill: true,
     responsive: true,
+    autoplay: true,
     sources: [
       {
-        // src: 'assets/meme.mp4',
+        // src: 'assets/meme4.mp4',
         // type: 'video/mp4',
 
         src: '/api/streams/meme/output.m3u8',
@@ -59,7 +61,7 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     const target = this.videoPlayerElement.nativeElement;
 
     this.player = videojs(target, this.options);
-    this.player.volume(this.volume);
+    this.changeVolume();
   }
   // Controls
 
@@ -108,7 +110,25 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   }
 
   changeVolume(): void {
+    const slider = document.querySelector('.slider') as HTMLInputElement;
+    slider.style.setProperty('--thumb-position', `${this.volume * 100}%`);
     this.player.volume(this.volume);
+  }
+
+  sliderVisible: boolean = false;
+
+  showSlider(): void {
+    this.sliderVisible = true;
+  }
+
+  hideSlider(event: MouseEvent): void {
+    if (!event.relatedTarget || !(event.relatedTarget as Element).classList.contains('slider')) {
+      this.sliderVisible = false;
+    }
+  }
+
+  keepSliderVisible(): void {
+    this.sliderVisible = true;
   }
 
   // fullscreen
@@ -121,46 +141,71 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   }
   // timeline
   previewProgress(): string {
-    if (this.newTime != 0) {
-      return this.newTime.toFixed(20) + '%';
+    if (this.newTime != 0 && this.duration != undefined && this.isInTimeline) {
+      return ((this.newTime / this.duration) * 100).toFixed(20) + '%';
     } else {
       return (this.player.bufferedPercent() * 100).toFixed(20) + '%';
     }
   }
   progress(): string {
     if (this.currentTime == undefined || this.duration == undefined) return '0%';
+    if (this.isDragging) {
+      this.currentTime = this.newTime;
+    }
     return ((this.currentTime / this.duration) * 100).toFixed(20) + '%';
   }
 
   isDragging = false;
+  isInTimeline = false;
   onMouseDown(event: MouseEvent): void {
     this.isDragging = true;
     this.seek(event);
-    if (this.duration != undefined && this.newTime >= 0 && this.newTime <= 100) {
-      // console.log(this.newTime + ' ' + this.duration + ' ' + (this.newTime * this.duration) / 100);
-      this.player.currentTime((this.newTime * this.duration) / 100);
-    }
+    this.currentTime = this.newTime;
   }
-
+  @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
+    // if (this.isDragging) {
+    // if (this.mouseEventLeavesWindow(event)) {
+    // this.isDragging = false;
+    // }
     this.seek(event);
+    // }
   }
-
+  @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     this.isDragging = false;
     this.seek(event);
-    this.newTime = 0;
+    this.player.currentTime(this.currentTime);
   }
-
+  onMouseEnter(): void {
+    this.isInTimeline = true;
+  }
+  onMouseLeave(event: MouseEvent): void {
+    this.isInTimeline = false;
+    this.seek(event);
+    // console.log(this.newTime + ' ' + this.currentTime!);
+    // this.newTime = 0;
+  }
+  @HostListener('document:mouseout', ['$event'])
+  onMouseOut(event: MouseEvent): void {
+    if (this.mouseEventLeavesWindow(event)) {
+      this.onMouseUp(event);
+    }
+  }
+  private mouseEventLeavesWindow(event: MouseEvent): boolean {
+    // Check if the mouse has actually left the window
+    return event.clientX <= 0 || event.clientX >= window.innerWidth || event.clientY <= 0 || event.clientY >= window.innerHeight;
+  }
   seek(event: MouseEvent): void {
-    const timeline = (event.target as HTMLElement).closest('.timeline-container') as HTMLElement;
-    const rect = timeline.getBoundingClientRect();
-    this.newTime = ((event.clientX - rect.left) * 100) / rect.width;
-    if (this.isDragging) {
-      console.log(this.isDragging);
-      if (this.duration != undefined && this.newTime >= 0 && this.newTime <= 100) {
-        this.player.currentTime((this.newTime * this.duration) / 100);
-      }
+    // const timeline = (event.target as HTMLElement).closest('.timeline-container') as HTMLElement;
+    // const rect = timeline.getBoundingClientRect();
+    const rect = this.videoTimeline.nativeElement.getBoundingClientRect();
+
+    const newProgress = ((event.clientX - rect.left) * 100) / rect.width;
+    if (newProgress >= 0 && newProgress <= 100 && this.duration != undefined) {
+      this.newTime = (newProgress * this.duration) / 100;
+      // console.log(newProgress + ' ' + this.currentTime! + ' ' + this.newTime + ' ' + this.duration);
+      // this.player.currentTime((this.newTime * this.duration) / 100);
     }
   }
 }

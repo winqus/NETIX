@@ -1,18 +1,3 @@
-// .timeline-container {
-//   //   height: 7px;
-//   //   margin-inline: 0.5rem;
-//   cursor: pointer;
-// }
-// .timeline-container:hover {
-//   //   height: 100%;
-//   //   margin-inline: 0.5rem;
-//   //   cursor: pointer;
-// }
-// .timeline-b {
-//   //   background-color: aqua;
-//   //   height: 3px;
-//   //   width: 100%;
-// }
 .timeline-b::before {
   content: '';
   position: absolute;
@@ -44,4 +29,37 @@
   border-radius: 50%;
   transition: transform 150ms ease-in-out;
   aspect-ratio: 1 / 1;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgb(71, 85, 105);
+  outline: none;
+  position: relative;
+  cursor: pointer;
+  transform-origin: left center;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.slider::before {
+  width: var(--thumb-position, 0%);
+  border-radius: 6px;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: white;
+  z-index: 1;
 }

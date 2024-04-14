@@ -1,37 +1,38 @@
-<div class="relative w-full h-full bg-white">
+<!-- TODO make volume slider animation: growing from left to right -->
+<!-- TODO Show title at the top with a description -->
+<!-- TODO make that spacebar pauses and plays video -->
+<!-- TODO when clicked in on the screen pauses and plays video -->
+<!-- TODO h key hides controls -->
+<!-- TODO add timestamp on mouse -->
+
+<div class="relative w-full h-full bg-white select-none">
   <video #videoPlayer class="vjs-matrix video-js" playsinline preload="auto"></video>
 
-  <div class="absolute bottom-0 left-0 w-full bg-black-to-transparent px-2">
-    <!-- </div> -->
+  <div class="absolute bottom-0 left-0 w-full bg-black-to-transparent px-2 pb-2">
     <!-- <div> -->
-    <div
-      class="timeline-container flex items-center h-[7px] cursor-pointer"
-      (mousedown)="onMouseDown($event)"
-      (mousemove)="onMouseMove($event)"
-      (mouseup)="onMouseUp($event)"
-      (mouseleave)="onMouseUp($event)"
-    >
-      <div [style.--preview-position]="previewProgress()" [style.--progress-position]="progress()" class="timeline-b h-[3px] hover:h-full w-full bg-slate-600 rounded-md relative before:rounded-md">
-        <div class="thumb-indicator"></div>
+    <div #timeline class="timeline-container flex items-center h-[8px] cursor-pointer" (mouseenter)="onMouseEnter()" (mousedown)="onMouseDown($event)" (mouseleave)="onMouseLeave($event)">
+      <div [style.--preview-position]="previewProgress()" [style.--progress-position]="progress()" class="timeline-b h-[4px] hover:h-full w-full bg-slate-600 rounded-md relative before:rounded-md">
+        <div class="thumb-indicator">
+          <div class="time-tooltip absolute -mt-8 bg-black text-white text-xs rounded py-1 px-2 hidden" [style.left.px]="tooltipPosition" [innerText]="currentTooltipTime"></div>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center justify-center text-white">
-      <div class="flex-1">{{ convertToTime(this.player.currentTime()) }}</div>
-      <div class="flex-1 text-right">{{ convertToTime(this.player.duration()) }}</div>
-    </div>
     <div id="video-controls" class="flex items-center justify-center align-middle">
       <div class="flex-1">
-        <div class="flex items-center justify-start align-middle space-x-3">
-          <button class="btn btn-circle" (click)="toggleMute()">
+        <div class="flex items-center justify-center text-white">
+          <div class="flex-1">{{ convertToTime(this.player.currentTime()) }}</div>
+        </div>
+        <div class="flex items-center justify-start align-middle" (mouseleave)="hideSlider($event)">
+          <button class="btn btn-circle min-h-[2rem] h-[2rem] w-[2rem]" (mouseenter)="showSlider()" (click)="toggleMute()">
             @if (this.player.muted() || volume === 0) {
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-volume-mute-fill" viewBox="0 0 16 16">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
                 <path
                   d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06m7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0"
                 />
               </svg>
             } @else if (volume > 0.7) {
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-volume-up-fill" viewBox="0 0 16 16">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
                 <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z" />
                 <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z" />
                 <path
@@ -39,50 +40,61 @@
                 />
               </svg>
             } @else if (volume > 0.4) {
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-volume-down-fill" viewBox="0 0 16 16">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
                 <path
                   d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12zm3.025 4a4.5 4.5 0 0 1-1.318 3.182L10 10.475A3.5 3.5 0 0 0 11.025 8 3.5 3.5 0 0 0 10 5.525l.707-.707A4.5 4.5 0 0 1 12.025 8"
                 />
               </svg>
             } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-volume-off-fill" viewBox="0 0 16 16">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
                 <path d="M10.717 3.55A.5.5 0 0 1 11 4v8a.5.5 0 0 1-.812.39L7.825 10.5H5.5A.5.5 0 0 1 5 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06" />
               </svg>
             }
           </button>
-          <input type="range" min="0" max="1" step="0.01" [(ngModel)]="volume" class="range range-xs [--range-shdw:white] w-32" (input)="changeVolume()" />
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            [(ngModel)]="volume"
+            [style.opacity]="sliderVisible ? '1' : '0'"
+            [style.visibility]="sliderVisible ? 'visible' : 'hidden'"
+            class="slider w-32 h-[4px] rounded-md opacity-0 ml-3 transition-opacity duration-300 ease-in-out group-hover:opacity-100 absolute"
+            (input)="changeVolume()"
+          />
         </div>
       </div>
       <div class="text-center">
         <button class="btn btn-circle" (click)="togglePlay()">
           @if (isPlaying()) {
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="swap-on bi bi-play-fill" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
               <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
             </svg>
           } @else {
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="swap-off bi bi-pause-fill" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
               <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
             </svg>
           }
         </button>
       </div>
       <div class="flex-1 text-right">
+        <div class="flex items-center justify-center text-white">
+          <div class="flex-1 text-right">{{ convertToTime(this.player.duration()) }}</div>
+        </div>
         <div class="flex items-center justify-end align-middle space-x-3">
-          <button class="btn btn-circle">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip" viewBox="0 0 16 16">
+          <button class="btn btn-circle min-h-[2rem] h-[2rem] w-[2rem]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
               <path
                 d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"
               />
               <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z" />
             </svg>
           </button>
-          <button class="btn btn-circle" (click)="toggleFullscreen()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-fullscreen" viewBox="0 0 16 16">
-                <path
-                  d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"
-                />
-              </svg>
+          <button class="btn btn-circle min-h-[2rem] h-[2rem] w-[2rem]" (click)="toggleFullscreen()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+              <path
+                d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"
+              />
             </svg>
           </button>
         </div>
