@@ -1,3 +1,8 @@
+//  TODO make volume slider animation: growing from left to right
+//  TODO buffer
+//  TODO when mouse idle the controls should vanish
+//? TODO tooltips on buttons?
+
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
@@ -11,8 +16,10 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./videojs-media-viewer.component.scss'],
 })
 export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
+  @ViewChild('fullscreenContainer', { static: true }) fullscreenContainer!: ElementRef<HTMLElement>;
   @ViewChild('videoPlayer', { static: true }) videoPlayerElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('timeline', { static: true }) videoTimeline!: ElementRef<HTMLElement>;
+  @ViewChild('thumbTooltip', { static: true }) thumbTooltip!: ElementRef<HTMLElement>;
 
   player!: Player;
 
@@ -32,6 +39,8 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
       },
     ],
   };
+
+  videoTitle = 'Star Wars';
 
   volume: number = 1.0; // Default volume
   currentTime: number | undefined = 0;
@@ -64,7 +73,40 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     this.changeVolume();
   }
   // Controls
+  controlsVisible: boolean = true;
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    switch (event.key) {
+      case ' ':
+        event.preventDefault();
+        this.togglePlay();
+        break;
+      case 'h':
+        // this.toggleControls();
+        this.controlsVisible = !this.controlsVisible;
+        break;
+    }
+  }
+  lastClickTime!: number;
+  onClick(): void {
+    console.log(this.lastClickTime);
+    // Prevent double click from triggering this twice
+    const currentTime = new Date().getTime();
+    if (currentTime - (this.lastClickTime || 0) < 300) {
+      return;
+    }
 
+    this.lastClickTime = currentTime;
+
+    setTimeout(() => {
+      if (currentTime === this.lastClickTime) {
+        this.togglePlay();
+      }
+    }, 300);
+  }
+  onDoubleClick(): void {
+    this.toggleFullscreen();
+  }
   // time
   convertToTime(timeInSeconds: number | undefined): string {
     if (timeInSeconds == undefined) return '00:00:00';
@@ -104,6 +146,23 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
       return true;
     }
   }
+  // forward/backward
+  goForward() {
+    if (this.duration != undefined && this.currentTime != undefined && this.currentTime + 10 <= this.duration) {
+      this.currentTime += 10;
+      this.player.currentTime(this.currentTime);
+    } else {
+      this.player.currentTime(this.duration);
+    }
+  }
+  goBackward() {
+    if (this.duration != undefined && this.currentTime != undefined && this.currentTime - 10 >= 0) {
+      this.currentTime -= 10;
+      this.player.currentTime(this.currentTime);
+    } else {
+      this.player.currentTime(0);
+    }
+  }
   // volume
   toggleMute(): void {
     this.player.muted(!this.player.muted());
@@ -132,13 +191,38 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   }
 
   // fullscreen
-  toggleFullscreen(): void {
-    if (!this.player.isFullscreen()) {
-      this.player.requestFullscreen();
+  // toggleFullscreen(): void {
+  //   if (!this.player.isFullscreen()) {
+  //     this.player.requestFullscreen();
+  //   } else {
+  //     this.player.exitFullscreen();
+  //   }
+  // }
+  isInFullscreen: boolean = false;
+  toggleFullscreen() {
+    const elem = this.fullscreenContainer.nativeElement;
+
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+        this.isInFullscreen = true;
+      }
     } else {
-      this.player.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        this.isInFullscreen = false;
+      }
     }
   }
+  // Picture In Picture
+  enablePictureInPicture() {
+    if (!this.player.isInPictureInPicture()) {
+      this.player.requestPictureInPicture();
+    } else {
+      this.player.exitPictureInPicture();
+    }
+  }
+
   // timeline
   previewProgress(): string {
     if (this.newTime != 0 && this.duration != undefined && this.isInTimeline) {
@@ -164,12 +248,7 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   }
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    // if (this.isDragging) {
-    // if (this.mouseEventLeavesWindow(event)) {
-    // this.isDragging = false;
-    // }
     this.seek(event);
-    // }
   }
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
@@ -183,8 +262,6 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   onMouseLeave(event: MouseEvent): void {
     this.isInTimeline = false;
     this.seek(event);
-    // console.log(this.newTime + ' ' + this.currentTime!);
-    // this.newTime = 0;
   }
   @HostListener('document:mouseout', ['$event'])
   onMouseOut(event: MouseEvent): void {
@@ -193,47 +270,27 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     }
   }
   private mouseEventLeavesWindow(event: MouseEvent): boolean {
-    // Check if the mouse has actually left the window
     return event.clientX <= 0 || event.clientX >= window.innerWidth || event.clientY <= 0 || event.clientY >= window.innerHeight;
   }
   seek(event: MouseEvent): void {
-    // const timeline = (event.target as HTMLElement).closest('.timeline-container') as HTMLElement;
-    // const rect = timeline.getBoundingClientRect();
     const rect = this.videoTimeline.nativeElement.getBoundingClientRect();
+    const toolTipRect = this.thumbTooltip.nativeElement.getBoundingClientRect();
 
     const newProgress = ((event.clientX - rect.left) * 100) / rect.width;
     if (newProgress >= 0 && newProgress <= 100 && this.duration != undefined) {
       this.newTime = (newProgress * this.duration) / 100;
       this.currentTooltipTime = this.convertToTime(this.newTime);
-      this.tooltipPosition = event.clientX - 64;
-      // console.log(newProgress + ' ' + this.currentTime! + ' ' + this.newTime + ' ' + this.duration);
-      // this.player.currentTime((this.newTime * this.duration) / 100);
+
+      if (event.x <= toolTipRect.width / 2 + rect.left) {
+        this.tooltipPosition = event.clientX - event.x + rect.left;
+      } else if (event.x >= rect.width - toolTipRect.width / 2 + rect.left) {
+        this.tooltipPosition = rect.width - toolTipRect.width + rect.left;
+      } else {
+        this.tooltipPosition = event.clientX - toolTipRect.width / 2;
+      }
     }
   }
   // thumb tool tip
   tooltipPosition: number = 0;
   currentTooltipTime: string = '';
-
-  // updateTooltip(event: MouseEvent): void {
-  //   const timelineRect = this.videoTimeline.nativeElement.getBoundingClientRect();
-  //   const position = event.clientX - timelineRect.left; // Position within the timeline
-  //   this.tooltipPosition = position;
-  //   const time = this.calculateTimeFromPosition(position);
-  //   this.currentTooltipTime = this.formatTime(time);
-  // }
-
-  // calculateTimeFromPosition(position: number): number {
-  //   // Assuming the max position is the width of the timeline
-  //   const timelineWidth = this.videoTimeline.nativeElement.offsetWidth;
-  //   const time = (position / timelineWidth) * this.duration!; // Calculate time based on position
-  //   return time;
-  // }
-
-  // formatTime(seconds: number): string {
-  //   // Format seconds into a time string (HH:MM:SS or MM:SS)
-  //   const date = new Date(0);
-  //   date.setSeconds(seconds); // Set the seconds
-  //   const timeString = date.toISOString().substr(11, 8);
-  //   return timeString.startsWith('00:') ? timeString.substr(3) : timeString;
-  // }
 }
