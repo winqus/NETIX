@@ -17,14 +17,18 @@ export default class SystemFileService implements IFileService {
     } catch (error) {
       this.logger.error(`[SystemFileService]: ${error}`);
 
-      return Result.fail<void>(error);
+      return Result.fail(error);
     }
   }
 
   public async makeDirIfNotExists(dirPath: string): Promise<Result<void>> {
     try {
+      if (!dirPath) {
+        return Result.fail<void>('Invalid directory path');
+      }
+
       if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath);
+        fs.mkdirSync(dirPath, { recursive: true });
         this.logger.info(`[SystemFileService]: Directory created at ${dirPath}`);
       }
 

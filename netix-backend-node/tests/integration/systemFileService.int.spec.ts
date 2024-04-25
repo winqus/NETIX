@@ -39,6 +39,14 @@ describe('SystemFileService with real file interactions', () => {
     expect(fs.existsSync(dirPath)).toBe(true);
   });
 
+  it('should create directories recursively if they do not exist', async () => {
+    const dirPath = path.join(testDirPath, 'newDir', 'subDir', 'subSubDir');
+
+    await fileService.makeDirIfNotExists(dirPath);
+
+    expect(fs.existsSync(dirPath)).toBe(true);
+  });
+
   it('should overwrite a file if it already exists', async () => {
     const filePath = path.join(testDirPath, 'someFile.txt');
     fs.writeFileSync(filePath, 'old data');
