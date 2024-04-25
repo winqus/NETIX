@@ -46,6 +46,9 @@
       }
     ],
     "arrow-parens": ["error", "always"],
-    "curly": ["error", "all"]
+    "curly": ["error", "all"],
+    // "function-paren-newline": ["error", "multiline"],
+    // "function-paren-newline": ["error", { "minItems": 4 }]
+    "max-len": ["error", { "code": 150 }]
   }
 }
