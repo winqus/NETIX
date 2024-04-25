@@ -30,6 +30,7 @@
           <div class="flex items-center justify-center text-white">
             <div class="flex-1">{{ convertToTime(this.player.currentTime()) }}</div>
           </div>
+          <!-- @if (!isMobile()) { -->
           <div class="flex items-center justify-start align-middle" (mouseleave)="hideSlider($event)">
             <button class="btn btn-circle min-h-[2rem] h-[2rem] w-[2rem]" (mouseenter)="showSlider()" (click)="toggleMute()">
               @if (this.player.muted() || volume === 0) {
@@ -70,6 +71,7 @@
               (input)="changeVolume()"
             />
           </div>
+          <!-- } -->
         </div>
         <div class="flex items-center justify-center">
           <button class="btn btn-circle min-h-[2rem] h-[2rem] w-[2rem] m-4" (click)="goBackward()">

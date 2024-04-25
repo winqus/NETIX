@@ -1,6 +1,7 @@
 //  TODO make volume slider animation: growing from left to right
 //  TODO buffer
 //  TODO when mouse idle the controls should vanish
+//  TODO can add controls with right click
 //? TODO tooltips on buttons?
 
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -27,6 +28,7 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     fill: true,
     responsive: true,
     autoplay: true,
+    controls: false,
     sources: [
       {
         // src: 'assets/meme4.mp4',
@@ -70,7 +72,14 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     const target = this.videoPlayerElement.nativeElement;
 
     this.player = videojs(target, this.options);
+    this.player.usingNativeControls(false);
     this.changeVolume();
+
+    this.videoPlayerElement.nativeElement.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    });
   }
   // Controls
   controlsVisible: boolean = true;
@@ -293,4 +302,10 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   // thumb tool tip
   tooltipPosition: number = 0;
   currentTooltipTime: string = '';
+
+  isMobile(): boolean {
+    // Regex pattern to check if it's a Mobile Device
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    return mobileRegex.test(navigator.userAgent);
+  }
 }
