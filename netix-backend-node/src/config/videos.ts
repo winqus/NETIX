@@ -26,6 +26,9 @@ export interface VideoConfig {
       height: number;
     };
   };
+  rawUploadDir: string;
+  processedUploadDir: string;
+  singleChunkMaxSizeInBytes: number;
 }
 
 export const config: VideoConfig = {
@@ -56,4 +59,7 @@ export const config: VideoConfig = {
       height: 17,
     },
   },
+  rawUploadDir: `${process.env.RAW_VIDEO_UPLOAD_DIR || './data/uploads/rawVideos'}`,
+  processedUploadDir: `${process.env.PROCESSED_VIDEO_UPLOAD_DIR || './data/uploads/processedVideos'}`,
+  singleChunkMaxSizeInBytes: 150 * 1024 * 1024, // 150 MB
 };

@@ -1,4 +1,12 @@
 import dotenv from 'dotenv';
+
+const envFound = dotenv.config();
+if (!envFound || envFound?.error) {
+  wLoggerInstance.warn('⚠️  No .env file found, using default environment variables ⚠️');
+}
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 import { wLoggerInstance } from '../loaders/logger';
 import { EnvironmentType, getCurrentEnvironment } from './utils';
 import { VideoConfig, config as videoConfig } from './videos';
@@ -27,12 +35,7 @@ interface AppConfig {
 /*
  * Load environment variables from .env file
  */
-const envFound = dotenv.config();
-if (!envFound || envFound?.error) {
-  wLoggerInstance.warn('⚠️  No .env file found, using default environment variables ⚠️');
-}
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const env: AppEnvironment = process.env as AppEnvironment;
 
 /*
