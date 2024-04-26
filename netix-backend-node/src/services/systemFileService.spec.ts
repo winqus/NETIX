@@ -1,7 +1,7 @@
 const fs = require('fs');
 import { mock } from 'jest-mock-extended';
 import { Logger } from 'winston';
-import SystemFileService from './systemFileService';
+import SystemFileService from './SystemFileService';
 
 describe('sysFileService', () => {
   jest.mock('fs');

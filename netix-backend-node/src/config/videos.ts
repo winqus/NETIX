@@ -29,6 +29,7 @@ export interface VideoConfig {
   rawUploadDir: string;
   processedUploadDir: string;
   singleChunkMaxSizeInBytes: number;
+  defaultUserUploadRateInChunksAtOnce: number;
 }
 
 const videoConfig: VideoConfig = {
@@ -62,6 +63,7 @@ const videoConfig: VideoConfig = {
   rawUploadDir: `${process.env.RAW_VIDEO_UPLOAD_DIR || './data/uploads/rawVideos'}`,
   processedUploadDir: `${process.env.PROCESSED_VIDEO_UPLOAD_DIR || './data/uploads/processedVideos'}`,
   singleChunkMaxSizeInBytes: 150 * 1024 * 1024, // 150 MB
+  defaultUserUploadRateInChunksAtOnce: 1,
 };
 
 export default videoConfig;

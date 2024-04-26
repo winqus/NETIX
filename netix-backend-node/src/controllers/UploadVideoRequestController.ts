@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
+import config from '../config';
 import { NewVideoUploadRequestDTO, NewVideoUploadRequestResponseDTO } from '../dto/videoUploadDTOs';
 import ErrorResponse from '../models/errorResponse.model';
 import IVideoUploadRequestService from '../services/IServices/IVideoUploadRequestService';
@@ -48,13 +49,15 @@ export default class UploadVideoRequestController {
         return res.status(400).json(response);
       }
 
+      const uploadRequest = uploadRequestResult.getValue();
+
       const response: NewVideoUploadRequestResponseDTO = {
-        requestId: uploadRequestResult.getValue().requestId,
-        videoId: uploadRequestResult.getValue().videoId,
-        uploadUrl: 'temp-upload-url',
-        totalChunksCount: 1,
-        allowedUploadRateInChunksAtOnce: 1,
-        chunkBaseName: 'temp-chunk-base-name',
+        requestId: uploadRequest.requestId,
+        videoId: uploadRequest.videoId,
+        uploadUrl: '/api/v1/videos/upload/',
+        totalChunksCount: uploadRequest.totalChunks,
+        allowedUploadRateInChunksAtOnce: config.video.defaultUserUploadRateInChunksAtOnce,
+        chunkBaseName: `${uploadRequest.videoId}_chunk-`,
       };
 
       return res.status(200).json(response);

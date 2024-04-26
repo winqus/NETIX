@@ -64,14 +64,58 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
   }
 
   public async findByRequestId(requestId: string): Promise<Result<VideoUploadRequest | null>> {
-    throw new Error('Method not implemented.');
+    try {
+      const query = { uuid: requestId };
+
+      const request = await this.uploadRequestModel.findOne(query);
+
+      if (!request) {
+        return Result.fail(`No VideoUploadRequest found with id ${requestId}`);
+      }
+
+      return VideoUploadRequestMapper.persistanceToEntity(request);
+    } catch (error) {
+      this.logger.error(`[VideoUploadRequestRepository]: ${error}`);
+
+      throw error;
+    }
   }
 
   public async findByVideoId(videoId: string): Promise<Result<VideoUploadRequest | null>> {
-    throw new Error('Method not implemented.');
+    try {
+      const query = { videoId };
+
+      const request = await this.uploadRequestModel.findOne(query);
+
+      if (!request) {
+        return Result.fail(`No VideoUploadRequest found with videoId ${videoId}`);
+      }
+
+      return VideoUploadRequestMapper.persistanceToEntity(request);
+    } catch (error) {
+      this.logger.error(`[VideoUploadRequestRepository]: ${error}`);
+
+      throw error;
+    }
   }
 
   public async delete(requestId: string): Promise<Result<void>> {
-    throw new Error('Method not implemented.');
+    try {
+      const query = { uuid: requestId };
+
+      const deleteResult = await this.uploadRequestModel.deleteOne(query);
+
+      if (deleteResult.deletedCount === 0) {
+        this.logger.error(`[VideoUploadRequestRepository]: Failed to delete VideoUploadRequest with id ${requestId}`);
+
+        return Result.fail(`Failed to delete VideoUploadRequest with id ${requestId}`);
+      }
+
+      return Result.ok();
+    } catch (error) {
+      this.logger.error(`[VideoUploadRequestRepository]: ${error}`);
+
+      throw error;
+    }
   }
 }

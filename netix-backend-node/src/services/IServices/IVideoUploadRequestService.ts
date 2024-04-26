@@ -5,4 +5,6 @@ export default interface IVideoUploadRequestService {
   getVideoUploadRequest(requestId: string): Promise<Result<VideoUploadRequestDTO>>;
 
   createVideoUploadRequest(newUploadRequestDTO: NewVideoUploadRequestDTO): Promise<Result<VideoUploadRequestDTO>>;
+
+  incrementUploadProgress(requestId: string, chunkIndex: number): Promise<Result<VideoUploadRequestDTO>>;
 }

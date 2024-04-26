@@ -1,6 +1,5 @@
 export enum VideoUploadRequestState {
   Pending = 'PENDING',
-  Initializing = 'INITIALIZING',
   Uploading = 'UPLOADING',
   Processing = 'PROCESSING',
   Completed = 'COMPLETED',
