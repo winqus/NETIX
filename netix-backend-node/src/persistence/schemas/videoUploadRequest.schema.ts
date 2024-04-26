@@ -8,9 +8,9 @@ export interface IVideoUploadRequestPersistance {
   requesterId: string;
   videoState: string;
   thumbnailState: string;
-  thumbnailId: string;
+  thumbnailId?: string;
   metadataState: string;
-  metadataId: string;
+  metadataId?: string;
   overallState: string;
   chunksReceived: number;
   totalChunks: number;

@@ -50,7 +50,7 @@ describe('sysFileService', () => {
 
       const result = await fileService.makeDirIfNotExists(dirPath);
 
-      expect(fs.mkdirSync).toHaveBeenCalledWith(dirPath);
+      expect(fs.mkdirSync).toHaveBeenCalledWith(dirPath, { recursive: true });
       expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining(dirPath));
       expect(result.isSuccess).toBe(true);
     });

@@ -51,9 +51,7 @@ export default (router: Router) => {
 
   router.get('/constraints', (req, res, next) => controller.getConstraints(req, res, next));
 
-  router.post('/videos/upload/permission', celebrate(newVideoUploadRequestSchema), (req, res, next) =>
-    controller.requestUploadPermission(req, res, next)
-  );
+  router.post('/upload/permission', celebrate(newVideoUploadRequestSchema), (req, res, next) => controller.requestUploadPermission(req, res, next));
 
   router.post('/upload/:requestId/:chunkIndex', celebrate(videoChunkUploadRequestSchema), videoChunkUpload.single('videoChunk'), (req, res, next) =>
     controller.uploadVideoChunk(req, res, next)

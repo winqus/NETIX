@@ -1,4 +1,5 @@
 import express from 'express';
+import config from '../config';
 import dependencyLoader from './dependencyLoader';
 import expressLoader from './expressLoader';
 import { wLoggerInstance as logger } from './logger';
@@ -9,15 +10,10 @@ export default async (expressApp: express.Application) => {
   logger.info('MongoDB loaded ✌️');
 
   await dependencyLoader({
-    schemas: [
-      { name: 'VideoMetadataSchema', path: '../persistence/schemas/videoMetadata.schema' },
-      { name: 'VideoSchema', path: '../persistence/schemas/video.schema' },
-      { name: 'ThumbnailSchema', path: '../persistence/schemas/thumbnail.schema' },
-      { name: 'VideoUploadRequestSchema', path: '../persistence/schemas/videoUploadRequest.schema' },
-    ],
-    controllers: [],
-    repositories: [],
-    services: [],
+    schemas: config.dependencies.schemas,
+    controllers: [], // Handled by typedi
+    repositories: [], // Handled by typedi
+    services: [], // Handled by typedi
   });
   logger.info('Dependencies loaded ✌️');
 

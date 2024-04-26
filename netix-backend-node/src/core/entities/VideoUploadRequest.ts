@@ -32,10 +32,18 @@ export default class VideoUploadRequest extends Entity<VideoUploadRequestProps> 
 
   set videoState(state: VideoUploadState) {
     if (!Object.values(VideoUploadState).includes(state)) {
-      throw new Error('Invalid video state');
+      throw new Error('Invalid videoState value');
     }
 
     this.props.videoState = state;
+  }
+
+  get thumbnailId(): UniqueEntityID | undefined {
+    return this.props.thumbnailId;
+  }
+
+  set thumbnailId(id: UniqueEntityID) {
+    this.props.thumbnailId = id;
   }
 
   get thumbnailState(): ThumbnailUploadState {
@@ -44,10 +52,18 @@ export default class VideoUploadRequest extends Entity<VideoUploadRequestProps> 
 
   set thumbnailState(state: ThumbnailUploadState) {
     if (!Object.values(ThumbnailUploadState).includes(state)) {
-      throw new Error('Invalid thumbnail state');
+      throw new Error('Invalid thumbnailState value');
     }
 
     this.props.thumbnailState = state;
+  }
+
+  get metadataId(): UniqueEntityID | undefined {
+    return this.props.metadataId;
+  }
+
+  set metadataId(id: UniqueEntityID) {
+    this.props.metadataId = id;
   }
 
   get metadataState(): MetadataUploadState {
@@ -56,7 +72,7 @@ export default class VideoUploadRequest extends Entity<VideoUploadRequestProps> 
 
   set metadataState(state: MetadataUploadState) {
     if (!Object.values(MetadataUploadState).includes(state)) {
-      throw new Error('Invalid metadata state');
+      throw new Error('Invalid metadataState value');
     }
 
     this.props.metadataState = state;
@@ -68,7 +84,7 @@ export default class VideoUploadRequest extends Entity<VideoUploadRequestProps> 
 
   set overallState(state: VideoUploadRequestState) {
     if (!Object.values(VideoUploadRequestState).includes(state)) {
-      throw new Error('Invalid overall state');
+      throw new Error('Invalid overallState value');
     }
 
     this.props.overallState = state;
@@ -100,59 +116,59 @@ export default class VideoUploadRequest extends Entity<VideoUploadRequestProps> 
 
   public static create(props: VideoUploadRequestProps, uuid?: UniqueEntityID): Result<VideoUploadRequest> {
     if (!props.videoId) {
-      return Result.fail<VideoUploadRequest>('Title is required');
+      return Result.fail<VideoUploadRequest>('Video ID is required');
     }
 
     if (!props.requesterId) {
       return Result.fail<VideoUploadRequest>('Requester ID is required');
     }
 
-    if (!props.videoState) {
+    if (props.videoState === undefined) {
       return Result.fail<VideoUploadRequest>('Video state is required');
     }
 
     if (!Object.values(VideoUploadState).includes(props.videoState)) {
-      return Result.fail<VideoUploadRequest>('Invalid video state');
+      return Result.fail<VideoUploadRequest>('Invalid videoState value');
     }
 
-    if (!props.thumbnailState) {
+    if (props.thumbnailState === undefined) {
       return Result.fail<VideoUploadRequest>('Thumbnail state is required');
     }
 
     if (!Object.values(ThumbnailUploadState).includes(props.thumbnailState)) {
-      return Result.fail<VideoUploadRequest>('Invalid thumbnail state');
+      return Result.fail<VideoUploadRequest>('Invalid thumbnailState value');
     }
 
-    if (!props.metadataState) {
+    if (props.metadataState === undefined) {
       return Result.fail<VideoUploadRequest>('Metadata state is required');
     }
 
     if (!Object.values(MetadataUploadState).includes(props.metadataState)) {
-      return Result.fail<VideoUploadRequest>('Invalid metadata state');
+      return Result.fail<VideoUploadRequest>('Invalid metadataState value');
     }
 
-    if (!props.overallState) {
+    if (props.overallState === undefined) {
       return Result.fail<VideoUploadRequest>('Overall state is required');
     }
 
     if (!Object.values(VideoUploadRequestState).includes(props.overallState)) {
-      return Result.fail<VideoUploadRequest>('Invalid overall state');
+      return Result.fail<VideoUploadRequest>('Invalid overallState value');
     }
 
-    if (!props.chunksReceived) {
-      return Result.fail<VideoUploadRequest>('Chunks received is required');
-    }
-
-    if (!inRange(props.chunksReceived, 0, props.totalChunks) || !Number.isInteger(props.chunksReceived)) {
-      return Result.fail<VideoUploadRequest>('Invalid chunks received');
-    }
-
-    if (!props.totalChunks) {
+    if (props.totalChunks === undefined) {
       return Result.fail<VideoUploadRequest>('Total chunks is required');
     }
 
     if (props.totalChunks < 1 || !Number.isInteger(props.totalChunks)) {
-      return Result.fail<VideoUploadRequest>('Invalid total chunks');
+      return Result.fail<VideoUploadRequest>('Invalid total chunks value');
+    }
+
+    if (props.chunksReceived === undefined) {
+      return Result.fail<VideoUploadRequest>('Chunks received is required');
+    }
+
+    if (!inRange(props.chunksReceived, 0, props.totalChunks) || !Number.isInteger(props.chunksReceived)) {
+      return Result.fail<VideoUploadRequest>('Invalid chunks received value');
     }
 
     const newVideo = new VideoUploadRequest(props, uuid || new UniqueEntityID());
