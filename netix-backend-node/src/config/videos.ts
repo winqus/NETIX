@@ -31,7 +31,7 @@ export interface VideoConfig {
   singleChunkMaxSizeInBytes: number;
 }
 
-export const config: VideoConfig = {
+const videoConfig: VideoConfig = {
   titleLength: { min: 1, max: 100 },
   descriptionLength: { min: 0, max: 1000 },
   tagValueLength: { min: 3, max: 20 },
@@ -63,3 +63,5 @@ export const config: VideoConfig = {
   processedUploadDir: `${process.env.PROCESSED_VIDEO_UPLOAD_DIR || './data/uploads/processedVideos'}`,
   singleChunkMaxSizeInBytes: 150 * 1024 * 1024, // 150 MB
 };
+
+export default videoConfig;

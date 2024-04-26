@@ -8,8 +8,9 @@ if (!envFound || envFound?.error) {
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 import { wLoggerInstance } from '../loaders/logger';
+import dependencyConfig, { DependencyConfig } from './dependencies';
 import { EnvironmentType, getCurrentEnvironment } from './utils';
-import { VideoConfig, config as videoConfig } from './videos';
+import videoConfig, { VideoConfig } from './videos';
 
 /*
  * Environment variables that will be loaded from .env file
@@ -30,9 +31,7 @@ interface AppConfig {
     prefix: string;
   };
   video: VideoConfig;
-  dependencies: {
-    schemas: { name: string; path: string }[];
-  };
+  dependencies: DependencyConfig;
 }
 
 /*
@@ -57,13 +56,6 @@ const config: AppConfig = {
 
   video: videoConfig,
 
-  dependencies: {
-    schemas: [
-      { name: 'VideoMetadataSchema', path: '../persistence/schemas/videoMetadata.schema' },
-      { name: 'VideoSchema', path: '../persistence/schemas/video.schema' },
-      { name: 'ThumbnailSchema', path: '../persistence/schemas/thumbnail.schema' },
-      { name: 'VideoUploadRequestSchema', path: '../persistence/schemas/videoUploadRequest.schema' },
-    ],
-  },
+  dependencies: dependencyConfig,
 };
 export default config;

@@ -7,9 +7,10 @@ import { MetadataUploadState, ThumbnailUploadState, VideoUploadRequestState, Vid
 import { NewVideoUploadRequestDTO, VideoUploadRequestDTO } from '../dto/videoUploadDTOs';
 import VideoUploadRequestMapper from '../mappers/VideoUploadRequest.mapper';
 import VideoUploadRequestRepository from '../repositories/VideoUploadRequestRepository';
+import IVideoUploadRequestService from './IServices/IVideoUploadRequestService';
 
 @Service()
-export default class UploadRequestService {
+export default class VideoUploadRequestService implements IVideoUploadRequestService {
   constructor(
     @Inject('logger') private logger: Logger,
     @Inject() private videoUploadRequestRepo: VideoUploadRequestRepository

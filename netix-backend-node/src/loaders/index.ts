@@ -11,10 +11,10 @@ export default async (expressApp: express.Application) => {
 
   await dependencyLoader({
     schemas: config.dependencies.schemas,
-    controllers: [], // Handled by typedi
-    repositories: [], // Handled by typedi
-    services: [], // Handled by typedi
+    repositories: config.dependencies.repositories,
+    services: config.dependencies.services,
   });
+
   logger.info('Dependencies loaded ✌️');
 
   await expressLoader(expressApp);

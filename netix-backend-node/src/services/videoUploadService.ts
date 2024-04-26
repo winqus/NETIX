@@ -1,6 +1,6 @@
 import Container, { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
-import config from '../config/';
+import config from '../config';
 import { Result } from '../core/logic/Result';
 import {
   VideoChunkUploadDTO,
@@ -9,10 +9,11 @@ import {
   VideoUploadConstraintsDTO,
 } from '../dto/videoUploadDTOs';
 import IFileService from './IServices/IFileService';
-import SystemFileService from './systemFileService';
+import IVideoUploadService from './IServices/IVideoUploadService';
+import SystemFileService from './SystemFileService';
 
 @Service()
-export default class VideoService {
+export default class VideoUploadService implements IVideoUploadService {
   constructor(
     @Inject('logger') private logger: Logger,
     private fileService: IFileService
@@ -56,14 +57,14 @@ export default class VideoService {
 
       const dirResult = await this.fileService.makeDirIfNotExists(fileDir);
       if (dirResult.isFailure) {
-        this.logger.error(`[VideoService]: Failed to create directory at ${fileDir}`);
+        this.logger.error(`[VideoUploadService]: Failed to create directory at ${fileDir}`);
 
         return Result.fail(dirResult.errorValue());
       }
 
       const fileExists = this.fileService.fileExists(filePath);
       if (fileExists && !overwrite) {
-        this.logger.warn(`[VideoService]: Chunk already exists: ${filePath}`);
+        this.logger.warn(`[VideoUploadService]: Chunk already exists: ${filePath}`);
 
         return Result.fail('Chunk already exists');
       }
@@ -71,16 +72,16 @@ export default class VideoService {
       const chunkData = videoChunkUpload.chunkData;
       const saveResult = await this.fileService.saveBufferToFile(chunkData, filePath);
       if (saveResult.isFailure) {
-        this.logger.error(`[VideoService]: Failed to save chunk at ${filePath}`);
+        this.logger.error(`[VideoUploadService]: Failed to save chunk at ${filePath}`);
 
         return Result.fail(saveResult.errorValue());
       }
 
-      this.logger.info(`[VideoService]: Saved chunk: ${filePath}`);
+      this.logger.info(`[VideoUploadService]: Saved chunk: ${filePath}`);
 
       return Result.ok<void>();
     } catch (error) {
-      this.logger.error(`[VideoService]: Failed to save chunk: ${error}`);
+      this.logger.error(`[VideoUploadService]: Failed to save chunk: ${error}`);
 
       throw error;
     }

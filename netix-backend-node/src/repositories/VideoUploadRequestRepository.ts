@@ -7,7 +7,6 @@ import VideoUploadRequestMapper from '../mappers/VideoUploadRequest.mapper';
 import { IVideoUploadRequestPersistance } from '../persistence/schemas/videoUploadRequest.schema';
 import IVideoUploadRequestRepository from '../services/IRepositories/IVideoUploadRequestRepository';
 
-// @Service<IVideoUploadRequestRepository>()
 @Service()
 export default class VideoUploadRequestRepository implements IVideoUploadRequestRepository {
   constructor(

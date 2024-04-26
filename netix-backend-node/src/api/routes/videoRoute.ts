@@ -4,7 +4,8 @@ import multer from 'multer';
 import Container from 'typedi';
 import config from '../../config';
 import UploadVideoController from '../../controllers/UploadVideoController';
-import { CustomMulterError } from '../middlewares/multerErrorHandler';
+import UploadVideoRequestController from '../../controllers/UploadVideoRequestController';
+// import { CustomMulterError } from '../middlewares/multerErrorHandler';
 
 const videoChunkStorage = multer.memoryStorage();
 
@@ -47,13 +48,16 @@ const newVideoUploadRequestSchema = {
 export default (router: Router) => {
   router.use('/v1/videos', router);
 
-  const controller = Container.get(UploadVideoController);
+  const uploadController = Container.get(UploadVideoController);
+  const requestController = Container.get(UploadVideoRequestController);
 
-  router.get('/constraints', (req, res, next) => controller.getConstraints(req, res, next));
+  router.get('/constraints', (req, res, next) => uploadController.getConstraints(req, res, next));
 
-  router.post('/upload/permission', celebrate(newVideoUploadRequestSchema), (req, res, next) => controller.requestUploadPermission(req, res, next));
+  router.post('/upload/permission', celebrate(newVideoUploadRequestSchema), (req, res, next) =>
+    requestController.requestUploadPermission(req, res, next)
+  );
 
   router.post('/upload/:requestId/:chunkIndex', celebrate(videoChunkUploadRequestSchema), videoChunkUpload.single('videoChunk'), (req, res, next) =>
-    controller.uploadVideoChunk(req, res, next)
+    uploadController.uploadVideoChunk(req, res, next)
   );
 };
