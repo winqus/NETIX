@@ -37,8 +37,6 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
 
   public async update(request: VideoUploadRequest): Promise<Result<VideoUploadRequest>> {
     try {
-      const query = { uuid: request.uuid.toString() };
-
       const requestPersistanceResult = VideoUploadRequestMapper.entityToPersistance(request);
 
       if (requestPersistanceResult.isFailure) {
@@ -47,7 +45,10 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
         return Result.fail<VideoUploadRequest>(requestPersistanceResult.error);
       }
 
-      const updateDocument = await this.uploadRequestModel.findOneAndUpdate(query, requestPersistanceResult.getValue());
+      const filter = { uuid: request.uuid.toString() };
+      const update = requestPersistanceResult.getValue();
+      const options = { new: true };
+      const updateDocument = await this.uploadRequestModel.findOneAndUpdate(filter, update, options);
 
       if (!updateDocument) {
         this.logger.error(`[VideoUploadRequestRepository]: Failed to find and update VideoUploadRequest with id ${request.uuid.toString()}`);
@@ -55,7 +56,9 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
         return Result.fail<VideoUploadRequest>(`Failed to find and update VideoUploadRequest with id ${request.uuid.toString()}`);
       }
 
-      return Result.ok(VideoUploadRequestMapper.persistanceToEntity(updateDocument).getValue());
+      const updatedRequest = VideoUploadRequestMapper.persistanceToEntity(updateDocument).getValue();
+
+      return Result.ok(updatedRequest);
     } catch (error) {
       this.logger.error(`[VideoUploadRequestRepository]: ${error}`);
 
@@ -65,9 +68,9 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
 
   public async findByRequestId(requestId: string): Promise<Result<VideoUploadRequest | null>> {
     try {
-      const query = { uuid: requestId };
+      const filter = { uuid: requestId };
 
-      const request = await this.uploadRequestModel.findOne(query);
+      const request = await this.uploadRequestModel.findOne(filter);
 
       if (!request) {
         return Result.fail(`No VideoUploadRequest found with id ${requestId}`);
@@ -83,9 +86,9 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
 
   public async findByVideoId(videoId: string): Promise<Result<VideoUploadRequest | null>> {
     try {
-      const query = { videoId };
+      const filter = { videoId };
 
-      const request = await this.uploadRequestModel.findOne(query);
+      const request = await this.uploadRequestModel.findOne(filter);
 
       if (!request) {
         return Result.fail(`No VideoUploadRequest found with videoId ${videoId}`);
@@ -101,9 +104,9 @@ export default class VideoUploadRequestRepository implements IVideoUploadRequest
 
   public async delete(requestId: string): Promise<Result<void>> {
     try {
-      const query = { uuid: requestId };
+      const filter = { uuid: requestId };
 
-      const deleteResult = await this.uploadRequestModel.deleteOne(query);
+      const deleteResult = await this.uploadRequestModel.deleteOne(filter);
 
       if (deleteResult.deletedCount === 0) {
         this.logger.error(`[VideoUploadRequestRepository]: Failed to delete VideoUploadRequest with id ${requestId}`);

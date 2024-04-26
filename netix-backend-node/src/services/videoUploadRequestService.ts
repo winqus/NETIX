@@ -160,12 +160,15 @@ export default class VideoUploadRequestService implements IVideoUploadRequestSer
         return Result.fail('All chunks already received');
       }
 
-      uploadReq.chunksReceived += 1;
-
-      if (uploadReq.chunksReceived === 1) {
+      if (uploadReq.chunksReceived === 0) {
         uploadReq.videoState = VideoUploadState.Uploading;
         uploadReq.overallState = VideoUploadRequestState.Uploading;
-      } else if (uploadReq.chunksReceived === uploadReq.totalChunks) {
+      }
+
+      uploadReq.chunksReceived += 1;
+
+      if (uploadReq.chunksReceived === uploadReq.totalChunks) {
+        // TODO: Add event to trigger video processing (merge chunks, etc.)
         uploadReq.videoState = VideoUploadState.Completed;
 
         if (
@@ -174,7 +177,6 @@ export default class VideoUploadRequestService implements IVideoUploadRequestSer
           uploadReq.videoState === VideoUploadState.Completed
         ) {
           uploadReq.overallState = VideoUploadRequestState.Processing;
-          // TODO: Add event to trigger video processing
         }
       }
 
