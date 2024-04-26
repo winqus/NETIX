@@ -4,6 +4,7 @@ import videoMetadataSchema from '../persistence/schemas/videoMetadata.schema';
 import videoUploadRequestSchema from '../persistence/schemas/videoUploadRequest.schema';
 import VideoUploadRepository from '../repositories/VideoUploadRepository';
 import VideoUploadRequestRepository from '../repositories/VideoUploadRequestRepository';
+import SystemFileService from '../services/SystemFileService';
 import VideoUploadRequestService from '../services/VideoUploadRequestService';
 import VideoUploadService from '../services/VideoUploadService';
 
@@ -27,6 +28,7 @@ const dependencyConfig: DependencyConfig = {
   ],
 
   services: [
+    { name: 'FileService', class: SystemFileService },
     { name: 'VideoUploadService', class: VideoUploadService },
     { name: 'VideoUploadRequestService', class: VideoUploadRequestService },
   ],

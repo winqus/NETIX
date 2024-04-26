@@ -1,4 +1,4 @@
-import Container, { Inject, Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import config from '../config';
 import { Result } from '../core/logic/Result';
@@ -10,16 +10,13 @@ import {
 } from '../dto/videoUploadDTOs';
 import IFileService from './IServices/IFileService';
 import IVideoUploadService from './IServices/IVideoUploadService';
-import SystemFileService from './SystemFileService';
 
 @Service()
 export default class VideoUploadService implements IVideoUploadService {
   constructor(
     @Inject('logger') private logger: Logger,
-    private fileService: IFileService
-  ) {
-    this.fileService = Container.get(SystemFileService);
-  }
+    @Inject('FileService') private fileService: IFileService
+  ) {}
 
   public async getVideoUploadConstraints(): Promise<Result<VideoUploadConstraintsDTO>> {
     try {

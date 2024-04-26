@@ -6,14 +6,14 @@ import { Result } from '../core/logic/Result';
 import { MetadataUploadState, ThumbnailUploadState, VideoUploadRequestState, VideoUploadState } from '../core/states/VideoUploadRequest.state';
 import { NewVideoUploadRequestDTO, VideoUploadRequestDTO } from '../dto/videoUploadDTOs';
 import VideoUploadRequestMapper from '../mappers/VideoUploadRequest.mapper';
-import VideoUploadRequestRepository from '../repositories/VideoUploadRequestRepository';
+import IVideoUploadRequestRepository from './IRepositories/IVideoUploadRequestRepository';
 import IVideoUploadRequestService from './IServices/IVideoUploadRequestService';
 
 @Service()
 export default class VideoUploadRequestService implements IVideoUploadRequestService {
   constructor(
     @Inject('logger') private logger: Logger,
-    @Inject() private videoUploadRequestRepo: VideoUploadRequestRepository
+    @Inject('VideoUploadRequestRepository') private videoUploadRequestRepo: IVideoUploadRequestRepository
   ) {}
 
   public async getVideoUploadRequest(_requestId: string): Promise<Result<VideoUploadRequestDTO>> {
