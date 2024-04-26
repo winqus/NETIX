@@ -2,7 +2,6 @@ import thumbnailSchema from '../persistence/schemas/thumbnail.schema';
 import videoSchema from '../persistence/schemas/video.schema';
 import videoMetadataSchema from '../persistence/schemas/videoMetadata.schema';
 import videoUploadRequestSchema from '../persistence/schemas/videoUploadRequest.schema';
-import VideoUploadRepository from '../repositories/VideoUploadRepository';
 import VideoUploadRequestRepository from '../repositories/VideoUploadRequestRepository';
 import SystemFileService from '../services/SystemFileService';
 import VideoUploadRequestService from '../services/VideoUploadRequestService';
@@ -22,10 +21,7 @@ const dependencyConfig: DependencyConfig = {
     { name: 'VideoUploadRequestSchema', class: videoUploadRequestSchema },
   ],
 
-  repositories: [
-    { name: 'VideoUploadRepository', class: VideoUploadRepository },
-    { name: 'VideoUploadRequestRepository', class: VideoUploadRequestRepository },
-  ],
+  repositories: [{ name: 'VideoUploadRequestRepository', class: VideoUploadRequestRepository }],
 
   services: [
     { name: 'FileService', class: SystemFileService },
