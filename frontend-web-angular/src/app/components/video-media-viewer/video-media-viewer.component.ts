@@ -1,22 +1,19 @@
-//  TODO make volume slider animation: growing from left to right
-//  TODO buffer
-//  TODO when mouse idle the controls should vanish
-//  TODO can add controls with right click
 //? TODO tooltips on buttons?
 
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
 import { FormsModule } from '@angular/forms';
+import { Subscription, timer } from 'rxjs';
 
 @Component({
-  selector: 'app-videojs-media-viewer',
+  selector: 'app-video-media-viewer',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './videojs-media-viewer.component.html',
-  styleUrls: ['./videojs-media-viewer.component.scss'],
+  templateUrl: './video-media-viewer.component.html',
+  styleUrls: ['./video-media-viewer.component.scss'],
 })
-export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
+export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   @ViewChild('fullscreenContainer', { static: true }) fullscreenContainer!: ElementRef<HTMLElement>;
   @ViewChild('videoPlayer', { static: true }) videoPlayerElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('timeline', { static: true }) videoTimeline!: ElementRef<HTMLElement>;
@@ -51,20 +48,21 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setupPlayer();
+    this.setupActivityTracker();
 
     this.player.on('timeupdate', () => {
       this.currentTime = this.player.currentTime();
       this.duration = this.player.duration();
-    });
-
-    this.player.on('progress', () => {
-      // Update buffered range here if needed
     });
   }
 
   ngOnDestroy(): void {
     if (this.player) {
       this.player.dispose();
+    }
+
+    if (this.idleTimerSubscription) {
+      this.idleTimerSubscription.unsubscribe();
     }
   }
 
@@ -81,6 +79,7 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
       return false;
     });
   }
+
   // Controls
   controlsVisible: boolean = true;
   @HostListener('document:keydown', ['$event'])
@@ -97,8 +96,10 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
     }
   }
   lastClickTime!: number;
-  onClick(): void {
-    console.log(this.lastClickTime);
+  onClick(event: MouseEvent): void {
+    if (event.button != 0) {
+      return;
+    }
     // Prevent double click from triggering this twice
     const currentTime = new Date().getTime();
     if (currentTime - (this.lastClickTime || 0) < 300) {
@@ -113,9 +114,14 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
       }
     }, 300);
   }
-  onDoubleClick(): void {
+  onDoubleClick(event: MouseEvent): void {
+    if (event.button != 0) {
+      return;
+    }
+
     this.toggleFullscreen();
   }
+
   // time
   convertToTime(timeInSeconds: number | undefined): string {
     if (timeInSeconds == undefined) return '00:00:00';
@@ -142,18 +148,10 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
 
   // play/pause
   togglePlay() {
-    if (this.player.paused()) {
-      this.player.play();
-    } else {
-      this.player.pause();
-    }
+    this.player.paused() ? this.player.play() : this.player.pause();
   }
   isPlaying(): boolean {
-    if (this.player.paused()) {
-      return false;
-    } else {
-      return true;
-    }
+    return !this.player.paused();
   }
   // forward/backward
   goForward() {
@@ -198,54 +196,52 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   keepSliderVisible(): void {
     this.sliderVisible = true;
   }
-
-  // fullscreen
-  // toggleFullscreen(): void {
-  //   if (!this.player.isFullscreen()) {
-  //     this.player.requestFullscreen();
-  //   } else {
-  //     this.player.exitFullscreen();
-  //   }
-  // }
+  // Fullscreen
   isInFullscreen: boolean = false;
   toggleFullscreen() {
-    const elem = this.fullscreenContainer.nativeElement;
-
     if (!document.fullscreenElement) {
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-        this.isInFullscreen = true;
-      }
+      this.fullscreenContainer.nativeElement.requestFullscreen();
+      this.isInFullscreen = true;
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-        this.isInFullscreen = false;
-      }
+      document.exitFullscreen();
+      this.isInFullscreen = false;
     }
   }
   // Picture In Picture
   enablePictureInPicture() {
-    if (!this.player.isInPictureInPicture()) {
-      this.player.requestPictureInPicture();
-    } else {
-      this.player.exitPictureInPicture();
-    }
+    !this.player.isInPictureInPicture() ? this.player.requestPictureInPicture() : this.player.exitPictureInPicture();
   }
 
   // timeline
   previewProgress(): string {
-    if (this.newTime != 0 && this.duration != undefined && this.isInTimeline) {
-      return ((this.newTime / this.duration) * 100).toFixed(20) + '%';
+    const duration = this.duration ?? 0;
+    const currentTime = this.currentTime ?? 0;
+
+    if (this.newTime != 0 && this.isInTimeline) {
+      return this.calculatePercentage(this.newTime, duration);
     } else {
-      return (this.player.bufferedPercent() * 100).toFixed(20) + '%';
+      const passedPercent = currentTime / duration;
+      return this.calculatePercentage(passedPercent + this.player.bufferedEnd(), duration);
     }
   }
+
   progress(): string {
-    if (this.currentTime == undefined || this.duration == undefined) return '0%';
+    if (this.duration === undefined || this.currentTime === undefined) {
+      return '0%';
+    }
+
     if (this.isDragging) {
       this.currentTime = this.newTime;
     }
-    return ((this.currentTime / this.duration) * 100).toFixed(20) + '%';
+
+    return this.calculatePercentage(this.currentTime, this.duration);
+  }
+
+  private calculatePercentage(time: number, duration: number): string {
+    if (duration === 0) return '0%';
+
+    const percentage = (time / duration) * 100;
+    return `${percentage.toFixed(20)}%`;
   }
 
   isDragging = false;
@@ -258,7 +254,30 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     this.seek(event);
+    this.controlsVisible = true;
+
+    if (this.idleTimerSubscription) {
+      this.idleTimerSubscription.unsubscribe();
+    }
+
+    this.resetIdleTimer();
   }
+  private idleTimerSubscription!: Subscription;
+  private idleThreshold = 3000;
+
+  private setupActivityTracker() {
+    this.resetIdleTimer();
+  }
+
+  private resetIdleTimer() {
+    const idleTimer = timer(this.idleThreshold);
+    this.idleTimerSubscription = idleTimer.subscribe(() => {
+      if (this.isPlaying()) {
+        this.controlsVisible = false;
+      }
+    });
+  }
+
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     this.isDragging = false;
@@ -302,10 +321,4 @@ export class VideojsMediaViewerComponent implements OnInit, OnDestroy {
   // thumb tool tip
   tooltipPosition: number = 0;
   currentTooltipTime: string = '';
-
-  isMobile(): boolean {
-    // Regex pattern to check if it's a Mobile Device
-    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-    return mobileRegex.test(navigator.userAgent);
-  }
 }

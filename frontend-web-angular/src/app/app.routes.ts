@@ -4,7 +4,7 @@ import { EmptyLayoutComponent } from './layouts/empty-layout/empty-layout.compon
 import { ErrorPageComponent } from './components/error-page/error-page.component';
 import appMessages from '../assets/i18n/en/appMessages.json';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
-import { VideojsMediaViewerComponent } from './components/videojs-media-viewer/videojs-media-viewer.component';
+import { VideoMediaViewerComponent } from './components/video-media-viewer/video-media-viewer.component';
 
 export const routes: Routes = [
   {
@@ -19,7 +19,7 @@ export const routes: Routes = [
   {
     path: 'watch',
     component: MainLayoutComponent,
-    children: [{ path: '', component: VideojsMediaViewerComponent }],
+    children: [{ path: '', component: VideoMediaViewerComponent }],
   },
   {
     path: 'error',
