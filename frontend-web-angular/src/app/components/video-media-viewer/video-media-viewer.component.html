@@ -1,139 +1,228 @@
 <div #fullscreenContainer [style.cursor]="controlsVisible ? 'auto' : 'none'" class="relative w-full h-full bg-white select-none">
   <video #videoPlayer class="vjs-matrix video-js focus:outline-none border-none" playsinline preload="auto" tabindex="-1" (mousedown)="onClick($event)" (dblclick)="onDoubleClick($event)"></video>
-
-  <!-- Title Overlay -->
   <div [style.visibility]="controlsVisible ? 'visible' : 'hidden'" class="transition-opacity duration-500 ease-linear">
+    <!-- Title Overlay -->
     @if (isInFullscreen) {
       <div class="absolute top-0 left-0 w-full h-24 p-3 px-5 text-white text-3xl font-bold">{{ videoTitle }}</div>
     } @else {
       <div class="absolute top-16 left-0 w-full h-24 p-3 px-5 text-white text-3xl font-bold">{{ videoTitle }}</div>
     }
-    <!-- Video Controls -->
-    <div class="absolute bottom-0 left-0 w-full bg-black-to-transparent px-2 pb-2 z-10">
-      <div
-        #timeline
-        class="timeline-container flex items-center h-[6px] cursor-pointer overflow-visible"
-        (mouseenter)="onMouseEnter()"
-        (mousedown)="onMouseDown($event)"
-        (mouseleave)="onMouseLeave($event)"
-      >
+    @if (!isMobile) {
+      <!-- Video Controls -->
+      <div class="absolute bottom-0 left-0 w-full bg-black-to-transparent px-2 pb-2 z-10">
         <div
-          [style.--preview-position]="previewProgress()"
-          [style.--progress-position]="progress()"
-          class="timeline-b h-[3px] hover:h-full w-full bg-slate-600 rounded-md relative before:rounded-md transition-height hover:duration-100 ease-in-out"
+          #timeline
+          class="timeline-container flex items-center h-[6px] cursor-pointer overflow-visible"
+          (mouseenter)="onMouseEnter()"
+          (mousedown)="onMouseDown($event)"
+          (mouseleave)="onMouseLeave($event)"
         >
-          <div class="thumb-indicator"></div>
-        </div>
-        <div #thumbTooltip class="absolute bottom-[5rem] text-center w-auto rounded-md bg-black text-xs p-1" [style.visibility]="isInTimeline ? 'visible' : 'hidden'" [style.left.px]="tooltipPosition">
-          <div class="text-white" [innerText]="currentTooltipTime"></div>
-        </div>
-      </div>
-
-      <div id="video-controls" class="flex items-center justify-center align-middle">
-        <div class="flex-1">
-          <div class="flex items-center justify-center text-white">
-            <div class="flex-1 text-xs">{{ convertToTime(this.player.currentTime()) }}</div>
+          <div
+            [style.--preview-position]="previewBufferedProgress()"
+            [style.--progress-position]="mediaProgress()"
+            class="timeline-b h-[3px] hover:h-full w-full bg-slate-600 rounded-md relative before:rounded-md transition-height hover:duration-100 ease-in-out"
+          >
+            <div class="thumb-indicator"></div>
           </div>
-          <div class="flex items-center justify-start align-middle" (mouseleave)="hideSlider($event)">
-            <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (mouseenter)="showSlider()" (click)="toggleMute()">
-              @if (this.player.muted() || volume === 0) {
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                  <path
-                    d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06m7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0"
-                  />
-                </svg>
-              } @else if (volume > 0.7) {
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                  <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z" />
-                  <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z" />
-                  <path
-                    d="M8.707 11.182A4.5 4.5 0 0 0 10.025 8a4.5 4.5 0 0 0-1.318-3.182L8 5.525A3.5 3.5 0 0 1 9.025 8 3.5 3.5 0 0 1 8 10.475zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06"
-                  />
-                </svg>
-              } @else if (volume > 0.4) {
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                  <path
-                    d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12zm3.025 4a4.5 4.5 0 0 1-1.318 3.182L10 10.475A3.5 3.5 0 0 0 11.025 8 3.5 3.5 0 0 0 10 5.525l.707-.707A4.5 4.5 0 0 1 12.025 8"
-                  />
+          <div
+            #thumbTooltip
+            class="absolute bottom-[5rem] text-center w-auto rounded-md bg-black text-xs p-1"
+            [style.visibility]="isInTimeline ? 'visible' : 'hidden'"
+            [style.left.px]="tooltipPosition"
+          >
+            <div class="text-white" [innerText]="currentTooltipTime"></div>
+          </div>
+        </div>
+
+        <div id="video-controls" class="flex items-center justify-center align-middle">
+          <div class="flex-1">
+            <div class="flex items-center justify-center text-white">
+              <div class="flex-1 text-xs">{{ convertToTime(this.player.currentTime()) }}</div>
+            </div>
+            <div class="flex items-center justify-start align-middle" (mouseleave)="hideSlider($event)">
+              <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (mouseenter)="showSlider()" (click)="toggleMute()">
+                @if (this.player.muted() || volume === 0) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                    <path
+                      d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06m7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0"
+                    />
+                  </svg>
+                } @else if (volume > 0.7) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                    <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z" />
+                    <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z" />
+                    <path
+                      d="M8.707 11.182A4.5 4.5 0 0 0 10.025 8a4.5 4.5 0 0 0-1.318-3.182L8 5.525A3.5 3.5 0 0 1 9.025 8 3.5 3.5 0 0 1 8 10.475zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06"
+                    />
+                  </svg>
+                } @else if (volume > 0.4) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                    <path
+                      d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12zm3.025 4a4.5 4.5 0 0 1-1.318 3.182L10 10.475A3.5 3.5 0 0 0 11.025 8 3.5 3.5 0 0 0 10 5.525l.707-.707A4.5 4.5 0 0 1 12.025 8"
+                    />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                    <path d="M10.717 3.55A.5.5 0 0 1 11 4v8a.5.5 0 0 1-.812.39L7.825 10.5H5.5A.5.5 0 0 1 5 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06" />
+                  </svg>
+                }
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                [(ngModel)]="volume"
+                [style.opacity]="sliderVisible ? '1' : '0'"
+                [style.visibility]="sliderVisible ? 'visible' : 'hidden'"
+                [style.width]="sliderVisible ? '7rem' : '0rem'"
+                class="slider w-0 h-[4px] rounded-md opacity-0 ml-3 transition-opacity duration-500 ease-in-out absolute"
+                (input)="changeVolume()"
+              />
+            </div>
+          </div>
+          <div class="flex items-center justify-center">
+            <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none m-4" (click)="fastBackward()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                <path d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
+                <path d="M.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
+              </svg>
+            </button>
+            <button class="btn btn-circle btn-sm bg-transparent hover:bg-transparent border-none" (click)="togglePlay()">
+              @if (isPlaying()) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                  <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
                 </svg>
               } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                  <path d="M10.717 3.55A.5.5 0 0 1 11 4v8a.5.5 0 0 1-.812.39L7.825 10.5H5.5A.5.5 0 0 1 5 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                  <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
                 </svg>
               }
             </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              [(ngModel)]="volume"
-              [style.opacity]="sliderVisible ? '1' : '0'"
-              [style.visibility]="sliderVisible ? 'visible' : 'hidden'"
-              [style.width]="sliderVisible ? '7rem' : '0rem'"
-              class="slider w-0 h-[4px] rounded-md opacity-0 ml-3 transition-opacity duration-500 ease-in-out absolute"
-              (input)="changeVolume()"
-            />
+            <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none m-4" (click)="fastForward()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                <path d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696z" />
+                <path d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696z" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex-1 text-right">
+            <div class="flex items-center justify-center text-white">
+              <div class="flex-1 text-right text-xs">{{ convertToTime(this.player.duration()) }}</div>
+            </div>
+            <div class="flex items-center justify-end align-middle space-x-3">
+              <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="enablePictureInPicture()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                  <path
+                    d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"
+                  />
+                  <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z" />
+                </svg>
+              </button>
+              <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="toggleFullscreen()">
+                @if (isInFullscreen) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                    <path
+                      d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5m5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5M0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5m10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0z"
+                    />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                    <path
+                      d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"
+                    />
+                  </svg>
+                }
+              </button>
+            </div>
           </div>
         </div>
-        <div class="flex items-center justify-center">
-          <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none m-4" (click)="goBackward()">
-            <!-- -10s -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-              <path d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
-              <path d="M.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
+      </div>
+    } @else {
+      <div class="absolute top-0 h-full w-full flex items-center justify-center align-middle">
+        <button class="btn btn-circle btn-sm bg-opacity-60 border-none bg-black mx-6" (click)="fastBackward()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+            <path d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
+            <path d="M.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
+          </svg>
+        </button>
+        <button class="btn btn-circle btn-md bg-opacity-60 border-none bg-black mx-8" (click)="togglePlay()">
+          @if (isPlaying()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+              <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
             </svg>
-          </button>
-          <button class="btn btn-circle btn-sm bg-transparent hover:bg-transparent border-none" (click)="togglePlay()">
-            @if (!isPlaying()) {
-              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+              <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
+            </svg>
+          }
+        </button>
+        <button class="btn btn-circle btn-sm bg-opacity-60 border-none bg-black mx-6" (click)="fastForward()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+            <path d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696z" />
+            <path d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696z" />
+          </svg>
+        </button>
+      </div>
+      <div class="absolute bottom-0 left-0 w-full bg-black-to-transparent px-2 pb-2 z-10">
+        <div class="flex items-center justify-end align-middle pb-2">
+          <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="toggleFullscreen()">
+            @if (isInFullscreen) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                <path
+                  d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5m5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5M0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5m10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0z"
+                />
               </svg>
             } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
+                <path
+                  d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"
+                />
               </svg>
             }
           </button>
-          <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none m-4" (click)="goForward()">
-            <!-- 10s -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-              <path d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696z" />
-              <path d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696z" />
-            </svg>
-          </button>
         </div>
-        <div class="flex-1 text-right">
-          <div class="flex items-center justify-center text-white">
-            <div class="flex-1 text-right text-xs">{{ convertToTime(this.player.duration()) }}</div>
+        <div
+          #timeline
+          class="timeline-container flex items-center h-[6px] cursor-pointer overflow-visible"
+          (touchstart)="onTouchStart($event)"
+          (touchmove)="onTouchMove($event)"
+          (touchend)="onTouchEnd($event)"
+        >
+          <div
+            [style.--preview-position]="previewBufferedProgress()"
+            [style.--progress-position]="mediaProgress()"
+            [style.height]="isInTimeline ? '100%' : '4px'"
+            class="timeline-b w-full bg-slate-600 rounded-md relative before:rounded-md transition-height hover:duration-100 ease-in-out"
+          >
+            <div class="thumb-indicator"></div>
           </div>
-          <div class="flex items-center justify-end align-middle space-x-3">
-            <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="enablePictureInPicture()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                <path
-                  d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"
-                />
-                <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z" />
-              </svg>
-            </button>
-            <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="toggleFullscreen()">
-              @if (isInFullscreen) {
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                  <path
-                    d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5m5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5M0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5m10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0z"
-                  />
-                </svg>
-              } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
-                  <path
-                    d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"
-                  />
-                </svg>
-              }
-            </button>
+          <div
+            #thumbTooltip
+            class="absolute bottom-[4rem] text-center w-auto rounded-md bg-black text-xs p-1"
+            [style.visibility]="isInTimeline ? 'visible' : 'hidden'"
+            [style.left.px]="tooltipPosition"
+          >
+            <div class="text-white" [innerText]="currentTooltipTime"></div>
+          </div>
+        </div>
+
+        <div id="video-controls" class="flex items-center justify-center align-middle">
+          <div class="flex-1">
+            <div class="flex items-center justify-center text-white py-2">
+              <div class="flex-1 text-xs">{{ convertToTime(this.player.currentTime()) }}</div>
+            </div>
+          </div>
+
+          <div class="flex-1 text-right">
+            <div class="flex items-center justify-center text-white py-2">
+              <div class="flex-1 text-right text-xs">{{ convertToTime(this.player.duration()) }}</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>
+<!-- <div>isMobile = {{ isMobile }}</div>
+<div>{{ controlsVisible }}</div> -->
