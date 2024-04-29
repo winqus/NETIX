@@ -1,9 +1,33 @@
 <div #fullscreenContainer [style.cursor]="controlsVisible ? 'auto' : 'none'" class="relative w-full h-full bg-white select-none">
-  <video #videoPlayer class="vjs-matrix video-js focus:outline-none border-none" playsinline preload="auto" tabindex="-1" (mousedown)="onClick($event)" (dblclick)="onDoubleClick($event)"></video>
+  <video
+    #videoPlayer
+    class="vjs-matrix video-js focus:outline-none border-none"
+    playsinline
+    preload="auto"
+    tabindex="-1"
+    (mousedown)="onClick($event)"
+    (dblclick)="onDoubleClick($event)"
+    (touchend)="onTouch($event)"
+  ></video>
   <div [style.visibility]="controlsVisible ? 'visible' : 'hidden'" class="transition-opacity duration-500 ease-linear">
     <!-- Title Overlay -->
-    @if (isInFullscreen) {
-      <div class="absolute top-0 left-0 w-full h-24 p-3 px-5 text-white text-3xl font-bold">{{ videoTitle }}</div>
+    @if (isInFullscreen || isMobile) {
+      <div class="absolute top-0 left-0 w-full h-24 p-3 px-5 text-white text-3xl font-bold">
+        @if (isMobile) {
+          <button class="btn btn-xs w-auto bg-transparent border-none" (click)="goBack()">
+            <svg width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16" version="1.1" id="svg4" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+              <defs id="defs8" />
+              <path
+                fill-rule="evenodd"
+                d="M 9.224,1.553 A 0.5,0.49999973 0 0 1 9.447,2.2229996 L 6.56,7.9999965 9.448,13.775994 a 0.5,0.49999973 0 1 1 -0.894,0.447999 l -3,-5.9999965 a 0.5,0.49999973 0 0 1 0,-0.4479999 l 3,-5.9999968 A 0.5,0.49999973 0 0 1 9.224,1.553"
+                id="path2"
+                style="stroke-width: 1.5; paint-order: stroke fill markers; stroke: #fff; stroke-opacity: 1; stroke-miterlimit: 4; stroke-dasharray: none"
+              />
+            </svg>
+          </button>
+        }
+        {{ videoTitle }}
+      </div>
     } @else {
       <div class="absolute top-16 left-0 w-full h-24 p-3 px-5 text-white text-3xl font-bold">{{ videoTitle }}</div>
     }
@@ -139,7 +163,7 @@
         </div>
       </div>
     } @else {
-      <div class="absolute top-0 h-full w-full flex items-center justify-center align-middle">
+      <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto h-auto flex items-center justify-center align-middle">
         <button class="btn btn-circle btn-sm bg-opacity-60 border-none bg-black mx-6" (click)="fastBackward()">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="fill-white" viewBox="0 0 16 16">
             <path d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z" />
@@ -190,8 +214,8 @@
           (touchend)="onTouchEnd($event)"
         >
           <div
-            [style.--preview-position]="previewBufferedProgress()"
-            [style.--progress-position]="mediaProgress()"
+            [style.--preview-position]="previewPosition"
+            [style.--progress-position]="progressPosition"
             [style.height]="isInTimeline ? '100%' : '4px'"
             class="timeline-b w-full bg-slate-600 rounded-md relative before:rounded-md transition-height hover:duration-100 ease-in-out"
           >
@@ -224,5 +248,3 @@
     }
   </div>
 </div>
-<!-- <div>isMobile = {{ isMobile }}</div>
-<div>{{ controlsVisible }}</div> -->

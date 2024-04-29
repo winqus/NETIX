@@ -1,10 +1,10 @@
-//? TODO tooltips on buttons?
-
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, Subscription, debounceTime, fromEvent, map, timer } from 'rxjs';
+import { Router } from '@angular/router';
+import { LayoutService } from '../../services/layout.service';
 
 @Component({
   selector: 'app-video-media-viewer',
@@ -13,7 +13,7 @@ import { BehaviorSubject, Subscription, debounceTime, fromEvent, map, timer } fr
   templateUrl: './video-media-viewer.component.html',
   styleUrls: ['./video-media-viewer.component.scss'],
 })
-export class VideoMediaViewerComponent implements OnInit, OnDestroy {
+export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('fullscreenContainer', { static: true }) fullscreenContainer!: ElementRef<HTMLElement>;
   @ViewChild('videoPlayer', { static: true }) videoPlayerElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('timeline', { static: false }) videoTimeline!: ElementRef<HTMLElement>;
@@ -40,12 +40,17 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   currentTime: number = 0;
   newTime: number = 0;
   duration: number = 0;
+  previewPosition: string = '0%';
+  progressPosition: string = '0%';
 
   private resizeSubscription: Subscription;
   isMobile$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isMobile: boolean = false;
 
-  constructor() {
+  constructor(
+    private router: Router,
+    private layoutService: LayoutService
+  ) {
     this.resizeSubscription = fromEvent(window, 'resize')
       .pipe(
         debounceTime(300),
@@ -61,10 +66,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
     this.setupPlayer();
 
     this.isMobile = this.checkScreenSize();
-    console.log(this.isMobile);
-    if (this.isMobile) {
-      this.setupActivityTracker();
-    }
+    this.setupActivityTracker();
   }
 
   ngOnDestroy(): void {
@@ -78,16 +80,19 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
     this.resizeSubscription.unsubscribe();
   }
 
+  ngAfterViewInit() {
+    this.changeVolume();
+  }
+
   setupPlayer() {
     const target = this.videoPlayerElement.nativeElement;
 
     this.player = videojs(target, this.options);
-    this.player.usingNativeControls(false);
-    this.changeVolume();
 
     this.player.on('timeupdate', () => {
       this.currentTime = this.player ? this.player.currentTime() || 0 : 0;
       this.duration = this.player ? this.player.duration() || 0 : 0;
+      this.updateProgressStyles();
     });
   }
 
@@ -138,10 +143,6 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   onMouseMove(event: MouseEvent): void {
     this.seek(event);
 
-    if (this.isMobile) {
-      return;
-    }
-
     this.controlsVisible = true;
     if (this.idleTimerSubscription) {
       this.idleTimerSubscription.unsubscribe();
@@ -157,53 +158,58 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   private resetIdleTimer() {
     const idleTimer = timer(this.idleThreshold);
     this.idleTimerSubscription = idleTimer.subscribe(() => {
-      if (!this.isPlaying()) {
+      if (!this.isPlaying() && !this.isMobile) {
         this.controlsVisible = false;
       }
     });
   }
 
+  goBack() {
+    this.layoutService.setIsMobile(false);
+    this.router.navigate(['/']);
+  }
+
   checkScreenSize(): boolean {
-    // Example of a simple responsive check based on viewport width
     let hasTouchScreen = false;
     if ('maxTouchPoints' in navigator) {
       hasTouchScreen = navigator.maxTouchPoints > 0;
-      this.isMobile = hasTouchScreen;
     }
     // if (window.innerWidth <= 768) {
     //   return true;
     // }
 
-    console.log(hasTouchScreen);
+    // console.log(hasTouchScreen);
+    this.layoutService.setIsMobile(hasTouchScreen);
     return hasTouchScreen;
   }
 
-  // lastClickTime!: number;
-  // onTouch(event: TouchEvent): void {
-  //   console.log(event);
-  // if (event.button != 0) {
-  //   return;
-  // }
-  // // Prevent double click from triggering this twice
-  // const currentTime = new Date().getTime();
-  // if (currentTime - (this.lastClickTime || 0) < 300) {
-  //   return;
-  // }
-  // this.lastClickTime = currentTime;
-  // setTimeout(() => {
-  //   if (currentTime === this.lastClickTime) {
-  //     this.togglePlay();
-  //   }
-  // }, 300);
-  // }
+  lastTouchTime!: number;
+  onTouch(event: TouchEvent) {
+    console.log(event);
 
-  // onDoubleClick(event: MouseEvent): void {
-  //   if (event.button != 0) {
-  //     return;
-  //   }
+    const currentTime = new Date().getTime();
+    if (currentTime - (this.lastTouchTime || 0) < 300) {
+      this.toggleFullscreen();
+      this.resetLastTouchTimeout();
+    } else {
+      // It's a single touch, potentially
+      this.lastTouchTime = currentTime;
+      this.setSingleTouchTimeout(currentTime);
+    }
+  }
 
-  //   this.toggleFullscreen();
-  // }
+  private setSingleTouchTimeout(time: number) {
+    setTimeout(() => {
+      if (time === this.lastTouchTime) {
+        // No subsequent touch has occurred
+        this.controlsVisible = !this.controlsVisible;
+      }
+    }, 300);
+  }
+
+  private resetLastTouchTimeout() {
+    this.lastTouchTime = 0;
+  }
 
   // * PLAY/PAUSE
   togglePlay() {
@@ -290,6 +296,11 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   tooltipPosition: number = 0;
   currentTooltipTime: string = '';
 
+  updateProgressStyles(): void {
+    this.previewPosition = this.previewBufferedProgress();
+    this.progressPosition = this.mediaProgress();
+  }
+
   previewBufferedProgress(): string {
     const duration = this.duration ?? 0;
     const currentTime = this.currentTime ?? 0;
@@ -303,7 +314,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   }
 
   mediaProgress(): string {
-    if (this.isDragging) {
+    if (this.isDragging && this.currentTime != this.newTime) {
       this.currentTime = this.newTime;
     }
 
@@ -315,7 +326,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
     if (duration === 0) return '0%';
 
     const percentage = (time / duration) * 100;
-    return `${percentage.toFixed(20)}%`;
+    return `${percentage.toFixed(3)}%`;
   }
 
   // * TIMELINE FOR DESKTOP
@@ -353,24 +364,22 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
   }
 
   seek(event: any): void {
-    // if (this.isMobile) {
-    //   return;
-    // }
+    const clientX = event.clientX;
 
     const rect = this.videoTimeline.nativeElement.getBoundingClientRect();
     const toolTipRect = this.thumbTooltip.nativeElement.getBoundingClientRect();
 
-    const newProgress = ((event.clientX - rect.left) * 100) / rect.width;
+    const newProgress = ((clientX - rect.left) * 100) / rect.width;
     if (newProgress >= 0 && newProgress <= 100 && this.duration != undefined) {
       this.newTime = (newProgress * this.duration) / 100;
       this.currentTooltipTime = this.convertToTime(this.newTime);
 
-      if (event.x <= toolTipRect.width / 2 + rect.left) {
-        this.tooltipPosition = event.clientX - event.x + rect.left;
-      } else if (event.x >= rect.width - toolTipRect.width / 2 + rect.left) {
+      if (clientX <= toolTipRect.width / 2 + rect.left) {
+        this.tooltipPosition = rect.left;
+      } else if (clientX >= rect.width - toolTipRect.width / 2 + rect.left) {
         this.tooltipPosition = rect.width - toolTipRect.width + rect.left;
       } else {
-        this.tooltipPosition = event.clientX - toolTipRect.width / 2;
+        this.tooltipPosition = clientX - toolTipRect.width / 2;
       }
     }
   }
@@ -383,11 +392,6 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy {
       const touch = event.touches[0];
 
       this.seek(touch);
-      // this.currentTime = this.newTime;
-
-      // console.log(`Touch coordinates: clientX=${touch.clientX}, clientY=${touch.clientY}`);
-      // console.log(`Page coordinates: pageX=${touch.pageX}, pageY=${touch.pageY}`);
-      // console.log(`Screen coordinates: screenX=${touch.screenX}, screenY=${touch.screenY}`);
     }
   }
 
