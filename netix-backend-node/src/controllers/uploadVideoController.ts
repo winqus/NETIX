@@ -14,24 +14,6 @@ export default class UploadVideoController {
     @Inject('VideoUploadRequestService') private uploadRequestService: IVideoUploadRequestService
   ) {}
 
-  public async getConstraints(_req: Request, res: Response, next: NextFunction) {
-    try {
-      const constraintsResult = await this.videoUploadService.getVideoUploadConstraints();
-
-      if (constraintsResult.isFailure) {
-        return res.status(400).json({ error: constraintsResult.errorValue() });
-      }
-
-      const response = constraintsResult.getValue();
-
-      return res.status(200).json(response);
-    } catch (error) {
-      this.logger.error(`[UploadVideoController]: ${error}`);
-
-      return next(error);
-    }
-  }
-
   public async uploadVideoChunk(req: Request, res: Response, next: NextFunction) {
     try {
       const uploadRequestId = req.params.requestId;

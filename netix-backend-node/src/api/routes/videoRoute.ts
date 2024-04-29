@@ -51,8 +51,6 @@ export default (router: Router) => {
   const uploadController = Container.get(UploadVideoController);
   const requestController = Container.get(UploadVideoRequestController);
 
-  router.get('/constraints', (req, res, next) => uploadController.getConstraints(req, res, next));
-
   router.post('/upload/permission', celebrate(newVideoUploadRequestSchema), (req, res, next) =>
     requestController.requestUploadPermission(req, res, next)
   );

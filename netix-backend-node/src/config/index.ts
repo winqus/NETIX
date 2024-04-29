@@ -18,6 +18,10 @@ import videoConfig, { VideoConfig } from './videos';
 interface AppEnvironment extends NodeJS.ProcessEnv {
   NODE_ENV: string;
   PORT: string;
+  MONGODB_URI: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  REDIS_PASSWORD?: string;
 }
 
 /*
@@ -32,6 +36,11 @@ interface AppConfig {
   };
   video: VideoConfig;
   dependencies: DependencyConfig;
+  redis: {
+    host: string;
+    port: number;
+    password?: string;
+  };
 }
 
 /*
@@ -57,5 +66,11 @@ const config: AppConfig = {
   video: videoConfig,
 
   dependencies: dependencyConfig,
+
+  redis: {
+    host: env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(env.REDIS_PORT, 10) || 6379,
+    password: env.REDIS_PASSWORD,
+  },
 };
 export default config;

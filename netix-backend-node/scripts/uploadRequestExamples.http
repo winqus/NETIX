@@ -1,0 +1,3 @@
+# GET upload constraints with JWT Authentication header
+GET http://[::1]:3055/api/v1/upload/constraints HTTP/1.1
+Authorization: Bearer some.fake-jwt.token

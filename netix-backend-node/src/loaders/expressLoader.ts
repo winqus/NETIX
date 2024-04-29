@@ -50,6 +50,7 @@ export default (app: express.Application) => {
 
   app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
     logger.error(`[server]: Unexpected error: ${error.message}`);
+    logger.debug(`[server]: ${JSON.stringify(error)}`);
 
     res.status(error.status || 500);
     const response: ErrorResponse = { message: error.message || 'Unexpected error has occured.' };

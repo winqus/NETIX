@@ -4,8 +4,29 @@ import videoMetadataSchema from '../persistence/schemas/videoMetadata.schema';
 import videoUploadRequestSchema from '../persistence/schemas/videoUploadRequest.schema';
 import VideoUploadRequestRepository from '../repositories/VideoUploadRequestRepository';
 import SystemFileService from '../services/SystemFileService';
+import UploadService from '../services/UploadService';
 import VideoUploadRequestService from '../services/VideoUploadRequestService';
 import VideoUploadService from '../services/VideoUploadService';
+
+export const NAMES = {
+  LOGGER: 'logger',
+  REDIS: 'redis',
+  SCHEMAS: {
+    // TODO schema names
+  },
+  REPOSITORIES: {
+    // TODO repository names
+  },
+  SERVICES: {
+    Upload: 'UploadService',
+  },
+  QUEUES: {
+    // TODO queue names
+  },
+  WORKERS: {
+    // TODO worker names
+  },
+};
 
 export interface DependencyConfig {
   schemas: { name: string; class: any }[];
@@ -25,6 +46,7 @@ const dependencyConfig: DependencyConfig = {
 
   services: [
     { name: 'FileService', class: SystemFileService },
+    { name: NAMES.SERVICES.Upload, class: UploadService },
     { name: 'VideoUploadService', class: VideoUploadService },
     { name: 'VideoUploadRequestService', class: VideoUploadRequestService },
   ],

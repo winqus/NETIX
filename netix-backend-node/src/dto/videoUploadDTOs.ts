@@ -1,37 +1,5 @@
 import { MetadataUploadState, ThumbnailUploadState, VideoUploadRequestState, VideoUploadState } from '../core/states/VideoUploadRequest.state';
 
-export interface VideoUploadConstraintsDTO {
-  videoFileConstraints: VideoFileUploadContraintsDTO;
-  thumbnailConstraints: VideoThumbnailUploadConstraintsDTO;
-}
-
-export interface VideoFileUploadContraintsDTO {
-  durationInSeconds: { min: number; max: number };
-  sizeInBytes: { min: number; max: number };
-  allowedMimeTypes: string[];
-  resolution: {
-    minWidth: number;
-    minHeight: number;
-    maxWidth: number;
-    maxHeight: number;
-  };
-}
-
-export interface VideoThumbnailUploadConstraintsDTO {
-  maxSizeBytes: number;
-  allowedMimeTypes: string[];
-  resolution: {
-    minWidth: number;
-    minHeight: number;
-    maxWidth: number;
-    maxHeight: number;
-  };
-  aspectRatio: {
-    width: number;
-    height: number;
-  };
-}
-
 export interface NewVideoUploadRequestDTO {
   fileName: string;
   fileSizeInBytes: number;

@@ -2,12 +2,8 @@ import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import config from '../config';
 import { Result } from '../core/logic/Result';
-import {
-  VideoChunkUploadDTO,
-  VideoFileUploadContraintsDTO,
-  VideoThumbnailUploadConstraintsDTO,
-  VideoUploadConstraintsDTO,
-} from '../dto/videoUploadDTOs';
+import { VideoChunkUploadDTO } from '../dto/videoUploadDTOs';
+import IVideoUploadRequestRepository from './IRepositories/IVideoUploadRequestRepository';
 import IFileService from './IServices/IFileService';
 import IVideoUploadService from './IServices/IVideoUploadService';
 
@@ -15,37 +11,9 @@ import IVideoUploadService from './IServices/IVideoUploadService';
 export default class VideoUploadService implements IVideoUploadService {
   constructor(
     @Inject('logger') private logger: Logger,
-    @Inject('FileService') private fileService: IFileService
+    @Inject('FileService') private fileService: IFileService,
+    @Inject('VideoUploadRequestRepository') private uploadRequestService: IVideoUploadRequestRepository
   ) {}
-
-  public async getVideoUploadConstraints(): Promise<Result<VideoUploadConstraintsDTO>> {
-    try {
-      const videoConstrains: VideoFileUploadContraintsDTO = {
-        durationInSeconds: config.video.durationInSeconds,
-        sizeInBytes: config.video.sizeInBytes,
-        allowedMimeTypes: config.video.allowedMimeTypes,
-        resolution: config.video.resolution,
-      };
-
-      const thumbnailConstraints: VideoThumbnailUploadConstraintsDTO = {
-        maxSizeBytes: config.video.thumbnail.maxSizeBytes,
-        allowedMimeTypes: config.video.thumbnail.allowedMimeTypes,
-        resolution: config.video.thumbnail.resolution,
-        aspectRatio: config.video.thumbnail.aspectRatio,
-      };
-
-      const constraintsResponse: VideoUploadConstraintsDTO = {
-        videoFileConstraints: videoConstrains,
-        thumbnailConstraints: thumbnailConstraints,
-      };
-
-      return Result.ok<VideoUploadConstraintsDTO>(constraintsResponse);
-    } catch (error) {
-      this.logger.error(`[UploadRequestService]: ${error}`);
-
-      throw error;
-    }
-  }
 
   public async saveVideoChunkFile(videoChunkUpload: VideoChunkUploadDTO, overwrite = false): Promise<Result<void>> {
     try {

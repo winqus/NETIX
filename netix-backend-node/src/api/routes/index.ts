@@ -1,12 +1,15 @@
 import { Router } from 'express';
-import status from './statusRoute';
-import video from './videoRoute';
+import statusRoute from './statusRoute';
+import uploadRoute from './uploadRoute';
+import videoRoute from './videoRoute';
 
 export default () => {
   const router = Router();
 
-  status(router);
-  video(router);
+  statusRoute(router);
+
+  uploadRoute(router);
+  videoRoute(router);
 
   return router;
 };
