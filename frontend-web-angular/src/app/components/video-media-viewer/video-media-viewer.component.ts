@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, Subscription, debounceTime, fromEvent, map, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { LayoutService } from '../../services/layout.service';
+import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
 
 @Component({
   selector: 'app-video-media-viewer',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, SvgIconsComponent],
   templateUrl: './video-media-viewer.component.html',
   styleUrls: ['./video-media-viewer.component.scss'],
 })
