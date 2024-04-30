@@ -91,9 +91,7 @@ export class SvgIconsComponent implements OnChanges {
       </svg>
     `,
     default: `
-      <svg width="size" height="size" fill="currentColor" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10"></circle>
-      </svg>
+      <div class="bg-[red] text-white">ERROR</div>
     `,
   };
 
