@@ -4,6 +4,11 @@
     <div class="flex-1">
       <a href="/" class="btn btn-ghost normal-case text-2xl">{{ props.title }}</a>
     </div>
+    <div class="flex-none">
+      <div class="flex items-center">
+        <a href="/watch" class="btn btn-ghost">Watch</a>
+      </div>
+    </div>
   </div>
   @if (!isUploadRoute) {
     <button [routerLink]="['/upload']" [disabled]="isUploadRoute" class="btn btn-ghost rounded-md hover:bg-black">
