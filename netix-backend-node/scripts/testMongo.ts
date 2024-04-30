@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-const uri = 'mongodb://localhost:27017/test12345';
+const uri = 'mongodb://localhost:27017/test123456';
 
 const addressSchema = new mongoose.Schema({
   _id: mongoose.Schema.Types.UUID,
@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   name: String,
   age: Number,
   address: addressSchema,
-  friendUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  friendUser: { type: mongoose.Schema.Types.UUID, ref: 'User' },
   created: { type: Date, default: () => Date.now(), immutable: true },
 });
 
@@ -42,9 +42,10 @@ const userModel = mongoose.model('User', userSchema);
 
   const user = new userModel({
     _id: new mongoose.Types.UUID(userIdString),
-    name: 'Homer Simpson',
+    name: 'Marge Simpson',
     age: 39,
     address: address,
+    friendUser: '6d8c6d22-326b-4dba-8081-843fc09a0033',
   });
 
   await address.save();

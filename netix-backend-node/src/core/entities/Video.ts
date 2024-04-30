@@ -1,45 +1,60 @@
 import { Result } from '../logic/Result';
-import { VideoState } from '../states/Video.state';
+import { VideoState } from '../states/VideoState';
 import Entity from './Entity';
-import Thumbnail from './Thumbnail';
 import UniqueEntityID from './UniqueEntityID';
-import VideoMetadata from './VideoMetadata';
 
 interface VideoProps {
-  state: VideoState;
-  path: string;
-  uploaderId: UniqueEntityID;
-  thumbnail: Thumbnail;
-  metadata: VideoMetadata;
+  lengthInSeconds?: number;
+  sizeInBytes?: number;
+  state?: VideoState;
 }
 
 export default class Video extends Entity<VideoProps> {
-  constructor(props: VideoProps, uuid?: UniqueEntityID) {
-    super(props, uuid);
+  get state(): VideoState {
+    return this.props.state || VideoState.PENDING;
   }
 
-  public static create(props: VideoProps, uuid?: UniqueEntityID): Result<Video> {
-    if (!props.state) {
-      return Result.fail<Video>('State is required');
-    }
-    if (!Object.values(VideoState).includes(props.state)) {
-      return Result.fail<Video>('Invalid state');
-    }
-    if (!props.path) {
-      return Result.fail<Video>('Path is required');
-    }
-    if (!props.uploaderId) {
-      return Result.fail<Video>('Uploader is required');
-    }
-    if (!props.thumbnail) {
-      return Result.fail<Video>('Thumbnail is required');
-    }
-    if (!props.metadata) {
-      return Result.fail<Video>('Metadata is required');
+  get ready(): boolean {
+    return this.state === VideoState.READY;
+  }
+
+  get lengthInSeconds(): number {
+    if (!this.ready) {
+      throw new Error('Cannot access length of a video that is not ready');
     }
 
-    const newVideo = new Video(props, uuid);
+    return this.props.lengthInSeconds || 0;
+  }
 
-    return Result.ok<Video>(newVideo);
+  get sizeInBytes(): number {
+    if (!this.ready) {
+      throw new Error('Cannot access size of a video that is not ready');
+    }
+
+    return this.props.sizeInBytes || 0;
+  }
+
+  private constructor(props: VideoProps, uuid?: UniqueEntityID, createdAt?: Date, updatedAt?: Date) {
+    super(props, uuid, createdAt, updatedAt);
+  }
+
+  public static create(props: VideoProps, uuid?: UniqueEntityID, createdAt?: Date, updatedAt?: Date): Result<Video> {
+    if (props.state && Object.values(VideoState).includes(props.state) && props.state === VideoState.READY) {
+      if (!props.lengthInSeconds) {
+        return Result.fail('Length is required');
+      }
+
+      if (!props.sizeInBytes) {
+        return Result.fail('Size is required');
+      }
+    }
+
+    if (props.state == null) {
+      props.state = VideoState.PENDING;
+    }
+
+    const newVideo = new Video(props, uuid, createdAt, updatedAt);
+
+    return Result.ok(newVideo);
   }
 }

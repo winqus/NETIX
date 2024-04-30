@@ -9,7 +9,7 @@ export default () => {
   statusRoute(router);
 
   uploadRoute(router);
-  videoRoute(router);
+  // videoRoute(router);
 
   return router;
 };

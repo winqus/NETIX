@@ -1,3 +1,30 @@
-# GET upload constraints with JWT Authentication header
+### GET upload constraints with JWT Authentication header
+
 GET http://[::1]:3055/api/v1/upload/constraints HTTP/1.1
 Authorization: Bearer some.fake-jwt.token
+
+### Get upload permission (for single chunk)
+
+POST http://[::1]:3055/api/v1/upload/permission HTTP/1.1
+Authorization: Bearer some.fake-jwt.token
+Content-Type: application/json
+
+{
+    "fileName": "sample",
+    "fileSizeInBytes": 22222,
+    "mimeType": "video/mp4",
+    "durationInSeconds": 100
+}
+
+### Get upload permission (for multiple chunks)
+
+POST http://[::1]:3055/api/v1/upload/permission HTTP/1.1
+Authorization: Bearer some.fake-jwt.token
+Content-Type: application/json
+
+{
+    "fileName": "sampleBig",
+    "fileSizeInBytes": 1073741824,
+    "mimeType": "video/mp4",
+    "durationInSeconds": 1000
+}

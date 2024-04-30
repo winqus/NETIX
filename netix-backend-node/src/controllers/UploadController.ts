@@ -29,4 +29,36 @@ export default class UploadController {
       return next(error);
     }
   }
+
+  public async getPermission(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user?.id;
+      const { fileName, fileSizeInBytes, mimeType, durationInSeconds } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'User not found in request.' });
+      }
+
+      const permissionResult = await this.uploadService.getPermissionToUpload({
+        userId,
+        fileName,
+        fileSizeInBytes,
+        mimeType,
+        durationInSeconds,
+      });
+
+      if (permissionResult.isFailure) {
+        return res.status(400).json({ error: permissionResult.errorValue() });
+      }
+
+      const response = permissionResult.getValue();
+      this.logger.info(`[UploadVideoController, getPermission]: Returning permission to upload video: ${JSON.stringify(response)}`);
+
+      return res.status(200).json(response);
+    } catch (error) {
+      this.logger.error(`[UploadVideoController, getPermission]: ${error}`);
+
+      return next(error);
+    }
+  }
 }
