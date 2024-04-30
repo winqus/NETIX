@@ -4,15 +4,22 @@ import { EmptyLayoutComponent } from './layouts/empty-layout/empty-layout.compon
 import { ErrorPageComponent } from './components/error-page/error-page.component';
 import appMessages from '../assets/i18n/en/appMessages.json';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
+import { VideoMediaViewerComponent } from './components/video-media-viewer/video-media-viewer.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
     children: [{ path: '', component: MovieListComponent }],
+
     // path: '',
     // component: MainLayoutComponent,
     // children: [{ path: '', component: MainPageComponent }],
+  },
+  {
+    path: 'watch',
+    component: MainLayoutComponent,
+    children: [{ path: '', component: VideoMediaViewerComponent }],
   },
   {
     path: 'error',

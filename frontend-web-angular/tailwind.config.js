@@ -9,6 +9,10 @@ module.exports = {
       backgroundImage: {
         'black-to-transparent': 'linear-gradient(to bottom, transparent, black)',
       },
+      // fillHight:
+      // {
+      //   ''
+      // }
     },
   },
   plugins: [require("daisyui")],

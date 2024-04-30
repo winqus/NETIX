@@ -1,6 +1,9 @@
-<div class="flex flex-col min-h-screen bg-base-300">
-  <app-navbar [props]="navbarData"></app-navbar>
-  <div class="flex-grow h-full pt-24 md:pt-16">
+<div class="flex flex-col w-dvw h-dvh bg-base-300">
+  @if (!isMobile) {
+    <app-navbar [props]="navbarData"></app-navbar>
+  }
+  <!-- <div class="grow pt-24 md:pt-16"> -->
+  <div class="grow">
     <router-outlet></router-outlet>
   </div>
 </div>
