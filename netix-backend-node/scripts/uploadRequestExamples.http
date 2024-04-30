@@ -28,3 +28,9 @@ Content-Type: application/json
     "mimeType": "video/mp4",
     "durationInSeconds": 1000
 }
+
+### Test Upload Chunk Endpoint (non existing uploadId)
+
+POST http://[::1]:3055/api/v1/upload/dsadasdsadsa/videoChunk/0 HTTP/1.1
+Authorization: Bearer some.fake-jwt.token
+

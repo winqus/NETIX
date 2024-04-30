@@ -17,8 +17,8 @@ const videoSchema = new Schema<IVideoPersistence>({
   createdAt: { type: Date, default: () => Date.now(), immutable: true },
   updatedAt: { type: Date, default: () => Date.now() },
 
-  lengthInSeconds: { type: Number, min: 0 },
-  sizeInBytes: { type: Number, min: 0 },
+  lengthInSeconds: { type: Number, min: 0, default: 0 },
+  sizeInBytes: { type: Number, min: 0, default: 0 },
   ready: { type: Boolean, default: false },
   state: { type: String, enum: Object.values(VideoState), default: VideoState.PENDING },
 });

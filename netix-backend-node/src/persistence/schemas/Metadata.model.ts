@@ -18,7 +18,7 @@ const metadataSchema = new Schema<IMetadataPersistence>({
   updatedAt: { type: Date, default: () => Date.now() },
 
   title: { type: String },
-  publishDatetime: { type: Date },
+  publishDatetime: { type: Date, default: () => Date.now() },
   ready: { type: Boolean, default: false },
   state: { type: String, enum: Object.values(MetadataState), default: MetadataState.PENDING },
 });

@@ -1,22 +1,15 @@
-import Metadata from '../core/entities/Metadata';
-import UploadVideoJob from '../core/entities/UploadVideoJob';
 import MetadataModel from '../persistence/schemas/Metadata.model';
-import { default as ThumbnailModel, default as thumbnailSchema } from '../persistence/schemas/Thumbnail.model';
+import { default as ThumbnailModel } from '../persistence/schemas/Thumbnail.model';
 import UploadModel from '../persistence/schemas/Upload.model';
 import UploadVideoJobModel from '../persistence/schemas/UploadVideoJob.model';
 import VideoModel from '../persistence/schemas/Video.model';
-import videoSchema from '../persistence/schemas/video.schema';
-import videoMetadataSchema from '../persistence/schemas/videoMetadata.schema';
-import videoUploadRequestSchema from '../persistence/schemas/videoUploadRequest.schema';
-import VideoUploadRequestRepository from '../repositories/VideoUploadRequestRepository';
 import SystemFileService from '../services/SystemFileService';
 import UploadService from '../services/UploadService';
-import VideoUploadRequestService from '../services/VideoUploadRequestService';
-import VideoUploadService from '../services/VideoUploadService';
+import UploadVideoJobService from '../services/UploadVideoJobService';
 
 export const NAMES = {
-  LOGGER: 'logger',
-  REDIS: 'redis',
+  Logger: 'logger',
+  Redis: 'redis',
   SCHEMAS: {
     Video: 'VideoSchema',
     Metadata: 'MetadataSchema',
@@ -29,6 +22,7 @@ export const NAMES = {
   },
   SERVICES: {
     Upload: 'UploadService',
+    UploadVideoJob: 'UploadVideoJobService',
   },
   QUEUES: {
     // TODO queue names
@@ -64,6 +58,8 @@ const dependencyConfig: DependencyConfig = {
   services: [
     { name: 'FileService', class: SystemFileService },
     { name: NAMES.SERVICES.Upload, class: UploadService },
+    { name: NAMES.SERVICES.UploadVideoJob, class: UploadVideoJobService },
+
     // { name: 'VideoUploadService', class: VideoUploadService },
     // { name: 'VideoUploadRequestService', class: VideoUploadRequestService },
   ],

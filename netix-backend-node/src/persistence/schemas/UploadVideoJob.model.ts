@@ -1,10 +1,17 @@
 import mongoose, { Schema, model } from 'mongoose';
+import { IMetadataPersistence } from './Metadata.model';
+import { IThumbnailPersistence } from './Thumbnail.model';
+import { IUploadPersistence } from './Upload.model';
+import { IVideoPersistence } from './Video.model';
 
+export type IFullUploadVideoJobPersistance = IUploadVideoJobPersistence & {
+  uploadID: IUploadPersistence & { videoID: IVideoPersistence; metadataID: IMetadataPersistence; thumbnailID: IThumbnailPersistence };
+};
 export interface IUploadVideoJobPersistence {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-  uploadID: string | any;
+  uploadID: mongoose.Schema.Types.UUID | IUploadPersistence;
 
   chunks: boolean[];
   chunksReceived: number;
@@ -28,7 +35,7 @@ const uploadVideoJobSchema = new Schema<IUploadVideoJobPersistence>({
   chunksReceived: { type: Number, default: 0 },
   totalChunkCount: { type: Number, required: true },
   rawFileSizeInBytes: { type: Number, required: true },
-  originalFileName: { type: String },
+  originalFileName: { type: String, default: '' },
   uploadFileProgressPercentage: { type: Number, default: 0 },
   uploadFileDone: { type: Boolean, default: false },
   transcodingProgressPercentage: { type: Number, default: 0 },

@@ -1,30 +1,17 @@
 import mongoose, { Schema, model } from 'mongoose';
 import { UploadState } from '../../core/states/UploadState';
-// import { IMetadataPersistence } from './Metadata.model';
-// import { IThumbnailPersistence } from './Thumbnail.model';
-// import { IVideoPersistence } from './Video.model';
-
-// export interface IUploadPersistenceFullyPopulated {
-//   _id: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-//   uploaderID: string | any;
-//   video: IVideoPersistence;
-//   metadata: IMetadataPersistence;
-//   thumbnail: IThumbnailPersistence;
-
-//   ready: boolean;
-//   state: UploadState;
-// }
+import { IMetadataPersistence } from './Metadata.model';
+import { IThumbnailPersistence } from './Thumbnail.model';
+import { IVideoPersistence } from './Video.model';
 
 export interface IUploadPersistence {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-  uploaderID: string | any;
-  videoID: string | any;
-  metadataID: string | any;
-  thumbnailID: string | any;
+  uploaderID: string;
+  videoID: string | IVideoPersistence;
+  metadataID: string | IMetadataPersistence;
+  thumbnailID: string | IThumbnailPersistence;
 
   ready: boolean;
   state: UploadState;

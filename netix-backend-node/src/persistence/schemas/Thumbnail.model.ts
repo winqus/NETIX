@@ -16,7 +16,7 @@ const thumbnailSchema = new Schema<IThumbnailPersistence>({
   createdAt: { type: Date, default: () => Date.now(), immutable: true },
   updatedAt: { type: Date, default: () => Date.now() },
 
-  mimeType: { type: String },
+  mimeType: { type: String, default: '' },
   ready: { type: Boolean, default: false },
   state: { type: String, enum: Object.values(ThumbnailState), default: ThumbnailState.PENDING },
 });

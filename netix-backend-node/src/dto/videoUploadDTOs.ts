@@ -1,13 +1,5 @@
 import { MetadataUploadState, ThumbnailUploadState, VideoUploadRequestState, VideoUploadState } from '../core/states/VideoUploadRequest.state';
 
-export interface NewVideoUploadRequestDTO {
-  fileName: string;
-  fileSizeInBytes: number;
-  mimeType: string;
-  durationInSeconds: number;
-  userId: string;
-}
-
 export interface VideoUploadRequestDTO {
   requestId: string;
   createdAt: Date;
@@ -22,23 +14,6 @@ export interface VideoUploadRequestDTO {
   overallState: VideoUploadRequestState;
   chunksReceived: number;
   totalChunks: number;
-}
-
-// export interface VideoRequestTokenProperties {
-//   requestId: string;
-//   creationTime: Date;
-//   expirationTime: Date;
-//   userId: string;
-//   videoId: string;
-// }
-
-export interface NewVideoUploadRequestResponseDTO {
-  requestId: string;
-  videoId: string;
-  uploadUrl: string;
-  totalChunksCount: number;
-  allowedUploadRateInChunksAtOnce: number;
-  chunkBaseName: string;
 }
 
 export interface VideoChunkUploadDTO {

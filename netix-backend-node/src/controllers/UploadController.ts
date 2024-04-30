@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
-import { Inject, Service } from 'typedi';
+import Container, { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import { NAMES } from '../config/dependencies';
 import IUploadService from '../services/IServices/IUploadService';
+import UploadVideoJobService from '../services/UploadVideoJobService';
 
 @Service()
 export default class UploadController {
   constructor(
-    @Inject(NAMES.LOGGER) private logger: Logger,
+    @Inject(NAMES.Logger) private logger: Logger,
     @Inject(NAMES.SERVICES.Upload) private uploadService: IUploadService
   ) {}
 
@@ -24,7 +25,7 @@ export default class UploadController {
 
       return res.status(200).json(response);
     } catch (error) {
-      this.logger.error(`[UploadVideoController, getConstraints]: ${error}`);
+      this.logger.error(`[UploadVideoController, getConstraints]: ${JSON.stringify(error)}`);
 
       return next(error);
     }
@@ -56,9 +57,48 @@ export default class UploadController {
 
       return res.status(200).json(response);
     } catch (error) {
-      this.logger.error(`[UploadVideoController, getPermission]: ${error}`);
+      this.logger.error(`[UploadVideoController, getPermission]: ${JSON.stringify(error)}`);
 
       return next(error);
+    }
+  }
+
+  public async processChunk(req: Request, res: Response, next: NextFunction) {
+    try {
+      this.checkUserAttached(req);
+      this.checkUploadJobAttached(req);
+
+      const dtoResult = await Container.get(UploadVideoJobService).getFullByUploadID(req.params.uploadID);
+
+      if (dtoResult.isFailure) {
+        this.logger.error(`[UploadVideoController, uploadChunk]: ${JSON.stringify(dtoResult.errorValue())}`);
+
+        return res.status(400).json({ error: dtoResult.errorValue() });
+      }
+
+      const dto = dtoResult.getValue();
+
+      return res.status(200).json(dto);
+    } catch (error) {
+      this.logger.error(`[UploadVideoController, uploadChunk]: ${JSON.stringify(error)}`);
+
+      return next(error);
+    }
+  }
+
+  private checkUserAttached(req: Request) {
+    if (!(req as any).user) {
+      this.logger.error(`[UploadVideoController, uploadChunk]: User not found in request.`);
+
+      throw new Error('User not found in request.');
+    }
+  }
+
+  private checkUploadJobAttached(req: Request) {
+    if (!(req as any).uploadJob) {
+      this.logger.error(`[UploadVideoController, uploadChunk]: Upload job not found in request.`);
+
+      throw new Error('Upload job not found in request.');
     }
   }
 }
