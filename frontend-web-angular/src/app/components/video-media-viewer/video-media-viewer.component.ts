@@ -185,8 +185,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   lastTouchTime!: number;
   onTouch(event: TouchEvent) {
-    console.log(event);
-
+    this.seek(event);
     const currentTime = new Date().getTime();
     if (currentTime - (this.lastTouchTime || 0) < 300) {
       this.toggleFullscreen();
@@ -389,7 +388,6 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
   // * TIMELINE FOR MOBILE
   onTouchStart(event: TouchEvent) {
-    event.preventDefault();
     this.isDragging = true;
     this.isInTimeline = true;
     if (event.touches.length > 0) {
@@ -406,8 +404,6 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
       const touch = event.touches[0];
       this.seek(touch);
     }
-    // this.isDragging = false;
-    // this.isInTimeline = false;
   }
 
   onTouchEnd(event: TouchEvent) {
@@ -417,8 +413,6 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
       const touch = event.touches[0];
       this.seek(touch);
     }
-
-    console.log(event);
     this.player.currentTime(this.currentTime);
   }
 
