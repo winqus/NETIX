@@ -302,6 +302,10 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   previewBufferedProgress(): string {
+    if (this.isDragging) {
+      return '0%';
+    }
+
     const duration = this.duration ?? 0;
     const currentTime = this.currentTime ?? 0;
 
