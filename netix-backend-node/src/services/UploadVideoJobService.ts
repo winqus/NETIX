@@ -2,9 +2,12 @@ import Container, { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import { NAMES } from '../config/dependencies';
 import { Result } from '../core/logic/Result';
+import { MetadataState } from '../core/states/MetadataState';
 import { UploadState } from '../core/states/UploadState';
 import { VideoState } from '../core/states/VideoState';
 import FullUploadVideoJobDTO from '../dto/FullUploadVideoJobDTO';
+import MetadataDTO from '../dto/MetadataDTO';
+import { UploadMetadataRequestDTO } from '../dto/UploadMetadataDTO';
 import UploadVideoJobMapper from '../mappers/UploadVideoJobMapper';
 import UploadModel from '../persistence/schemas/Upload.model';
 import UploadVideoJobModel, { IFullUploadVideoJobPersistanceDocument } from '../persistence/schemas/UploadVideoJob.model';
@@ -76,7 +79,19 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       }
 
       if (![UploadState.PENDING, UploadState.IN_PROGRESS].includes(job.uploadID.state)) {
-        throw new Error(`Upload video job is not in PENDING or IN_PROGRESS state to upload chunks.`);
+        this.logger.error(
+          `[UploadVideoJobService, updateChunkUploadProgress]: Upload job is not in correct state (${job.uploadID.state}) to upload chunks.`
+        );
+
+        return Result.fail(`Upload job is not in correct state to upload chunks.`);
+      }
+
+      if (![VideoState.PENDING, VideoState.PENDING].includes(job.uploadID.videoID.state)) {
+        this.logger.error(
+          `[UploadVideoJobService, updateChunkUploadProgress]: Video is not in correct state (${job.uploadID.videoID.state}) to upload chunks.`
+        );
+
+        return Result.fail(`Video is not in correct state to upload chunks.`);
       }
 
       if (job.chunks[chunkIndex]) {
@@ -128,6 +143,64 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       );
 
       return Result.fail(`Failed to update chunk upload progress for upload ID.`);
+    }
+  }
+
+  public async uploadMetadata(uploadID: string, request: UploadMetadataRequestDTO): Promise<Result<MetadataDTO>> {
+    try {
+      const { title, publishDatetime } = request.metadata;
+
+      if (title == null || publishDatetime == null) {
+        this.logger.error(`[UploadVideoJobService, uploadMetadata]: Metadata is missing required fields.`);
+
+        return Result.fail(`Metadata is missing required fields.`);
+      }
+
+      const job = await this.getPopulatedJob(uploadID);
+
+      if (!job) {
+        return Result.fail(`Upload video job not found for upload ID: ${uploadID}`);
+      }
+
+      if (![UploadState.PENDING, UploadState.IN_PROGRESS].includes(job.uploadID.state)) {
+        this.logger.error(`[UploadVideoJobService, uploadMetadata]: Upload job is not in correct state to upload metadata (${job.uploadID.state}).`);
+
+        return Result.fail(`Upload job is not in correct state to upload metadata.`);
+      }
+
+      if (![job.uploadID.metadataID.state].includes(MetadataState.PENDING)) {
+        this.logger.error(
+          `[UploadVideoJobService, uploadMetadata]: Metadata is not in correct state to upload metadata (${job.uploadID.metadataID.state}).`
+        );
+
+        return Result.fail(`Metadata is not in correct state to upload metadata.`);
+      }
+
+      if (job.uploadID.state !== UploadState.IN_PROGRESS) {
+        await UploadModel.updateOne({ _id: job.uploadID._id }, { state: UploadState.IN_PROGRESS }).exec();
+      }
+
+      job.uploadID.metadataID.title = title;
+      job.uploadID.metadataID.publishDatetime = publishDatetime;
+      job.uploadID.metadataID.state = MetadataState.READY;
+      job.uploadID.metadataID.ready = true;
+      const updatedMetadata = await job.uploadID.metadataID.save();
+
+      this.logger.info(`Uploaded metadata for upload ID (${uploadID})`);
+
+      return Result.ok({
+        uuid: updatedMetadata.id,
+        createdAt: updatedMetadata.createdAt,
+        updatedAt: updatedMetadata.updatedAt,
+        title: updatedMetadata.title,
+        publishDatetime: updatedMetadata.publishDatetime,
+        ready: updatedMetadata.ready,
+        state: updatedMetadata.state,
+      });
+    } catch (error) {
+      this.logger.error(`[UploadVideoJobService, uploadMetadata]: ` + `Error while trying to upload metadata for upload ID (${uploadID}): ${error}`);
+
+      throw new Error(`Failed to upload metadata for upload ID. Check logs.`);
     }
   }
 

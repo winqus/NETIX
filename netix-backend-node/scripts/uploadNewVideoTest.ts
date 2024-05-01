@@ -77,6 +77,28 @@ const uploadChunks = async (chunks: Blob[], permission: any) => {
   }
 };
 
+const uploadMetadata = async (uploadId: string, metadata: { title: string; publishDatetime: Date }) => {
+  const url = `http://[::1]:3055/api/v1/upload/${uploadId}/metadata`;
+
+  const body = {
+    metadata: metadata,
+  };
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer some.fake-jwt.token',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+  console.log(response.status + ' Metadata uploaded', data);
+
+  return data;
+};
+
 const loadLocalFile = async (fileName = 'videoFile1.mkv'): Promise<File> => {
   if (!fileName) {
     throw new Error('File name is required');
@@ -91,22 +113,30 @@ const loadLocalFile = async (fileName = 'videoFile1.mkv'): Promise<File> => {
 };
 
 (async () => {
-  const file = await loadLocalFile('videoFile1.mkv');
-  // const file = await loadLocalFile('image2.mp4');
-  console.log(`File (${file.name}) loaded`, file);
+  /*** Upload Reuquest ***/
+  // const file = await loadLocalFile('videoFile1.mkv');
+  // // const file = await loadLocalFile('image2.mp4');
+  // console.log(`File (${file.name}) loaded`, file);
 
-  // const permission = await getPermission(file);
-  const permission = {
-    uploadId: 'f9c0f9a2-8452-485a-a10c-94f6ef8180a0',
-    uploadUrl: 'http://localhost:3055/api/v1/upload/f9c0f9a2-8452-485a-a10c-94f6ef8180a0/videoChunk',
-    // totalChunksCount: 1,
-    totalChunksCount: 2,
-    allowedUploadRateInChunksAtOnce: 1,
-    chunkBaseName: 'a2398c2c-fd0a-432d-a077-5b790b787667',
-  };
-  console.log('Permission received', permission);
+  // // const permission = await getPermission(file);
+  // const permission = {
+  //   uploadId: 'f9c0f9a2-8452-485a-a10c-94f6ef8180a0',
+  //   uploadUrl: 'http://localhost:3055/api/v1/upload/f9c0f9a2-8452-485a-a10c-94f6ef8180a0/videoChunk',
+  //   // totalChunksCount: 1,
+  //   totalChunksCount: 2,
+  //   allowedUploadRateInChunksAtOnce: 1,
+  //   chunkBaseName: 'a2398c2c-fd0a-432d-a077-5b790b787667',
+  // };
+  // console.log('Permission received', permission);
 
-  const chunks = await splitVideoIntoChunks(file, permission);
+  /*** Upload video ***/
+  // const chunks = await splitVideoIntoChunks(file, permission);
 
-  await uploadChunks(chunks, permission);
+  // await uploadChunks(chunks, permission);
+
+  /*** Upload metadata ***/
+  await uploadMetadata('f9c0f9a2-8452-485a-a10c-94f6ef8180a0', {
+    title: 'Amazing video title',
+    publishDatetime: new Date('2021-09-05T00:00:00.000Z'),
+  });
 })();

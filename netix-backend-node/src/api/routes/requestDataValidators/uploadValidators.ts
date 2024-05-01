@@ -1,4 +1,5 @@
 import { Joi } from 'celebrate';
+import config from '../../../config';
 
 export const permissionRequestSchema = {
   body: Joi.object({
@@ -14,4 +15,16 @@ export const videoChunkUploadRequestSchema = {
     uploadID: Joi.string().required(),
     chunkIndex: Joi.number().integer().min(0).required(),
   },
+};
+
+export const metadataUploadRequestSchema = {
+  params: {
+    uploadID: Joi.string().required(),
+  },
+  body: Joi.object({
+    metadata: {
+      title: Joi.string().required().min(config.video.titleLength.min).max(config.video.titleLength.max),
+      publishDatetime: Joi.date().required(),
+    },
+  }).required(),
 };

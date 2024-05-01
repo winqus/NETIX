@@ -3,15 +3,16 @@ import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
 import HttpUploadRequest from '../api/IHttpRequest/HttpUploadRequest';
 import { NAMES } from '../config/dependencies';
+import { UploadMetadataRequestDTO, UploadMetadataResponseDTO } from '../dto/UploadMetadataDTO';
 import IUploadService from '../services/IServices/IUploadService';
-import UploadVideoJobService from '../services/UploadVideoJobService';
+import IUploadVideoJobService from '../services/IServices/IUploadVideoJobService';
 
 @Service()
 export default class UploadController {
   constructor(
     @Inject(NAMES.Logger) private logger: Logger,
     @Inject(NAMES.SERVICES.Upload) private uploadService: IUploadService,
-    @Inject(NAMES.SERVICES.UploadVideoJob) private uploadVideoJobService: UploadVideoJobService
+    @Inject(NAMES.SERVICES.UploadVideoJob) private uploadVideoJobService: IUploadVideoJobService
   ) {}
 
   public async getConstraints(_req: Request, res: Response, next: NextFunction) {
@@ -84,6 +85,32 @@ export default class UploadController {
       return res.status(200).json({ message: 'Chunk upload progress updated.' });
     } catch (error) {
       this.logger.error(`[UploadVideoController, uploadChunk]: ${JSON.stringify(error)}`);
+
+      return next(error);
+    }
+  }
+
+  public async uploadMetadata(req: HttpUploadRequest, res: Response, next: NextFunction) {
+    try {
+      this.checkUserAttached(req);
+      this.checkUploadJobAttached(req);
+
+      const uploadID = req.uploadJob!.upload.uuid;
+      const metadata = req.body as UploadMetadataRequestDTO;
+
+      const updateResult = await this.uploadVideoJobService.uploadMetadata(uploadID, metadata);
+
+      if (updateResult.isFailure) {
+        this.logger.error(`[UploadVideoController, uploadMetadata]: ${updateResult.errorValue()}`);
+
+        return res.status(400).json({ success: false, message: updateResult.errorValue() } as UploadMetadataResponseDTO);
+      }
+
+      const metadataDTO = updateResult.getValue();
+
+      return res.status(200).json({ success: true, metadata: metadataDTO } as UploadMetadataResponseDTO);
+    } catch (error) {
+      this.logger.error(`[UploadVideoController, uploadMetadata]: ${error}`);
 
       return next(error);
     }

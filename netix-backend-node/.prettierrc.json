@@ -3,5 +3,13 @@
   "trailingComma": "es5",
   "endOfLine": "auto",
   "printWidth": 150,
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "overrides": [
+    {
+      "files": "src/api/routes/*Route.ts",
+      "options": {
+        "printWidth": 100
+      }
+    }
+  ]
 }
