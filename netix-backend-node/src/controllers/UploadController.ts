@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import Container, { Inject, Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { Logger } from 'winston';
+import HttpUploadRequest from '../api/IHttpRequest/HttpUploadRequest';
 import { NAMES } from '../config/dependencies';
 import IUploadService from '../services/IServices/IUploadService';
 import UploadVideoJobService from '../services/UploadVideoJobService';
@@ -9,7 +10,8 @@ import UploadVideoJobService from '../services/UploadVideoJobService';
 export default class UploadController {
   constructor(
     @Inject(NAMES.Logger) private logger: Logger,
-    @Inject(NAMES.SERVICES.Upload) private uploadService: IUploadService
+    @Inject(NAMES.SERVICES.Upload) private uploadService: IUploadService,
+    @Inject(NAMES.SERVICES.UploadVideoJob) private uploadVideoJobService: UploadVideoJobService
   ) {}
 
   public async getConstraints(_req: Request, res: Response, next: NextFunction) {
@@ -63,22 +65,23 @@ export default class UploadController {
     }
   }
 
-  public async processChunk(req: Request, res: Response, next: NextFunction) {
+  public async processChunk(req: HttpUploadRequest, res: Response, next: NextFunction) {
     try {
       this.checkUserAttached(req);
       this.checkUploadJobAttached(req);
 
-      const dtoResult = await Container.get(UploadVideoJobService).getFullByUploadID(req.params.uploadID);
+      const uploadID = req.uploadJob!.upload.uuid;
+      const chunkIndex = parseInt(req.params.chunkIndex, 10);
 
-      if (dtoResult.isFailure) {
-        this.logger.error(`[UploadVideoController, uploadChunk]: ${JSON.stringify(dtoResult.errorValue())}`);
+      const result = await this.uploadVideoJobService.updateChunkUploadProgress(uploadID, chunkIndex);
 
-        return res.status(400).json({ error: dtoResult.errorValue() });
+      if (result.isFailure) {
+        this.logger.error(`[UploadVideoController, uploadChunk]: ${result.errorValue()}`);
+
+        return res.status(400).json({ error: result.errorValue() });
       }
 
-      const dto = dtoResult.getValue();
-
-      return res.status(200).json(dto);
+      return res.status(200).json({ message: 'Chunk upload progress updated.' });
     } catch (error) {
       this.logger.error(`[UploadVideoController, uploadChunk]: ${JSON.stringify(error)}`);
 

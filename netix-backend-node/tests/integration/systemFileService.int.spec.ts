@@ -3,7 +3,7 @@ import { mock } from 'jest-mock-extended';
 import os from 'os';
 import path from 'path';
 import { Logger } from 'winston';
-import SystemFileService from '../../src/services/systemFileService';
+import SystemFileService from '../../src/services/SystemFileService';
 
 describe('SystemFileService with real file interactions', () => {
   const mockLogger = mock<Logger>();

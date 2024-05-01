@@ -17,6 +17,25 @@
       "outFiles": [
         "${workspaceFolder}/dist/**/*.js"
       ]
+    },
+
+    {
+      "name": "Launch TS Program",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/uploadNewVideoTest.ts",
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "args": [
+        // Any arguments your program needs
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
+
+    
   ]
 }

@@ -23,4 +23,16 @@ const videoSchema = new Schema<IVideoPersistence>({
   state: { type: String, enum: Object.values(VideoState), default: VideoState.PENDING },
 });
 
+videoSchema.pre('save', function (next) {
+  console.log('>>> Saving Video Model');
+  this.updatedAt = new Date();
+  next();
+});
+
+videoSchema.pre('updateOne', function (next) {
+  console.log('>>> Updating Video Model');
+  this.updateOne({}, { $set: { updatedAt: new Date() } });
+  next();
+});
+
 export default model<IVideoPersistence>('Video', videoSchema);

@@ -23,4 +23,16 @@ const metadataSchema = new Schema<IMetadataPersistence>({
   state: { type: String, enum: Object.values(MetadataState), default: MetadataState.PENDING },
 });
 
+metadataSchema.pre('save', function (next) {
+  console.log('>>> Saving Metadata Model');
+  this.updatedAt = new Date();
+  next();
+});
+
+metadataSchema.pre('updateOne', function (next) {
+  console.log('>>> Updating Metadata Model');
+  this.updateOne({}, { $set: { updatedAt: new Date() } });
+  next();
+});
+
 export default model<IMetadataPersistence>('Metadata', metadataSchema);

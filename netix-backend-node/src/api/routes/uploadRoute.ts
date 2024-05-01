@@ -1,8 +1,10 @@
-import { Joi, celebrate } from 'celebrate';
+import { celebrate } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import UploadController from '../../controllers/UploadController';
-import attachUploadVideoJobInProgress from '../middlewares/attachUploadVideoJobInProgress';
+import { UploadState } from '../../core/states/UploadState';
+import attachUploadVideoJob from '../middlewares/attachUploadVideoJob';
+import { checkUploadState } from '../middlewares/checkUploadJobState';
 import attachUser from '../middlewares/fakeAttachUser';
 import authenticate from '../middlewares/fakeAuthenticate';
 import uploadVideoChunk from '../middlewares/uploadVideoChunk';
@@ -24,7 +26,8 @@ export default (router: Router) => {
     celebrate(videoChunkUploadRequestSchema),
     authenticate,
     attachUser,
-    attachUploadVideoJobInProgress,
+    attachUploadVideoJob,
+    checkUploadState([UploadState.PENDING, UploadState.IN_PROGRESS]),
     uploadVideoChunk,
     (req, res, next) => uploadController.processChunk(req, res, next)
   );

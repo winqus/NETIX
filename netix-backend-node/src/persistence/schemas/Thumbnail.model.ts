@@ -21,4 +21,16 @@ const thumbnailSchema = new Schema<IThumbnailPersistence>({
   state: { type: String, enum: Object.values(ThumbnailState), default: ThumbnailState.PENDING },
 });
 
+thumbnailSchema.pre('save', function (next) {
+  console.log('>>> Saving Thumbnail Model');
+  this.updatedAt = new Date();
+  next();
+});
+
+thumbnailSchema.pre('updateOne', function (next) {
+  console.log('>>> Updating Thumbnail Model');
+  this.updateOne({}, { $set: { updatedAt: new Date() } });
+  next();
+});
+
 export default model<IThumbnailPersistence>('Thumbnail', thumbnailSchema);

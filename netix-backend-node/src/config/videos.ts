@@ -39,7 +39,7 @@ const videoConfig: VideoConfig = {
   tagCount: { min: 1, max: 20 },
   durationInSeconds: { min: 1, max: 10 * 3600 }, // Max 10 hours
   sizeInBytes: { min: 1, max: 20 * 1073741824 }, // 20 GB
-  allowedMimeTypes: ['video/mp4', 'video/quicktime', 'video/x-matroska'],
+  allowedMimeTypes: ['video/mp4', 'video/x-matroska'],
   resolution: {
     minWidth: 640,
     minHeight: 360,

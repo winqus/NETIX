@@ -9,9 +9,9 @@ export interface IUploadPersistence {
   createdAt: Date;
   updatedAt: Date;
   uploaderID: string;
-  videoID: string | IVideoPersistence;
-  metadataID: string | IMetadataPersistence;
-  thumbnailID: string | IThumbnailPersistence;
+  videoID: IVideoPersistence;
+  metadataID: IMetadataPersistence;
+  thumbnailID: IThumbnailPersistence;
 
   ready: boolean;
   state: UploadState;
@@ -28,6 +28,18 @@ const uploadSchema = new Schema<IUploadPersistence>({
 
   ready: { type: Boolean, default: false },
   state: { type: String, enum: Object.values(UploadState), default: UploadState.PENDING },
+});
+
+uploadSchema.pre('save', function (next) {
+  console.log('>>> Saving Upload Model');
+  this.updatedAt = new Date();
+  next();
+});
+
+uploadSchema.pre('updateOne', function (next) {
+  console.log('>>> Updating Upload Model');
+  this.updateOne({}, { $set: { updatedAt: new Date() } });
+  next();
 });
 
 export default model<IUploadPersistence>('Upload', uploadSchema);

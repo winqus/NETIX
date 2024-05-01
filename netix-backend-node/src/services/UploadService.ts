@@ -114,10 +114,10 @@ export default class UploadService implements IUploadService {
 
       const response: NewUploadPermissionResponseDTO = {
         uploadId: newUpload.id,
-        uploadUrl: `http://localhost:3055/api/v1/upload/${newUpload.id}`,
+        uploadUrl: `http://localhost:3055/api/v1/upload/${newUpload.id}/videoChunk`,
         totalChunksCount: totalChunkCount,
         allowedUploadRateInChunksAtOnce: 1,
-        chunkBaseName: newUploadVideoJob.id,
+        chunkBaseName: newUploadVideoJob.id + '_chunk-',
       };
 
       this.logger.info(`[UploadService, getPermissionToUpload]: ` + `Created upload (${newUpload.id}) for user ${newUpload.uploaderID}`);

@@ -7,8 +7,8 @@ if (!envFound || envFound?.error) {
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
+import { DependencyConfig, dependencyConfig } from '../loaders/dependencyConfig';
 import { wLoggerInstance } from '../loaders/logger';
-import dependencyConfig, { DependencyConfig } from './dependencies';
 import { EnvironmentType, getCurrentEnvironment } from './utils';
 import videoConfig, { VideoConfig } from './videos';
 

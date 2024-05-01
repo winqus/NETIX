@@ -1,5 +1,5 @@
 import express from 'express';
-import config from '../config';
+import { dependencyConfig } from './dependencyConfig';
 import dependencyLoader from './dependencyLoader';
 import expressLoader from './expressLoader';
 import { wLoggerInstance as logger } from './logger';
@@ -13,10 +13,9 @@ export default async (expressApp: express.Application) => {
   const redisConnection = await redisLoader();
   logger.info('Redis loaded ✌️');
 
+  // const dependencyConfig = await import('./dependencyConfig');
   await dependencyLoader({
-    schemas: config.dependencies.schemas,
-    repositories: config.dependencies.repositories,
-    services: config.dependencies.services,
+    ...(dependencyConfig as any),
     redisConnection: redisConnection,
   });
   logger.info('Dependencies loaded ✌️');

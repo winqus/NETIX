@@ -4,7 +4,7 @@ import { Logger } from 'winston';
 import { NAMES } from '../../config/dependencies';
 import IUploadVideoJobService from '../../services/IServices/IUploadVideoJobService';
 
-const attachUploadVideoJobInProgress = async (req: Request, res: Response, next: NextFunction) => {
+const attachUploadVideoJob = async (req: Request, res: Response, next: NextFunction) => {
   const uploadId = req.params.uploadID;
   const userId = (req as any).user.id;
 
@@ -39,4 +39,4 @@ const attachUploadVideoJobInProgress = async (req: Request, res: Response, next:
   }
 };
 
-export default attachUploadVideoJobInProgress;
+export default attachUploadVideoJob;

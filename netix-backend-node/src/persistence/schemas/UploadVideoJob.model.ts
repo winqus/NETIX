@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from 'mongoose';
+import mongoose, { Document, Schema, model } from 'mongoose';
 import { IMetadataPersistence } from './Metadata.model';
 import { IThumbnailPersistence } from './Thumbnail.model';
 import { IUploadPersistence } from './Upload.model';
@@ -7,11 +7,21 @@ import { IVideoPersistence } from './Video.model';
 export type IFullUploadVideoJobPersistance = IUploadVideoJobPersistence & {
   uploadID: IUploadPersistence & { videoID: IVideoPersistence; metadataID: IMetadataPersistence; thumbnailID: IThumbnailPersistence };
 };
+export type IFullUploadVideoJobPersistanceDocument = Document &
+  IUploadVideoJobPersistence & {
+    uploadID: Document &
+      IUploadPersistence & {
+        videoID: Document & IVideoPersistence;
+        metadataID: Document & IMetadataPersistence;
+        thumbnailID: Document & IThumbnailPersistence;
+      };
+  };
+
 export interface IUploadVideoJobPersistence {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-  uploadID: mongoose.Schema.Types.UUID | IUploadPersistence;
+  uploadID: IUploadPersistence;
 
   chunks: boolean[];
   chunksReceived: number;
@@ -41,6 +51,18 @@ const uploadVideoJobSchema = new Schema<IUploadVideoJobPersistence>({
   transcodingProgressPercentage: { type: Number, default: 0 },
   transcodingDone: { type: Boolean, default: false },
   transcodingRate: { type: Number, default: 0 },
+});
+
+uploadVideoJobSchema.pre('save', function (next) {
+  this.updatedAt = new Date();
+  console.log('>>> Saving UploadVideoJob Model');
+  next();
+});
+
+uploadVideoJobSchema.pre('updateOne', function (next) {
+  this.updateOne({}, { $set: { updatedAt: new Date() } });
+  console.log('>>> Updating UploadVideoJob Model');
+  next();
 });
 
 export default model<IUploadVideoJobPersistence>('UploadVideoJob', uploadVideoJobSchema);
