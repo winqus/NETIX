@@ -5,6 +5,7 @@ import { Logger } from 'winston';
 import config from '../config';
 import { NAMES } from '../config/dependencies';
 import { Result } from '../core/logic/Result';
+import { import_FileTypeFromFile } from '../helpers/importFileType';
 import IFileService from './IServices/IFileService';
 
 interface MergedFile {
@@ -67,7 +68,7 @@ export default class RawUploadFileService implements IRawUploadFileService {
   }
 
   private async getFileType(filePath: string): Promise<{ mime: string; ext: string } | undefined> {
-    const { fileTypeFromFile } = await (eval('import("file-type")') as Promise<typeof import('file-type')>);
+    const fileTypeFromFile = await import_FileTypeFromFile();
     const data = await fileTypeFromFile(filePath);
 
     return data;

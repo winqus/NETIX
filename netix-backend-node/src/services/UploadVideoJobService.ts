@@ -88,8 +88,8 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       }
 
       if (job.chunksReceived === 0) {
-        job.uploadID.state = UploadState.IN_PROGRESS;
-        await VideoModel.updateOne({ _id: job.uploadID.videoID._id }, { state: VideoState.PROCESSING }).exec();
+        await UploadModel.updateOne({ _id: job.uploadID._id }, { state: UploadState.IN_PROGRESS }).exec();
+        await VideoModel.updateOne({ _id: job.uploadID.videoID._id }, { state: VideoState.UPLOADING }).exec();
       }
 
       job.chunks[chunkIndex] = true;
