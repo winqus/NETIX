@@ -19,6 +19,6 @@ export default function multerErrorHandler(error: any, _: Request, res: Response
 
     res.status(400).json({ message: error.message });
   } else {
-    next(error);
+    return next(error);
   }
 }

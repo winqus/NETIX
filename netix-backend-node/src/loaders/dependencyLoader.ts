@@ -2,10 +2,10 @@ import { Redis } from 'ioredis';
 import Container from 'typedi';
 // import videoUploadProcessingQueue from '../queue/queues/videoUploadProcessingQueue';
 import { NAMES } from '../config/dependencies';
-import processVideoUpload from '../queue/processors/processVideoUpload';
-import { QueueNames } from '../queue/queueConfig';
-import { createQueue } from '../queue/queueFactory';
-import { createWorker } from '../queue/workerFactory';
+// import processVideoUpload from '../queue/processors/processVideoUpload';
+// import { QueueNames } from '../queue/queueConfig';
+// import { createQueue } from '../queue/queueFactory';
+// import { createWorker } from '../queue/workerFactory';
 import { wLoggerInstance as logger } from './logger';
 
 interface DependencyLoaderArgs {
@@ -21,11 +21,11 @@ export default ({ schemas, repositories, services, redisConnection }: Dependency
 
     Container.set(NAMES.Redis, redisConnection);
 
-    const videoUploadProcessingQueue = createQueue(QueueNames.VIDEO_UPLOAD_PROCESSING, redisConnection);
-    const videoUploadProcessingWorker = createWorker(videoUploadProcessingQueue, processVideoUpload, redisConnection);
+    // const videoUploadProcessingQueue = createQueue(QueueNames.VIDEO_UPLOAD_PROCESSING, redisConnection);
+    // const videoUploadProcessingWorker = createWorker(videoUploadProcessingQueue, processVideoUpload, redisConnection);
 
-    Container.set(QueueNames.VIDEO_UPLOAD_PROCESSING, videoUploadProcessingQueue);
-    Container.set('VideoUploadProcessingWorker', videoUploadProcessingWorker);
+    // Container.set(QueueNames.VIDEO_UPLOAD_PROCESSING, videoUploadProcessingQueue);
+    // Container.set('VideoUploadProcessingWorker', videoUploadProcessingWorker);
 
     // Load schemas
     schemas.forEach(({ name, class: SchemaClass }) => {
