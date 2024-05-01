@@ -3,12 +3,14 @@ import { Logger } from 'winston';
 import { NAMES } from '../config/dependencies';
 import { Result } from '../core/logic/Result';
 import { MetadataState } from '../core/states/MetadataState';
+import { ThumbnailState } from '../core/states/ThumbnailState';
 import { UploadState } from '../core/states/UploadState';
 import { VideoState } from '../core/states/VideoState';
 import FullUploadVideoJobDTO from '../dto/FullUploadVideoJobDTO';
 import MetadataDTO from '../dto/MetadataDTO';
 import { UploadMetadataRequestDTO } from '../dto/UploadMetadataDTO';
 import UploadVideoJobMapper from '../mappers/UploadVideoJobMapper';
+import ThumbnailModel from '../persistence/schemas/Thumbnail.model';
 import UploadModel from '../persistence/schemas/Upload.model';
 import UploadVideoJobModel, { IFullUploadVideoJobPersistanceDocument } from '../persistence/schemas/UploadVideoJob.model';
 import VideoModel from '../persistence/schemas/Video.model';
@@ -86,7 +88,7 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
         return Result.fail(`Upload job is not in correct state to upload chunks.`);
       }
 
-      if (![VideoState.PENDING, VideoState.PENDING].includes(job.uploadID.videoID.state)) {
+      if (![VideoState.PENDING, VideoState.PENDING, VideoState.UPLOADING].includes(job.uploadID.videoID.state)) {
         this.logger.error(
           `[UploadVideoJobService, updateChunkUploadProgress]: Video is not in correct state (${job.uploadID.videoID.state}) to upload chunks.`
         );
@@ -110,25 +112,32 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       job.chunks[chunkIndex] = true;
       job.chunksReceived += 1;
       job.uploadFileProgressPercentage = Math.round((job.chunksReceived / job.totalChunkCount) * 100);
-
-      if (job.chunksReceived === job.totalChunkCount) {
-        await job.save();
-
-        const service = Container.get(RawUploadFileService);
-        const mergeResult = await service.mergeFileChunksIntoVideoFile(uploadID);
-
-        if (mergeResult.isFailure) {
-          this.logger.error(`[UploadVideoJobService, updateChunkUploadProgress]: ${mergeResult.errorValue()}`);
-
-          throw new Error(mergeResult.errorValue() as string);
-        }
-
-        job.uploadFileDone = true;
-
-        await VideoModel.updateOne({ _id: job.uploadID.videoID._id }, { state: VideoState.WAITING_FOR_PROCESSING }).exec();
-      }
-
       await job.save();
+
+      // TODO - move merge operation to separate service (worker queue)
+      if (job.chunksReceived === job.totalChunkCount) {
+        setTimeout(async () => {
+          try {
+            const service = Container.get(RawUploadFileService);
+            const mergeResult = await service.mergeFileChunksIntoVideoFile(uploadID);
+
+            if (mergeResult.isFailure) {
+              this.logger.error(`[UploadVideoJobService, updateChunkUploadProgress]: ${mergeResult.errorValue()}`);
+              throw new Error(mergeResult.errorValue() as string);
+            }
+
+            await UploadVideoJobModel.updateOne({ _id: job._id }, { uploadFileDone: true });
+            await VideoModel.updateOne({ _id: job.uploadID.videoID._id }, { state: VideoState.WAITING_FOR_PROCESSING }).exec();
+
+            this.logger.info(`Merged video chunks into single file with extention for upload ID (${uploadID})`);
+          } catch (error) {
+            this.logger.error(`Error during merging process: ${JSON.stringify((error as any).message)}`);
+          }
+        }, 3000);
+      }
+      // --- Merge operation done ---
+
+      this.checkJobCompletedAndUpdate(uploadID);
 
       this.logger.debug(`Updated chunk (${chunkIndex}) upload progress for upload ID (${uploadID}), chunks received: ${job.chunksReceived}`);
 
@@ -186,6 +195,8 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       job.uploadID.metadataID.ready = true;
       const updatedMetadata = await job.uploadID.metadataID.save();
 
+      this.checkJobCompletedAndUpdate(uploadID);
+
       this.logger.info(`Uploaded metadata for upload ID (${uploadID})`);
 
       return Result.ok({
@@ -201,6 +212,87 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       this.logger.error(`[UploadVideoJobService, uploadMetadata]: ` + `Error while trying to upload metadata for upload ID (${uploadID}): ${error}`);
 
       throw new Error(`Failed to upload metadata for upload ID. Check logs.`);
+    }
+  }
+
+  public async updateThumbnailUploadProgress(uploadID: string): Promise<Result<void>> {
+    try {
+      const job = await this.getPopulatedJob(uploadID);
+
+      if (!job) {
+        return Result.fail(`Upload video job not found for upload ID: ${uploadID}`);
+      }
+
+      if (![UploadState.PENDING, UploadState.IN_PROGRESS].includes(job.uploadID.state)) {
+        this.logger.error(
+          `[UploadVideoJobService, updateThumbnailUploadProgress]: ` +
+            `Upload job is not in correct state to upload thumbnail (${job.uploadID.state}).`
+        );
+
+        return Result.fail(`Upload job is not in correct state to upload thumbnail.`);
+      }
+
+      if (![ThumbnailState.PENDING, ThumbnailState.UPLOADING].includes(job.uploadID.thumbnailID.state)) {
+        this.logger.error(
+          `[UploadVideoJobService, updateThumbnailUploadProgress]: ` +
+            `Thumbnail is not in correct state to upload thumbnail (${job.uploadID.thumbnailID.state}).`
+        );
+
+        return Result.fail(`Thumbnail is not in correct state to upload thumbnail.`);
+      }
+
+      if (job.uploadID.state !== UploadState.IN_PROGRESS) {
+        await UploadModel.updateOne({ _id: job.uploadID._id }, { state: UploadState.IN_PROGRESS }).exec();
+      }
+
+      job.uploadID.thumbnailID.state = ThumbnailState.WAITING_FOR_PROCESSING;
+      await job.uploadID.thumbnailID.save();
+
+      // TODO - move thumbnail processing to separate service (worker queue?)
+      setTimeout(async () => {
+        try {
+          await ThumbnailModel.updateOne({ _id: job.uploadID.thumbnailID._id }, { state: ThumbnailState.PROCESSING }).exec();
+
+          const rawUploadService = Container.get(RawUploadFileService);
+
+          const thumbnailResult = await rawUploadService.checkAndMoveThumbnailFile(uploadID);
+
+          if (thumbnailResult.isFailure) {
+            this.logger.error(`[UploadVideoJobService, updateThumbnailUploadProgress]: ${thumbnailResult.errorValue()}`);
+            job.uploadID.thumbnailID.state = ThumbnailState.FAILED;
+            await job.uploadID.thumbnailID.save();
+
+            throw new Error(`Failed to upload thumbnail for upload ID (${uploadID}).`);
+          }
+
+          await ThumbnailModel.updateOne(
+            { _id: job.uploadID.thumbnailID._id },
+            {
+              mimeType: thumbnailResult.getValue().fileMimeType,
+              state: ThumbnailState.READY,
+              ready: true,
+            }
+          ).exec();
+
+          await this.checkJobCompletedAndUpdate(uploadID);
+
+          this.logger.info(`Processed thumbnail for upload ID (${uploadID})`);
+        } catch (error) {
+          this.logger.error(`Error during merging process: ${JSON.stringify((error as any).message)}`);
+        }
+      }, 3000);
+      // --- Thumbnail processing done ---
+
+      this.logger.info(`Uploaded thumbnail for upload ID (${uploadID})`);
+
+      return Result.ok();
+    } catch (error) {
+      this.logger.error(
+        `[UploadVideoJobService, updateThumbnailUploadProgress]: ` +
+          `Error while trying to upload thumbnail for upload ID (${uploadID}): ${JSON.stringify(error)}`
+      );
+
+      return Result.fail(`Failed to upload thumbnail for upload ID.`);
     }
   }
 
@@ -228,6 +320,19 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       return job as IFullUploadVideoJobPersistanceDocument;
     } catch (error) {
       throw error;
+    }
+  }
+
+  private async checkJobCompletedAndUpdate(uploadID: string) {
+    const job = await this.getPopulatedJob(uploadID);
+    if (
+      job.uploadID.state === UploadState.IN_PROGRESS &&
+      job.uploadID.metadataID.ready &&
+      job.uploadID.thumbnailID.ready &&
+      job.uploadID.videoID.ready
+    ) {
+      job.uploadID.state = UploadState.COMPLETED;
+      await job.uploadID.save();
     }
   }
 }

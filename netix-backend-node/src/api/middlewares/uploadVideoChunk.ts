@@ -75,8 +75,8 @@ const uploadVideoChunkMiddleware = (req: any, res: any, next: NextFunction) => {
   upload(req, res, (error) => {
     const logger = Container.get(NAMES.Logger) as Logger;
 
-    if (error) {
-      logger.error(`[uploadVideoChunkMiddleware]: Unexpected error: ${error.message}`);
+    if (error instanceof CustomMulterError) {
+      logger.error(`[uploadVideoChunkMiddleware]: ${error.message}`);
     }
 
     if (!req.file) {

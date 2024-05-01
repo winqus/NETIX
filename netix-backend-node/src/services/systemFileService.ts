@@ -135,6 +135,7 @@ export default class SystemFileService implements IFileService {
         return Result.fail(`Source file does not exist: ${sourcePath}`);
       }
 
+      destinationPath = normalizeToForwardSlash(destinationPath);
       const destinationDirPath = destinationPath.substring(0, destinationPath.lastIndexOf('/'));
       const dirResult = await this.makeDirIfNotExists(destinationDirPath);
 

@@ -8,7 +8,7 @@ import { Result } from '../core/logic/Result';
 import { import_FileTypeFromFile } from '../helpers/importFileType';
 import IFileService from './IServices/IFileService';
 
-interface MergedFile {
+interface ProcessedFile {
   filePath: string;
   fileName: string;
   fileExtension: string;
@@ -17,7 +17,9 @@ interface MergedFile {
 }
 
 export interface IRawUploadFileService {
-  mergeFileChunksIntoVideoFile(uploadID: string, uploadDir?: string): Promise<Result<MergedFile>>;
+  mergeFileChunksIntoVideoFile(uploadID: string, uploadDir?: string): Promise<Result<ProcessedFile>>;
+
+  checkAndMoveThumbnailFile(uploadID: string, uploadDir?: string): Promise<Result<ProcessedFile>>;
 }
 
 @Service()
@@ -27,9 +29,9 @@ export default class RawUploadFileService implements IRawUploadFileService {
     @Inject(NAMES.SERVICES.SystemFile) private systemFileService: IFileService
   ) {}
 
-  public async mergeFileChunksIntoVideoFile(uploadID: string, uploadDir?: string): Promise<Result<MergedFile>> {
+  public async mergeFileChunksIntoVideoFile(uploadID: string, uploadDir?: string): Promise<Result<ProcessedFile>> {
     try {
-      const uploadDirPath = this.constructUploadDirPath(uploadID, uploadDir);
+      const uploadDirPath = this.constructVideoUploadDirPath(uploadID, uploadDir);
 
       const fileNames = await this.fetchAndFilterFileNames(uploadID, uploadDirPath);
       if (fileNames.length === 0) {
@@ -57,13 +59,45 @@ export default class RawUploadFileService implements IRawUploadFileService {
       const finalFilePath = path.join(uploadDirPath, finalFileName);
       fs.renameSync(mergedFilePath, finalFilePath);
 
-      const mergedFile = this.createMergedFileInfo(finalFilePath, finalFileName, mime);
+      const mergedFile = this.createProcessedFileInfo(finalFilePath, finalFileName, mime);
 
       return Result.ok(mergedFile);
     } catch (error) {
       this.logger.error(`[RawUploadFileService, mergeFileChunksIntoVideoFile] Failed to merge upload (${uploadID}): ${error}`);
 
       return Result.fail(`Failed to merge file chunks into video file for uploadID ${uploadID}.`);
+    }
+  }
+
+  public async checkAndMoveThumbnailFile(uploadID: string, uploadDir?: string): Promise<Result<ProcessedFile>> {
+    try {
+      const uploadDirPath = this.constructThumbnailUploadDirPath(uploadDir);
+
+      const thumbnailFileName = `${uploadID}_thumbnail`;
+      const thumbnailFilePath = path.join(uploadDirPath, thumbnailFileName);
+
+      const fileTypeResult = await this.getFileType(thumbnailFilePath);
+      if (!fileTypeResult) {
+        return Result.fail(`Cannot determine file type for thumbnail file.`);
+      }
+
+      if (!config.video.thumbnail.allowedMimeTypes.includes(fileTypeResult.mime)) {
+        return Result.fail(`Thumbnail file has invalid mime type: ${fileTypeResult.mime}.`);
+      }
+
+      const { mime, ext } = fileTypeResult;
+      const finalFileName = `${uploadID}.${ext}`;
+      const finalFilePath = path.join(config.video.thumbnail.processedUploadDir, finalFileName);
+
+      await this.systemFileService.moveFile(thumbnailFilePath, finalFilePath);
+
+      const thumbnailFile = this.createProcessedFileInfo(finalFilePath, finalFileName, mime);
+
+      return Result.ok(thumbnailFile);
+    } catch (error) {
+      this.logger.error(`[RawUploadFileService, checkAndMoveThumbnailFile] Failed to move thumbnail for upload (${uploadID}): ${error}`);
+
+      return Result.fail(`Failed to move thumbnail file for uploadID ${uploadID}.`);
     }
   }
 
@@ -74,7 +108,7 @@ export default class RawUploadFileService implements IRawUploadFileService {
     return data;
   }
 
-  private createMergedFileInfo(filePath: string, fileName: string, mimeType: string): MergedFile {
+  private createProcessedFileInfo(filePath: string, fileName: string, mimeType: string): ProcessedFile {
     const fileExtension = path.extname(filePath);
     const fileSize = fs.statSync(filePath).size;
 
@@ -104,9 +138,15 @@ export default class RawUploadFileService implements IRawUploadFileService {
     return await this.systemFileService.mergeFiles(filePaths, path.join(uploadDirPath, `${uploadID}_merged`));
   }
 
-  private constructUploadDirPath(uploadID: string, uploadDir?: string): string {
+  private constructVideoUploadDirPath(uploadID: string, uploadDir?: string): string {
     const rawUploadDirPath = uploadDir || config.video.rawUploadDir;
 
     return path.join(rawUploadDirPath, uploadID);
+  }
+
+  private constructThumbnailUploadDirPath(uploadDir?: string): string {
+    const thumbnailUploadDirPath = uploadDir || config.video.thumbnail.rawUploadDir;
+
+    return path.join(thumbnailUploadDirPath);
   }
 }

@@ -13,6 +13,8 @@ export interface VideoConfig {
     maxHeight: number;
   };
   thumbnail: {
+    rawUploadDir: string;
+    processedUploadDir: string;
     maxSizeBytes: number;
     allowedMimeTypes: string[];
     resolution: {
@@ -47,6 +49,8 @@ const videoConfig: VideoConfig = {
     maxHeight: 1080,
   },
   thumbnail: {
+    rawUploadDir: `${process.env.RAW_THUMBNAIL_UPLOAD_DIR || './data/uploads/rawThumbnails'}`,
+    processedUploadDir: `${process.env.PROCESSED_THUMBNAIL_UPLOAD_DIR || './data/uploads/processedThumbnails'}`,
     maxSizeBytes: 50 * 1024, // 50 KB
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     resolution: {

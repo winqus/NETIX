@@ -11,4 +11,6 @@ export default interface IUploadVideoJobService {
   updateChunkUploadProgress(uploadID: string, chunkIndex: number): Promise<Result<void>>;
 
   uploadMetadata(uploadID: string, metadata: UploadMetadataRequestDTO): Promise<Result<MetadataDTO>>;
+
+  updateThumbnailUploadProgress(uploadID: string): Promise<Result<void>>;
 }

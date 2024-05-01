@@ -7,6 +7,7 @@ import attachUploadVideoJob from '../middlewares/attachUploadVideoJob';
 import { checkUploadState } from '../middlewares/checkUploadJobState';
 import attachUser from '../middlewares/fakeAttachUser';
 import authenticate from '../middlewares/fakeAuthenticate';
+import uploadThumbnail from '../middlewares/uploadThumbnail';
 import uploadVideoChunk from '../middlewares/uploadVideoChunk';
 import {
   metadataUploadRequestSchema,
@@ -42,9 +43,14 @@ export default (router: Router) => {
     (req, res, next) => uploadController.processChunk(req, res, next)
   );
 
-  // router.put('/:uploadID/thumbnail', authenticate, attachUser, attachUploadVideoJob, (req, res, next) =>
-  //   uploadController.uploadThumbnail(req, res, next)
-  // );
+  router.post(
+    '/:uploadID/thumbnail',
+    authenticate,
+    attachUser,
+    attachUploadVideoJob,
+    uploadThumbnail,
+    (req, res, next) => uploadController.processThumbnail(req, res, next)
+  );
 
   router.put(
     '/:uploadID/metadata',

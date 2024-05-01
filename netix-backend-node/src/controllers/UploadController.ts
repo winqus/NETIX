@@ -116,6 +116,35 @@ export default class UploadController {
     }
   }
 
+  public async processThumbnail(req: HttpUploadRequest, res: Response, next: NextFunction) {
+    try {
+      this.checkUserAttached(req);
+      this.checkUploadJobAttached(req);
+
+      const uploadID = req.uploadJob!.upload.uuid;
+
+      if (req.file == null) {
+        this.logger.error(`[UploadVideoController, uploadThumbnail]: No thumbnail file was provided.`);
+
+        return res.status(400).json({ error: 'No file was provided.' });
+      }
+
+      const result = await this.uploadVideoJobService.updateThumbnailUploadProgress(uploadID);
+
+      if (result.isFailure) {
+        this.logger.error(`[UploadVideoController, uploadThumbnail]: ${result.errorValue()}`);
+
+        return res.status(400).json({ error: result.errorValue() });
+      }
+
+      return res.status(200).json({ message: 'Thumbnail uploaded.' });
+    } catch (error) {
+      this.logger.error(`[UploadVideoController, uploadThumbnail]: ${JSON.stringify(error)}`);
+
+      return next(error);
+    }
+  }
+
   private checkUserAttached(req: Request) {
     if (!(req as any).user) {
       this.logger.error(`[UploadVideoController, uploadChunk]: User not found in request.`);
