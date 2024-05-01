@@ -2,6 +2,14 @@
   "singleQuote": true,
   "trailingComma": "es5",
   "endOfLine": "auto",
-  "printWidth": 200,
-  "arrowParens": "always"
+  "printWidth": 150,
+  "arrowParens": "always",
+  "overrides": [
+    {
+      "files": "src/api/routes/*Route.ts",
+      "options": {
+        "printWidth": 100
+      }
+    }
+  ]
 }

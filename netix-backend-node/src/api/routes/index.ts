@@ -1,10 +1,13 @@
 import { Router } from 'express';
-import status from './status';
+import statusRoute from './statusRoute';
+import uploadRoute from './uploadRoute';
 
 export default () => {
   const router = Router();
 
-  status(router);
+  statusRoute(router);
+
+  uploadRoute(router);
 
   return router;
 };
