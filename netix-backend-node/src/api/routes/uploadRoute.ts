@@ -32,6 +32,10 @@ export default (router: Router) => {
     (req, res, next) => uploadController.getPermission(req, res, next)
   );
 
+  router.get('/user', authenticate, attachUser, (req, res, next) =>
+    uploadController.getUserUploadInProgress(req, res, next)
+  );
+
   router.post(
     '/:uploadID/videoChunk/:chunkIndex',
     celebrate(videoChunkUploadRequestSchema),
