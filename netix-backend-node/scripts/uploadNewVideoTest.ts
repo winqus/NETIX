@@ -160,22 +160,51 @@ const uploadThumbnail = async (uploadId: string, fileName: string) => {
   return data;
 };
 
+function getRandomTitle() {
+  const titles = [
+    'Incredible Video Showcase',
+    'Amazing Video Showcase',
+    'Stunning Video Showcase',
+    'Unbelievable Nature Footage',
+    'Unbelievable Nature Time-lapse',
+    'Incredible City Time-lapse',
+    'Amazing Journey Highlights',
+    'Incredible Journey Highlights',
+    'Amazing Journey Time-lapse',
+    'Epic Adventure Compilation',
+    'Epic Journey Compilation',
+    'Amazing Video Title',
+    'Epic Video Title',
+  ];
+  const randomIndex = Math.floor(Math.random() * titles.length);
+
+  return titles[randomIndex];
+}
+
+function getRandomDate(startYear = 2016, endYear = 2023) {
+  const start = new Date(startYear, 0, 1); // January 1 of start year
+  const end = new Date(endYear, 11, 31); // December 31 of end year
+  const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+
+  return new Date(randomTime);
+}
+
 (async () => {
   /*** Load video file ***/
-  const file = await loadLocalFile('videofile1.mp4');
+  const file = await loadLocalFile('videoFile1.mkv');
   // // const file = await loadLocalFile('image2.mp4');
   console.log(`File (${file.name}) loaded`, file);
   /*** Upload Request ***/
   //--------------------------------------------------------------------------------
   let permission: PermissionResponseDTO;
-  // permission = await getPermission(file);
-  permission = {
-    uploadId: '70d168df-1ad4-4144-8a4a-da986b1986a3',
-    uploadUrl: 'http://localhost:3055/api/v1/upload/70d168df-1ad4-4144-8a4a-da986b1986a3/videoChunk',
-    totalChunksCount: 1,
-    allowedUploadRateInChunksAtOnce: 1,
-    chunkBaseName: 'd8a574d7-dc41-4b4a-bc71-1b6c4fa31ff9_chunk-',
-  };
+  permission = await getPermission(file);
+  // permission = {
+  //   uploadId: '70d168df-1ad4-4144-8a4a-da986b1986a3',
+  //   uploadUrl: 'http://localhost:3055/api/v1/upload/70d168df-1ad4-4144-8a4a-da986b1986a3/videoChunk',
+  //   totalChunksCount: 1,
+  //   allowedUploadRateInChunksAtOnce: 1,
+  //   chunkBaseName: 'd8a574d7-dc41-4b4a-bc71-1b6c4fa31ff9_chunk-',
+  // };
   console.log('Permission: ', permission);
   //--------------------------------------------------------------------------------
   /*** Upload video ***/
@@ -184,8 +213,8 @@ const uploadThumbnail = async (uploadId: string, fileName: string) => {
   //--------------------------------------------------------------------------------
   /*** Upload metadata ***/
   await uploadMetadata(permission.uploadId, {
-    title: 'Amazing video title',
-    publishDatetime: new Date('2021-09-05T00:00:00.000Z'),
+    title: getRandomTitle(),
+    publishDatetime: getRandomDate(2010, 2023),
   });
   //--------------------------------------------------------------------------------
   /*** Upload thumbnail ***/

@@ -3,14 +3,14 @@ import { Router } from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import config from '../../config';
-import fakeAuthenticate from '../middlewares/fakeAuthenticate';
+import { wLoggerInstance } from '../../loaders/logger';
 
-const fileCache: any = {};
+// const fileCache: Record<string, string> = {};
+const fileCache: Record<string, { path: string; type: string }> = {};
 
 export default (router: Router) => {
   router.get(
     '/v1/thumbnail/:uuid',
-    fakeAuthenticate,
     celebrate({
       params: Joi.object({
         uuid: Joi.string().uuid().required(),
@@ -22,9 +22,11 @@ export default (router: Router) => {
       const extensions = ['.png', '.webp', '.jpeg'];
 
       if (fileCache[uuid]) {
-        return res.sendFile(fileCache[uuid], (err) => {
+        const options = { headers: { 'Content-Type': fileCache[uuid].type } };
+
+        return res.sendFile(fileCache[uuid].path, options, (err) => {
           if (err) {
-            console.error('Failed to send file from cache:', err);
+            wLoggerInstance.error(`Failed to send file from cache: ${err}`);
             delete fileCache[uuid]; // Remove corrupt or missing cache entry
             res.status(500).send('Failed to retrieve thumbnail');
           }
@@ -40,14 +42,18 @@ export default (router: Router) => {
 
         fs.access(filePath, fs.constants.F_OK, (err) => {
           if (err) {
-            console.log(`File not found: ${filePath}`);
+            wLoggerInstance.info(`File not found: ${filePath}`);
             sendFileIfExists(index + 1); // Try the next file extension
           } else {
-            fileCache[uuid] = filePath; // Cache the found file path
-            res.sendFile(filePath, (err) => {
+            const contentType = getContentType(filePath);
+            // res.type(contentType);
+            const options = { headers: { 'Content-Type': contentType } };
+            fileCache[uuid] = { path: filePath, type: contentType }; // Cache the found file path
+            res.sendFile(filePath, options, (err) => {
               if (err) {
-                console.error('Failed to send file:', err);
+                wLoggerInstance.error(`Failed to send file: ${err}`);
                 delete fileCache[uuid]; // In case of any error, clear the cache entry
+
                 res.status(500).send('Failed to retrieve thumbnail');
               }
             });
@@ -59,3 +65,18 @@ export default (router: Router) => {
     }
   );
 };
+
+function getContentType(filePath: string) {
+  const extension = path.extname(filePath).toLowerCase();
+  switch (extension) {
+    case '.png':
+      return 'image/png';
+    case '.jpeg':
+    case '.jpg':
+      return 'image/jpeg';
+    case '.webp':
+      return 'image/webp';
+    default:
+      return 'application/octet-stream'; // Default content type if none matches
+  }
+}

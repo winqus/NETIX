@@ -1,4 +1,3 @@
-// src/app/services/upload.service.ts
 import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UploadConstraintsDTO } from '../models/uploadConstraints.dto';
@@ -12,7 +11,6 @@ import { UploadMetadataRequestDTO, UploadMetadataResponseDTO } from '../models/u
 })
 export class UploadService {
   private baseUrl = API_CONFIG.baseUrl;
-  private authToken = 'some.fake-jwt.token';
 
   public splitChunkProgress = new EventEmitter<number>();
   public sendChunkProgress = new EventEmitter<number>();
@@ -26,7 +24,6 @@ export class UploadService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.authToken}`,
       }),
     };
 
@@ -37,12 +34,8 @@ export class UploadService {
     const endpoint = API_CONFIG.endpoints.uploadPermission;
     const fullUrl = this.baseUrl + endpoint;
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.authToken}`,
-      }),
-    };
+    const httpOptions = {};
+
     const body: PermissionRequestDTO = {
       fileName: file.name,
       fileSizeInBytes: file.size,
@@ -56,11 +49,7 @@ export class UploadService {
   uploadChunks(chunks: Blob[], permission: PermissionResponseDTO) {
     const baseUrl = permission.uploadUrl;
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.authToken}`,
-      }),
-    };
+    const httpOptions = {};
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
@@ -92,7 +81,6 @@ export class UploadService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.authToken}`,
       }),
     };
 
@@ -104,11 +92,7 @@ export class UploadService {
   async uploadThumbnail(uploadId: string, file: File): Promise<Observable<{ message: string }>> {
     const fullUrl = `${API_CONFIG.baseUrl}/upload/${uploadId}/thumbnail`;
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.authToken}`,
-      }),
-    };
+    const httpOptions = {};
 
     const formData = new FormData();
     formData.append('thumbnail', file);
