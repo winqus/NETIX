@@ -1,13 +1,11 @@
 import { Router } from 'express';
 
 export default (router: Router) => {
-  router.use('/status', router);
-
-  router.head('/', (_, res) => {
+  router.head('/status', (_, res) => {
     res.status(200).end();
   });
 
-  router.options('/', (_, res) => {
+  router.options('/status', (_, res) => {
     const headers = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
@@ -17,27 +15,27 @@ export default (router: Router) => {
     res.writeHead(200, headers);
   });
 
-  router.get('/', (_, res) => {
+  router.get('/status', (_, res) => {
     res.status(200).send('GET received');
   });
 
-  router.post('/', (_, res) => {
+  router.post('/status', (_, res) => {
     res.status(200).send('POST received');
   });
 
-  router.put('/', (_, res) => {
+  router.put('/status', (_, res) => {
     res.status(200).send('PUT received');
   });
 
-  router.delete('/', (_, res) => {
+  router.delete('/status', (_, res) => {
     res.status(200).send('DELETE received');
   });
 
-  router.patch('/', (_, res) => {
+  router.patch('/status', (_, res) => {
     res.status(200).send('PATCH received');
   });
 
-  router.trace('/', (_, res) => {
+  router.trace('/status', (_, res) => {
     res.status(200).send('TRACE received');
   });
 };
