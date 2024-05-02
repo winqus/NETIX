@@ -53,11 +53,11 @@
         <div id="video-controls" class="flex items-center justify-center align-middle">
           <div class="flex-1">
             <div class="flex items-center justify-center text-white">
-              <div class="flex-1 text-xs">{{ convertToTime(this.player.currentTime()) }}</div>
+              <div class="flex-1 text-xs">{{ getCurrentTime() }}</div>
             </div>
             <div class="flex items-center justify-start align-middle" (mouseleave)="hideSlider($event)">
               <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (mouseenter)="showSlider()" (click)="toggleMute()">
-                @if (this.player.muted() || volume === 0) {
+                @if (isMuted() || volume === 0) {
                   <app-svg-icons name="volume0" size="15px" color="white"></app-svg-icons>
                 } @else if (volume > 0.7) {
                   <app-svg-icons name="volume1" size="15px" color="white"></app-svg-icons>
@@ -98,7 +98,7 @@
           </div>
           <div class="flex-1 text-right">
             <div class="flex items-center justify-center text-white">
-              <div class="flex-1 text-right text-xs">{{ convertToTime(this.player.duration()) }}</div>
+              <div class="flex-1 text-right text-xs">{{ getDurationTime() }}</div>
             </div>
             <div class="flex items-center justify-end align-middle space-x-3">
               <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="enablePictureInPicture()">
@@ -169,13 +169,13 @@
         <div id="video-controls" class="flex items-center justify-center align-middle">
           <div class="flex-1">
             <div class="flex items-center justify-center text-white py-2">
-              <div class="flex-1 text-xs">{{ convertToTime(this.player.currentTime()) }}</div>
+              <div class="flex-1 text-xs">{{ getCurrentTime() }}</div>
             </div>
           </div>
 
           <div class="flex-1 text-right">
             <div class="flex items-center justify-center text-white py-2">
-              <div class="flex-1 text-right text-xs">{{ convertToTime(this.player.duration()) }}</div>
+              <div class="flex-1 text-right text-xs">{{ getDurationTime() }}</div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 @if (isMobile) {
-  <div class="card card-compact aspect-[4/1] flex-row bg-slate-950 rounded-md text-white">
+  <div class="card card-compact aspect-[4/1] flex-row bg-slate-950 rounded-md text-white group relative" tabindex="0" (click)="watch()" (keyup.enter)="watch()" (keyup.space)="watch()">
     <div class="flex-none">
       <img [src]="movie.thumbnails.default" [alt]="movie.title" class="object-cover h-full w-[19vw] rounded-s-md" />
     </div>
@@ -7,19 +7,36 @@
       <h2 class="card-title">{{ movie.title }}</h2>
       <div class="flex justify-between">
         <h3>{{ publishedDate }}</h3>
-        <h3>{{ formattedDuration }}</h3>
+        <!-- <h3>{{ formattedDuration }}</h3> -->
       </div>
     </div>
+    @if (!isReady()) {
+      <div class="absolute top-1 right-1">
+        <div class="badge badge-error gap-2 text-xs font-bold">{{ movieState() }}</div>
+      </div>
+    }
   </div>
 } @else {
-  <div class="card card-compact aspect-[3/4] group relative rounded-md shadow-xl dark:shadow-gray-950 text-white">
+  <div
+    class="card card-compact aspect-[3/4] group relative rounded-md shadow-xl dark:shadow-gray-950 text-white"
+    [style.cursor]="isReady() ? 'pointer' : 'default'"
+    tabindex="0"
+    (click)="watch()"
+    (keyup.enter)="watch()"
+    (keyup.space)="watch()"
+  >
     <img [src]="movie.thumbnails.default" [alt]="movie.title" class="object-cover h-full w-full rounded-md" />
-    <div class="card-body rounded-md bg-black-to-transparent absolute bottom-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+    <div class="card-body rounded-sm bg-black-to-transparent absolute bottom-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
       <h2 class="card-title">{{ movie.title }}</h2>
       <div class="flex justify-between">
         <h3>{{ publishedDate }}</h3>
-        <h3>{{ formattedDuration }}</h3>
+        <!-- <h3>{{ formattedDuration }}</h3> -->
       </div>
     </div>
+    @if (!isReady()) {
+      <div class="absolute top-0 left-0 w-full text-center">
+        <div class="badge badge-error gap-2 font-bold p-2 my-1">{{ movieState() }}</div>
+      </div>
+    }
   </div>
 }

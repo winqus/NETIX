@@ -4,6 +4,8 @@
 //   seasons: SeasonInfo[];
 // }
 
+import { VideoState } from './watchableVideo.dto';
+
 // interface SeasonInfo {
 //   seasonId: string;
 //   seasonNumber: number;
@@ -29,6 +31,8 @@ export interface MediaItem {
   categories: string[];
   createdAt: Date;
   updatedAt?: Date;
+  state: VideoState;
+  ready: boolean;
   // statistics: {
   //   viewCount: number;
   //   commentCount: number;
