@@ -1,17 +1,20 @@
-import { Inject, Service } from 'typedi';
+import Container, { Inject, Service } from 'typedi';
 import { v4 } from 'uuid';
 import { Logger } from 'winston';
 import config from '../config';
 import { Result } from '../core/logic/Result';
 import { UploadState } from '../core/states/UploadState';
+import FullUploadVideoJobDTO from '../dto/FullUploadVideoJobDTO';
 import NewUploadPermissionRequestDTO from '../dto/NewUploadPermissionRequestDTO';
 import { NewUploadPermissionResponseDTO } from '../dto/NewUploadPermissionResponseDTO';
 import { ThumbnailUploadConstraintsDTO, UploadConstraintsDTO, VideoFileUploadContraintsDTO } from '../dto/UploadConstraintsDTO';
+import UploadVideoJobMapper from '../mappers/UploadVideoJobMapper';
 import MetadataModel from '../persistence/schemas/Metadata.model';
 import ThumbnailModel from '../persistence/schemas/Thumbnail.model';
 import UploadModel from '../persistence/schemas/Upload.model';
 import UploadVideoJobModel from '../persistence/schemas/UploadVideoJob.model';
 import VideoModel from '../persistence/schemas/Video.model';
+import UploadVideoJobRepository from '../repositories/UploadVideoJobRepository';
 import { inRange } from '../utils/mathUtils';
 import { secureFileName } from '../utils/sanitization';
 import IUploadService from './IServices/IUploadService';
@@ -43,7 +46,7 @@ export default class UploadService implements IUploadService {
 
       return Result.ok<UploadConstraintsDTO>(constraintsResponse);
     } catch (error) {
-      this.logger.error(`[UploadRequestService, getUploadConstraints]: ${error}`);
+      this.logger.error(`[UploadService, getUploadConstraints]: ${error}`);
 
       throw error;
     }
@@ -57,7 +60,7 @@ export default class UploadService implements IUploadService {
         throw new Error('Invalid upload request. Missing required arguments.');
       }
 
-      this.logger.info(`[UploadRequestService, getPermissionToUpload]: User ${userId} requested to upload file ${fileName}, checking constraints`);
+      this.logger.info(`[UploadService, getPermissionToUpload]: User ${userId} requested to upload file ${fileName}, checking constraints`);
 
       const allowedDurationInSecRange = config.video.durationInSeconds;
       const allowedSizeInBytesRange = config.video.sizeInBytes;
@@ -81,9 +84,7 @@ export default class UploadService implements IUploadService {
       });
 
       if (userHasOtherUploadsInProgress) {
-        this.logger.error(
-          `[UploadRequestService, getPermissionToUpload]: User (${userId}) not allowed to upload because of other uploads in progress`
-        );
+        this.logger.error(`[UploadService, getPermissionToUpload]: User (${userId}) not allowed to upload because of other uploads in progress`);
 
         return Result.fail('User has other uploads in progress');
       }
@@ -124,7 +125,34 @@ export default class UploadService implements IUploadService {
 
       return Result.ok(response);
     } catch (error) {
-      this.logger.error(`[UploadRequestService, getPermissionToUpload]: ${error}`);
+      this.logger.error(`[UploadService, getPermissionToUpload]: ${error}`);
+
+      throw error;
+    }
+  }
+
+  public async getUserUploadInProgress(userId: string): Promise<Result<FullUploadVideoJobDTO>> {
+    try {
+      const userUpload = await UploadModel.findOne({
+        uploaderID: userId,
+        state: { $in: [UploadState.PENDING, UploadState.IN_PROGRESS] },
+      });
+
+      if (!userUpload) {
+        return Result.fail('No uploads in progress');
+      }
+      const repository = Container.get(UploadVideoJobRepository);
+      const uploadJob = await repository.getPopulatedJobByUploadID(userUpload.id);
+
+      if (!uploadJob) {
+        return Result.fail('No upload job found for upload');
+      }
+
+      const dto = UploadVideoJobMapper.fullPersistanceToDTO(uploadJob);
+
+      return Result.ok(dto);
+    } catch (error) {
+      this.logger.error(`[UploadService, getUserUploadInProgress]: ${error}`);
 
       throw error;
     }

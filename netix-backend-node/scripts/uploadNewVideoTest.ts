@@ -51,6 +51,22 @@ const getPermission = async (file: File): Promise<PermissionResponseDTO> => {
   return data as PermissionResponseDTO;
 };
 
+const getExistingUserUpload = async (log = true) => {
+  const url = 'http://[::1]:3055/api/v1/upload/user';
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer some.fake-jwt.token',
+    },
+  });
+
+  const data = await response.json();
+  log && console.log(`${response.status} Existing user upload`, data);
+
+  return data;
+};
+
 // Split video into chunks
 const splitVideoIntoChunks = async (file: File, permission: any) => {
   const chunkCount = permission.totalChunksCount;
@@ -164,15 +180,16 @@ const uploadThumbnail = async (uploadId: string, fileName: string) => {
   console.log('Permission: ', permission);
   //--------------------------------------------------------------------------------
   /*** Upload video ***/
-  const chunks = await splitVideoIntoChunks(file, permission);
-  await uploadChunks(chunks, permission);
+  // const chunks = await splitVideoIntoChunks(file, permission);
+  // await uploadChunks(chunks, permission);
   //--------------------------------------------------------------------------------
   /*** Upload metadata ***/
-  await uploadMetadata(permission.uploadId, {
-    title: 'Amazing video title',
-    publishDatetime: new Date('2021-09-05T00:00:00.000Z'),
-  });
+  // await uploadMetadata(permission.uploadId, {
+  //   title: 'Amazing video title',
+  //   publishDatetime: new Date('2021-09-05T00:00:00.000Z'),
+  // });
   //--------------------------------------------------------------------------------
   /*** Upload thumbnail ***/
-  await uploadThumbnail(permission.uploadId, 'thumbnail1.png');
+  // await uploadThumbnail(permission.uploadId, 'thumbnail1.png');
+  await getExistingUserUpload();
 })();
