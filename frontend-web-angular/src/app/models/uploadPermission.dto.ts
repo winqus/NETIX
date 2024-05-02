@@ -1,12 +1,11 @@
-export default interface NewUploadPermissionRequestDTO {
-  userId: string;
+export interface PermissionRequestDTO {
   fileName: string;
   mimeType: string;
   fileSizeInBytes: number;
   durationInSeconds: number;
 }
 
-export interface NewUploadPermissionResponseDTO {
+export interface PermissionResponseDTO {
   uploadId: string;
   uploadUrl: string;
   totalChunksCount: number;

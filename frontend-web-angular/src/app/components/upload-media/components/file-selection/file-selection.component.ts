@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SvgIconsComponent } from '../../../svg-icons/svg-icons.component';
 import { UploadConstraintsDTO } from '../../../../models/uploadConstraints.dto';
 
@@ -10,7 +10,7 @@ import { UploadConstraintsDTO } from '../../../../models/uploadConstraints.dto';
 })
 export class VideoFileSelectionComponent {
   @Input() isVideo!: boolean;
-  @Input() constraints!: UploadConstraintsDTO;
+  @Input() constraints: UploadConstraintsDTO | null = null;
   @Input() file!: File | null;
   @Output() filePassed = new EventEmitter<File>();
 
@@ -74,15 +74,22 @@ export class VideoFileSelectionComponent {
   }
 
   isValidMediaFormat(file: File): boolean {
-    if (this.isVideo) return this.constraints.videoFileConstraints.allowedMimeTypes.includes(file.type);
+    if (this.constraints) {
+      if (this.isVideo) return this.constraints.videoFileConstraints.allowedMimeTypes.includes(file.type);
 
-    return this.constraints.thumbnailConstraints.allowedMimeTypes.includes(file.type);
+      return this.constraints.thumbnailConstraints.allowedMimeTypes.includes(file.type);
+    }
+    return false;
   }
 
   mediaFormats(): string {
-    if (this.isVideo) return this.constraints.videoFileConstraints.allowedMimeTypes.join(', ');
+    if (this.constraints) {
+      if (this.isVideo) return this.constraints.videoFileConstraints.allowedMimeTypes.join(', ');
 
-    return this.constraints.thumbnailConstraints.allowedMimeTypes.join(', ');
+      return this.constraints.thumbnailConstraints.allowedMimeTypes.join(', ');
+    }
+
+    return '';
   }
 
   mediaItem(): string {
@@ -90,11 +97,15 @@ export class VideoFileSelectionComponent {
   }
 
   mimeTypes(): string {
-    if (this.isVideo) {
-      return this.formatAllowedMediaTypes(this.constraints.videoFileConstraints.allowedMimeTypes, this.videoMimeTypeMap);
+    if (this.constraints) {
+      if (this.isVideo) {
+        return this.formatAllowedMediaTypes(this.constraints.videoFileConstraints.allowedMimeTypes, this.videoMimeTypeMap);
+      }
+
+      return this.formatAllowedMediaTypes(this.constraints.thumbnailConstraints.allowedMimeTypes, this.pictureMimeTypeMap);
     }
 
-    return this.formatAllowedMediaTypes(this.constraints.thumbnailConstraints.allowedMimeTypes, this.pictureMimeTypeMap);
+    return '';
   }
 
   formatAllowedMediaTypes(allowedMediaFormats: string[], mimeTypeMap: Map<string, string>): string {

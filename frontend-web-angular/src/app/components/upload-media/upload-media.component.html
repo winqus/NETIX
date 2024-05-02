@@ -22,15 +22,6 @@
           <label class="block text-sm font-medium">Release date</label>
           <input type="date" id="media-release-date" class="input input-bordered w-full mb-4 rounded-md" (change)="onChangeDate($event)" [value]="mediaDateToSimpleDateFormat()" />
         </div>
-        <div class="text-left">
-          <label class="block text-sm font-medium">Media description</label>
-          <textarea
-            class="textarea textarea-bordered w-full min-h-24 max-h-44 mb-4 rounded-md"
-            placeholder="Enter media description"
-            (change)="onChangeDescription($event)"
-            [value]="mediaDescription"
-          ></textarea>
-        </div>
       </div>
     </div>
     <div class="flex-[1] content-center">
@@ -51,10 +42,12 @@
         </div>
       </div>
     </div>
+  } @else if (currentStep === UploadSteps.Uploading) {
+    <div class="">Uploading . . .</div>
+    <progress class="progress progress-info w-[80%] m-12" [value]="totalProgress()" max="400"></progress>
+    <h1>splitChunkProgress = {{ splitChunkProgress }}/100</h1>
+    <h1>uploadChunkProgress = {{ uploadChunkProgress }}/100</h1>
+    <h1>uploadMetaData = {{ uploadMetaData }}/100</h1>
+    <h1>uploadThumbnail = {{ uploadThumbnail }}/100</h1>
   }
-  <!-- @else if (currentStep === UploadSteps.Uploading) {
-    <progress class="progress progress-info w-[80%] m-12" [value]="mediaUploadProgress" max="100"></progress>
-
-    <h1>{{ mediaUploadProgress }}/ 100</h1>
-  } -->
 </div>

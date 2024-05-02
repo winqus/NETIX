@@ -7,6 +7,9 @@ import { UploadMediaService } from '../../services/upload-media.service';
 import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
 import { VideoFileSelectionComponent } from './components/file-selection/file-selection.component';
 import { UploadConstraintsDTO } from '../../models/uploadConstraints.dto';
+import { UploadService } from '../../services/upload.service';
+import { PermissionResponseDTO } from '../../models/uploadPermission.dto';
+import { UploadMetadataRequestDTO } from '../../models/uploadMetadata.dto';
 
 enum UploadSteps {
   FileSelection,
@@ -22,8 +25,6 @@ enum UploadSteps {
   templateUrl: './upload-media.component.html',
 })
 export class UploadMediaComponent {
-  constructor(public uploadMediaService: UploadMediaService) {}
-
   UploadSteps = UploadSteps;
   currentStep: UploadSteps = UploadSteps.FileSelection;
 
@@ -31,45 +32,43 @@ export class UploadMediaComponent {
   mediaThumbnail: File | null = null;
 
   mediaTitle: string = '';
-  mediaDescription: string = '';
   mediaDate!: Date;
   mediaUpdatedAt!: Date;
 
-  mediaUploadProgress: number = 0;
+  uploadConstraints: UploadConstraintsDTO | null = null;
 
-  uploadConstraints: UploadConstraintsDTO = {
-    videoFileConstraints: {
-      durationInSeconds: {
-        min: 30, // Minimum duration of 30 seconds
-        max: 3600, // Maximum duration of 1 hour
+  // progress
+  chunkSize = 0;
+  splitChunkProgress = 0;
+  uploadChunkProgress = 0;
+  uploadMetaData = 0;
+  uploadThumbnail = 0;
+
+  constructor(
+    public uploadMediaService: UploadMediaService,
+    private uploadService: UploadService
+  ) {
+    this.uploadService.getConstraints().subscribe({
+      next: (uploadConstraints: UploadConstraintsDTO) => {
+        this.uploadConstraints = uploadConstraints;
       },
-      sizeInBytes: {
-        min: 1048576, // Minimum size of 1MB
-        max: 1073741824, // Maximum size of 1GB
+      error: (error) => {
+        // TODO if error ocours disable upload functionality (better error handeling)
+        alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
+        console.log(error);
       },
-      allowedMimeTypes: ['video/mp4', 'video/webm', 'video/ogg'],
-      resolution: {
-        minWidth: 640, // Minimum width of 640 pixels
-        minHeight: 360, // Minimum height of 360 pixels
-        maxWidth: 1920, // Maximum width of 1920 pixels
-        maxHeight: 1080, // Maximum height of 1080 pixels
-      },
-    },
-    thumbnailConstraints: {
-      maxSizeBytes: 204800, // Maximum file size of 200KB
-      allowedMimeTypes: ['image/jpeg', 'image/png'],
-      resolution: {
-        minWidth: 640, // Minimum width of 640 pixels
-        minHeight: 360, // Minimum height of 360 pixels
-        maxWidth: 1280, // Maximum width of 1280 pixels
-        maxHeight: 720, // Maximum height of 720 pixels
-      },
-      aspectRatio: {
-        width: 16, // Aspect ratio width component
-        height: 9, // Aspect ratio height component
-      },
-    },
-  };
+    });
+
+    this.uploadService.splitChunkProgress.subscribe((progress) => {
+      this.splitChunkProgress = progress;
+    });
+
+    this.uploadService.sendChunkProgress.subscribe((progress) => {
+      console.log(progress);
+
+      this.uploadChunkProgress += progress;
+    });
+  }
 
   handleVideoFile(file: File) {
     console.log('Received file:', file);
@@ -95,7 +94,7 @@ export class UploadMediaComponent {
 
   goToUploading() {
     this.currentStep = UploadSteps.Uploading;
-    // this.uploadMedia();
+    this.uploadData();
   }
 
   onChangeTitle(event: Event) {
@@ -106,11 +105,6 @@ export class UploadMediaComponent {
   onChangeDate(event: Event) {
     const newValue = (event.target as HTMLInputElement).value;
     this.mediaDate = new Date(newValue);
-  }
-
-  onChangeDescription(event: Event) {
-    const newValue = (event.target as HTMLInputElement).value;
-    this.mediaDescription = newValue;
   }
 
   mediaDateToSimpleDateFormat(): string {
@@ -135,5 +129,57 @@ export class UploadMediaComponent {
       default:
         return '0';
     }
+  }
+  // TODO rename method
+  uploadData() {
+    this.uploadService.getPermision(this.video!).subscribe({
+      next: async (permission: PermissionResponseDTO) => {
+        console.log(permission);
+
+        const chunks = await this.uploadService.splitVideoIntoChunks(this.video!, permission);
+        this.chunkSize = chunks.length;
+
+        this.uploadService.uploadChunks(chunks, permission);
+
+        const metadataRequest: UploadMetadataRequestDTO = { metadata: { title: this.mediaTitle, publishDatetime: this.mediaDate } };
+
+        this.uploadService.uploadMetadata(permission.uploadId, metadataRequest).subscribe({
+          next: (metadataResponse) => {
+            console.log(metadataResponse);
+            if (metadataResponse.success) {
+              // TODO add to progress, prob
+              this.uploadMetaData = 100;
+            }
+          },
+          error: (error) => {
+            // TODO if error ocours disable upload functionality (better error handeling)
+            // alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
+            console.log(error);
+          },
+        });
+
+        (await this.uploadService.uploadThumbnail(permission.uploadId, this.mediaThumbnail!)).subscribe({
+          next: (response) => {
+            console.log(response);
+            this.uploadThumbnail = 100;
+          },
+          error: (error) => {
+            // TODO if error ocours disable upload functionality (better error handeling)
+            // alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
+            console.log(error);
+          },
+        });
+      },
+      error: (error) => {
+        // TODO if error ocours disable upload functionality (better error handeling)
+        // alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
+        console.log(error);
+      },
+    });
+  }
+  totalProgress(): number {
+    const uploadVideoProcess = (this.uploadChunkProgress / this.chunkSize) * 100;
+
+    return this.splitChunkProgress + uploadVideoProcess + this.uploadMetaData + this.uploadThumbnail;
   }
 }

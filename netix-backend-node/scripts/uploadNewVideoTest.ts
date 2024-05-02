@@ -146,21 +146,20 @@ const uploadThumbnail = async (uploadId: string, fileName: string) => {
 
 (async () => {
   /*** Load video file ***/
-  const file = await loadLocalFile('videoFile1.mkv');
+  const file = await loadLocalFile('videofile1.mp4');
   // // const file = await loadLocalFile('image2.mp4');
   console.log(`File (${file.name}) loaded`, file);
   /*** Upload Request ***/
   //--------------------------------------------------------------------------------
   let permission: PermissionResponseDTO;
-  permission = await getPermission(file);
-  // permission = {
-  //   uploadId: '354f4bb9-2da2-4f82-b6bd-6172e53390bb',
-  //   uploadUrl: 'http://localhost:3055/api/v1/upload/354f4bb9-2da2-4f82-b6bd-6172e53390bb/videoChunk',
-  //   // totalChunksCount: 1,
-  //   totalChunksCount: 2,
-  //   allowedUploadRateInChunksAtOnce: 1,
-  //   chunkBaseName: '354f4bb9-2da2-4f82-b6bd-6172e53390bb' + '_chunk-',
-  // };
+  // permission = await getPermission(file);
+  permission = {
+    uploadId: '70d168df-1ad4-4144-8a4a-da986b1986a3',
+    uploadUrl: 'http://localhost:3055/api/v1/upload/70d168df-1ad4-4144-8a4a-da986b1986a3/videoChunk',
+    totalChunksCount: 1,
+    allowedUploadRateInChunksAtOnce: 1,
+    chunkBaseName: 'd8a574d7-dc41-4b4a-bc71-1b6c4fa31ff9_chunk-',
+  };
   console.log('Permission: ', permission);
   //--------------------------------------------------------------------------------
   /*** Upload video ***/

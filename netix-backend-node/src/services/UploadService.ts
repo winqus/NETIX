@@ -80,7 +80,8 @@ export default class UploadService implements IUploadService {
         state: { $in: [UploadState.PENDING, UploadState.IN_PROGRESS] },
       });
 
-      if (userHasOtherUploadsInProgress) {
+      // if (userHasOtherUploadsInProgress) {
+      if (false) {
         this.logger.error(
           `[UploadRequestService, getPermissionToUpload]: User (${userId}) not allowed to upload because of other uploads in progress`
         );
