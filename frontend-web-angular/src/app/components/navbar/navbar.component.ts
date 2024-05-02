@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
 
 interface NavbarProps {
   title: string;
@@ -8,7 +9,7 @@ interface NavbarProps {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, SvgIconsComponent],
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {

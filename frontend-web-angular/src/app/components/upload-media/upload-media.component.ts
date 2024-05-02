@@ -4,6 +4,9 @@
 
 import { Component } from '@angular/core';
 import { UploadMediaService } from '../../services/upload-media.service';
+import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { VideoFileSelectionComponent } from './components/file-selection/file-selection.component';
+import { UploadConstraintsDTO } from '../../models/uploadConstraints.dto';
 
 enum UploadSteps {
   FileSelection,
@@ -15,7 +18,7 @@ enum UploadSteps {
 @Component({
   selector: 'app-upload-media',
   standalone: true,
-  imports: [],
+  imports: [SvgIconsComponent, VideoFileSelectionComponent],
   templateUrl: './upload-media.component.html',
 })
 export class UploadMediaComponent {
@@ -23,12 +26,10 @@ export class UploadMediaComponent {
 
   UploadSteps = UploadSteps;
   currentStep: UploadSteps = UploadSteps.FileSelection;
-  isDraggingOver: boolean = false;
-  allowedMediaFormats: string[] = ['video/mp4', 'video/mov', 'video/x-matroska', 'video/hevc'];
-  allowedThumbnailFormats: string[] = ['image/PNG', 'image/jpg', 'image/JPEG'];
 
-  mediaFile: File | null = null;
+  video: File | null = null;
   mediaThumbnail: File | null = null;
+
   mediaTitle: string = '';
   mediaDescription: string = '';
   mediaDate!: Date;
@@ -36,66 +37,49 @@ export class UploadMediaComponent {
 
   mediaUploadProgress: number = 0;
 
-  //file upload
-  onFileSelected(event: Event, _isMedia: boolean = false, _isThumbnail: boolean = false) {
-    const input = event.target as HTMLInputElement;
+  uploadConstraints: UploadConstraintsDTO = {
+    videoFileConstraints: {
+      durationInSeconds: {
+        min: 30, // Minimum duration of 30 seconds
+        max: 3600, // Maximum duration of 1 hour
+      },
+      sizeInBytes: {
+        min: 1048576, // Minimum size of 1MB
+        max: 1073741824, // Maximum size of 1GB
+      },
+      allowedMimeTypes: ['video/mp4', 'video/webm', 'video/ogg'],
+      resolution: {
+        minWidth: 640, // Minimum width of 640 pixels
+        minHeight: 360, // Minimum height of 360 pixels
+        maxWidth: 1920, // Maximum width of 1920 pixels
+        maxHeight: 1080, // Maximum height of 1080 pixels
+      },
+    },
+    thumbnailConstraints: {
+      maxSizeBytes: 204800, // Maximum file size of 200KB
+      allowedMimeTypes: ['image/jpeg', 'image/png'],
+      resolution: {
+        minWidth: 640, // Minimum width of 640 pixels
+        minHeight: 360, // Minimum height of 360 pixels
+        maxWidth: 1280, // Maximum width of 1280 pixels
+        maxHeight: 720, // Maximum height of 720 pixels
+      },
+      aspectRatio: {
+        width: 16, // Aspect ratio width component
+        height: 9, // Aspect ratio height component
+      },
+    },
+  };
 
-    if (!input.files?.length) {
-      return;
-    }
-
-    const file = input.files[0];
-    if (_isMedia) this.setMediaFile(file);
-    if (_isThumbnail) this.setThumbFile(file);
+  handleVideoFile(file: File) {
+    console.log('Received file:', file);
+    this.video = file;
   }
 
-  dragOverHandler(event: DragEvent) {
-    event.preventDefault();
-    this.isDraggingOver = true;
+  handleThumbnailFile(file: File) {
+    console.log('Received file:', file);
+    this.mediaThumbnail = file;
   }
-
-  dropHandler(event: DragEvent, _isMedia: boolean = false, _isThumbnail: boolean = false) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDraggingOver = false;
-
-    if (event.dataTransfer && event.dataTransfer.files.length) {
-      const file = event.dataTransfer.files[0];
-
-      if (_isMedia) this.setMediaFile(file);
-      if (_isThumbnail) this.setThumbFile(file);
-    }
-  }
-
-  dragLeaveHandler(event: DragEvent) {
-    event.preventDefault();
-    this.isDraggingOver = false;
-  }
-
-  setMediaFile(file: File) {
-    if (this.isValidMediaFormat(file)) {
-      console.log(file);
-      this.mediaFile = file;
-    } else {
-      alert('Invalid file format. Please upload a valid video file.');
-    }
-  }
-
-  isValidMediaFormat(file: File): boolean {
-    return this.allowedMediaFormats.includes(file.type);
-  }
-  setThumbFile(file: File) {
-    if (this.isValidThumbnailFormat(file)) {
-      this.mediaThumbnail = file;
-    } else {
-      alert('Invalid file format. Please upload a valid image file.');
-    }
-  }
-  isValidThumbnailFormat(file: File): boolean {
-    return this.allowedThumbnailFormats.includes(file.type);
-  }
-
-  // ----
 
   goToFileSelection() {
     this.currentStep = UploadSteps.FileSelection;
@@ -104,12 +88,14 @@ export class UploadMediaComponent {
   goToDetailsFilling() {
     this.currentStep = UploadSteps.DetailsFilling;
   }
+
   goToThumnNailSelection() {
     this.currentStep = UploadSteps.ThumbNailSelection;
   }
+
   goToUploading() {
     this.currentStep = UploadSteps.Uploading;
-    this.uploadMedia();
+    // this.uploadMedia();
   }
 
   onChangeTitle(event: Event) {
@@ -148,18 +134,6 @@ export class UploadMediaComponent {
         return '100';
       default:
         return '0';
-    }
-  }
-  mediaFormats(formats: string[]): string {
-    return formats.join(',');
-  }
-
-  async uploadMedia() {
-    this.uploadMediaService.uploadFile(this.mediaFile!);
-    const progressChunk = 100 / this.uploadMediaService.totalChunks!;
-    for (let chunk = 0; chunk < this.uploadMediaService.totalChunks!; chunk++) {
-      this.mediaUploadProgress += progressChunk;
-      this.uploadMediaService.uploadFileChunk(this.mediaFile!, '', chunk).subscribe();
     }
   }
 }

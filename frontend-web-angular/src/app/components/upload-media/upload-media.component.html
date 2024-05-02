@@ -5,29 +5,7 @@
 
 <div class="flex flex-col mb:px-24 xl:px-44 w-full h-[35rem]">
   @if (currentStep === UploadSteps.FileSelection) {
-    <div class="flex-[3]">
-      <label
-        for="dropzone-file"
-        class="flex flex-col items-center w-full h-full justify-start p-10 cursor-pointer"
-        (dragover)="dragOverHandler($event)"
-        (drop)="dropHandler($event, true)"
-        (dragleave)="dragLeaveHandler($event)"
-      >
-        <div class="card bg-slate-950 hover:bg-black p-16 rounded-md m-10" [class.bg-black]="isDraggingOver">
-          <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="" viewBox="0 0 16 16">
-            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
-          </svg>
-        </div>
-        @if (mediaFile === null) {
-          <p class="mb-2 text-sm"><span class="font-semibold">Click to upload</span> or drag and drop <span class="font-semibold">media file</span></p>
-          <p class="text-xs">MP4, MOV, MKV or HEVC</p>
-        } @else {
-          <p class="text-ellipsis overflow-hidden w-full mb-2 text-sm text-center"><span class="font-semibold">Uploaded</span> {{ this.mediaFile.name }}</p>
-        }
-        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, true)" [accept]="mediaFormats(allowedMediaFormats)" />
-      </label>
-    </div>
+    <app-file-selection [file]="video" [constraints]="uploadConstraints" (filePassed)="handleVideoFile($event)" [isVideo]="true"></app-file-selection>
     <div class="flex-[1] content-center">
       <div class="flex justify-center justify-self-stretch">
         <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Next</button>
@@ -35,7 +13,7 @@
     </div>
   } @else if (currentStep === UploadSteps.DetailsFilling) {
     <div class="flex-[3] flex justify-center align-top h-full">
-      <div class="flex flex-col w-[40%]">
+      <div class="flex flex-col w-full md:w-3/4 lg:w-1/2 p-4">
         <div class="text-left">
           <label class="block text-sm font-medium">Title</label>
           <input type="text" id="media-title" placeholder="Enter media title" class="input input-bordered w-full mb-4 rounded-md" (change)="onChangeTitle($event)" [value]="mediaTitle" />
@@ -64,29 +42,7 @@
       </div>
     </div>
   } @else if (currentStep === UploadSteps.ThumbNailSelection) {
-    <div class="flex-[3]">
-      <label
-        for="dropzone-file"
-        class="flex flex-col items-center w-full h-full justify-start p-10 cursor-pointer"
-        (dragover)="dragOverHandler($event)"
-        (drop)="dropHandler($event, false, true)"
-        (dragleave)="dragLeaveHandler($event)"
-      >
-        <div class="card bg-slate-950 hover:bg-black p-16 rounded-md m-10" [class.bg-black]="isDraggingOver">
-          <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="" viewBox="0 0 16 16">
-            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
-          </svg>
-        </div>
-        @if (mediaThumbnail === null) {
-          <p class="mb-2 text-sm"><span class="font-semibold">Click to upload</span> or drag and drop <span class="font-semibold">thumbnail file</span></p>
-          <p class="text-xs">PNG, JPG or JPEG</p>
-        } @else {
-          <p class="text-ellipsis overflow-hidden w-full mb-2 text-sm text-center"><span class="font-semibold">Uploaded</span> {{ this.mediaThumbnail.name }}</p>
-        }
-        <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event, false, true)" [accept]="mediaFormats(allowedThumbnailFormats)" />
-      </label>
-    </div>
+    <app-file-selection [file]="mediaThumbnail" [constraints]="uploadConstraints" (filePassed)="handleThumbnailFile($event)" [isVideo]="false"></app-file-selection>
     <div class="flex-[1] content-center">
       <div class="flex justify-center items-end">
         <div class="flex flex-row justify-between w-[40%] gap-10">
@@ -95,9 +51,10 @@
         </div>
       </div>
     </div>
-  } @else if (currentStep === UploadSteps.Uploading) {
+  }
+  <!-- @else if (currentStep === UploadSteps.Uploading) {
     <progress class="progress progress-info w-[80%] m-12" [value]="mediaUploadProgress" max="100"></progress>
 
     <h1>{{ mediaUploadProgress }}/ 100</h1>
-  }
+  } -->
 </div>
