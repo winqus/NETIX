@@ -56,7 +56,7 @@ export default class UploadService implements IUploadService {
     try {
       const { userId, fileName, fileSizeInBytes, mimeType, durationInSeconds } = uploadRequest;
 
-      if (!userId || !fileName || fileSizeInBytes === undefined || !mimeType || durationInSeconds === undefined) {
+      if (!userId || !fileName || fileSizeInBytes == null || !mimeType || durationInSeconds == null) {
         throw new Error('Invalid upload request. Missing required arguments.');
       }
 
@@ -83,7 +83,9 @@ export default class UploadService implements IUploadService {
         state: { $in: [UploadState.PENDING, UploadState.IN_PROGRESS] },
       });
 
-      if (userHasOtherUploadsInProgress) {
+      // TODO: Remove later (for testing purposes only)
+      // if (userHasOtherUploadsInProgress) {
+      if (false) {
         this.logger.error(`[UploadService, getPermissionToUpload]: User (${userId}) not allowed to upload because of other uploads in progress`);
 
         return Result.fail('User has other uploads in progress');

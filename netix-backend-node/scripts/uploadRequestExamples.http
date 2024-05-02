@@ -34,3 +34,10 @@ Content-Type: application/json
 POST http://[::1]:3055/api/v1/upload/dsadasdsadsa/videoChunk/0 HTTP/1.1
 Authorization: Bearer some.fake-jwt.token
 
+### Get videos at page
+GET http://[::1]:3055/api/v1/videos?page=1 HTTP/1.1
+Authorization: Bearer some.fake-jwt.token
+
+### Get video by id
+GET http://[::1]:3055/api/v1/videos/fc4d367f-d427-46f7-90e8-8549344fe6fa HTTP/1.1
+Authorization: Bearer some.fake-jwt.token

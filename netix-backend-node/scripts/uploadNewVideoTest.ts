@@ -180,16 +180,16 @@ const uploadThumbnail = async (uploadId: string, fileName: string) => {
   console.log('Permission: ', permission);
   //--------------------------------------------------------------------------------
   /*** Upload video ***/
-  // const chunks = await splitVideoIntoChunks(file, permission);
-  // await uploadChunks(chunks, permission);
+  const chunks = await splitVideoIntoChunks(file, permission);
+  await uploadChunks(chunks, permission);
   //--------------------------------------------------------------------------------
   /*** Upload metadata ***/
-  // await uploadMetadata(permission.uploadId, {
-  //   title: 'Amazing video title',
-  //   publishDatetime: new Date('2021-09-05T00:00:00.000Z'),
-  // });
+  await uploadMetadata(permission.uploadId, {
+    title: 'Amazing video title',
+    publishDatetime: new Date('2021-09-05T00:00:00.000Z'),
+  });
   //--------------------------------------------------------------------------------
   /*** Upload thumbnail ***/
-  // await uploadThumbnail(permission.uploadId, 'thumbnail1.png');
-  await getExistingUserUpload();
+  await uploadThumbnail(permission.uploadId, 'thumbnail1.png');
+  // await getExistingUserUpload();
 })();

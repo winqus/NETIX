@@ -7,6 +7,12 @@ import { IVideoPersistence } from './Video.model';
 export type IFullUploadVideoJobPersistance = IUploadVideoJobPersistence & {
   uploadID: IUploadPersistence & { videoID: IVideoPersistence; metadataID: IMetadataPersistence; thumbnailID: IThumbnailPersistence };
 };
+export type IFullUploadPersistance = IUploadPersistence & {
+  videoID: IVideoPersistence;
+  metadataID: IMetadataPersistence;
+  thumbnailID: IThumbnailPersistence;
+};
+
 export type IFullUploadVideoJobPersistanceDocument = Document &
   IUploadVideoJobPersistence & {
     uploadID: Document &
