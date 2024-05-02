@@ -87,7 +87,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
       console.log('streamID', this.streamID);
 
-      this.options.sources[0].src = `/api/v3/stream/${this.streamID}/`;
+      this.options.sources[0].src = `/api/v1/stream/${this.streamID}/`;
     }
   }
 

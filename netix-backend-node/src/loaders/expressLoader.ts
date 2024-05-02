@@ -32,6 +32,8 @@ export default (app: express.Application) => {
   // Load API routes
   app.use(config.api.prefix, routes());
 
+  // app.use(express.static('data/uploads/processedVideos'));
+
   // Catch other not matched routes (404)
   app.use((_req: Request, res: Response, _next: NextFunction) => {
     logger.error(`[server]: Not Found`);
