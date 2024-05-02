@@ -113,15 +113,18 @@ export class UploadMediaComponent {
   onChangeDate(event: Event) {
     const newValue = (event.target as HTMLInputElement).value;
     this.mediaDate = new Date(newValue);
+    console.log(newValue, this.mediaDate);
   }
 
   mediaDateToSimpleDateFormat(): string {
     if (this.mediaDate == null) return '';
-    const year: string = this.mediaDate.getFullYear().toString();
-    const month: string = this.mediaDate.getMonth().toString().padStart(2, '0');
-    const day: string = this.mediaDate.getDay().toString().padStart(2, '0');
 
-    return year + '-' + month + '-' + day;
+    const date = new Date(this.mediaDate);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`; // Format date into 'yyyy-MM-dd'
   }
 
   calculateProgress(): any {
