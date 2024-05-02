@@ -12,14 +12,14 @@ export const permissionRequestSchema = {
 
 export const videoChunkUploadRequestSchema = {
   params: {
-    uploadID: Joi.string().required(),
+    uploadID: Joi.string().uuid().required(),
     chunkIndex: Joi.number().integer().min(0).required(),
   },
 };
 
 export const metadataUploadRequestSchema = {
   params: {
-    uploadID: Joi.string().required(),
+    uploadID: Joi.string().uuid().required(),
   },
   body: Joi.object({
     metadata: {

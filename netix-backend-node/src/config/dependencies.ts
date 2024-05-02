@@ -16,6 +16,7 @@ export const NAMES = {
     UploadVideoJob: 'UploadVideoJobService',
     RawUpload: 'RawUploadFileService',
     SystemFile: 'SystemFileService',
+    Video: 'VideoService',
   },
   QUEUES: {
     // TODO queue names

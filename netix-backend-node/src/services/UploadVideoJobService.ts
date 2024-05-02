@@ -40,10 +40,16 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
 
   public async getPendingOrInProgressForUserByUploadID(userID: string, uploadID: string): Promise<Result<FullUploadVideoJobDTO>> {
     try {
+      if (userID == null || uploadID == null) {
+        this.logger.warn(`[UploadVideoJobService, getPendingOrInProgressForUserByUploadID]: User ID or upload ID is missing.`);
+
+        return Result.fail(`User ID or upload ID is missing.`);
+      }
+
       const job = await this.getPopulatedJob(uploadID);
 
       if (job.uploadID.uploaderID !== userID) {
-        this.logger.error(
+        this.logger.warn(
           `[UploadVideoJobService, getPendingOrInProgressForUserByUploadID]: ` +
             `Upload video job does not belong to user: ${userID} for upload ID: ${uploadID}`
         );
@@ -52,7 +58,7 @@ export default class UploadVideoJobService implements IUploadVideoJobService {
       }
 
       if (job.uploadID.state !== UploadState.PENDING && job.uploadID.state !== UploadState.IN_PROGRESS) {
-        this.logger.error(
+        this.logger.warn(
           `[UploadVideoJobService, getPendingOrInProgressForUserByUploadID]: ` +
             `Upload video job is not in PENDING or IN_PROGRESS state for upload ID: ${uploadID}`
         );

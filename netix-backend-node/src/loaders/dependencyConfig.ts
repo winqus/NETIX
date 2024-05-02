@@ -6,9 +6,10 @@ import UploadModel from '../persistence/schemas/Upload.model';
 import UploadVideoJobModel from '../persistence/schemas/UploadVideoJob.model';
 import VideoModel from '../persistence/schemas/Video.model';
 import RawUploadFileService from '../services/RawUploadFileService';
-import SystemFileService from '../services/SystemFileService';
 import UploadService from '../services/UploadService';
 import UploadVideoJobService from '../services/UploadVideoJobService';
+import VideoService from '../services/VideoService';
+import SystemFileService from '../services/systemFileService';
 
 export interface DependencyConfig {
   schemas: { name: string; class: any }[];
@@ -32,5 +33,6 @@ export const dependencyConfig: DependencyConfig = {
     { name: NAMES.SERVICES.RawUpload, class: RawUploadFileService },
     { name: NAMES.SERVICES.Upload, class: UploadService },
     { name: NAMES.SERVICES.UploadVideoJob, class: UploadVideoJobService },
+    { name: NAMES.SERVICES.Video, class: VideoService },
   ],
 };

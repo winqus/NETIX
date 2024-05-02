@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import { UploadState } from '../../core/states/UploadState';
 import { IMetadataPersistence } from './Metadata.model';
 import { IThumbnailPersistence } from './Thumbnail.model';
@@ -16,6 +17,8 @@ export interface IUploadPersistence {
   ready: boolean;
   state: UploadState;
 }
+
+type UploadDocument = mongoose.Document & IUploadPersistence;
 
 const uploadSchema = new Schema<IUploadPersistence>({
   _id: mongoose.Schema.Types.UUID,
@@ -42,4 +45,6 @@ uploadSchema.pre('updateOne', function (next) {
   next();
 });
 
-export default model<IUploadPersistence>('Upload', uploadSchema);
+uploadSchema.plugin(mongoosePaginate);
+
+export default model<IUploadPersistence, mongoose.PaginateModel<UploadDocument>>('Upload', uploadSchema);

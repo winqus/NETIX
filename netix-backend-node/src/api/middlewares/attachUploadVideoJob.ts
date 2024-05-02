@@ -8,11 +8,11 @@ const attachUploadVideoJob = async (req: Request, res: Response, next: NextFunct
   const uploadId = req.params.uploadID;
   const userId = (req as any).user.id;
 
-  if (!uploadId) {
+  if (uploadId == null || uploadId === '' || uploadId === 'undefined') {
     return res.status(400).send({ message: 'Upload ID is required.' });
   }
 
-  if (!userId) {
+  if (userId == null || userId === '' || userId === 'undefined') {
     return res.status(400).send({ message: 'User is required.' });
   }
 

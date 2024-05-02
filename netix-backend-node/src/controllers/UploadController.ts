@@ -66,6 +66,31 @@ export default class UploadController {
     }
   }
 
+  public async getUserUploadInProgress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user?.id;
+
+      if (!userId) {
+        return res.status(400).json({ error: 'User not found in request.' });
+      }
+
+      const uploadsResult = await this.uploadService.getUserUploadInProgress(userId);
+
+      if (uploadsResult.isFailure) {
+        return res.status(400).json({ error: uploadsResult.errorValue() });
+      }
+
+      const response = uploadsResult.getValue();
+      this.logger.info(`[UploadVideoController, getUserUploads]: Returning user uploads: ${JSON.stringify(response)}`);
+
+      return res.status(200).json(response);
+    } catch (error) {
+      this.logger.error(`[UploadVideoController, getUserUploads]: ${JSON.stringify(error)}`);
+
+      return next(error);
+    }
+  }
+
   public async processChunk(req: HttpUploadRequest, res: Response, next: NextFunction) {
     try {
       this.checkUserAttached(req);
