@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SvgIconsComponent } from '../../../svg-icons/svg-icons.component';
 import { UploadConstraintsDTO } from '../../../../models/uploadConstraints.dto';
+import { AlertCardComponent } from '../../../alert-card/alert-card.component';
 
 @Component({
   selector: 'app-file-selection',
   standalone: true,
-  imports: [SvgIconsComponent],
   templateUrl: './file-selection.component.html',
+  imports: [SvgIconsComponent, AlertCardComponent],
 })
 export class VideoFileSelectionComponent {
   @Input() isVideo!: boolean;
@@ -18,6 +19,11 @@ export class VideoFileSelectionComponent {
 
   videoMimeTypeMap: Map<string, string> = new Map([['video/x-matroska', 'MKV']]);
   pictureMimeTypeMap: Map<string, string> = new Map([['', '']]);
+
+  hideError: boolean = true;
+  handleCardHide($event: boolean) {
+    this.hideError = $event;
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -63,13 +69,20 @@ export class VideoFileSelectionComponent {
       this.filePassed.emit(file);
       this.file = file;
     } else {
-      alert('Invalid file format. Please upload a valid video file.');
+      this.hideError = false;
     }
   }
 
   checkConstraints(file: File): boolean {
     if (!this.isValidMediaFormat(file)) return false;
 
+    console.log(file.size, this.constraints!.videoFileConstraints.sizeInBytes.max, this.constraints!.thumbnailConstraints.maxSizeBytes);
+
+    if (this.isVideo) {
+      if (file.size > this.constraints!.videoFileConstraints.sizeInBytes.max) return false;
+    } else {
+      if (file.size > this.constraints!.thumbnailConstraints.maxSizeBytes) return false;
+    }
     return true;
   }
 

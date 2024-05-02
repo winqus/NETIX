@@ -58,7 +58,6 @@ export class UploadService {
       formData.append('videoChunk', chunk);
 
       const fullUrl = `${baseUrl}/${i}`;
-      console.log('Uploading chunk', i, 'to', fullUrl);
 
       const body = formData;
 
@@ -67,8 +66,6 @@ export class UploadService {
           this.sendChunkProgress.emit(1);
         },
         error: (error) => {
-          // TODO better error handeling :)
-          alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
           console.log(error);
         },
       });

@@ -10,6 +10,8 @@ import { UploadConstraintsDTO } from '../../models/uploadConstraints.dto';
 import { UploadService } from '../../services/upload.service';
 import { PermissionResponseDTO } from '../../models/uploadPermission.dto';
 import { UploadMetadataRequestDTO } from '../../models/uploadMetadata.dto';
+import { Router } from '@angular/router';
+import { AlertCardComponent } from '../alert-card/alert-card.component';
 
 enum UploadSteps {
   FileSelection,
@@ -21,8 +23,8 @@ enum UploadSteps {
 @Component({
   selector: 'app-upload-media',
   standalone: true,
-  imports: [SvgIconsComponent, VideoFileSelectionComponent],
   templateUrl: './upload-media.component.html',
+  imports: [SvgIconsComponent, VideoFileSelectionComponent, AlertCardComponent],
 })
 export class UploadMediaComponent {
   UploadSteps = UploadSteps;
@@ -44,7 +46,11 @@ export class UploadMediaComponent {
   uploadMetaData = 0;
   uploadThumbnail = 0;
 
+  errorMessage = '';
+  hideError = true;
+
   constructor(
+    private router: Router,
     public uploadMediaService: UploadMediaService,
     private uploadService: UploadService
   ) {
@@ -53,9 +59,7 @@ export class UploadMediaComponent {
         this.uploadConstraints = uploadConstraints;
       },
       error: (error) => {
-        // TODO if error ocours disable upload functionality (better error handeling)
-        alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
-        console.log(error);
+        this.showError(error);
       },
     });
 
@@ -64,20 +68,20 @@ export class UploadMediaComponent {
     });
 
     this.uploadService.sendChunkProgress.subscribe((progress) => {
-      console.log(progress);
-
       this.uploadChunkProgress += progress;
     });
   }
 
   handleVideoFile(file: File) {
-    console.log('Received file:', file);
     this.video = file;
   }
 
   handleThumbnailFile(file: File) {
-    console.log('Received file:', file);
     this.mediaThumbnail = file;
+  }
+
+  handleCardHide(isHiden: boolean) {
+    this.hideError = isHiden;
   }
 
   goToFileSelection() {
@@ -93,8 +97,12 @@ export class UploadMediaComponent {
   }
 
   goToUploading() {
-    this.currentStep = UploadSteps.Uploading;
     this.uploadData();
+    this.currentStep = UploadSteps.Uploading;
+  }
+
+  goToHome(): void {
+    this.router.navigate(['/']);
   }
 
   onChangeTitle(event: Event) {
@@ -130,12 +138,10 @@ export class UploadMediaComponent {
         return '0';
     }
   }
-  // TODO rename method
+
   uploadData() {
     this.uploadService.getPermision(this.video!).subscribe({
       next: async (permission: PermissionResponseDTO) => {
-        console.log(permission);
-
         const chunks = await this.uploadService.splitVideoIntoChunks(this.video!, permission);
         this.chunkSize = chunks.length;
 
@@ -145,41 +151,51 @@ export class UploadMediaComponent {
 
         this.uploadService.uploadMetadata(permission.uploadId, metadataRequest).subscribe({
           next: (metadataResponse) => {
-            console.log(metadataResponse);
             if (metadataResponse.success) {
-              // TODO add to progress, prob
               this.uploadMetaData = 100;
             }
           },
           error: (error) => {
-            // TODO if error ocours disable upload functionality (better error handeling)
-            // alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
-            console.log(error);
+            this.showError(error);
           },
         });
 
         (await this.uploadService.uploadThumbnail(permission.uploadId, this.mediaThumbnail!)).subscribe({
-          next: (response) => {
-            console.log(response);
+          next: () => {
             this.uploadThumbnail = 100;
           },
           error: (error) => {
-            // TODO if error ocours disable upload functionality (better error handeling)
-            // alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
-            console.log(error);
+            this.showError(error);
           },
         });
       },
       error: (error) => {
-        // TODO if error ocours disable upload functionality (better error handeling)
-        // alert(`There has been an server error \n ${JSON.stringify(error.message)}`);
-        console.log(error);
+        this.showError(error);
       },
     });
   }
+
   totalProgress(): number {
-    const uploadVideoProcess = (this.uploadChunkProgress / this.chunkSize) * 100;
+    let chunkSize = this.chunkSize;
+
+    if (chunkSize == 0) {
+      chunkSize = 1;
+    }
+    const uploadVideoProcess = (this.uploadChunkProgress / chunkSize) * 100;
 
     return this.splitChunkProgress + uploadVideoProcess + this.uploadMetaData + this.uploadThumbnail;
+  }
+
+  isUploaded(): boolean {
+    return this.totalProgress() == 400 ? true : false;
+  }
+
+  showError(error: any) {
+    if (error.error.error == undefined) {
+      this.errorMessage = `${error.status} ${error.error.message}`;
+    } else {
+      this.errorMessage = `${error.error.error}`;
+    }
+    this.hideError = false;
   }
 }

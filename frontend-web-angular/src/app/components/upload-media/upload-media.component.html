@@ -1,19 +1,25 @@
 <!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
-<div class="flex justify-center">
-  <progress class="progress w-[80%] m-12" [value]="calculateProgress()" max="100"></progress>
-</div>
 
-<div class="flex flex-col mb:px-24 xl:px-44 w-full h-[35rem]">
+<div class="flex flex-col w-full h-full">
+  @if (currentStep !== UploadSteps.Uploading) {
+    <div class="flex-[1] justify-center content-center pt-10 xl:mx-24 sm:mx-10 mx-5">
+      <progress class="progress progress-primary" [value]="calculateProgress()" max="100"></progress>
+    </div>
+  }
   @if (currentStep === UploadSteps.FileSelection) {
     <app-file-selection [file]="video" [constraints]="uploadConstraints" (filePassed)="handleVideoFile($event)" [isVideo]="true"></app-file-selection>
-    <div class="flex-[1] content-center">
+    <div class="flex-[2] content-center">
       <div class="flex justify-center justify-self-stretch">
-        <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Next</button>
+        @if (video) {
+          <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Next</button>
+        } @else {
+          <button class="btn btn-disabled rounded-md">Next</button>
+        }
       </div>
     </div>
   } @else if (currentStep === UploadSteps.DetailsFilling) {
     <div class="flex-[3] flex justify-center align-top h-full">
-      <div class="flex flex-col w-full md:w-3/4 lg:w-1/2 p-4">
+      <div class="flex flex-col w-full md:w-3/4 lg:w-1/2 xl:w-[35%] p-4 mx-5">
         <div class="text-left">
           <label class="block text-sm font-medium">Title</label>
           <input type="text" id="media-title" placeholder="Enter media title" class="input input-bordered w-full mb-4 rounded-md" (change)="onChangeTitle($event)" [value]="mediaTitle" />
@@ -24,30 +30,56 @@
         </div>
       </div>
     </div>
-    <div class="flex-[1] content-center">
+    <div class="flex-[2] content-center">
       <div class="flex justify-center items-end">
         <div class="flex flex-row justify-between w-[40%] gap-10">
           <button class="btn btn-primary rounded-md" (click)="goToFileSelection()">Back</button>
-          <button class="btn btn-primary rounded-md" (click)="goToThumnNailSelection()">Next</button>
+          @if (mediaTitle && mediaDate) {
+            <button class="btn btn-primary rounded-md" (click)="goToThumnNailSelection()">Next</button>
+          } @else {
+            <button class="btn btn-disabled rounded-md">Next</button>
+          }
         </div>
       </div>
     </div>
   } @else if (currentStep === UploadSteps.ThumbNailSelection) {
     <app-file-selection [file]="mediaThumbnail" [constraints]="uploadConstraints" (filePassed)="handleThumbnailFile($event)" [isVideo]="false"></app-file-selection>
-    <div class="flex-[1] content-center">
+    <div class="flex-[2] content-center">
       <div class="flex justify-center items-end">
         <div class="flex flex-row justify-between w-[40%] gap-10">
           <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Back</button>
-          <button class="btn btn-info rounded-md" (click)="goToUploading()">Confirm</button>
+          @if (mediaThumbnail) {
+            <button class="btn btn-info rounded-md" (click)="goToUploading()">Confirm</button>
+          } @else {
+            <button class="btn btn-disabled rounded-md">Confirm</button>
+          }
         </div>
       </div>
     </div>
   } @else if (currentStep === UploadSteps.Uploading) {
-    <div class="">Uploading . . .</div>
-    <progress class="progress progress-info w-[80%] m-12" [value]="totalProgress()" max="400"></progress>
-    <h1>splitChunkProgress = {{ splitChunkProgress }}/100</h1>
-    <h1>uploadChunkProgress = {{ uploadChunkProgress }}/100</h1>
-    <h1>uploadMetaData = {{ uploadMetaData }}/100</h1>
-    <h1>uploadThumbnail = {{ uploadThumbnail }}/100</h1>
+    <div class="flex-row h-full w-full content-center">
+      <div class="flex flex-col justify-center items-center w-full">
+        <div class="w-[80%] xl:mx-24 sm:mx-10 mx-5">
+          <div class="text-start text-5xl md:text-4xl font-bold mb-6">
+            @if (!isUploaded()) {
+              <span>Uploading . . .</span>
+            } @else {
+              <span>Finished</span>
+            }
+          </div>
+          <progress class="progress progress-error mx-auto my-10" [value]="totalProgress()" max="100"></progress>
+        </div>
+      </div>
+      @if (isUploaded()) {
+        <div class="flex-[1] content-center py-7">
+          <div class="flex justify-center items-end">
+            <div class="flex flex-row">
+              <button class="btn btn-primary rounded-md" (click)="goToHome()">Go to Home</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
   }
 </div>
+<app-alert-card [message]="errorMessage" [hideCard]="hideError" (cardHidden)="handleCardHide($event)"></app-alert-card>

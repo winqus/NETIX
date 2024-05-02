@@ -20,3 +20,4 @@
     <input id="dropzone-file" type="file" class="hidden" (change)="onFileSelected($event)" [accept]="mediaFormats()" />
   </label>
 </div>
+<app-alert-card message="Invalid file. Please upload a valid video file." [hideCard]="hideError" (cardHidden)="handleCardHide($event)"></app-alert-card>
