@@ -1,0 +1,53 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="flex justify-center">
+  <progress class="progress w-[80%] m-12" [value]="calculateProgress()" max="100"></progress>
+</div>
+
+<div class="flex flex-col mb:px-24 xl:px-44 w-full h-[35rem]">
+  @if (currentStep === UploadSteps.FileSelection) {
+    <app-file-selection [file]="video" [constraints]="uploadConstraints" (filePassed)="handleVideoFile($event)" [isVideo]="true"></app-file-selection>
+    <div class="flex-[1] content-center">
+      <div class="flex justify-center justify-self-stretch">
+        <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Next</button>
+      </div>
+    </div>
+  } @else if (currentStep === UploadSteps.DetailsFilling) {
+    <div class="flex-[3] flex justify-center align-top h-full">
+      <div class="flex flex-col w-full md:w-3/4 lg:w-1/2 p-4">
+        <div class="text-left">
+          <label class="block text-sm font-medium">Title</label>
+          <input type="text" id="media-title" placeholder="Enter media title" class="input input-bordered w-full mb-4 rounded-md" (change)="onChangeTitle($event)" [value]="mediaTitle" />
+        </div>
+        <div class="text-left">
+          <label class="block text-sm font-medium">Release date</label>
+          <input type="date" id="media-release-date" class="input input-bordered w-full mb-4 rounded-md" (change)="onChangeDate($event)" [value]="mediaDateToSimpleDateFormat()" />
+        </div>
+      </div>
+    </div>
+    <div class="flex-[1] content-center">
+      <div class="flex justify-center items-end">
+        <div class="flex flex-row justify-between w-[40%] gap-10">
+          <button class="btn btn-primary rounded-md" (click)="goToFileSelection()">Back</button>
+          <button class="btn btn-primary rounded-md" (click)="goToThumnNailSelection()">Next</button>
+        </div>
+      </div>
+    </div>
+  } @else if (currentStep === UploadSteps.ThumbNailSelection) {
+    <app-file-selection [file]="mediaThumbnail" [constraints]="uploadConstraints" (filePassed)="handleThumbnailFile($event)" [isVideo]="false"></app-file-selection>
+    <div class="flex-[1] content-center">
+      <div class="flex justify-center items-end">
+        <div class="flex flex-row justify-between w-[40%] gap-10">
+          <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Back</button>
+          <button class="btn btn-info rounded-md" (click)="goToUploading()">Confirm</button>
+        </div>
+      </div>
+    </div>
+  } @else if (currentStep === UploadSteps.Uploading) {
+    <div class="">Uploading . . .</div>
+    <progress class="progress progress-info w-[80%] m-12" [value]="totalProgress()" max="400"></progress>
+    <h1>splitChunkProgress = {{ splitChunkProgress }}/100</h1>
+    <h1>uploadChunkProgress = {{ uploadChunkProgress }}/100</h1>
+    <h1>uploadMetaData = {{ uploadMetaData }}/100</h1>
+    <h1>uploadThumbnail = {{ uploadThumbnail }}/100</h1>
+  }
+</div>

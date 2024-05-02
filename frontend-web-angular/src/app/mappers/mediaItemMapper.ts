@@ -7,11 +7,12 @@ export class MediaItemMapper {
       title: raw.title,
       description: raw.description || '',
       duration: raw.duration,
+      releaseDate: raw.releaseDate,
       creator: raw.creator || { id: 'unknown', name: 'unknown' },
       thumbnails: raw.thumbnails,
       tags: raw.tags || [],
       categories: raw.categories || [],
-      publishedAt: new Date(raw.publishedAt),
+      createdAt: new Date(raw.createdAt),
       updatedAt: new Date(raw.updatedAt),
     } as MediaItem;
   }

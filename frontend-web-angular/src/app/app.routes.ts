@@ -4,6 +4,7 @@ import { EmptyLayoutComponent } from './layouts/empty-layout/empty-layout.compon
 import { ErrorPageComponent } from './components/error-page/error-page.component';
 import appMessages from '../assets/i18n/en/appMessages.json';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
+import { UploadMediaComponent } from './components/upload-media/upload-media.component';
 import { VideoMediaViewerComponent } from './components/video-media-viewer/video-media-viewer.component';
 
 export const routes: Routes = [
@@ -11,10 +12,11 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [{ path: '', component: MovieListComponent }],
-
-    // path: '',
-    // component: MainLayoutComponent,
-    // children: [{ path: '', component: MainPageComponent }],
+  },
+  {
+    path: 'upload',
+    component: MainLayoutComponent,
+    children: [{ path: '', component: UploadMediaComponent }],
   },
   {
     path: 'watch',

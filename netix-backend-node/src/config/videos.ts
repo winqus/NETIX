@@ -51,7 +51,7 @@ const videoConfig: VideoConfig = {
   thumbnail: {
     rawUploadDir: `${process.env.RAW_THUMBNAIL_UPLOAD_DIR || './data/uploads/rawThumbnails'}`,
     processedUploadDir: `${process.env.PROCESSED_THUMBNAIL_UPLOAD_DIR || './data/uploads/processedThumbnails'}`,
-    maxSizeBytes: 50 * 1024, // 50 KB
+    maxSizeBytes: 20000 * 1024, // 20000 KB
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     resolution: {
       minWidth: 100,

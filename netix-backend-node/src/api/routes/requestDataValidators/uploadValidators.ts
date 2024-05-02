@@ -26,5 +26,5 @@ export const metadataUploadRequestSchema = {
       title: Joi.string().required().min(config.video.titleLength.min).max(config.video.titleLength.max),
       publishDatetime: Joi.date().required(),
     },
-  }).required(),
+  }),
 };
