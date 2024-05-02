@@ -21,7 +21,10 @@ export const routes: Routes = [
   {
     path: 'watch',
     component: MainLayoutComponent,
-    children: [{ path: '', component: VideoMediaViewerComponent }],
+    children: [
+      { path: '', redirectTo: '/error/404', pathMatch: 'full' },
+      { path: ':uuid', component: VideoMediaViewerComponent },
+    ],
   },
   {
     path: 'error',

@@ -2,10 +2,11 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, 
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, Subscription, debounceTime, fromEvent, map, timer } from 'rxjs';
-import { Router } from '@angular/router';
+import { BehaviorSubject, Subscription, debounceTime, firstValueFrom, fromEvent, map, timer } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '../../services/layout.service';
 import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { MediaItem } from '../../models/mediaItem';
 
 @Component({
   selector: 'app-video-media-viewer',
@@ -22,6 +23,9 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   player!: Player;
 
+  mediaData?: MediaItem;
+  streamID: string | null = null;
+
   private options = {
     fill: true,
     responsive: true,
@@ -29,13 +33,13 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     controls: false,
     sources: [
       {
-        src: '/api/streams/meme/output.m3u8',
+        src: '',
         type: 'application/vnd.apple.mpegurl',
       },
     ],
   };
 
-  videoTitle = 'Star Wars';
+  videoTitle = 'No title';
 
   volume: number = 1.0;
   currentTime: number = 0;
@@ -50,6 +54,8 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   constructor(
     private router: Router,
+
+    private activeRoute: ActivatedRoute,
     private layoutService: LayoutService
   ) {
     this.resizeSubscription = fromEvent(window, 'resize')
@@ -63,11 +69,26 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
       });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.getStreamID();
     this.setupPlayer();
 
     this.isMobile = this.checkScreenSize();
     this.setupActivityTracker();
+  }
+
+  private async getStreamID(): Promise<void> {
+    const params = await firstValueFrom(this.activeRoute.paramMap);
+    this.streamID = params!.get('uuid');
+
+    if (this.streamID) {
+      this.mediaData = history.state.data as MediaItem;
+      this.videoTitle = this.mediaData?.title || 'No title available';
+
+      console.log('streamID', this.streamID);
+
+      this.options.sources[0].src = `/api/v3/stream/${this.streamID}/`;
+    }
   }
 
   ngOnDestroy(): void {
