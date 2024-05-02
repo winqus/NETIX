@@ -17,6 +17,8 @@ export class WatchableVideoDTOMapper {
       categories: [],
       createdAt: new Date(dto.createdDateTime),
       updatedAt: new Date(dto.uploadedDateTime),
+      state: dto.state,
+      ready: dto.ready,
     } as MediaItem;
   }
 
