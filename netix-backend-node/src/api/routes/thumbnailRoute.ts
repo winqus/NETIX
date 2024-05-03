@@ -4,13 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import config from '../../config';
 import { wLoggerInstance } from '../../loaders/logger';
+import authenticate from '../middlewares/validateAccessToken';
 
-// const fileCache: Record<string, string> = {};
 const fileCache: Record<string, { path: string; type: string }> = {};
 
 export default (router: Router) => {
   router.get(
     '/v1/thumbnail/:uuid',
+    // authenticate,
     celebrate({
       params: Joi.object({
         uuid: Joi.string().uuid().required(),
@@ -19,7 +20,7 @@ export default (router: Router) => {
     (req, res) => {
       const { uuid } = req.params;
       const directoryPath = path.resolve(config.video.thumbnail.processedUploadDir);
-      const extensions = ['.png', '.webp', '.jpeg'];
+      const extensions = ['.png', '.webp', '.jpg'];
 
       if (fileCache[uuid]) {
         const options = { headers: { 'Content-Type': fileCache[uuid].type } };
@@ -46,7 +47,6 @@ export default (router: Router) => {
             sendFileIfExists(index + 1); // Try the next file extension
           } else {
             const contentType = getContentType(filePath);
-            // res.type(contentType);
             const options = { headers: { 'Content-Type': contentType } };
             fileCache[uuid] = { path: filePath, type: contentType }; // Cache the found file path
             res.sendFile(filePath, options, (err) => {

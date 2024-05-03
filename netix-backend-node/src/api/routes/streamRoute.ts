@@ -2,6 +2,7 @@ import { celebrate, Joi } from 'celebrate';
 import { Router } from 'express';
 import path from 'node:path';
 import { wLoggerInstance } from '../../loaders/logger';
+import authenticate from '../middlewares/validateAccessToken';
 
 export default (router: Router) => {
   router.get(
@@ -11,6 +12,7 @@ export default (router: Router) => {
         uuid: Joi.string().uuid().required(),
       }),
     }),
+    // authenticate,
     (req, res) => {
       wLoggerInstance.info(`Sending video stream with id ${req.params.uuid}`);
 
@@ -28,6 +30,7 @@ export default (router: Router) => {
         segment: Joi.string().required(),
       }),
     }),
+    // authenticate,
     (req, res) => {
       wLoggerInstance.info(
         `Sending video segment ${req.params.segment} of stream with id ${req.params.uuid}`
