@@ -76,8 +76,6 @@ export class VideoFileSelectionComponent {
   checkConstraints(file: File): boolean {
     if (!this.isValidMediaFormat(file)) return false;
 
-    console.log(file.size, this.constraints!.videoFileConstraints.sizeInBytes.max, this.constraints!.thumbnailConstraints.maxSizeBytes);
-
     if (this.isVideo) {
       if (file.size > this.constraints!.videoFileConstraints.sizeInBytes.max) return false;
     } else {

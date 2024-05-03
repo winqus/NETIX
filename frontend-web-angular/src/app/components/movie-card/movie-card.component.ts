@@ -1,5 +1,7 @@
 import { Component, HostListener, Input } from '@angular/core';
 import { MediaItem } from '../../models/mediaItem';
+import { Router } from '@angular/router';
+import { VideoState } from '../../models/watchableVideo.dto';
 
 @Component({
   selector: 'app-movie-card',
@@ -8,17 +10,11 @@ import { MediaItem } from '../../models/mediaItem';
   templateUrl: './movie-card.component.html',
 })
 export class MovieCardComponent {
-  movie!: MediaItem;
-
+  @Input() movie!: MediaItem;
   isMobile: boolean = false;
 
-  constructor() {
+  constructor(private router: Router) {
     this.checkScreenSize();
-  }
-
-  @Input()
-  set movieData(value: MediaItem) {
-    this.movie = value;
   }
 
   @HostListener('window:resize', ['$event'])
@@ -49,5 +45,17 @@ export class MovieCardComponent {
       .padStart(2, '0');
     const seconds = (duration % 60).toString().padStart(2, '0');
     return `${hours}:${minutes}:${seconds}`;
+  }
+
+  isReady(): boolean {
+    return this.movie.state == VideoState.READY ? true : false;
+  }
+
+  watch() {
+    if (this.isReady()) this.router.navigate(['/watch', this.movie.id], { state: { data: this.movie } });
+  }
+
+  movieState(): string {
+    return this.movie.state.toLocaleUpperCase().replaceAll('_', ' ');
   }
 }

@@ -103,7 +103,9 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   ngAfterViewInit() {
-    this.changeVolume();
+    setTimeout(() => {
+      this.changeVolume();
+    }, 100);
   }
 
   setupPlayer() {
@@ -267,12 +269,19 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     this.player.muted(!this.player.muted());
   }
 
+  isMuted(): boolean {
+    if (this.player) {
+      return this.player.muted() || false;
+    }
+
+    return false;
+  }
+
   changeVolume(): void {
     const slider = document.querySelector('.slider') as HTMLInputElement;
     if (slider) {
       slider.style.setProperty('--thumb-position', `${this.volume * 100}%`);
     }
-
     this.player.volume(this.volume);
   }
 
@@ -334,7 +343,11 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
       return this.calculatePercentage(this.newTime, duration);
     } else {
       const passedPercent = currentTime / duration;
-      return this.calculatePercentage(passedPercent + this.player.bufferedEnd(), duration);
+      let bufferedEnd = 0;
+      if (this.player != undefined) {
+        bufferedEnd = this.player.bufferedEnd();
+      }
+      return this.calculatePercentage(passedPercent + bufferedEnd, duration);
     }
   }
 
@@ -439,6 +452,22 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   // * HELPER FUNCTIONS
+  getCurrentTime(): string {
+    if (this.player) {
+      return this.convertToTime(this.player.currentTime());
+    }
+
+    return '00:00';
+  }
+
+  getDurationTime(): string {
+    if (this.player) {
+      return this.convertToTime(this.player.duration());
+    }
+
+    return '00:00';
+  }
+
   // time converter time -> 00:00:00
   convertToTime(timeInSeconds: number | undefined): string {
     if (timeInSeconds == undefined) return '00:00:00';
