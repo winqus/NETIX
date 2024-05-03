@@ -10,4 +10,9 @@
       <app-svg-icons name="upload" size="20" color="white"></app-svg-icons>
     </button>
   }
+  @if (auth.isAuthenticated$ | async; as isAuthenticated) {
+    <button class="btn" (click)="logout()">Logout</button>
+  } @else {
+    <button class="btn" (click)="auth.loginWithPopup()">Login</button>
+  }
 </nav>

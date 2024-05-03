@@ -14,7 +14,7 @@ import { WatchableVideoDTOMapper } from '../mappers/WatchableVideoDTOMapper';
 export class MovieService {
   constructor(private http: HttpClient) {}
 
-  getMovies(page = 1, limit = 10): Observable<MediaItem[]> {
+  getMovies(page = 1, limit = 20): Observable<MediaItem[]> {
     const videosUrl = API_CONFIG.baseUrl + API_CONFIG.endpoints.videos;
 
     const url = `${videosUrl}?page=${page}&limit=${limit}`;

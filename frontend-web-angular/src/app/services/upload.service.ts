@@ -48,28 +48,33 @@ export class UploadService {
 
   uploadChunks(chunks: Blob[], permission: PermissionResponseDTO) {
     const baseUrl = permission.uploadUrl;
-
     const httpOptions = {};
+    const delay = 1000; // Delay in milliseconds, e.g., 1000ms = 1 second
 
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
+    const uploadChunk = (index: number) => {
+      if (index >= chunks.length) {
+        return; // Stop when all chunks have been sent
+      }
+
+      const chunk = chunks[index];
       const formData = new FormData();
-
       formData.append('videoChunk', chunk);
 
-      const fullUrl = `${baseUrl}/${i}`;
-
+      const fullUrl = `${baseUrl}/${index}`;
       const body = formData;
 
       this.http.post(fullUrl, body, httpOptions).subscribe({
         next: () => {
           this.sendChunkProgress.emit(1);
+          setTimeout(() => uploadChunk(index + 1), delay); // Schedule next upload after a delay
         },
         error: (error) => {
           console.log(error);
         },
       });
-    }
+    };
+
+    uploadChunk(0); // Start uploading from the first chunk
   }
 
   uploadMetadata(uploadId: string, metadata: UploadMetadataRequestDTO): Observable<UploadMetadataResponseDTO> {

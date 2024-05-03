@@ -4,11 +4,11 @@ import Container from 'typedi';
 import UploadController from '../../controllers/UploadController';
 import { UploadState } from '../../core/states/UploadState';
 import attachUploadVideoJob from '../middlewares/attachUploadVideoJob';
+import attachUser from '../middlewares/attachUserFromToken';
 import { checkUploadState } from '../middlewares/checkUploadJobState';
-import attachUser from '../middlewares/fakeAttachUser';
-import authenticate from '../middlewares/fakeAuthenticate';
 import uploadThumbnail from '../middlewares/uploadThumbnail';
 import uploadVideoChunk from '../middlewares/uploadVideoChunk';
+import authenticate from '../middlewares/validateAccessToken';
 import {
   metadataUploadRequestSchema,
   permissionRequestSchema,

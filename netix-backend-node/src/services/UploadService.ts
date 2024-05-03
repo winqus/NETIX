@@ -84,8 +84,8 @@ export default class UploadService implements IUploadService {
       });
 
       // TODO: Remove later (for testing purposes only)
-      // if (userHasOtherUploadsInProgress) {
-      if (false) {
+      // if (false) {
+      if (userHasOtherUploadsInProgress) {
         this.logger.error(`[UploadService, getPermissionToUpload]: User (${userId}) not allowed to upload because of other uploads in progress`);
 
         return Result.fail('User has other uploads in progress');
