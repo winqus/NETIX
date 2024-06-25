@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 
-// TODO: Implement propper authentication middleware with OAuth2 or JWT
 const fakeAuthenticate = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('Authorization');
   const fakeToken = 'some.fake-jwt.token';

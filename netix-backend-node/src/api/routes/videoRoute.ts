@@ -2,7 +2,8 @@ import { celebrate, Joi } from 'celebrate';
 import { Router } from 'express';
 import Container from 'typedi';
 import VideoController from '../../controllers/VideoController';
-import authenticate from '../middlewares/validateAccessToken';
+import authenticate from '../middlewares/fakeAuthenticate';
+// import authenticate from '../middlewares/validateAccessToken';
 
 export default (router: Router) => {
   const videoController = Container.get(VideoController);

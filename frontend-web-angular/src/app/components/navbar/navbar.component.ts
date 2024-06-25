@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
-import { AuthService } from '@auth0/auth0-angular';
+// import { AuthService } from '@auth0/auth0-angular';
 import { CommonModule } from '@angular/common';
 
 interface NavbarProps {
@@ -18,8 +18,8 @@ export class NavbarComponent {
   @Input() props: NavbarProps = { title: '' };
 
   constructor(
-    private router: Router,
-    public auth: AuthService
+    private router: Router
+    // public auth: AuthService
   ) {}
 
   get isUploadRoute(): boolean {
@@ -27,6 +27,6 @@ export class NavbarComponent {
   }
 
   logout(): void {
-    this.auth.logout();
+    // this.auth.logout();
   }
 }

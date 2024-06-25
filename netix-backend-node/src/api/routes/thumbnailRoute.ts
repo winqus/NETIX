@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import config from '../../config';
 import { wLoggerInstance } from '../../loaders/logger';
-import authenticate from '../middlewares/validateAccessToken';
+// import authenticate from '../middlewares/validateAccessToken';
 
 const fileCache: Record<string, { path: string; type: string }> = {};
 

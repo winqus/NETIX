@@ -2,7 +2,7 @@ import { celebrate, Joi } from 'celebrate';
 import { Router } from 'express';
 import path from 'node:path';
 import { wLoggerInstance } from '../../loaders/logger';
-import authenticate from '../middlewares/validateAccessToken';
+// import authenticate from '../middlewares/validateAccessToken';
 
 export default (router: Router) => {
   router.get(

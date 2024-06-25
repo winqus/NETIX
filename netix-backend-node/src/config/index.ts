@@ -1,14 +1,16 @@
 import dotenv from 'dotenv';
+import { exit } from 'node:process';
+import { wLoggerInstance } from '../loaders/logger';
 
 const envFound = dotenv.config();
 if (!envFound || envFound?.error) {
-  wLoggerInstance.warn('⚠️  No .env file found, using default environment variables ⚠️');
+  wLoggerInstance.error('⚠️  No .env file found ⚠️');
+  exit(1);
 }
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 import { DependencyConfig, dependencyConfig } from '../loaders/dependencyConfig';
-import { wLoggerInstance } from '../loaders/logger';
 import { EnvironmentType, getCurrentEnvironment } from './utils';
 import videoConfig, { VideoConfig } from './videos';
 
