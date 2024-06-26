@@ -5,14 +5,14 @@ Streaming platform designed for tailored home entertainment within a home networ
 * Have node.js installed (v20.x.x, check with `node -v` in cmd), angular client (v17.x.x, check with `ng version`).
 * Install [Docker](https://www.docker.com/products/docker-desktop/) and run it.
 * VSCode is the preferred IDE.
-* Run `docker-compose-up` (setups and runs mongodb and redis image containers; make sure Docker Desktop/Engine is running).
+* Run `npm run docker-compose-up` (setups and runs mongodb and redis image containers; make sure Docker Desktop/Engine is running).
 * In the **netix-backend-node** repository folder, run command in the terminal: `npm install` (installs needed dependencies), create **.env** file (check below), finally run `npm run start` (successful when you see in terminal `Server is running at http://.......`).
 * In the **frontend-web-angular** repository folder, run command in the terminal: `npm install` (installs needed dependencies), create **.env** file (check below), for the first time (or when .env file is changed) run `npm run start-with-env`, other times use `npm run start`.
  The env command will set the environment variables for the Angular app in the **src/environments/** files. **DO NOT COMMIT THE ENVIROMENT/ FILES WITH SENSITIVE DATA**.
 * Container data (db, etc.) and upload data is stored in the *./data* folder in **netix-backend-node** root dir. Make sure it's created, also create folders *./data/uploads*, *./data/redis*, *./data/mongodb*. Unlikely, but could potentially fail to create sub-folders inside, check it (and possibly the logs) when uploading something (e.g. video file, thumbnail).
 
 ## Removal
-* Docker containers can be stopped with terminal command in the **netix-backend-node** folder: `npm run docker-compose-stop` or `npm run docker-compose-down` (to remove stopped container and docker network).
+* Docker containers can be stopped with terminal command in the **netix-backend-node** folder: `npm run docker-compose-stop` or `npm run docker-compose-down` (to remove stopped container and docker network). Alternatively, the container group can be stopped in the Docker Desktop client.
 
 ## Development .env file
 Create a **.env** file in the **netix-backend-node** repository folder with the following content:
