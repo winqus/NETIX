@@ -3,7 +3,7 @@ version: "4.28.0"
 services:
   netix-redis:
     image: redis:7.2.4-bookworm
-    container_name: c-netix-redis
+    container_name: cont-netix-redis
     ports:
       - "6379:6379"
     command: redis-server --save 60 1 --loglevel warning --requirepass pass_r1
@@ -15,7 +15,7 @@ services:
   
   netix-mongodb:
     image: mongodb/mongodb-community-server:4.4.16-ubi8
-    container_name: c-netix-mongodb
+    container_name: cont-netix-mongodb
     ports:
       - "27018:27017"
     volumes:
