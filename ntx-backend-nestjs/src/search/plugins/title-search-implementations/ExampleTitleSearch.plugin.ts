@@ -49,7 +49,10 @@ export default class ExampleTitleSearchPlugin
     return [
       {
         title: 'Example Title (2018)',
+        originalTitle: 'Example Title',
         id: 'example-id-1234',
+        type: 'MOVIE',
+        weight: 0.8,
         releaseDate: '2018-06-14',
         sourceUUID: this.pluginUUID,
       },

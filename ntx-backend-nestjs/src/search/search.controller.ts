@@ -27,6 +27,6 @@ export class SearchController {
       plugins.map((plugin) => plugin.search(query)),
     );
 
-    return searchResults.flat();
+    return searchResults.flat().sort((a, b) => b.weight - a.weight);
   }
 }

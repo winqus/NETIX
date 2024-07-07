@@ -19,7 +19,10 @@ export interface ITitleSearchPlugin {
 
 export interface TitleSearchResult {
   title: string;
+  originalTitle: string;
   id: string;
+  type: 'MOVIE' | 'SERIES';
+  weight: number;
   releaseDate: string;
   sourceUUID: string;
 }

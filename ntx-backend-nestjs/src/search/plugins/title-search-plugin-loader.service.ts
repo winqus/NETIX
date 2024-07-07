@@ -29,9 +29,26 @@ export class TitleSearchPluginLoaderService {
           return;
         }
 
-        const pluginInstance: ITitleSearchPlugin = new PluginClass();
+        const pluginInstance: ITitleSearchPlugin = new PluginClass(
+          new Logger(PluginClass.name),
+        );
 
         const config = config_lut[pluginInstance.pluginUUID];
+
+        if (config == undefined) {
+          this.logger.error(
+            `No configuration found for plugin (${pluginInstance.pluginUUID})`,
+          );
+
+          loadResult = false;
+
+          return;
+        }
+
+        if (config.usePlugin === false) {
+          return;
+        }
+
         const initResult = pluginInstance.init(config);
 
         if (initResult === true) {
@@ -39,9 +56,6 @@ export class TitleSearchPluginLoaderService {
         } else {
           loadResult = false;
 
-          // console.error(
-          //   `Failed to initialize plugin (${pluginInstance.pluginUUID})`,
-          // );
           this.logger.error(
             `Failed to initialize plugin (${pluginInstance.pluginUUID})`,
           );
@@ -49,7 +63,6 @@ export class TitleSearchPluginLoaderService {
       }
     });
 
-    // console.log(`Title search plugins (${this.plugins.length}) loaded`);
     this.logger.log(`Title search plugins (${this.plugins.length}) loaded`);
 
     return loadResult;

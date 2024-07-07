@@ -1,7 +1,15 @@
+import { LoggerService } from '@nestjs/common/services/logger.service';
+
 export default abstract class {
   abstract readonly pluginUUID: string;
   protected lastCallTime: number = 0;
   protected timeBetweenCallsMs: number;
+
+  constructor(protected logger: LoggerService) {
+    if (logger == null) {
+      throw new Error('LoggerService is required for plugin.');
+    }
+  }
 
   public canCall(): boolean {
     return Date.now() - this.lastCallTime > this.timeBetweenCallsMs;

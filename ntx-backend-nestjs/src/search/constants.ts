@@ -1,18 +1,20 @@
 import { PluginLoaderConfigLUT } from './plugins/interfaces/ITitleSearchPlugin.interface';
 
+export const TMBD_SEARCH_TITLES = 'TMBD_SEARCH_V3';
+
 export const titleSearchPluginConfig = () => {
   const config: PluginLoaderConfigLUT = {
-    'example-uuid-1234': {
-      usePlugin: true,
+    ['example-uuid-1234']: {
+      usePlugin: false,
       options: {
-        apiKey: process.env['TMBD_API_KEY'] || '',
+        apiKey: 'example-api-key2',
       },
       timeBetweenCallsMs: 25,
     },
-    'example-uuid-2': {
+    [TMBD_SEARCH_TITLES]: {
       usePlugin: true,
       options: {
-        apiKey: 'example-api-key2',
+        apiKey: process.env['TMBD_API_KEY'] || '',
       },
       timeBetweenCallsMs: 1000,
     },
