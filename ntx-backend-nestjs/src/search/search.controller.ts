@@ -1,5 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { titleSearchPluginConfig } from './constants';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Query,
+} from '@nestjs/common';
+import { SYSTEM_SEARCH_TITLES, titleSearchPluginConfig } from './constants';
+import { TitleType } from './plugins/interfaces/ITitleSearchPlugin.interface';
 import { TitleSearchPluginLoaderService } from './plugins/title-search-plugin-loader.service';
 
 @Controller({
@@ -28,5 +36,53 @@ export class SearchController {
     );
 
     return searchResults.flat().sort((a, b) => b.weight - a.weight);
+  }
+
+  @Get('title/:id')
+  async searchDetails(
+    @Param('id') id: string,
+    @Query('type') type: string,
+    @Query('source') source?: string,
+  ) {
+    if (id == null || id === '') {
+      throw new HttpException('ID is required', HttpStatus.BAD_REQUEST);
+    }
+
+    if (type !== 'MOVIE' && type !== 'SERIES') {
+      throw new HttpException(
+        'Invalid type. Type must be either MOVIE or SERIES',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (source == null || source === '') {
+      source = SYSTEM_SEARCH_TITLES;
+    }
+
+    const plugins = this.titleSearchPluginLoaderService
+      .getPlugins()
+      .filter((plugin) => plugin.pluginUUID === source);
+
+    if (plugins.length === 0) {
+      throw new HttpException(
+        'Search source not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (plugins.length !== 1) {
+      throw new HttpException(
+        'Multiple search sources found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const result = await plugins[0].searchById(id, type as TitleType);
+
+    if (!result) {
+      throw new HttpException('No results found', HttpStatus.NOT_FOUND);
+    }
+
+    return result;
   }
 }

@@ -1,6 +1,7 @@
 import AbstractTitleSearchPlugin from '../AbstractTitleSearchPlugin';
 import {
   ITitleSearchPlugin,
+  TitleDetailedSearchResult,
   TitleSearchPluginConfig,
   TitleSearchResult,
 } from '../interfaces/ITitleSearchPlugin.interface';
@@ -57,5 +58,36 @@ export default class ExampleTitleSearchPlugin
         sourceUUID: this.pluginUUID,
       },
     ];
+  }
+
+  public async searchById(
+    id: string,
+    type: string,
+  ): Promise<TitleDetailedSearchResult | null> {
+    if (this.canCall() === false) {
+      console.log(`Rate limit exceeded (${this.pluginUUID})`);
+
+      return null;
+    }
+
+    if (id == '' || id == null) {
+      console.log('ID is empty or null');
+
+      return null;
+    }
+
+    this.updateLastCallTime();
+
+    return {
+      title: 'Example Title (2018)',
+      originalTitle: 'Example Title',
+      id: 'example-id-1234',
+      type: type as any,
+      releaseDate: '2018-06-14',
+      sourceUUID: this.pluginUUID,
+      details: {
+        runtime: 120,
+      },
+    };
   }
 }
