@@ -54,14 +54,13 @@ export interface MovieDetails {
 }
 
 export interface SeriesDetails {
-  episodeRuntime: number;
   numberOfSeasons?: number;
   numberOfEpisodes?: number;
   seasons: {
     id: string;
     name: string;
     seasonNumber: number;
-    releaseDate: string;
     episodeCount: number;
+    releaseDate: string | null; // null if not released yet
   };
 }

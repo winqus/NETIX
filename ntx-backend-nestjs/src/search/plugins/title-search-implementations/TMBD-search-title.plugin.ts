@@ -6,7 +6,7 @@
   https://developer.themoviedb.org/reference/tv-series-details
 */
 
-import { TMDB_SEARCH_TITLES } from 'src/search/constants';
+import { TMDB_SEARCH_TITLES } from '../../constants';
 import AbstractTitleSearchPlugin from '../AbstractTitleSearchPlugin';
 import {
   ITitleSearchPlugin,
@@ -452,7 +452,7 @@ export default class TMBDSearchTitlePlugin
       movie.popularity = normalizedPopularity[index];
     });
 
-    let popularityThreshold = 5.0;
+    let popularityThreshold = 0.3;
     if (titles.length > 5) {
       const meanNormalizedPopularity =
         normalizedPopularity.reduce((sum, value) => sum + value, 0) /
@@ -613,7 +613,6 @@ export default class TMBDSearchTitlePlugin
       releaseDate: data.first_air_date,
       sourceUUID: this.pluginUUID,
       details: {
-        episodeRuntime: data.episode_run_time[0],
         numberOfSeasons: data['number_of_seasons'],
         numberOfEpisodes: data['number_of_episodes'],
         seasons: data.seasons.map((season) => ({
