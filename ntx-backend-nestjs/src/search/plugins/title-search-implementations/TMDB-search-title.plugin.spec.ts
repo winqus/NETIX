@@ -1,8 +1,8 @@
 import { LoggerService } from '@nestjs/common';
 import fetchMock from 'jest-fetch-mock';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import TMBDSearchTitlePlugin from './TMBD-search-title.plugin';
 import { tmdbResponseByUrl as resp } from './TMDB-search-title-response.examples';
+import TMBDSearchTitlePlugin from './TMDB-search-title.plugin';
 
 const mockLogger: LoggerService = {
   log: jest.fn(),
