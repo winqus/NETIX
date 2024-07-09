@@ -1,4 +1,4 @@
-import { PluginLoaderConfigLUT } from './plugins/interfaces/ITitleSearchPlugin.interface';
+import { PluginLoaderConfigLUT } from './plugins/interfaces/PluginLoaderConfigLUT.interface';
 
 export const SYSTEM_SEARCH_TITLES = 'SYSTEM_SEARCH_TITLES';
 export const TMDB_SEARCH_TITLES = 'TMDB_SEARCH_V3';

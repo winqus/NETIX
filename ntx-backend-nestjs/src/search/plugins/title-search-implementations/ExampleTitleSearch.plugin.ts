@@ -1,9 +1,9 @@
+import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSearchResult.interface';
+import { TitleSearchResult } from 'src/search/interfaces/TitleSearchResult.interface';
 import AbstractTitleSearchPlugin from '../AbstractTitleSearchPlugin';
 import {
   ITitleSearchPlugin,
-  TitleDetailedSearchResult,
   TitleSearchPluginConfig,
-  TitleSearchResult,
 } from '../interfaces/ITitleSearchPlugin.interface';
 
 export default class ExampleTitleSearchPlugin
@@ -34,13 +34,13 @@ export default class ExampleTitleSearchPlugin
 
   public async search(query: string): Promise<TitleSearchResult[]> {
     if (this.canCall() === false) {
-      console.log(`Rate limit exceeded (${this.pluginUUID})`);
+      this.logger.log(`Rate limit exceeded (${this.pluginUUID})`);
 
       return [];
     }
 
     if (query == '' || query == null) {
-      console.log('Query is empty or null');
+      this.logger.log('Query is empty or null');
 
       return [];
     }
@@ -65,13 +65,13 @@ export default class ExampleTitleSearchPlugin
     type: string,
   ): Promise<TitleDetailedSearchResult | null> {
     if (this.canCall() === false) {
-      console.log(`Rate limit exceeded (${this.pluginUUID})`);
+      this.logger.log(`Rate limit exceeded (${this.pluginUUID})`);
 
       return null;
     }
 
     if (id == '' || id == null) {
-      console.log('ID is empty or null');
+      this.logger.log('ID is empty or null');
 
       return null;
     }

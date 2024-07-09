@@ -6,14 +6,14 @@
   https://developer.themoviedb.org/reference/tv-series-details
 */
 
+import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSearchResult.interface';
+import { TitleSearchResult } from 'src/search/interfaces/TitleSearchResult.interface';
+import { TitleType } from 'src/search/interfaces/TitleType.enum';
 import { TMDB_SEARCH_TITLES } from '../../constants';
 import AbstractTitleSearchPlugin from '../AbstractTitleSearchPlugin';
 import {
   ITitleSearchPlugin,
-  TitleDetailedSearchResult,
   TitleSearchPluginConfig,
-  TitleSearchResult,
-  TitleType,
 } from '../interfaces/ITitleSearchPlugin.interface';
 
 interface TMDBSearchResult<T> {

@@ -1,14 +1,12 @@
+import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSearchResult.interface';
+import { TitleSearchResult } from 'src/search/interfaces/TitleSearchResult.interface';
+import { TitleType } from 'src/search/interfaces/TitleType.enum';
+
 export interface TitleSearchPluginConfig {
   usePlugin: boolean;
   options: { apiKey: string } | { [key: string]: string };
   timeBetweenCallsMs: number;
 }
-
-export interface PluginLoaderConfigLUT {
-  [plugin_uuid: string]: TitleSearchPluginConfig;
-}
-
-export type TitleType = 'MOVIE' | 'SERIES';
 
 export interface ITitleSearchPlugin {
   readonly pluginUUID: string;
@@ -27,40 +25,4 @@ export interface ITitleSearchPlugin {
   timeToNextCall(): number;
 
   resetRateLimit(): void;
-}
-
-export interface TitleSearchResult {
-  title: string;
-  originalTitle: string;
-  id: string;
-  type: TitleType;
-  weight: number;
-  releaseDate: string;
-  sourceUUID: string;
-}
-
-export interface TitleDetailedSearchResult {
-  title: string;
-  originalTitle: string;
-  id: string;
-  type: TitleType;
-  releaseDate: string;
-  sourceUUID: string;
-  details: MovieDetails | SeriesDetails;
-}
-
-export interface MovieDetails {
-  runtime: number;
-}
-
-export interface SeriesDetails {
-  numberOfSeasons?: number;
-  numberOfEpisodes?: number;
-  seasons: {
-    id: string;
-    name: string;
-    seasonNumber: number;
-    episodeCount: number;
-    releaseDate: string | null; // null if not released yet
-  };
 }

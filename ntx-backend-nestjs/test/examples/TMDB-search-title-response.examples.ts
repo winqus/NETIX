@@ -198,7 +198,6 @@ export const tmdbResponseByUrl = {
     },
   },
   http_api_themoviedb_org_3_tv_111110: {
-    // 111110 - original_name: 'ONE PIECE',
     status: 200,
     body: {
       adult: false,

@@ -3,8 +3,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
   ITitleSearchPlugin,
-  PluginLoaderConfigLUT,
 } from './interfaces/ITitleSearchPlugin.interface';
+import { PluginLoaderConfigLUT } from './interfaces/PluginLoaderConfigLUT.interface';
 
 @Injectable()
 export class TitleSearchPluginLoaderService {

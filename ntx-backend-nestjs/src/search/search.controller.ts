@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SYSTEM_SEARCH_TITLES, titleSearchPluginConfig } from './constants';
-import { TitleType } from './plugins/interfaces/ITitleSearchPlugin.interface';
+import { TitleType } from './interfaces/TitleType.enum';
 import { TitleSearchPluginLoaderService } from './plugins/title-search-plugin-loader.service';
 
 @Controller({
