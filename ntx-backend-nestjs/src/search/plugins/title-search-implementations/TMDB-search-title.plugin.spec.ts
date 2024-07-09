@@ -1,6 +1,7 @@
 import { LoggerService } from '@nestjs/common';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
+import { TitleType } from '../../interfaces/TitleType.enum';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 import TMBDSearchTitlePlugin from './TMDB-search-title.plugin';
 
@@ -116,8 +117,8 @@ describe('TMBDSearchTitlePlugin', () => {
     it('should return null if rate limit exceeded', async () => {
       fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
 
-      await plugin.searchById('1', 'MOVIE');
-      const result = await plugin.searchById('1', 'MOVIE');
+      await plugin.searchById('1', TitleType.MOVIE);
+      const result = await plugin.searchById('1', TitleType.MOVIE);
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
         `Rate limit exceeded (${plugin.pluginUUID})`,
@@ -126,7 +127,7 @@ describe('TMBDSearchTitlePlugin', () => {
     });
 
     it('should return null if ID is empty or null', async () => {
-      const result = await plugin.searchById('', 'MOVIE');
+      const result = await plugin.searchById('', TitleType.MOVIE);
 
       expect(mockLogger.error).toHaveBeenCalledWith('ID is empty or null');
       expect(result).toBeNull();
@@ -140,7 +141,7 @@ describe('TMBDSearchTitlePlugin', () => {
         },
       );
 
-      const result = await plugin.searchById('1', 'MOVIE');
+      const result = await plugin.searchById('1', TitleType.MOVIE);
 
       expect(result).not.toBeNull();
 
@@ -150,7 +151,7 @@ describe('TMBDSearchTitlePlugin', () => {
         originalTitle: expect.any(String),
         releaseDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
         sourceUUID: plugin.pluginUUID,
-        type: 'MOVIE',
+        type: TitleType.MOVIE,
         details: {
           runtime: expect.any(Number),
         },
@@ -165,7 +166,7 @@ describe('TMBDSearchTitlePlugin', () => {
         },
       );
 
-      const result = await plugin.searchById('111110', 'SERIES');
+      const result = await plugin.searchById('111110', TitleType.SERIES);
 
       expect(result).not.toBeNull();
 
@@ -173,7 +174,7 @@ describe('TMBDSearchTitlePlugin', () => {
         id: expect.stringMatching(/^\d+$/),
         title: expect.any(String),
         originalTitle: expect.any(String),
-        type: 'SERIES',
+        type: TitleType.SERIES,
         releaseDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
         sourceUUID: plugin.pluginUUID,
         details: {

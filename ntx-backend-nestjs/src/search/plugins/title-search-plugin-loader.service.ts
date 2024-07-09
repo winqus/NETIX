@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import {
-  ITitleSearchPlugin,
-} from './interfaces/ITitleSearchPlugin.interface';
+import { ITitleSearchPlugin } from './interfaces/ITitleSearchPlugin.interface';
 import { PluginLoaderConfigLUT } from './interfaces/PluginLoaderConfigLUT.interface';
 
 @Injectable()

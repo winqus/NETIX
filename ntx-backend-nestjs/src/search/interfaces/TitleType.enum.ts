@@ -1,1 +1,4 @@
-export type TitleType = 'MOVIE' | 'SERIES';
+export enum TitleType {
+  MOVIE = 'MOVIE',
+  SERIES = 'SERIES',
+}

@@ -1,6 +1,7 @@
 import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSearchResult.interface';
-import { TitleSearchResult } from 'src/search/interfaces/TitleSearchResult.interface';
-import AbstractTitleSearchPlugin from '../AbstractTitleSearchPlugin';
+import AbstractTitleSearchPlugin from '../../../common/AbstractAPIPlugin';
+import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
+import { TitleType } from '../../interfaces/TitleType.enum';
 import {
   ITitleSearchPlugin,
   TitleSearchPluginConfig,
@@ -52,7 +53,7 @@ export default class ExampleTitleSearchPlugin
         title: 'Example Title (2018)',
         originalTitle: 'Example Title',
         id: 'example-id-1234',
-        type: 'MOVIE',
+        type: TitleType.MOVIE,
         weight: 0.8,
         releaseDate: '2018-06-14',
         sourceUUID: this.pluginUUID,
@@ -62,7 +63,7 @@ export default class ExampleTitleSearchPlugin
 
   public async searchById(
     id: string,
-    type: string,
+    type: TitleType,
   ): Promise<TitleDetailedSearchResult | null> {
     if (this.canCall() === false) {
       this.logger.log(`Rate limit exceeded (${this.pluginUUID})`);
@@ -82,7 +83,7 @@ export default class ExampleTitleSearchPlugin
       title: 'Example Title (2018)',
       originalTitle: 'Example Title',
       id: 'example-id-1234',
-      type: type as any,
+      type: type,
       releaseDate: '2018-06-14',
       sourceUUID: this.pluginUUID,
       details: {

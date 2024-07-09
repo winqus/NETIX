@@ -6,11 +6,11 @@
   https://developer.themoviedb.org/reference/tv-series-details
 */
 
-import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSearchResult.interface';
-import { TitleSearchResult } from 'src/search/interfaces/TitleSearchResult.interface';
-import { TitleType } from 'src/search/interfaces/TitleType.enum';
+import AbstractTitleSearchPlugin from '../../../common/AbstractAPIPlugin';
 import { TMDB_SEARCH_TITLES } from '../../constants';
-import AbstractTitleSearchPlugin from '../AbstractTitleSearchPlugin';
+import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
+import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
+import { TitleType } from '../../interfaces/TitleType.enum';
 import {
   ITitleSearchPlugin,
   TitleSearchPluginConfig,
@@ -280,11 +280,11 @@ export default class TMBDSearchTitlePlugin
     let titleDetails: TitleDetailedSearchResult | null = null;
 
     switch (type) {
-      case 'MOVIE':
+      case TitleType.MOVIE:
         titleDetails = await this.getMovieDetailsByIdAPI(id);
 
         break;
-      case 'SERIES':
+      case TitleType.SERIES:
         titleDetails = await this.getTVShowDetailsByIdAPI(id);
 
         break;
@@ -476,15 +476,15 @@ export default class TMBDSearchTitlePlugin
   }
 
   private mapTMDBTitleToTitleSearchResult(title: TMDBTitle): TitleSearchResult {
-    let type: 'MOVIE' | 'SERIES' = 'MOVIE';
+    let type = TitleType.MOVIE;
     if ('first_air_date' in title) {
-      type = 'SERIES';
+      type = TitleType.SERIES;
     }
 
     let result: TitleSearchResult = {} as any;
 
     switch (type) {
-      case 'MOVIE':
+      case TitleType.MOVIE:
         title = title as TMDBMovie;
         result = {
           id: title.id.toString(),
@@ -497,7 +497,7 @@ export default class TMBDSearchTitlePlugin
         };
 
         break;
-      case 'SERIES':
+      case TitleType.SERIES:
         title = title as TMDBTVShow;
         result = {
           id: title.id.toString(),
@@ -559,7 +559,7 @@ export default class TMBDSearchTitlePlugin
       id: data.id.toString(),
       title: data.title,
       originalTitle: data.original_title,
-      type: 'MOVIE',
+      type: TitleType.MOVIE,
       releaseDate: data.release_date,
       sourceUUID: this.pluginUUID,
       details: {
@@ -609,7 +609,7 @@ export default class TMBDSearchTitlePlugin
       id: data.id.toString(),
       title: data.name,
       originalTitle: data.original_name,
-      type: 'SERIES',
+      type: TitleType.SERIES,
       releaseDate: data.first_air_date,
       sourceUUID: this.pluginUUID,
       details: {

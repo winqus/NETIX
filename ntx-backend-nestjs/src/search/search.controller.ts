@@ -41,14 +41,14 @@ export class SearchController {
   @Get('title/:id')
   async searchDetails(
     @Param('id') id: string,
-    @Query('type') type: string,
+    @Query('type') type: TitleType,
     @Query('source') source?: string,
   ) {
     if (id == null || id === '') {
       throw new HttpException('ID is required', HttpStatus.BAD_REQUEST);
     }
 
-    if (type !== 'MOVIE' && type !== 'SERIES') {
+    if (type !== TitleType.MOVIE && type !== TitleType.SERIES) {
       throw new HttpException(
         'Invalid type. Type must be either MOVIE or SERIES',
         HttpStatus.BAD_REQUEST,
@@ -77,7 +77,7 @@ export class SearchController {
       );
     }
 
-    const result = await plugins[0].searchById(id, type as TitleType);
+    const result = await plugins[0].searchById(id, type);
 
     if (!result) {
       throw new HttpException('No results found', HttpStatus.NOT_FOUND);
