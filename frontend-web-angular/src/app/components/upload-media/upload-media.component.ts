@@ -11,7 +11,7 @@ import { UploadService } from '../../services/upload.service';
 import { PermissionResponseDTO } from '../../models/uploadPermission.dto';
 import { UploadMetadataRequestDTO } from '../../models/uploadMetadata.dto';
 import { Router } from '@angular/router';
-import { AlertCardComponent } from '../alert-card/alert-card.component';
+import { AlertCardComponent } from '../shared/alert-card/alert-card.component';
 
 enum UploadSteps {
   FileSelection,

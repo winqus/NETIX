@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SvgIconsComponent } from '../../../svg-icons/svg-icons.component';
 import { UploadConstraintsDTO } from '../../../../models/uploadConstraints.dto';
-import { AlertCardComponent } from '../../../alert-card/alert-card.component';
+import { AlertCardComponent } from '../../../shared/alert-card/alert-card.component';
 
 @Component({
   selector: 'app-file-selection',

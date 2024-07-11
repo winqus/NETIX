@@ -26,6 +26,10 @@ export class NavbarComponent {
     return this.router.url === '/upload';
   }
 
+  get isUploadRoute2(): boolean {
+    return this.router.url === '/upload2';
+  }
+
   logout(): void {
     // this.auth.logout();
   }
