@@ -8,18 +8,38 @@
       <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
         <app-svg-icons [name]="iconName" size="20" color="grey"></app-svg-icons>
       </div>
-      <input [type]="type" [accept]="" [placeholder]="placeholder" class="input input-bordered block w-full ps-10 p-2 mb-4 rounded-md" [value]="value" [readOnly]="readonly" [disabled]="disabled" />
-      <div class="w-full h-[20%] absolute inset-y-12 start-0 z-10">
-        <ul class="border bg-slate-900 border-gray-300 rounded-md mt-1">
-          @for (result of results; track result.id) {
-            <li class="cursor-pointer px-4 py-2 hover:bg-gray-500">
-              {{ result.name }}
-            </li>
-          }
-        </ul>
-      </div>
+      <input
+        class="input input-bordered block w-full ps-10 p-2 mb-4 rounded-md"
+        [type]="type"
+        [accept]=""
+        [placeholder]="placeholder"
+        [value]="value"
+        (input)="onInputChange($event)"
+        [readOnly]="readonly"
+        [disabled]="disabled"
+      />
+      @if (results.length > 0) {
+        <div class="w-full h-[20%] absolute inset-y-12 start-0 z-10">
+          <ul class="border bg-slate-900 border-gray-300 rounded-md mt-1">
+            @for (result of results; track result) {
+              <li class="cursor-pointer px-4 py-2 hover:bg-gray-500">
+                {{ result }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
     </div>
   } @else {
-    <input [type]="type" [accept]="" [placeholder]="placeholder" class="input input-bordered block w-full p-2 mb-4 rounded-md" [value]="value" [readOnly]="readonly" [disabled]="disabled" />
+    <input
+      class="input input-bordered block w-full p-2 mb-4 rounded-md"
+      [type]="type"
+      [accept]=""
+      [placeholder]="placeholder"
+      [value]="value"
+      (input)="onInputChange($event)"
+      [readOnly]="readonly"
+      [disabled]="disabled"
+    />
   }
 </div>

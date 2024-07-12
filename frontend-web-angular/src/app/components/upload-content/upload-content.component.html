@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="flex flex-col flex-auto">
-        <app-input title="Enter video title or ID..." type="text" placeholder="Cars..." value="" iconName="search"></app-input>
+        <app-input iconName="search" title="Enter video title or ID..." type="text" placeholder="Cars..." (searchEvent)="search($event)" [results]="titles"></app-input>
         <app-input type="text" placeholder="Title" value="" [readonly]="true"></app-input>
         <app-input type="date" placeholder="Date" value="" [readonly]="true"></app-input>
         <app-input type="text" placeholder="00:00:00" value="" [readonly]="true"></app-input>
@@ -18,7 +18,7 @@
     <div class="flex flex-row content-between place-content-between">
       <input type="file" accept="image/*" class="input hidden" id="video-input" />
       <label for="video-input" class="w-44 text-center input input-bordered hover:bg-gray-700 py-2 px-4 rounded-md cursor-pointer"> Video Select </label>
-      <app-button label="UPLOAD"></app-button>
+      <!-- <app-button (clickEvent)="search()" label="UPLOAD"></app-button> -->
     </div>
   </div>
 </div>

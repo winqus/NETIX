@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SvgIconsComponent } from '../../svg-icons/svg-icons.component';
+import { debounceTime, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-input',
@@ -17,24 +18,24 @@ export class InputComponent {
   @Input() iconName: string = '';
   @Input() disabled: boolean = false;
   @Input() readonly: boolean = false;
+  @Input() results: string[] = [];
 
-  @Output() modelChange = new EventEmitter<string>();
+  @Output() changedValue = new EventEmitter<string>();
   @Output() changeEvent = new EventEmitter<Event>();
-  results = [
-    { id: 1, name: 'Angular For Beginners' },
-    { id: 2, name: 'Angular Core Deep Dive' },
-    { id: 3, name: 'Angular Forms In Depth' },
-    { id: 4, name: 'Angular For Beginners' },
-    { id: 5, name: 'Angular Core Deep Dive' },
-    { id: 6, name: 'Angular Forms In Depth' },
-    { id: 7, name: 'Angular For Beginners' },
-    { id: 8, name: 'Angular Core Deep Dive' },
-    { id: 9, name: 'Angular Forms In Depth' },
-  ];
+  @Output() searchEvent = new EventEmitter<string>();
+
+  private searchSubject = new Subject<string>();
+
+  constructor() {
+    this.searchSubject.pipe(debounceTime(500)).subscribe((searchText) => {
+      this.searchEvent.emit(searchText);
+    });
+  }
 
   onInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.modelChange.emit(input.value);
+    this.changedValue.emit(input.value);
     this.changeEvent.emit(event);
+    this.searchSubject.next(input.value);
   }
 }

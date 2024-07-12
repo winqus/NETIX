@@ -9,7 +9,7 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-
+  app.enableCors();
   await app.listen(process.env[PORT] || DEFAULT_PORT);
 
   console.log(`Application is running on: ${await app.getUrl()}`);
