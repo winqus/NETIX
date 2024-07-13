@@ -1,10 +1,12 @@
 import {
   BadRequestException,
   Controller,
+  Get,
   HttpException,
   Logger,
   Param,
   Post,
+  StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -38,6 +40,29 @@ export class ThumbnailsController {
       if (result.isFailure) {
         throw new BadRequestException(result.errorValue());
       }
+    } catch (error) {
+      this.logger.error(error);
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.debug(error.stack);
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Get('title/:id')
+  async getThumbnailFile(@Param('id') id: string): Promise<any> {
+    try {
+      const streamRes = await this.thumbnailService.getThumbnailReadStreamByTitleID(id);
+      if (streamRes.isFailure) {
+        throw new BadRequestException(streamRes.errorValue());
+      }
+
+      return new StreamableFile(streamRes.getValue(), {
+        type: 'image/webp',
+        disposition: `attachment; filename="th${id}.webp"`,
+      });
     } catch (error) {
       this.logger.error(error);
       if (error instanceof HttpException) {
