@@ -7,6 +7,17 @@ export const THUMBNAIL_FILE = {
   MAX_FILE_SIZE: 1024 * 100, // 100 KB
   MIME_TYPES: ['image/webp', 'application/octet-stream'],
   FIELD_NAME: 'thumbnail',
+  TARGET_WIDTH: 480,
+  TARGET_HEIGHT: 720,
+};
+export const THUMBNAIL_TEMP_DIR = './data/upload/temp/thumbnails';
+export const THUMBNAIL_DIR = './data/thumbnails';
+export const thumbnailFileName = (ID: string) => `th${ID}.webp`;
+
+export const THUMBNAIL_QUEUE = 'thumbnail-queue';
+export const THUMBNAIL_QUEUE_CONCURRENCY = 3;
+export const THUMBNAIL_QUEUE_JOBS = {
+  PROCESS_THUMBNAIL: 'process-thumbnail',
 };
 
-export const THUMBNAIL_TEMP_DIR = './data/upload/temp/thumbnails';
+export const THUMBNAIL_CREATED_EVENT = 'thumbnail.created';

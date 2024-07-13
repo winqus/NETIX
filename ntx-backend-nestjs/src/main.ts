@@ -1,7 +1,7 @@
 import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DEFAULT_CONTROLLER_VERSION, DEFAULT_PORT, GLOBAL_PREFIX, PORT } from './constants';
+import { DEFAULT_CONTROLLER_VERSION, DEFAULT_PORT, ENV, GLOBAL_ROUTE_PREFIX, PORT } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,10 +11,10 @@ async function bootstrap() {
     defaultVersion: DEFAULT_CONTROLLER_VERSION,
   });
 
-  app.setGlobalPrefix(GLOBAL_PREFIX);
+  app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
 
   await app.listen(process.env[PORT] || DEFAULT_PORT);
 
-  console.log(`Application is running on: ${await app.getUrl()}/${GLOBAL_PREFIX}`);
+  console.log(`✨ Application (ENV: ${process.env[ENV]}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`);
 }
 bootstrap();
