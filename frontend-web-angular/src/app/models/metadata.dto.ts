@@ -11,4 +11,9 @@ export default interface MetadataDTO {
   weights: string;
   releaseDate: Date;
   sourceUUID: string;
+  details?: MovieDetails;
+}
+
+export interface MovieDetails {
+  runtime: number;
 }

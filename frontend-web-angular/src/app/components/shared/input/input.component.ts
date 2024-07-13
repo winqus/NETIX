@@ -23,6 +23,7 @@ export class InputComponent {
   @Output() changedValue = new EventEmitter<string>();
   @Output() changeEvent = new EventEmitter<Event>();
   @Output() searchEvent = new EventEmitter<string>();
+  @Output() optionSelected = new EventEmitter<any>();
 
   private searchSubject = new Subject<string>();
 
@@ -37,5 +38,9 @@ export class InputComponent {
     this.changedValue.emit(input.value);
     this.changeEvent.emit(event);
     this.searchSubject.next(input.value);
+  }
+
+  onOptionClick(option: string) {
+    this.optionSelected.emit(option);
   }
 }

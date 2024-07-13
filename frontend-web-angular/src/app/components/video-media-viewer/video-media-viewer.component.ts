@@ -469,6 +469,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   // time converter time -> 00:00:00
+  // !TODO refactor to utils class
   convertToTime(timeInSeconds: number | undefined): string {
     if (timeInSeconds == undefined) return '00:00:00';
     let seconds = Math.floor(timeInSeconds);

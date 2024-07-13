@@ -1,4 +1,4 @@
-import MetadataDTO from '../models/metadata.dto';
+import MetadataDTO, { MovieDetails } from '../models/metadata.dto';
 import { ContentType } from '../models/metadata.dto';
 
 export class MetadataDTOMapper {
@@ -11,6 +11,12 @@ export class MetadataDTOMapper {
       weights: item.weights,
       releaseDate: new Date(item.releaseDate),
       sourceUUID: item.sourceUUID,
+      details: item.details ? this.toMovieDetails(item.details) : undefined,
+    };
+  }
+  static toMovieDetails(details: any): MovieDetails {
+    return {
+      runtime: details.runtime,
     };
   }
 }
