@@ -6,8 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sharp from 'sharp';
 import { Result } from 'src/common/Result';
-import ThumbnailCreatedEvent from './events/ThumbnailCreatedEvent';
-import { ProcessThumbnailJobData } from './queue/processThumbnailJobData.interface';
+import ThumbnailCreatedEvent from '../events/ThumbnailCreatedEvent';
 import {
   THUMBNAIL_CREATED_EVENT,
   THUMBNAIL_DIR,
@@ -16,7 +15,8 @@ import {
   THUMBNAIL_QUEUE_CONCURRENCY,
   THUMBNAIL_QUEUE_JOBS,
   thumbnailFileName,
-} from './thumbnails.constants';
+} from '../thumbnails.constants';
+import { ProcessThumbnailJobData } from './processThumbnailJobData.interface';
 
 @Processor(THUMBNAIL_QUEUE, {
   concurrency: THUMBNAIL_QUEUE_CONCURRENCY,
