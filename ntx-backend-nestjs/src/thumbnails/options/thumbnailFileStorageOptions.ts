@@ -16,5 +16,5 @@ export const thumbnailFileStorageOptions: MulterOptions = {
   limits: {
     fileSize: THUMBNAIL_FILE.MAX_FILE_SIZE,
   },
-  fileFilter: multerFileMimeTypeFilter(THUMBNAIL_FILE.MIME_TYPES),
+  fileFilter: multerFileMimeTypeFilter(THUMBNAIL_FILE.INPUT_MIME_TYPES),
 };

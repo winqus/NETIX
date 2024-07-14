@@ -5,7 +5,9 @@ export const UPLOAD_THROTTLE_OPTIONS = { limit: 3, ttl: 1000 };
 
 export const THUMBNAIL_FILE = {
   MAX_FILE_SIZE: 1024 * 100, // 100 KB
-  MIME_TYPES: ['image/webp', 'application/octet-stream'],
+  INPUT_MIME_TYPES: ['image/webp', 'application/octet-stream'],
+  MIME_TYPE: 'image/webp',
+  EXTENTION: 'webp',
   FIELD_NAME: 'thumbnail',
   TARGET_WIDTH: 480,
   TARGET_HEIGHT: 720,

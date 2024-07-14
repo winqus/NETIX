@@ -60,8 +60,8 @@ export class ThumbnailsController {
       }
 
       return new StreamableFile(streamRes.getValue(), {
-        type: 'image/webp',
-        disposition: `attachment; filename="th${id}.webp"`,
+        type: THUMBNAIL_FILE.MIME_TYPE,
+        disposition: `attachment; filename="th${id}.${THUMBNAIL_FILE.EXTENTION}"`,
       });
     } catch (error) {
       this.logger.error(error);
