@@ -47,6 +47,6 @@ module.exports = {
       }
     ],
     "arrow-parens": ["error", "always"],
-    "curly": ["error", "all"]
+    "curly": ["error", "all"],
   },
 };
