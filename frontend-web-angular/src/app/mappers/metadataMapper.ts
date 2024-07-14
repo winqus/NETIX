@@ -14,6 +14,11 @@ export class MetadataDTOMapper {
       details: item.details ? this.toMovieDetails(item.details) : undefined,
     };
   }
+
+  public static toMetadataItemList(raw: any[]): MetadataDTO[] {
+    return raw.map((x) => MetadataDTOMapper.toMetadataItem(x));
+  }
+
   static toMovieDetails(details: any): MovieDetails {
     return {
       runtime: details.runtime,

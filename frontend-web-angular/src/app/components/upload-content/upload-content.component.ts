@@ -1,6 +1,7 @@
+import { Component } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { ButtonComponent } from '../shared/button/button.component';
-import { MetadataSearch } from '../../services/metadataSearch.service';
+import { MetadataSearch } from '../../services/metadata/metadataSearch.service';
 import MetadataDTO from '../../models/metadata.dto';
 import { formatDate, formatTime } from '../../utils/utils';
 

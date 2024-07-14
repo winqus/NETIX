@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { SvgIconsComponent } from '../../svg-icons/svg-icons.component';
 import { debounceTime, Subject } from 'rxjs';
 
@@ -9,7 +9,7 @@ import { debounceTime, Subject } from 'rxjs';
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
 })
-export class InputComponent {
+export class InputComponent implements OnChanges {
   @Input() title: string = '';
   @Input() type: string = '';
   @Input() accept: string = '';
@@ -18,6 +18,7 @@ export class InputComponent {
   @Input() iconName: string = '';
   @Input() disabled: boolean = false;
   @Input() readonly: boolean = false;
+  @Input() searchCharLimit: string = '';
   @Input() results: string[] = [];
 
   @Output() changedValue = new EventEmitter<string>();
@@ -25,12 +26,25 @@ export class InputComponent {
   @Output() searchEvent = new EventEmitter<string>();
   @Output() optionSelected = new EventEmitter<any>();
 
+  tempIconName: string = '';
   private searchSubject = new Subject<string>();
 
   constructor() {
     this.searchSubject.pipe(debounceTime(500)).subscribe((searchText) => {
-      this.searchEvent.emit(searchText);
+      if (this.searchCharLimit != '' && searchText.length >= parseInt(this.searchCharLimit, 10)) {
+        this.searchEvent.emit(searchText);
+        this.tempIconName = this.iconName;
+        this.iconName = 'throbber';
+      }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['results']) {
+      if (this.results.length > 0) {
+        this.iconName = this.tempIconName;
+      }
+    }
   }
 
   onInputChange(event: Event) {
@@ -42,5 +56,6 @@ export class InputComponent {
 
   onOptionClick(option: string) {
     this.optionSelected.emit(option);
+    this.iconName = this.tempIconName;
   }
 }
