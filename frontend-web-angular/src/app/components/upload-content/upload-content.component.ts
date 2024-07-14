@@ -1,4 +1,3 @@
-import { Component, HostListener } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { ButtonComponent } from '../shared/button/button.component';
 import { MetadataSearch } from '../../services/metadataSearch.service';
@@ -8,7 +7,6 @@ import { formatDate, formatTime } from '../../utils/utils';
 @Component({
   selector: 'app-upload-content',
   standalone: true,
-  imports: [InputComponent, ButtonComponent],
   templateUrl: './upload-content.component.html',
 })
 export class UploadContentComponent {
@@ -23,25 +21,6 @@ export class UploadContentComponent {
   selectedMetadataJson: string = '';
 
   constructor(private metadataSearch: MetadataSearch) {}
-
-  @HostListener('window:dragover', ['$event'])
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-  }
-
-  @HostListener('window:drop', ['$event'])
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      if (file.type.startsWith('image/')) {
-        this.handleThumbnailDrop(file);
-      } else if (file.type.startsWith('video/')) {
-        this.handleVideoDrop(file);
-      }
-    }
-  }
 
   searchByTitle(search: string) {
     this.metadataSearch.getDataFromTitle(search).subscribe({
@@ -88,29 +67,5 @@ export class UploadContentComponent {
     this.durration = formatTime(metadata.details?.runtime);
     this.selectedMetadataJson = JSON.stringify(metadata, null, 4);
     this.isMetadataFilled = true;
-  }
-
-  handleThumbnailDrop(event: DragEvent) {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      // Process the thumbnail file
-      console.log('Thumbnail dropped:', file);
-    }
-  }
-
-  handleVideoDrop(event: DragEvent) {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      // Process the video file
-      console.log('Video dropped:', file);
-    }
-  }
-
-  allowDrop(event: DragEvent) {
-    event.preventDefault();
   }
 }
