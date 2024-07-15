@@ -17,7 +17,9 @@ export function formatDate(date: Date): string {
  * @returns formatted time string
  */
 export function formatTime(time: number | undefined, isSeconds: boolean = false): string {
-  if (time == undefined) return '00:00:00';
+  if (time == undefined) {
+    return '00:00:00';
+  }
 
   let totalSeconds = isSeconds ? time : time * 60;
 

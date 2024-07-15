@@ -4,12 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import MetadataDTO from '../../models/metadata.dto';
 import { MetadataDTOMapper } from '../../mappers/metadataMapper';
 import { map, Observable } from 'rxjs';
-import { IMetadataSearch } from './IMetadataSearch.service';
+import { IMetadata } from './IMetadata.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class MetadataSearch implements IMetadataSearch {
+export class Metadata implements IMetadata {
   constructor(private http: HttpClient) {}
 
   getDataFromTitle(search: string): Observable<MetadataDTO[]> {

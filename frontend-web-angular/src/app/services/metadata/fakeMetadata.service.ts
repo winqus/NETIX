@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { IMetadataSearch } from './IMetadataSearch.service';
+import { IMetadata } from './IMetadata.service';
 import MetadataDTO from '../../models/metadata.dto';
 import { MetadataDTOMapper } from '../../mappers/metadataMapper';
 
 @Injectable({
   providedIn: 'root',
 })
-export class FakeMetadataSearch implements IMetadataSearch {
+export class FakeMetadata implements IMetadata {
   constructor(private http: HttpClient) {}
 
   getDataFromTitle(_search: string): Observable<MetadataDTO[]> {

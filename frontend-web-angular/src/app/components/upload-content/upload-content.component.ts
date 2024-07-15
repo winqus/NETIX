@@ -1,13 +1,16 @@
+import { environment } from '../../../environments/environment';
 import { Component } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { ButtonComponent } from '../shared/button/button.component';
-import { MetadataSearch } from '../../services/metadata/metadataSearch.service';
+import { Metadata } from '../../services/metadata/metadata.service';
+import { FileUploadHadnlerComponent } from './components/file-upload-hadnler/file-upload-hadnler.component';
 import MetadataDTO from '../../models/metadata.dto';
 import { formatDate, formatTime } from '../../utils/utils';
 
 @Component({
   selector: 'app-upload-content',
   standalone: true,
+  imports: [InputComponent, ButtonComponent, FileUploadHadnlerComponent],
   templateUrl: './upload-content.component.html',
 })
 export class UploadContentComponent {
@@ -18,10 +21,10 @@ export class UploadContentComponent {
   isMetadataFilled: boolean = false;
   title: string = '';
   date: string = '';
-  durration: string = '';
+  duration: string = '';
   selectedMetadataJson: string = '';
 
-  constructor(private metadataSearch: MetadataSearch) {}
+  constructor(private metadataSearch: Metadata) {}
 
   searchByTitle(search: string) {
     this.metadataSearch.getDataFromTitle(search).subscribe({
@@ -33,7 +36,9 @@ export class UploadContentComponent {
         console.error('Error fetching search results', error);
       },
       complete: () => {
-        console.log('Search completed');
+        if (!environment.production) {
+          console.log('Search completed');
+        }
       },
     });
   }
@@ -48,7 +53,9 @@ export class UploadContentComponent {
         console.error('Error fetching details', error);
       },
       complete: () => {
-        console.log('Detail fetch completed');
+        if (!environment.production) {
+          console.log('Detail fetch completed');
+        }
       },
     });
   }
@@ -65,7 +72,7 @@ export class UploadContentComponent {
   fillMetadata(metadata: MetadataDTO) {
     this.title = metadata.title;
     this.date = formatDate(metadata.releaseDate);
-    this.durration = formatTime(metadata.details?.runtime);
+    this.duration = formatTime(metadata.details?.runtime);
     this.selectedMetadataJson = JSON.stringify(metadata, null, 4);
     this.isMetadataFilled = true;
   }

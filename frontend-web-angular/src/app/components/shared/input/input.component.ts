@@ -2,6 +2,19 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { SvgIconsComponent } from '../../svg-icons/svg-icons.component';
 import { debounceTime, Subject } from 'rxjs';
 
+export interface InputProps {
+  title?: string;
+  type?: string;
+  accept?: string;
+  placeholder?: string;
+  value?: string;
+  iconName?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  searchCharLimit?: string;
+  results?: string[];
+}
+
 @Component({
   selector: 'app-input',
   standalone: true,
@@ -10,16 +23,7 @@ import { debounceTime, Subject } from 'rxjs';
   styleUrl: './input.component.scss',
 })
 export class InputComponent implements OnChanges {
-  @Input() title: string = '';
-  @Input() type: string = '';
-  @Input() accept: string = '';
-  @Input() placeholder: string = '';
-  @Input() value: string = '';
-  @Input() iconName: string = '';
-  @Input() disabled: boolean = false;
-  @Input() readonly: boolean = false;
-  @Input() searchCharLimit: string = '';
-  @Input() results: string[] = [];
+  @Input() props: InputProps = {};
 
   @Output() changedValue = new EventEmitter<string>();
   @Output() changeEvent = new EventEmitter<Event>();
@@ -29,21 +33,34 @@ export class InputComponent implements OnChanges {
   tempIconName: string = '';
   private searchSubject = new Subject<string>();
 
+  defaultProps: InputProps = {
+    title: '',
+    type: '',
+    accept: '',
+    placeholder: '',
+    value: '',
+    iconName: '',
+    disabled: false,
+    readonly: false,
+    searchCharLimit: '3',
+    results: [],
+  };
+
   constructor() {
     this.searchSubject.pipe(debounceTime(500)).subscribe((searchText) => {
-      if (this.searchCharLimit != '' && searchText.length >= parseInt(this.searchCharLimit, 10)) {
+      if (this.props.searchCharLimit != undefined && searchText.length >= parseInt(this.props.searchCharLimit, 10)) {
         this.searchEvent.emit(searchText);
-        this.tempIconName = this.iconName;
-        this.iconName = 'throbber';
+        this.tempIconName = this.props.iconName!;
+        this.props.iconName = 'throbber';
       }
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['results']) {
-      if (this.results.length > 0) {
-        this.iconName = this.tempIconName;
-      }
+    this.props = { ...this.defaultProps, ...this.props };
+
+    if (changes['props'] && this.props.results && this.props.results.length > 0) {
+      this.props.iconName = this.tempIconName;
     }
   }
 
@@ -56,6 +73,6 @@ export class InputComponent implements OnChanges {
 
   onOptionClick(option: string) {
     this.optionSelected.emit(option);
-    this.iconName = this.tempIconName;
+    this.props.iconName = this.tempIconName;
   }
 }
