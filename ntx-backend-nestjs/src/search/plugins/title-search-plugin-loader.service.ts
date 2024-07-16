@@ -20,23 +20,17 @@ export class TitleSearchPluginLoaderService {
         const PluginClass = require(pluginPath).default;
 
         if (typeof PluginClass !== 'function') {
-          this.logger.error(
-            `Plugin file (${file}) does not export a class that implements ITitleSearchPlugin`,
-          );
+          this.logger.error(`Plugin file (${file}) does not export a class that implements ITitleSearchPlugin`);
 
           return;
         }
 
-        const pluginInstance: ITitleSearchPlugin = new PluginClass(
-          new Logger(PluginClass.name),
-        );
+        const pluginInstance: ITitleSearchPlugin = new PluginClass(new Logger(PluginClass.name));
 
         const config = config_lut[pluginInstance.pluginUUID];
 
         if (config == undefined) {
-          this.logger.error(
-            `No configuration found for plugin (${pluginInstance.pluginUUID})`,
-          );
+          this.logger.error(`No configuration found for plugin (${pluginInstance.pluginUUID})`);
 
           loadResult = false;
 
@@ -54,9 +48,7 @@ export class TitleSearchPluginLoaderService {
         } else {
           loadResult = false;
 
-          this.logger.error(
-            `Failed to initialize plugin (${pluginInstance.pluginUUID})`,
-          );
+          this.logger.error(`Failed to initialize plugin (${pluginInstance.pluginUUID})`);
         }
       }
     });

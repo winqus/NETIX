@@ -15,10 +15,7 @@ export interface ITitleSearchPlugin {
 
   search(query: string): Promise<TitleSearchResult[]>;
 
-  searchById(
-    id: string,
-    type: TitleType,
-  ): Promise<TitleDetailedSearchResult | null>;
+  searchById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null>;
 
   canCall(): boolean;
 

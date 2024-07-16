@@ -268,8 +268,7 @@ export const tmdbResponseByUrl = {
       origin_country: ['US'],
       original_language: 'en',
       original_name: 'ONE PIECE',
-      overview:
-        'With his straw hat and ragtag crew, young pirate Monkey D. Luffy goes on an epic voyage for treasure.',
+      overview: 'With his straw hat and ragtag crew, young pirate Monkey D. Luffy goes on an epic voyage for treasure.',
       popularity: 131.865,
       poster_path: '/rVX05xRKS5JhEYQFObCi4lAnZT4.jpg',
       production_companies: [

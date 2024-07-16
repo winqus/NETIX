@@ -2,15 +2,9 @@ import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSe
 import AbstractTitleSearchPlugin from '../../../common/AbstractAPIPlugin';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleType } from '../../interfaces/TitleType.enum';
-import {
-  ITitleSearchPlugin,
-  TitleSearchPluginConfig,
-} from '../interfaces/ITitleSearchPlugin.interface';
+import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 
-export default class ExampleTitleSearchPlugin
-  extends AbstractTitleSearchPlugin
-  implements ITitleSearchPlugin
-{
+export default class ExampleTitleSearchPlugin extends AbstractTitleSearchPlugin implements ITitleSearchPlugin {
   public readonly pluginUUID = 'example-uuid-1234';
 
   private apiKey: string;
@@ -25,9 +19,7 @@ export default class ExampleTitleSearchPlugin
     if ('timeBetweenCallsMs' in config) {
       this.timeBetweenCallsMs = config.timeBetweenCallsMs;
     } else {
-      throw new Error(
-        'Time between calls was not provided for ExampleTitleSearchPlugin',
-      );
+      throw new Error('Time between calls was not provided for ExampleTitleSearchPlugin');
     }
 
     return true;
@@ -61,10 +53,7 @@ export default class ExampleTitleSearchPlugin
     ];
   }
 
-  public async searchById(
-    id: string,
-    type: TitleType,
-  ): Promise<TitleDetailedSearchResult | null> {
+  public async searchById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
     if (this.canCall() === false) {
       this.logger.log(`Rate limit exceeded (${this.pluginUUID})`);
 

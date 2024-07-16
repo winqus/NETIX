@@ -72,9 +72,7 @@ describe('TMBDSearchTitlePlugin', () => {
       await plugin.search('test query');
       const results = await plugin.search('test query');
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        `Rate limit exceeded (${plugin.pluginUUID})`,
-      );
+      expect(mockLogger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
       expect(results).toEqual([]);
     });
 
@@ -88,21 +86,15 @@ describe('TMBDSearchTitlePlugin', () => {
     it('should return search results for a valid query', async () => {
       fetchMock.mockResponses(
         [
-          JSON.stringify(
-            resp.http_api_themoviedb_org_3_search_movie_query_shrek_2.body,
-          ),
+          JSON.stringify(resp.http_api_themoviedb_org_3_search_movie_query_shrek_2.body),
           {
-            status:
-              resp.http_api_themoviedb_org_3_search_movie_query_shrek_2.status,
+            status: resp.http_api_themoviedb_org_3_search_movie_query_shrek_2.status,
           },
         ],
         [
-          JSON.stringify(
-            resp.http_api_themoviedb_org_3_search_tv_query_hell_divers.body,
-          ),
+          JSON.stringify(resp.http_api_themoviedb_org_3_search_tv_query_hell_divers.body),
           {
-            status:
-              resp.http_api_themoviedb_org_3_search_tv_query_hell_divers.status,
+            status: resp.http_api_themoviedb_org_3_search_tv_query_hell_divers.status,
           },
         ],
       );
@@ -120,9 +112,7 @@ describe('TMBDSearchTitlePlugin', () => {
       await plugin.searchById('1', TitleType.MOVIE);
       const result = await plugin.searchById('1', TitleType.MOVIE);
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        `Rate limit exceeded (${plugin.pluginUUID})`,
-      );
+      expect(mockLogger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
       expect(result).toBeNull();
     });
 
@@ -134,12 +124,9 @@ describe('TMBDSearchTitlePlugin', () => {
     });
 
     it('should return movie details for a valid movie ID', async () => {
-      fetchMock.mockResponse(
-        JSON.stringify(resp.http_api_themoviedb_org_3_movie_809.body),
-        {
-          status: resp.http_api_themoviedb_org_3_movie_809.status,
-        },
-      );
+      fetchMock.mockResponse(JSON.stringify(resp.http_api_themoviedb_org_3_movie_809.body), {
+        status: resp.http_api_themoviedb_org_3_movie_809.status,
+      });
 
       const result = await plugin.searchById('1', TitleType.MOVIE);
 
@@ -159,12 +146,9 @@ describe('TMBDSearchTitlePlugin', () => {
     });
 
     it('should return TV show details for a valid TV show ID', async () => {
-      fetchMock.mockResponse(
-        JSON.stringify(resp.http_api_themoviedb_org_3_tv_111110.body),
-        {
-          status: resp.http_api_themoviedb_org_3_tv_111110.status,
-        },
-      );
+      fetchMock.mockResponse(JSON.stringify(resp.http_api_themoviedb_org_3_tv_111110.body), {
+        status: resp.http_api_themoviedb_org_3_tv_111110.status,
+      });
 
       const result = await plugin.searchById('111110', TitleType.SERIES);
 
@@ -192,9 +176,7 @@ describe('TMBDSearchTitlePlugin', () => {
         },
       });
 
-      expect(result!.releaseDate).toEqual(
-        expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) || null,
-      );
+      expect(result!.releaseDate).toEqual(expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) || null);
     });
 
     it('should return null for an unknown title type', async () => {

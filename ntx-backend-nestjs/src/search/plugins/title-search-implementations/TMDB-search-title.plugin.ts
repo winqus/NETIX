@@ -11,10 +11,7 @@ import { TMDB_SEARCH_TITLES } from '../../constants';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleType } from '../../interfaces/TitleType.enum';
-import {
-  ITitleSearchPlugin,
-  TitleSearchPluginConfig,
-} from '../interfaces/ITitleSearchPlugin.interface';
+import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 
 interface TMDBSearchResult<T> {
   page: number;
@@ -200,10 +197,7 @@ interface TMDBTVShowDetails {
 
 type TMDBTitle = TMDBMovie | TMDBTVShow;
 
-export default class TMBDSearchTitlePlugin
-  extends AbstractTitleSearchPlugin
-  implements ITitleSearchPlugin
-{
+export default class TMBDSearchTitlePlugin extends AbstractTitleSearchPlugin implements ITitleSearchPlugin {
   public readonly pluginUUID = TMDB_SEARCH_TITLES;
 
   private apiKey: string;
@@ -218,9 +212,7 @@ export default class TMBDSearchTitlePlugin
     if ('timeBetweenCallsMs' in config) {
       this.timeBetweenCallsMs = config.timeBetweenCallsMs;
     } else {
-      throw new Error(
-        'Time between calls was not provided for ExampleTitleSearchPlugin',
-      );
+      throw new Error('Time between calls was not provided for ExampleTitleSearchPlugin');
     }
 
     return true;
@@ -245,10 +237,7 @@ export default class TMBDSearchTitlePlugin
 
     const apiTVShowData = await this.searchTVShowAPI(query);
 
-    const mergedTitles = ([] as TMDBTitle[]).concat(
-      apiMovieData?.results || [],
-      apiTVShowData?.results || [],
-    );
+    const mergedTitles = ([] as TMDBTitle[]).concat(apiMovieData?.results || [], apiTVShowData?.results || []);
 
     const filteredTitles = this.normalizeAndfilterTMDBTitles(mergedTitles);
 
@@ -259,10 +248,7 @@ export default class TMBDSearchTitlePlugin
     return searchResults;
   }
 
-  public async searchById(
-    id: string,
-    type: TitleType,
-  ): Promise<TitleDetailedSearchResult | null> {
+  public async searchById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
     if (this.canCall() === false) {
       this.logger.warn(`Rate limit exceeded (${this.pluginUUID})`);
 
@@ -329,9 +315,7 @@ export default class TMBDSearchTitlePlugin
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(
-        `Failed to fetch movie data from TMBD API: ${response.statusText}`,
-      );
+      this.logger.error(`Failed to fetch movie data from TMBD API: ${response.statusText}`);
 
       return null;
     }
@@ -400,9 +384,7 @@ export default class TMBDSearchTitlePlugin
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(
-        `Failed to fetch TV show data from TMBD API: ${response.statusText}`,
-      );
+      this.logger.error(`Failed to fetch TV show data from TMBD API: ${response.statusText}`);
 
       return null;
     }
@@ -444,9 +426,7 @@ export default class TMBDSearchTitlePlugin
       return b.popularity - a.popularity;
     });
 
-    const normalizedPopularity = this.normalize(
-      sortedByPopularityDesc.map((title) => title.popularity),
-    );
+    const normalizedPopularity = this.normalize(sortedByPopularityDesc.map((title) => title.popularity));
 
     sortedByPopularityDesc.forEach((movie, index) => {
       movie.popularity = normalizedPopularity[index];
@@ -455,15 +435,12 @@ export default class TMBDSearchTitlePlugin
     let popularityThreshold = 0.3;
     if (titles.length > 5) {
       const meanNormalizedPopularity =
-        normalizedPopularity.reduce((sum, value) => sum + value, 0) /
-        normalizedPopularity.length;
+        normalizedPopularity.reduce((sum, value) => sum + value, 0) / normalizedPopularity.length;
 
       popularityThreshold = meanNormalizedPopularity;
     }
 
-    const filteredTitles = sortedByPopularityDesc.filter(
-      (title) => title.popularity > popularityThreshold,
-    );
+    const filteredTitles = sortedByPopularityDesc.filter((title) => title.popularity > popularityThreshold);
 
     return filteredTitles;
   }
@@ -518,9 +495,7 @@ export default class TMBDSearchTitlePlugin
     return result;
   }
 
-  private async getMovieDetailsByIdAPI(
-    movie_id: string,
-  ): Promise<TitleDetailedSearchResult | null> {
+  private async getMovieDetailsByIdAPI(movie_id: string): Promise<TitleDetailedSearchResult | null> {
     if (movie_id == '' || movie_id == null) {
       this.logger.error('movie_id is empty or null');
 
@@ -541,9 +516,7 @@ export default class TMBDSearchTitlePlugin
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(
-        `Failed to fetch movie data from TMBD API: ${response.statusText}`,
-      );
+      this.logger.error(`Failed to fetch movie data from TMBD API: ${response.statusText}`);
 
       return null;
     }
@@ -568,9 +541,7 @@ export default class TMBDSearchTitlePlugin
     };
   }
 
-  private async getTVShowDetailsByIdAPI(
-    series_id: string,
-  ): Promise<TitleDetailedSearchResult | null> {
+  private async getTVShowDetailsByIdAPI(series_id: string): Promise<TitleDetailedSearchResult | null> {
     if (series_id == '' || series_id == null) {
       this.logger.error('series_id is empty or null');
 
@@ -591,9 +562,7 @@ export default class TMBDSearchTitlePlugin
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(
-        `Failed to fetch movie data from TMBD API: ${response.statusText}`,
-      );
+      this.logger.error(`Failed to fetch movie data from TMBD API: ${response.statusText}`);
 
       return null;
     }

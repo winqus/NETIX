@@ -16,10 +16,7 @@ export default abstract class {
   }
 
   public timeToNextCall(): number {
-    return Math.max(
-      0,
-      Date.now() - this.lastCallTime - this.timeBetweenCallsMs,
-    );
+    return Math.max(0, Date.now() - this.lastCallTime - this.timeBetweenCallsMs);
   }
 
   public resetRateLimit(): void {
