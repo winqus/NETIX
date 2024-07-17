@@ -16,7 +16,7 @@ export function formatDate(date: Date): string {
  * @param isSeconds - boolean flag to indicate if the input time is in seconds
  * @returns formatted time string
  */
-export function formatTime(time: number | undefined, isSeconds: boolean = false): string {
+export function formatTime(time?: number, isSeconds: boolean = false): string {
   if (time == undefined) {
     return '00:00:00';
   }
