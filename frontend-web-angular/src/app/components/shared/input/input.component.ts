@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { SvgIconsComponent } from '../../svg-icons/svg-icons.component';
 import { debounceTime, Subject } from 'rxjs';
+import { APP_SETTINGS } from '../../../config/app-settings';
 
 export interface InputProps {
   title?: string;
@@ -30,9 +31,6 @@ export class InputComponent implements OnChanges {
   @Output() searchEvent = new EventEmitter<string>();
   @Output() optionSelected = new EventEmitter<any>();
 
-  tempIconName: string = '';
-  private searchSubject = new Subject<string>();
-
   defaultProps: InputProps = {
     title: '',
     type: '',
@@ -42,9 +40,12 @@ export class InputComponent implements OnChanges {
     iconName: '',
     disabled: false,
     readonly: false,
-    searchCharLimit: '3',
+    searchCharLimit: APP_SETTINGS.SEARCHCHARLIMIT,
     results: [],
   };
+
+  tempIconName: string = '';
+  private searchSubject = new Subject<string>();
 
   constructor() {
     this.searchSubject.pipe(debounceTime(500)).subscribe((searchText) => {

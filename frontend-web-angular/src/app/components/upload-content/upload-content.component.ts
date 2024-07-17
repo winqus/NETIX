@@ -2,7 +2,7 @@ import { environment } from '../../../environments/environment';
 import { Component } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { ButtonComponent } from '../shared/button/button.component';
-import { Metadata } from '../../services/metadata/metadata.service';
+import { MetadataService } from '../../services/metadata/metadata.service';
 import { FileUploadHadnlerComponent } from './components/file-upload-hadnler/file-upload-hadnler.component';
 import MetadataDTO from '../../models/metadata.dto';
 import { formatDate, formatTime } from '../../utils/utils';
@@ -24,7 +24,7 @@ export class UploadContentComponent {
   duration: string = '';
   selectedMetadataJson: string = '';
 
-  constructor(private metadataSearch: Metadata) {}
+  constructor(private metadataSearch: MetadataService) {}
 
   searchByTitle(search: string) {
     this.metadataSearch.getDataFromTitle(search).subscribe({

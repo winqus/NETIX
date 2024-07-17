@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { getSearchByIdUrl, getSearchByTitleUrl } from '../../config/metadata.config';
+import { getSearchByIdUrl, getSearchByTitleUrl } from '../../config/api-endpoints';
 import { HttpClient } from '@angular/common/http';
 import MetadataDTO from '../../models/metadata.dto';
 import { MetadataDTOMapper } from '../../mappers/metadataMapper';
 import { map, Observable } from 'rxjs';
-import { IMetadata } from './IMetadata.service';
+import { IMetadataService } from './IMetadata.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Metadata implements IMetadata {
+export class MetadataService implements IMetadataService {
   constructor(private http: HttpClient) {}
 
   getDataFromTitle(search: string): Observable<MetadataDTO[]> {
