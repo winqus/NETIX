@@ -40,7 +40,7 @@ export class InputComponent implements OnChanges {
     iconName: '',
     disabled: false,
     readonly: false,
-    searchCharLimit: APP_SETTINGS.SEARCHCHARLIMIT,
+    searchCharLimit: APP_SETTINGS.MINSEARCHLIMIT,
     results: [],
   };
 
