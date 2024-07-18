@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import MetadataDTO from '../../models/metadata.dto';
 import { MetadataDTOMapper } from '../../mappers/metadataMapper';
 import { map, Observable } from 'rxjs';
-import { IMetadataService } from './IMetadata.service';
+import { IMetadataService } from './IMetadata.interface';
 
 @Injectable({
   providedIn: 'root',
