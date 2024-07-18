@@ -11,6 +11,7 @@ async function bootstrap() {
     defaultVersion: DEFAULT_CONTROLLER_VERSION,
   });
 
+  app.enableCors();
   app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
 
   await app.listen(process.env[PORT] || DEFAULT_PORT);

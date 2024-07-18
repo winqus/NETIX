@@ -1,25 +1,47 @@
-<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <div class="text-left">
-  @if (title !== '') {
-    <label class="block mb-1 text-sm font-medium">{{ title }}</label>
+  @if (props.title) {
+    <div class="block mb-1 text-sm font-medium">{{ props.title }}</div>
   }
-  @if (iconName !== '') {
+  @if (props.iconName !== '') {
     <div class="relative">
       <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-        <app-svg-icons [name]="iconName" size="20" color="grey"></app-svg-icons>
+        <app-svg-icons [name]="props.iconName!" size="20" color="grey"></app-svg-icons>
       </div>
-      <input [type]="type" [accept]="" [placeholder]="placeholder" class="input input-bordered block w-full ps-10 p-2 mb-4 rounded-md" [value]="value" [readOnly]="readonly" [disabled]="disabled" />
-      <div class="w-full h-[20%] absolute inset-y-12 start-0 z-10">
-        <ul class="border bg-slate-900 border-gray-300 rounded-md mt-1">
-          @for (result of results; track result.id) {
-            <li class="cursor-pointer px-4 py-2 hover:bg-gray-500">
-              {{ result.name }}
-            </li>
-          }
-        </ul>
-      </div>
+      <input
+        class="input input-bordered block w-full ps-10 p-2 mb-4 rounded-md read-only:bg-neutral-900"
+        [type]="props.type"
+        [accept]=""
+        [placeholder]="props.placeholder"
+        [value]="props.value"
+        (input)="onInputChange($event)"
+        [readOnly]="props.readonly"
+        [attr.tabindex]="props.readonly ? -1 : null"
+        [disabled]="props.disabled"
+      />
+      @if (props.results && props.results.length > 0) {
+        <div class="w-full h-[20%] absolute inset-y-12 start-0 z-10">
+          <div class="border bg-black border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+            @for (result of props.results; track result) {
+              <option class="cursor-pointer px-4 py-2 hover:bg-gray-500" (click)="onOptionClick(result)">
+                {{ result }}
+              </option>
+            }
+          </div>
+        </div>
+      }
     </div>
   } @else {
-    <input [type]="type" [accept]="" [placeholder]="placeholder" class="input input-bordered block w-full p-2 mb-4 rounded-md" [value]="value" [readOnly]="readonly" [disabled]="disabled" />
+    <input
+      class="input input-bordered block w-full p-2 mb-4 rounded-md read-only:bg-neutral-900"
+      [type]="props.type"
+      [accept]=""
+      [placeholder]="props.placeholder"
+      [value]="props.value"
+      (input)="onInputChange($event)"
+      [readOnly]="props.readonly"
+      [attr.tabindex]="props.readonly ? -1 : null"
+      [class.readonly-input]="props.readonly"
+      [disabled]="props.disabled"
+    />
   }
 </div>

@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '../../services/layout.service';
 import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
 import { MediaItem } from '../../models/mediaItem';
+import { formatTime } from '../../utils/utils';
 
 @Component({
   selector: 'app-video-media-viewer',
@@ -410,7 +411,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     const newProgress = ((clientX - rect.left) * 100) / rect.width;
     if (newProgress >= 0 && newProgress <= 100 && this.duration != undefined) {
       this.newTime = (newProgress * this.duration) / 100;
-      this.currentTooltipTime = this.convertToTime(this.newTime);
+      this.currentTooltipTime = formatTime(this.newTime, true);
 
       if (clientX <= toolTipRect.width / 2 + rect.left) {
         this.tooltipPosition = rect.left;
@@ -454,7 +455,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   // * HELPER FUNCTIONS
   getCurrentTime(): string {
     if (this.player) {
-      return this.convertToTime(this.player.currentTime());
+      return formatTime(this.player.currentTime(), true);
     }
 
     return '00:00';
@@ -462,33 +463,9 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   getDurationTime(): string {
     if (this.player) {
-      return this.convertToTime(this.player.duration());
+      return formatTime(this.player.duration(), true);
     }
 
     return '00:00';
-  }
-
-  // time converter time -> 00:00:00
-  convertToTime(timeInSeconds: number | undefined): string {
-    if (timeInSeconds == undefined) return '00:00:00';
-    let seconds = Math.floor(timeInSeconds);
-    const hours = Math.floor(seconds / 3600);
-    seconds %= 3600;
-    const minutes = Math.floor(seconds / 60);
-    seconds = seconds % 60;
-
-    // Building the time format by checking if hours or minutes are zero
-    if (hours > 0) {
-      return `${hours}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
-    } else if (minutes > 0) {
-      return `${this.padZero(minutes)}:${this.padZero(seconds)}`;
-    } else {
-      return `00:${this.padZero(seconds)}`;
-    }
-  }
-
-  // Helper function to pad numbers with zero if less than 10
-  private padZero(num: number): string {
-    return num < 10 ? `0${num}` : num.toString();
   }
 }
