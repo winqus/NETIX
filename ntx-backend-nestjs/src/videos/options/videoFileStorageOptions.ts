@@ -2,11 +2,11 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { diskStorage } from 'multer';
 import { extname } from 'path/posix';
 import multerFileMimeTypeFilter from '../../utility/multerFileMimeTypeFilter';
-import { THUMBNAIL_FILE, THUMBNAIL_TEMP_DIR } from '../thumbnails.constants';
+import { VIDEO_FILE, VIDEO_TEMP_DIR } from '../videos.constants';
 
-export const thumbnailFileStorageOptions: MulterOptions = {
+export const videoFileStorageOptions: MulterOptions = {
   storage: diskStorage({
-    destination: THUMBNAIL_TEMP_DIR,
+    destination: VIDEO_TEMP_DIR,
     filename: (_req, file, callback) => {
       const fileName = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const ext = extname(file.originalname);
@@ -14,7 +14,7 @@ export const thumbnailFileStorageOptions: MulterOptions = {
     },
   }),
   limits: {
-    fileSize: THUMBNAIL_FILE.MAX_FILE_SIZE,
+    fileSize: VIDEO_FILE.MAX_FILE_SIZE,
   },
-  fileFilter: multerFileMimeTypeFilter(THUMBNAIL_FILE.INPUT_MIME_TYPES),
+  fileFilter: multerFileMimeTypeFilter(VIDEO_FILE.INPUT_MIME_TYPES),
 };
