@@ -3,14 +3,13 @@ import { Component } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { ButtonComponent } from '../shared/button/button.component';
 import { MetadataService } from '../../services/metadata/metadata.service';
-import { FileUploadHadnlerComponent } from './components/file-upload-hadnler/file-upload-hadnler.component';
 import MetadataDTO from '../../models/metadata.dto';
 import { formatDate, formatTime } from '../../utils/utils';
 
 @Component({
   selector: 'app-upload-content',
   standalone: true,
-  imports: [InputComponent, ButtonComponent, FileUploadHadnlerComponent],
+  imports: [InputComponent, ButtonComponent],
   templateUrl: './upload-content.component.html',
 })
 export class UploadContentComponent {
