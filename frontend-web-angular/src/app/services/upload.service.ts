@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UploadConstraintsDTO } from '../models/uploadConstraints.dto';
-import { API_CONFIG } from '../config/api.config';
+import { API_CONFIG } from '../config/api-endpoints';
 import { Observable } from 'rxjs';
 import { PermissionRequestDTO, PermissionResponseDTO } from '../models/uploadPermission.dto';
 import { UploadMetadataRequestDTO, UploadMetadataResponseDTO } from '../models/uploadMetadata.dto';
