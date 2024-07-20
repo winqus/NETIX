@@ -31,6 +31,7 @@ REDIS_PASSWORD='pass_r1'
 CLIENT_ORIGIN_URL='http://localhost:4200'
 # AUTH0_AUDIENCE=<none for now>
 # AUTH0_DOMAIN=<none for now>
+NODE_ENV='development'
 ```
 
 

@@ -8,9 +8,9 @@ export const API_CONFIG = {
 };
 
 export const METADATA_CONFIG = {
-  baseUrl: 'http://[::1]:3055/v1',
+  baseUrl: 'http://[::1]:3055/api',
   endpoints: {
-    searchByTitle: '/search/title',
+    searchByTitle: '/v1/search/title',
   },
 };
 
