@@ -3,7 +3,7 @@ import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
 import { TitleType } from '../../interfaces/TitleType.enum';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import TMBDSearchTitlePlugin from './TMDB-search-title.plugin';
+import TMDBSearchTitlePlugin from './TMDB-search-title.plugin';
 
 const mockLogger: LoggerService = {
   log: jest.fn(),
@@ -19,12 +19,12 @@ jest.mock('@nestjs/common/services/logger.service', () => ({
 
 (global as any).mockLogger = mockLogger;
 
-describe('TMBDSearchTitlePlugin', () => {
-  let plugin: TMBDSearchTitlePlugin;
+describe('TMDBSearchTitlePlugin', () => {
+  let plugin: TMDBSearchTitlePlugin;
 
   beforeEach(() => {
     fetchMock.doMock();
-    plugin = new TMBDSearchTitlePlugin(mockLogger);
+    plugin = new TMDBSearchTitlePlugin(mockLogger);
     plugin.init({
       usePlugin: true,
       options: { apiKey: 'testApiKey' },

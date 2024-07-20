@@ -15,7 +15,7 @@ export const titleSearchPluginConfig = () => {
     [TMDB_SEARCH_TITLES]: {
       usePlugin: true,
       options: {
-        apiKey: process.env['TMBD_API_KEY'] || '',
+        apiKey: process.env['TMDB_API_KEY'] || '',
       },
       timeBetweenCallsMs: 50,
     },
