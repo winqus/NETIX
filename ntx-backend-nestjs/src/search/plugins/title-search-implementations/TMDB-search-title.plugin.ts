@@ -234,10 +234,12 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
     this.updateLastCallTime();
 
     const apiMovieData = await this.searchMovieAPI(query);
-
     const apiTVShowData = await this.searchTVShowAPI(query);
 
-    const mergedTitles = ([] as TMDBTitle[]).concat(apiMovieData?.results || [], apiTVShowData?.results || []);
+    const mergedTitles = ([] as TMDBTitle[]).concat(
+      ...(apiMovieData?.map((result) => result.results) || []),
+      ...(apiTVShowData?.map((result) => result.results) || []),
+    );
 
     const filteredTitles = this.normalizeAndfilterTMDBTitles(mergedTitles);
 
@@ -287,138 +289,160 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
     title: string,
     year?: string,
     language = 'en-US',
-    page = 1,
-  ): Promise<TMDBSearchResult<TMDBMovie> | null> {
+  ): Promise<TMDBSearchResult<TMDBMovie>[] | null> {
     if (title == '' || title == null) {
       this.logger.error('movie title is empty or null');
 
       return null;
     }
 
-    const params = new URLSearchParams();
-    params.append('query', encodeURIComponent(title));
-    params.append('include_adult', 'false');
-    params.append('language', language);
-    params.append('page', page.toString());
-    if (year != null) {
-      params.append('year', year || '');
+    const allResults: TMDBSearchResult<TMDBMovie>[] = [];
+    let currentPage = 1;
+    let totalPages = 1;
+    const maxPages = 5;
+
+    while (currentPage <= totalPages && currentPage <= maxPages) {
+      const params = new URLSearchParams();
+      params.append('query', encodeURIComponent(title));
+      params.append('include_adult', 'false');
+      params.append('language', language);
+      params.append('page', currentPage.toString());
+      if (year != null) {
+        params.append('year', year || '');
+      }
+
+      const url = `https://api.themoviedb.org/3/search/movie?${params.toString()}`;
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      if (response.ok === false) {
+        this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
+
+        return null;
+      }
+
+      const data: TMDBSearchResult<TMDBMovie> = await response.json();
+      if (data == null || 'results' in data === false) {
+        this.logger.error('No movie results in data from TMDB API');
+
+        return null;
+      }
+
+      if (data.results.length === 0) {
+        break;
+      }
+
+      let popularityThreshold = 1.0;
+      if (data.results.length > 3) {
+        popularityThreshold = 5.0;
+      }
+
+      const filteredResults = data.results.filter(
+        (movie) =>
+          'popularity' in movie &&
+          movie.popularity > popularityThreshold &&
+          'release_date' in movie &&
+          movie.release_date.length > 0,
+      );
+
+      allResults.push({
+        page: data.page,
+        results: filteredResults,
+        total_pages: data.total_pages,
+        total_results: data.total_results,
+      });
+
+      totalPages = data.total_pages;
+      currentPage++;
     }
 
-    const url = `https://api.themoviedb.org/3/search/movie?${params.toString()}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-    };
-
-    const response = await fetch(url, options);
-    if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
-
-      return null;
-    }
-
-    const data: TMDBSearchResult<TMDBMovie> = await response.json();
-    if (data == null || 'results' in data === false) {
-      this.logger.error('No movie results in data from TMDB API');
-
-      return null;
-    }
-
-    if (data.results.length === 0) {
-      return null;
-    }
-
-    let popularityThreshold = 1.0;
-    if (data.results.length > 3) {
-      popularityThreshold = 5.0;
-    }
-
-    const filteredResults = data.results.filter(
-      (movie) =>
-        'popularity' in movie &&
-        movie.popularity > popularityThreshold &&
-        'release_date' in movie &&
-        movie.release_date.length > 0,
-    );
-
-    return {
-      page: data.page,
-      results: filteredResults,
-      total_pages: data.total_pages,
-      total_results: data.total_results,
-    };
+    return allResults.length > 0 ? allResults : null;
   }
 
   private async searchTVShowAPI(
     title: string,
     year?: string,
     language = 'en-US',
-    page = 1,
-  ): Promise<TMDBSearchResult<TMDBTVShow> | null> {
+  ): Promise<TMDBSearchResult<TMDBTVShow>[] | null> {
     if (title == '' || title == null) {
       this.logger.error('TV show title is empty or null');
 
       return null;
     }
 
-    const params = new URLSearchParams();
-    params.append('query', encodeURIComponent(title));
-    params.append('include_adult', 'false');
-    params.append('language', language);
-    params.append('page', page.toString());
-    if (year != null) {
-      params.append('first_air_date_year', year || '');
+    const allResults: TMDBSearchResult<TMDBTVShow>[] = [];
+    let currentPage = 1;
+    let totalPages = 1;
+    const maxPages = 5;
+
+    while (currentPage <= totalPages && currentPage <= maxPages) {
+      const params = new URLSearchParams();
+      params.append('query', encodeURIComponent(title));
+      params.append('include_adult', 'false');
+      params.append('language', language);
+      params.append('page', currentPage.toString());
+      if (year != null) {
+        params.append('first_air_date_year', year || '');
+      }
+
+      const url = `https://api.themoviedb.org/3/search/tv?${params.toString()}`;
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      if (response.ok === false) {
+        this.logger.error(`Failed to fetch TV show data from TMDB API: ${response.statusText}`);
+
+        return null;
+      }
+
+      const data: TMDBSearchResult<TMDBTVShow> = await response.json();
+      if (data == null || 'results' in data === false) {
+        this.logger.error('No TV show results in data from TMDB API');
+
+        return null;
+      }
+
+      if (data.results.length === 0) {
+        break;
+      }
+
+      let popularityThreshold = 1.0;
+      if (data.results.length > 3) {
+        popularityThreshold = 5.0;
+      }
+
+      const filteredResults = data.results.filter(
+        (tv_show) =>
+          'popularity' in tv_show &&
+          tv_show.popularity > popularityThreshold &&
+          'first_air_date' in tv_show &&
+          tv_show.first_air_date.length > 0,
+      );
+
+      allResults.push({
+        page: data.page,
+        results: filteredResults,
+        total_pages: data.total_pages,
+        total_results: data.total_results,
+      });
+
+      totalPages = data.total_pages;
+      currentPage++;
     }
 
-    const url = `https://api.themoviedb.org/3/search/tv?${params.toString()}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-    };
-
-    const response = await fetch(url, options);
-    if (response.ok === false) {
-      this.logger.error(`Failed to fetch TV show data from TMDB API: ${response.statusText}`);
-
-      return null;
-    }
-
-    const data: TMDBSearchResult<TMDBTVShow> = await response.json();
-    if (data == null || 'results' in data === false) {
-      this.logger.error('No TV show results in data from TMDB API');
-
-      return null;
-    }
-
-    if (data.results.length === 0) {
-      return null;
-    }
-
-    let popularityThreshold = 1.0;
-    if (data.results.length > 3) {
-      popularityThreshold = 5.0;
-    }
-
-    const filteredResults = data.results.filter(
-      (tv_show) =>
-        'popularity' in tv_show &&
-        tv_show.popularity > popularityThreshold &&
-        'first_air_date' in tv_show &&
-        tv_show.first_air_date.length > 0,
-    );
-
-    return {
-      page: data.page,
-      results: filteredResults,
-      total_pages: data.total_pages,
-      total_results: data.total_results,
-    };
+    return allResults.length > 0 ? allResults : null;
   }
 
   private normalizeAndfilterTMDBTitles(titles: TMDBTitle[]): TMDBTitle[] {
