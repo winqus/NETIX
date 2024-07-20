@@ -197,7 +197,7 @@ interface TMDBTVShowDetails {
 
 type TMDBTitle = TMDBMovie | TMDBTVShow;
 
-export default class TMBDSearchTitlePlugin extends AbstractTitleSearchPlugin implements ITitleSearchPlugin {
+export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin implements ITitleSearchPlugin {
   public readonly pluginUUID = TMDB_SEARCH_TITLES;
 
   private apiKey: string;
@@ -315,14 +315,14 @@ export default class TMBDSearchTitlePlugin extends AbstractTitleSearchPlugin imp
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie data from TMBD API: ${response.statusText}`);
+      this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
 
       return null;
     }
 
     const data: TMDBSearchResult<TMDBMovie> = await response.json();
     if (data == null || 'results' in data === false) {
-      this.logger.error('No movie results in data from TMBD API');
+      this.logger.error('No movie results in data from TMDB API');
 
       return null;
     }
@@ -384,14 +384,14 @@ export default class TMBDSearchTitlePlugin extends AbstractTitleSearchPlugin imp
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(`Failed to fetch TV show data from TMBD API: ${response.statusText}`);
+      this.logger.error(`Failed to fetch TV show data from TMDB API: ${response.statusText}`);
 
       return null;
     }
 
     const data: TMDBSearchResult<TMDBTVShow> = await response.json();
     if (data == null || 'results' in data === false) {
-      this.logger.error('No TV show results in data from TMBD API');
+      this.logger.error('No TV show results in data from TMDB API');
 
       return null;
     }
@@ -516,14 +516,14 @@ export default class TMBDSearchTitlePlugin extends AbstractTitleSearchPlugin imp
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie data from TMBD API: ${response.statusText}`);
+      this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
 
       return null;
     }
 
     const data: TMDBMovieDetails = await response.json();
     if (data == null || 'id' in data === false) {
-      this.logger.error('No movie results in data from TMBD API');
+      this.logger.error('No movie results in data from TMDB API');
 
       return null;
     }
@@ -562,14 +562,14 @@ export default class TMBDSearchTitlePlugin extends AbstractTitleSearchPlugin imp
 
     const response = await fetch(url, options);
     if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie data from TMBD API: ${response.statusText}`);
+      this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
 
       return null;
     }
 
     const data: TMDBTVShowDetails = await response.json();
     if (data == null || 'id' in data === false) {
-      this.logger.error('No movie results in data from TMBD API');
+      this.logger.error('No movie results in data from TMDB API');
 
       return null;
     }

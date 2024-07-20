@@ -22,8 +22,6 @@ Create a **.env** file in the **netix-backend-node** repository folder with the 
 ```bash
 PORT=3055
 MONGODB_URI='mongodb://user_m1:pass_m1@127.0.0.1:27018?authMechanism=DEFAULT'
-# TMBD is mistyped (should be TMDB), for now add both variants:
-TMBD_API_KEY=<your TMDB API KEY (READ ACCESS) (https://developer.themoviedb.org/reference/intro/getting-started)>
 TMDB_API_KEY=<your TMDB API KEY (READ ACCESS) (https://developer.themoviedb.org/reference/intro/getting-started)>
 REDIS_HOST='127.0.0.1'
 REDIS_PORT=6379
