@@ -1,3 +1,5 @@
+/test/.cache
+
 # Logs
 logs
 *.log
@@ -74,6 +76,8 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.development
+.env.test
 .env.development.local
 .env.test.local
 .env.production.local
@@ -129,3 +133,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 *.mp4
+ntx-backend-nestjs/.env.test
