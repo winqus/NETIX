@@ -35,12 +35,15 @@
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/throttler": "^6.0.0",
     "bullmq": "^5.8.7",
+    "joi": "^17.13.3",
     "mongoose": "^8.4.4",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "sharp": "^0.33.4"
   },
   "devDependencies": {
+    "@automock/adapters.nestjs": "^2.1.0",
+    "@automock/jest": "^2.1.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

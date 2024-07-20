@@ -3,6 +3,13 @@ export enum ENVIRONMENTS {
   PRODUCTION = 'production',
   TEST = 'test',
 }
+
+export const ENV_FILES = {
+  [ENVIRONMENTS.DEVELOPMENT]: '.env',
+  [ENVIRONMENTS.TEST]: '.env.test',
+  [ENVIRONMENTS.PRODUCTION]: '.env.production',
+};
+
 export const ENV = 'NODE_ENV';
 export const PORT = 'PORT';
 export const DEFAULT_PORT = 3055;

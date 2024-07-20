@@ -32,4 +32,5 @@
   "editor.rulers": [
     120
   ],
+  "jest.runMode": "on-demand",
 }
