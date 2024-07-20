@@ -21,21 +21,22 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
   /********************************************************************************************************************
     Test Case(s)
   /*******************************************************************************************************************/
-  const TEST_QUERIES = [
-    { searchTitle: 'Shrek', expectedPositionRange: [0, 0] },
-    { searchTitle: 'Shrek 2', expectedPositionRange: [0, 0] },
-    { searchTitle: 'One piece', expectedPositionRange: [0, 0] },
-    { searchTitle: 'The Matrix', expectedPositionRange: [0, 0] },
+  const TEST_TITLE_QUERIES = [
+    { query: 'Shrek', expected: 'Shrek', expectedPositionRange: [0, 0] },
+    { query: 'Shrek 2', expected: 'Shrek 2', expectedPositionRange: [0, 0] },
+    { query: 'One piece', expected: 'One Piece', expectedPositionRange: [0, 0] },
+    { query: 'matrix', expected: 'The Matrix', expectedPositionRange: [0, 0] },
+    { query: 'star wars skywalker', expected: 'Star Wars: The Rise of Skywalker', expectedPositionRange: [0, 0] },
   ];
 
-  TEST_QUERIES.forEach(({ searchTitle, expectedPositionRange }) => {
-    it(`should return search results for "${searchTitle}" within range [${expectedPositionRange}]`, async () => {
-      const results = await plugin.search(searchTitle);
+  TEST_TITLE_QUERIES.forEach(({ query, expected, expectedPositionRange }) => {
+    it(`should return search results for "${query}" with expected title "${expected}" within range [${expectedPositionRange}]`, async () => {
+      const results = await plugin.search(query);
 
-      const titlePosition = titlePositionInResults(searchTitle, results);
+      const titlePosition = titlePositionInResults(expected, results);
 
       if (isWithinRange(titlePosition, expectedPositionRange) === false) {
-        consoleOutputSearchResultTable(searchTitle, results);
+        consoleOutputSearchResultTable(query, results);
       }
 
       expect(results.length).toBeGreaterThan(0);
@@ -103,10 +104,10 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
     }
   });
 
-  const titlePositionInResults = (searchTitle: string, results: any[]): number => {
+  const titlePositionInResults = (title: string, results: any[]): number => {
     let position = -1;
     for (let i = 0; i < results.length; i++) {
-      if (results[i].title.toLowerCase() === searchTitle.toLowerCase()) {
+      if (results[i].title.toLowerCase() === title.toLowerCase()) {
         position = i;
         break;
       }
