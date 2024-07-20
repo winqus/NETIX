@@ -13,7 +13,7 @@ export interface ITitleSearchPlugin {
 
   init(config: TitleSearchPluginConfig): boolean;
 
-  search(query: string): Promise<TitleSearchResult[]>;
+  search(query: string, type?: TitleType, maxResults?: number): Promise<TitleSearchResult[]>;
 
   searchById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null>;
 
