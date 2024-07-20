@@ -446,6 +446,10 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
   }
 
   private normalizeAndfilterTMDBTitles(titles: TMDBTitle[]): TMDBTitle[] {
+    if (titles.length === 1) {
+      return titles;
+    }
+
     const sortedByPopularityDesc = titles.sort((a, b) => {
       return b.popularity - a.popularity;
     });
