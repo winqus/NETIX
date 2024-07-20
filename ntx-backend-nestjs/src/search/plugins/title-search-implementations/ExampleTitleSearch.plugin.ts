@@ -25,7 +25,7 @@ export default class ExampleTitleSearchPlugin extends AbstractTitleSearchPlugin 
     return true;
   }
 
-  public async search(query: string): Promise<TitleSearchResult[]> {
+  public async search(query: string, type?: TitleType, maxResults: number = 10): Promise<TitleSearchResult[]> {
     if (this.canCall() === false) {
       this.logger.log(`Rate limit exceeded (${this.pluginUUID})`);
 
