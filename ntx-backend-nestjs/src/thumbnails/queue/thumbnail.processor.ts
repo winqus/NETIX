@@ -52,6 +52,7 @@ export class ThumbnailProcessor extends WorkerHost {
       .webp()
       .toFile(outputFilePath);
 
+    // TODO: remove the old file after processing instead of this
     fs.writeFileSync(filePath.concat('.remove'), '');
 
     await job.updateProgress(100);

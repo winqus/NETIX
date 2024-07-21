@@ -2,10 +2,20 @@ import { OnQueueEvent, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bull
 import { Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Job } from 'bullmq';
-import * as fs from 'fs';
-import { Result } from 'src/common/Result';
-import VideoCreatedEvent from '../events/VideoCreatedEvent';
-import { VIDEO_CREATED_EVENT, VIDEO_QUEUE, VIDEO_QUEUE_CONCURRENCY, VIDEO_QUEUE_JOBS } from '../videos.constants';
+import * as fse from 'fs-extra';
+import { v4 as uuidv4 } from 'uuid';
+import { Result } from '../../common/Result';
+import { import_FileTypeFromFile } from '../../utility/importFileType';
+import { jobLogErrorAndThrowError, jobLogWithTimestamp } from '../../utility/queueJobLogAndThrowError';
+import VideoProcessedEvent from '../events/VideoProcessedEvent';
+import {
+  VIDEO_DIR,
+  VIDEO_FILE,
+  VIDEO_PROCESSED_EVENT,
+  VIDEO_QUEUE,
+  VIDEO_QUEUE_CONCURRENCY,
+  VIDEO_QUEUE_JOBS,
+} from '../videos.constants';
 import { ProcessVideoJobData } from './processVideoJobData.interface';
 
 @Processor(VIDEO_QUEUE, {
@@ -26,16 +36,49 @@ export class VideoProcessor extends WorkerHost {
   }
 
   async handleVideoProcessing(job: Job<ProcessVideoJobData>, _token?: string): Promise<Result<any>> {
-    const { filePath } = job.data;
-    await job.updateProgress(10);
+    const { filePath, titleID } = job.data;
 
-    fs.writeFileSync(filePath.concat('.remove'), '');
+    if (typeof filePath !== 'string' || typeof titleID !== 'string' || titleID.length === 0 || filePath.length === 0) {
+      await jobLogErrorAndThrowError(job, 'Invalid job data');
+    } else if (fse.pathExistsSync(filePath) === false) {
+      await jobLogErrorAndThrowError(job, `File not found at ${filePath}`);
+    }
+
+    await job.updateProgress(10);
+    await jobLogWithTimestamp(job, `Processing video for title ${titleID}, file path: ${filePath}`);
+
+    const fileTypeFromFile = await import_FileTypeFromFile();
+    await fileTypeFromFile(filePath)
+      .then(async (type) => {
+        if (type == null) {
+          throw new Error('File type not detected');
+        } else if (VIDEO_FILE.INPUT_MIME_TYPES.includes(type.mime) === false) {
+          throw new Error(`Invalid file type ${type.mime}`);
+        } else if (type.ext !== VIDEO_FILE.EXTENTION) {
+          throw new Error(`Invalid file extension ${type.ext}`);
+        }
+
+        await jobLogWithTimestamp(job, `File type (${type.mime}) and extension (${type.ext}) validated`);
+        await job.updateProgress(20);
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    const newVideoID = uuidv4();
+
+    const destinationPath = VIDEO_DIR.concat(newVideoID).concat('.', VIDEO_FILE.EXTENTION);
+    fse.moveSync(filePath, destinationPath, { overwrite: false });
+    await job.updateProgress(50);
+    await jobLogWithTimestamp(job, `Moved file to ${destinationPath}`);
 
     await job.updateProgress(100);
+    await jobLogWithTimestamp(job, 'Video processing complete');
+    this.eventEmitter.emit(VIDEO_PROCESSED_EVENT, new VideoProcessedEvent(titleID, newVideoID));
 
-    this.eventEmitter.emit(VIDEO_CREATED_EVENT, new VideoCreatedEvent(job.data.titleID, job.data.titleID));
+    this.logger.log(`Video processing complete for title ${titleID}, new video ID: ${newVideoID}`);
 
-    return Result.ok();
+    return Result.ok({ newVideoID });
   }
 
   @OnQueueEvent('active')

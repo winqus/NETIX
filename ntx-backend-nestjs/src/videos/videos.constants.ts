@@ -9,8 +9,8 @@ export const VIDEO_FILE = {
   EXTENTION: 'mkv',
   FIELD_NAME: 'video',
 };
-export const VIDEO_TEMP_DIR = './data/upload/temp/videos';
-export const VIDEO_DIR = './data/videos';
+export const VIDEO_TEMP_DIR = './data/upload/temp/videos/';
+export const VIDEO_DIR = './data/videos/';
 export const videoFileName = (ID: string) => `v${ID}.mkv`;
 
 export const VIDEO_QUEUE = 'video-queue';
@@ -19,4 +19,4 @@ export const VIDEO_QUEUE_JOBS = {
   PROCESS_VIDEO: 'process-video',
 };
 
-export const VIDEO_CREATED_EVENT = 'video.created';
+export const VIDEO_PROCESSED_EVENT = 'video.fileProcessed';
