@@ -1,14 +1,21 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+import { Result } from '@ntx/common/Result';
 import { Queue } from 'bullmq';
-import { Result } from '../common/Result';
-import { VIDEO_QUEUE, VIDEO_QUEUE_JOBS } from './videos.constants';
+import { Model } from 'mongoose';
+import VideoProcessedEvent from './events/VideoProcessedEvent';
+import { Video } from './interfaces/video.interface';
+import { VIDEO_MODEL, VIDEO_PROCESSED_EVENT, VIDEO_QUEUE, VIDEO_QUEUE_JOBS } from './videos.constants';
 
 @Injectable()
 export class VideosService {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(@InjectQueue(VIDEO_QUEUE) private readonly videoQueue: Queue) {}
+  constructor(
+    @InjectQueue(VIDEO_QUEUE) private readonly videoQueue: Queue,
+    @Inject(VIDEO_MODEL) private readonly videoModel: Model<Video>,
+  ) {}
 
   async processVideoForTitle(titleID: string, file: Express.Multer.File): Promise<Result<void>> {
     this.logger.log(`Adding video (${file.filename}) for title ${titleID} to queue for processing`);
@@ -19,5 +26,11 @@ export class VideosService {
     });
 
     return Result.ok();
+  }
+
+  @OnEvent(VIDEO_PROCESSED_EVENT)
+  async handleVideoProcessedEvent(payload: VideoProcessedEvent) {
+    await this.videoModel.create({ uuid: payload.videoID });
+    this.logger.log(`Saved video ${payload.videoID} to database`);
   }
 }

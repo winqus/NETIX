@@ -20,3 +20,6 @@ export const VIDEO_QUEUE_JOBS = {
 };
 
 export const VIDEO_PROCESSED_EVENT = 'video.fileProcessed';
+
+export const VIDEO_SCHEMA_NAME = 'Video';
+export const VIDEO_MODEL = 'VIDEO_MODEL';
