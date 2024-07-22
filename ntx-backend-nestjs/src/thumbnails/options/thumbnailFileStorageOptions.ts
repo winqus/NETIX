@@ -1,4 +1,5 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import { generateTempFileName } from '@ntx/utility/fileNameUtils';
 import { diskStorage } from 'multer';
 import { extname } from 'path/posix';
 import multerFileMimeTypeFilter from '../../utility/multerFileMimeTypeFilter';
@@ -8,9 +9,8 @@ export const thumbnailFileStorageOptions: MulterOptions = {
   storage: diskStorage({
     destination: THUMBNAIL_TEMP_DIR,
     filename: (_req, file, callback) => {
-      const fileName = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const ext = extname(file.originalname);
-      callback(null, `${file.fieldname}-${fileName}${ext}`);
+      const fileName = generateTempFileName({ prefix: file.fieldname, ext: extname(file.originalname) });
+      callback(null, fileName);
     },
   }),
   limits: {
