@@ -1,0 +1,17 @@
+<div class="w-full h-full bg-gray-700 rounded-lg" [class.dragging-over]="isDraggingOver" (dragover)="onDragOver($event)" (drop)="onDrop($event)" (dragleave)="onDragLeave($event)">
+  <label
+    [for]="readonly ? id : null"
+    class="w-full h-full input input-bordered flex items-center justify-center py-2 px-4 rounded-md"
+    [class.cursor-pointer]="readonly"
+    [class.cursor-default]="!readonly"
+    [class.bg-neutral-900]="!readonly"
+    [class.bg-neutral-400]="isDraggingOver"
+  >
+    <input type="file" [accept]="accept" class="hidden" [id]="id" [readonly]="readonly" (change)="onFileSelected($event)" />
+    @if (imageUrl) {
+      <img id="myImage" alt="Uploaded Image" />
+    } @else {
+      {{ title }}
+    }
+  </label>
+</div>

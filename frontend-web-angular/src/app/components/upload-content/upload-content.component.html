@@ -2,18 +2,8 @@
   <div class="w-1/2 min-w-[500px] h-[70%] flex flex-col outline outline-1 outline-offset-0 outline-gray-700 bg-transparent p-6 rounded-lg">
     <div class="flex flex-row h-full">
       <div class="flex flex-col items-center mr-6">
-        <div class="w-44 h-72 bg-gray-700 rounded-lg flex items-center justify-center mb-4">
-          <input type="file" accept="image/*" class="hidden" id="thumbnail-input" [readonly]="!isMetadataFilled" />
-          <label
-            [for]="isMetadataFilled ? 'thumbnail-input' : null"
-            class="w-full h-full input input-bordered flex items-center justify-center py-2 px-4 rounded-md"
-            [class.cursor-pointer]="isMetadataFilled"
-            [class.cursor-default]="!isMetadataFilled"
-            [class.bg-neutral-900]="!isMetadataFilled"
-          >
-            Thumbnail Select</label
-          >
-        </div>
+        <app-image-upload class="w-44 h-72" title="Thumbnail Select" accept="image/*" [readonly]="!isMetadataFilled"></app-image-upload>
+        <!-- <app-file-upload class="w-44 h-72" title="Video Select" accept="image/*" [readonly]="!isMetadataFilled"></app-file-upload> -->
       </div>
       <div class="flex flex-col flex-auto">
         <app-input
@@ -29,16 +19,7 @@
       </div>
     </div>
     <div class="flex flex-row content-between place-content-between">
-      <input type="file" accept="video/*" class="hidden" id="video-input" [readonly]="!isMetadataFilled" />
-      <label
-        [for]="isMetadataFilled ? 'video-input' : null"
-        class="w-44 text-center input input-bordered py-2 px-4 rounded-md"
-        [class.cursor-pointer]="isMetadataFilled"
-        [class.cursor-default]="!isMetadataFilled"
-        [class.bg-neutral-900]="!isMetadataFilled"
-      >
-        Video Select
-      </label>
+      <app-file-upload title="Video Select" accept="video/*" [readonly]="!isMetadataFilled"></app-file-upload>
       <app-button label="UPLOAD" [disabled]="true"></app-button>
     </div>
   </div>

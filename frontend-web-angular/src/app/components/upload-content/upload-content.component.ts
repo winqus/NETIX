@@ -5,11 +5,13 @@ import { ButtonComponent } from '../shared/button/button.component';
 import { MetadataService } from '../../services/metadata/metadata.service';
 import MetadataDTO from '../../models/metadata.dto';
 import { formatDate, formatTime } from '../../utils/utils';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-upload-content',
   standalone: true,
-  imports: [InputComponent, ButtonComponent],
+  imports: [InputComponent, ButtonComponent, FileUploadComponent, ImageUploadComponent],
   templateUrl: './upload-content.component.html',
 })
 export class UploadContentComponent {
