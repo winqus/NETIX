@@ -22,11 +22,44 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
     Test Case(s)
   /*******************************************************************************************************************/
   const TEST_TITLE_QUERIES = [
-    { query: 'Shrek', expected: 'Shrek', expectedPositionRange: [0, 0] },
-    { query: 'Shrek 2', expected: 'Shrek 2', expectedPositionRange: [0, 0] },
-    { query: 'One piece', expected: 'One Piece', expectedPositionRange: [0, 0] },
+    { query: 'shrek', expected: 'Shrek', expectedPositionRange: [0, 0] },
+    { query: 'shrek 2', expected: 'Shrek 2', expectedPositionRange: [0, 0] },
+    { query: 'one piece', expected: 'One Piece', expectedPositionRange: [0, 0] },
     { query: 'matrix', expected: 'The Matrix', expectedPositionRange: [0, 0] },
     { query: 'star wars skywalker', expected: 'Star Wars: The Rise of Skywalker', expectedPositionRange: [0, 0] },
+    { query: 'attack on titan', expected: 'Attack on Titan', expectedPositionRange: [0, 0] },
+    { query: 'toy story', expected: 'Toy Story', expectedPositionRange: [0, 0] },
+    { query: 'toy story 3', expected: 'Toy Story 3', expectedPositionRange: [0, 0] },
+    { query: 'naruto', expected: 'Naruto', expectedPositionRange: [0, 0] },
+    { query: 'naruto shippuden', expected: 'Naruto Shippūden', expectedPositionRange: [0, 0] },
+    { query: 'inception', expected: 'Inception', expectedPositionRange: [0, 0] },
+    { query: 'spirited away', expected: 'Spirited Away', expectedPositionRange: [0, 0] },
+    { query: 'your name', expected: 'Your Name.', expectedPositionRange: [0, 0] },
+    { query: 'my hero academia', expected: 'My Hero Academia', expectedPositionRange: [0, 0] },
+    { query: 'frozen', expected: 'Frozen', expectedPositionRange: [0, 0] },
+    { query: 'frozen 2', expected: 'Frozen II', expectedPositionRange: [0, 0] },
+    { query: 'death note', expected: 'Death Note', expectedPositionRange: [0, 0] },
+    { query: 'harry potter', expected: "Harry Potter and the Philosopher's Stone", expectedPositionRange: [0, 0] },
+    {
+      query: 'lord of the rings',
+      expected: 'The Lord of the Rings: The Fellowship of the Ring',
+      expectedPositionRange: [0, 3],
+    },
+    {
+      query: 'lord of rings Fellowship',
+      expected: 'The Lord of the Rings: The Fellowship of the Ring',
+      expectedPositionRange: [0, 0],
+    },
+    { query: 'fullmetal alchemist', expected: 'Fullmetal Alchemist: Brotherhood', expectedPositionRange: [0, 0] },
+    { query: 'lion king', expected: 'The Lion King', expectedPositionRange: [0, 0] },
+    { query: 'finding nemo', expected: 'Finding Nemo', expectedPositionRange: [0, 0] },
+    { query: 'dragon ball z', expected: 'Dragon Ball Z', expectedPositionRange: [0, 0] },
+    { query: 'cowboy bebop', expected: 'Cowboy Bebop', expectedPositionRange: [0, 0] },
+    { query: 'guardians of galaxy', expected: "Marvel's Guardians of the Galaxy", expectedPositionRange: [0, 0] },
+    { query: 'avengers endgame', expected: 'Avengers: Endgame', expectedPositionRange: [0, 0] },
+    { query: 'howl moving castle', expected: "Howl's Moving Castle", expectedPositionRange: [0, 0] },
+    { query: 'spiderman homecoming', expected: 'Spider-Man: Homecoming', expectedPositionRange: [0, 0] },
+    { query: 'demon slayer', expected: 'Demon Slayer: Kimetsu no Yaiba', expectedPositionRange: [0, 0] },
   ];
 
   TEST_TITLE_QUERIES.forEach(({ query, expected, expectedPositionRange }) => {
