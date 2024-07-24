@@ -20,6 +20,7 @@ import {
 import { DatabaseModule } from './database/database.module';
 import { SearchModule } from './search/search.module';
 import { ThumbnailsModule } from './thumbnails/thumbnails.module';
+import { VideosModule } from './videos/videos.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ThumbnailsModule } from './thumbnails/thumbnails.module';
     ]),
     SearchModule,
     ThumbnailsModule,
+    VideosModule,
   ],
   controllers: [AppController],
   providers: [
