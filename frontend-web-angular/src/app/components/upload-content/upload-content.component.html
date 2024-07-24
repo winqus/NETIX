@@ -2,7 +2,7 @@
   <div class="w-1/2 min-w-[500px] h-[70%] flex flex-col outline outline-1 outline-offset-0 outline-gray-700 bg-transparent p-6 rounded-lg">
     <div class="flex flex-row h-full">
       <div class="flex flex-col items-center mr-6">
-        <app-image-upload class="w-60 h-80 aspect-3/2" title="Thumbnail Select" [accept]="mediaConfig.getImageFormats()" [readonly]="!isMetadataFilled"></app-image-upload>
+        <app-image-upload class="w-60 h-80 aspect-3/2" title="Thumbnail Select" [accept]="mediaConfig.getImageFormats()" [readonly]="isMetadataFilled"></app-image-upload>
       </div>
       <div class="flex flex-col flex-auto">
         <app-input
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="flex flex-row content-between place-content-between">
-      <app-file-upload title="Video Select" [accept]="mediaConfig.getVideoFormats()" [maxSize]="mediaConfig.getMaxVideoSize()" [readonly]="!isMetadataFilled"></app-file-upload>
+      <app-file-upload title="Video Select" [accept]="mediaConfig.getVideoFormats()" [maxSize]="mediaConfig.getMaxVideoSize()" [readonly]="isMetadataFilled"></app-file-upload>
       <app-button label="UPLOAD" [disabled]="true"></app-button>
     </div>
   </div>
