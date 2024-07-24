@@ -7,6 +7,7 @@ import MetadataDTO from '../../models/metadata.dto';
 import { formatDate, formatTime } from '../../utils/utils';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
+import { MediaConfigService } from '@ntx/app/services/media-config.service';
 
 @Component({
   selector: 'app-upload-content',
@@ -25,7 +26,10 @@ export class UploadContentComponent {
   duration: string = '';
   selectedMetadataJson: string = '';
 
-  constructor(private metadataSearch: MetadataService) {}
+  constructor(
+    private metadataSearch: MetadataService,
+    public mediaConfig: MediaConfigService
+  ) {}
 
   searchByTitle(search: string) {
     this.metadataSearch.getDataFromTitle(search).subscribe({

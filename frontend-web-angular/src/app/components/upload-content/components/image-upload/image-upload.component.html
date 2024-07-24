@@ -9,7 +9,7 @@
   >
     <input type="file" [accept]="accept" class="hidden" [id]="id" [readonly]="readonly" (change)="onFileSelected($event)" />
     @if (imageUrl) {
-      <img id="myImage" alt="Uploaded Image" />
+      <img #imageElement class="w-full h-full rounded-lg m-auto" [class.hidden]="!imageCropped" [src]="imageUrl" id="myImage" alt="Preview" />
     } @else {
       {{ title }}
     }

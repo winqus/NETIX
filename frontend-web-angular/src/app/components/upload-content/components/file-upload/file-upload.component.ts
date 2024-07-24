@@ -11,6 +11,7 @@ export class FileUploadComponent implements OnInit {
   @Input() title: string = 'Upload File';
   @Input() accept: string = '';
   @Input() readonly: boolean = false;
+  @Input() maxSize: number = -1; // Maximum file size in bytes, -1 for no limit
 
   @Output() filePassed = new EventEmitter<File>();
 
@@ -26,18 +27,24 @@ export class FileUploadComponent implements OnInit {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    console.log(input);
     if (!input.files?.length) {
       return;
     }
     const file = input.files[0];
+    this.validateAndSetFile(file);
+  }
+
+  validateAndSetFile(file: File) {
+    if (this.maxSize > -1 && file.size > this.maxSize) {
+      return;
+    }
+
     this.setFile(file);
   }
 
   setFile(file: File) {
     this.filePassed.emit(file);
     this.file = file;
-    console.log(file);
   }
 
   onDragOver(event: DragEvent) {
@@ -53,7 +60,7 @@ export class FileUploadComponent implements OnInit {
     if (event.dataTransfer && event.dataTransfer.files.length) {
       const file = event.dataTransfer.files[0];
 
-      this.setFile(file);
+      this.validateAndSetFile(file);
     }
   }
 
