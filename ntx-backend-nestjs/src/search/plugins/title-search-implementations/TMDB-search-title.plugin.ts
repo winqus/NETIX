@@ -285,6 +285,10 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
     return titleDetails;
   }
 
+  private delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   private async searchMovieAPI(
     title: string,
     year?: string,
@@ -360,6 +364,7 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
 
       totalPages = data.total_pages;
       currentPage++;
+      await this.delay(1000);
     }
 
     return allResults.length > 0 ? allResults : null;
@@ -440,6 +445,7 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
 
       totalPages = data.total_pages;
       currentPage++;
+      await this.delay(1000);
     }
 
     return allResults.length > 0 ? allResults : null;
