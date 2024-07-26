@@ -461,8 +461,9 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
     return allResults.length > 0 ? allResults : null;
   }
 
+//#TODO:Configure this fuction to be less strict, when some titles have very high popularity
   private normalizeTMDBTitles(titles: TMDBTitle[]): TMDBTitle[] {
-    if (titles.length === 1) {
+    if (titles.length <= 3) {
       return titles;
     }
 
