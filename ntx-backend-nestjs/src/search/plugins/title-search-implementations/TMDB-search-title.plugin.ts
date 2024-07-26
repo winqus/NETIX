@@ -6,12 +6,20 @@
   https://developer.themoviedb.org/reference/tv-series-details
 */
 
+const Fuse = require('fuse.js');
 import AbstractTitleSearchPlugin from '../../../common/AbstractAPIPlugin';
 import { TMDB_SEARCH_TITLES } from '../../constants';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleType } from '../../interfaces/TitleType.enum';
 import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
+
+const fuseOptions = {
+  findAllMatches: true,
+  keys: ['title', 'originalTitle'],
+  threshold: 0.6,
+  distance: 100,
+};
 
 interface TMDBSearchResult<T> {
   page: number;
@@ -247,7 +255,9 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
       this.mapTMDBTitleToTitleSearchResult(title),
     );
 
-    return searchResults;
+    const filteredResults = this.filterResultsWithFuse(query, searchResults);
+
+    return filteredResults;
   }
 
   public async searchById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
@@ -484,6 +494,13 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
     const max = Math.max(...array);
 
     return array.map((value) => (value - min) / (max - min));
+  }
+
+  private filterResultsWithFuse(query: string, results: TitleSearchResult[]): TitleSearchResult[] {
+    const fuse = new Fuse(results, fuseOptions);
+    const fuseResults = fuse.search(query);
+
+    return fuseResults.map((result: { item: TitleSearchResult }) => result.item);
   }
 
   private mapTMDBTitleToTitleSearchResult(title: TMDBTitle): TitleSearchResult {
