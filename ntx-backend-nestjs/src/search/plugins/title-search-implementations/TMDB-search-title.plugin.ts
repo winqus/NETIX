@@ -241,9 +241,9 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
       ...(apiTVShowData?.map((result) => result.results) || []),
     );
 
-    const filteredTitles = this.normalizeAndfilterTMDBTitles(mergedTitles);
+    const normalizedTitles = this.normalizeTMDBTitles(mergedTitles);
 
-    const searchResults: TitleSearchResult[] = filteredTitles.map((title) =>
+    const searchResults: TitleSearchResult[] = normalizedTitles.map((title) =>
       this.mapTMDBTitleToTitleSearchResult(title),
     );
 
@@ -451,7 +451,7 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
     return allResults.length > 0 ? allResults : null;
   }
 
-  private normalizeAndfilterTMDBTitles(titles: TMDBTitle[]): TMDBTitle[] {
+  private normalizeTMDBTitles(titles: TMDBTitle[]): TMDBTitle[] {
     if (titles.length === 1) {
       return titles;
     }
@@ -474,9 +474,9 @@ export default class TMDBSearchTitlePlugin extends AbstractTitleSearchPlugin imp
       popularityThreshold = meanNormalizedPopularity;
     }
 
-    const filteredTitles = sortedByPopularityDesc.filter((title) => title.popularity > popularityThreshold);
+    const normalizedTitles = sortedByPopularityDesc.filter((title) => title.popularity > popularityThreshold);
 
-    return filteredTitles;
+    return normalizedTitles;
   }
 
   private normalize(array: number[]): number[] {
