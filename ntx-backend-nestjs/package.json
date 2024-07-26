@@ -37,6 +37,7 @@
     "bullmq": "^5.8.7",
     "file-type": "^19.2.0",
     "fs-extra": "^11.2.0",
+    "fuse.js": "^7.0.0",
     "joi": "^17.13.3",
     "mongoose": "^8.4.4",
     "reflect-metadata": "^0.2.0",
