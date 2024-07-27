@@ -1,3 +1,4 @@
+import { TestBed } from '@automock/jest';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { Test } from '@nestjs/testing';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
@@ -8,23 +9,25 @@ import * as path from 'path';
 import { ENV_FILES, ENVIRONMENTS } from '../../../../src/constants';
 import { TEST_CACHE_DIRECTORIES, TEST_DIRECTORIES } from '../../../../test/constants';
 import { JestCacheFetch } from '../../../../test/utils/JestCacheFetch';
-import stubLoggerService from '../../../../test/utils/stubLoggerService';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import TMDBSearchTitlePlugin from './TMDB-search-title.plugin';
+import { TMDBSearchTitleService } from './TMDB-search-title.service';
 
 const COMPRESSED_CACHE_FILE = true;
 const SAVED_CACHE_FILENAME = 'titleSearchTMDB_OkResponseCache.json';
 
-describe('TMDBSearchTitlePlugin expected titles', () => {
-  let plugin: TMDBSearchTitlePlugin;
+describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
+  let plugin: TMDBSearchTitleService;
   let cacheFilePath;
   let cacheFetch: JestCacheFetch;
-  const logger = stubLoggerService;
 
   /********************************************************************************************************************
     Test Case(s)
   /*******************************************************************************************************************/
+  it('should be defined', () => {
+    expect(plugin).toBeDefined();
+  });
+
   const TEST_TITLE_QUERIES: [
     {
       query: string;
@@ -32,7 +35,7 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
       expectedPositionRange: [number, number];
       type?: TitleType;
     },
-  ] = require('./TMDB-search-title.plugin.e2e.spec.data.json');
+  ] = require('./TMDB-search-title.service.e2e.spec.data.json');
 
   TEST_TITLE_QUERIES.forEach(({ query, expected, expectedPositionRange, type }) => {
     it(`should return search results for "${query}" with expected title "${expected}" within range [${expectedPositionRange}]`, async () => {
@@ -110,6 +113,9 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
     });
 
     cacheFetch.initialize(true);
+
+    const { unit } = TestBed.create(TMDBSearchTitleService).compile();
+    plugin = unit;
   });
 
   afterAll(() => {
@@ -121,7 +127,7 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
   });
 
   beforeEach(async () => {
-    plugin = new TMDBSearchTitlePlugin(logger);
+    // plugin = new TMDBSearchTitlePlugin(logger);
 
     const config: TitleSearchPluginConfig = {
       usePlugin: true,

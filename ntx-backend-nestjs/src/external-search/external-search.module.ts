@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
-import { TitleSearchPluginLoaderService } from './plugins/title-search-plugin-loader.service';
-import { SearchController } from './search.controller';
+import { Logger, Module } from '@nestjs/common';
+import { ExternalTitleSearchController } from './external-title-search.controller';
+import { ExternalTitleSearchService } from './external-title-search.service';
+import { TMDBSearchTitleService } from './plugins/tmdb-search-title/TMDB-search-title.service';
 
 @Module({
-  providers: [TitleSearchPluginLoaderService],
-  controllers: [SearchController],
+  providers: [TMDBSearchTitleService, ExternalTitleSearchService],
+  controllers: [ExternalTitleSearchController],
+  exports: [ExternalTitleSearchService],
 })
 export class ExternalSearchModule {}

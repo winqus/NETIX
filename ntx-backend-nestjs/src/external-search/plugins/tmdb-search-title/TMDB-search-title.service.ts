@@ -7,217 +7,44 @@
 */
 
 const Fuse = require('fuse.js');
+import { Injectable, Logger } from '@nestjs/common';
 import { normalize } from '@ntx/common/utils/mathUtils';
+import { ExternalSearchSources } from '@ntx/external-search/external-search.constants';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
-import { TMDB_SEARCH_TITLES } from '../../constants';
 import AbstractAPIPlugin from '../../interfaces/AbstractAPIPlugin';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleType } from '../../interfaces/TitleType.enum';
 import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
+import { TMDBMovie } from './interfaces/TMDBMovie';
+import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
+import { TMDBSearchResult } from './interfaces/TMDBSearchResult';
+import { TMDBTVShow } from './interfaces/TMDBTVShow';
+import { TMDBTVShowDetails } from './interfaces/TMDBTVShowDetails';
+import { TMDBTitle } from './interfaces/TMDBTitle';
 
-const fuseOptions: IFuseOptions<any> = {
-  findAllMatches: true,
-  keys: ['title', 'originalTitle'],
-  threshold: 0.6,
-  distance: 30,
-  includeScore: true,
-  shouldSort: true,
-  minMatchCharLength: 1,
-  ignoreFieldNorm: false, // Can improve matching, or not...
-};
+@Injectable()
+export class TMDBSearchTitleService extends AbstractAPIPlugin implements ITitleSearchPlugin {
+  private readonly logger = new Logger(this.constructor.name);
 
-const TMDB_POPULARITY_CRITERIA_WEIGHT = 0.0;
-const FUZEJS_SCORE_CRITERIA_WEIGHT = 1 - TMDB_POPULARITY_CRITERIA_WEIGHT;
-
-interface TMDBSearchResult<T> {
-  page: number;
-  results: T[];
-  total_pages: number;
-  total_results: number;
-}
-
-interface TMDBTVShow {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  id: number;
-  origin_country: string[];
-  original_language: string;
-  original_name: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  first_air_date: string;
-  name: string;
-  vote_average: number;
-  vote_count: number;
-}
-
-interface TMDBMovie {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-}
-
-interface TMDBMovieDetails {
-  adult: boolean;
-  backdrop_path: string;
-  belongs_to_collection: {
-    id: number;
-    name: string;
-    poster_path: string;
-    backdrop_path: string;
-  };
-  budget: number;
-  genres: {
-    id: number;
-    name: string;
-  }[];
-  homepage: string;
-  id: number;
-  imdb_id: string;
-  origin_country: string[];
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  production_companies: {
-    id: number;
-    logo_path: string | null;
-    name: string;
-    origin_country: string;
-  }[];
-  production_countries: {
-    iso_3166_1: string;
-    name: string;
-  }[];
-  release_date: string;
-  revenue: number;
-  runtime: number;
-  spoken_languages: {
-    english_name: string;
-    iso_639_1: string;
-    name: string;
-  }[];
-  status: string;
-  tagline: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-}
-
-interface TMDBTVShowDetails {
-  adult: boolean;
-  backdrop_path: string;
-  created_by: any[];
-  episode_run_time: number[];
-  first_air_date: string;
-  genres: {
-    id: number;
-    name: string;
-  }[];
-  homepage: string;
-  id: number;
-  in_production: boolean;
-  languages: string[];
-  last_air_date: string;
-  last_episode_to_air: {
-    id: number;
-    name: string;
-    overview: string;
-    vote_average: number;
-    vote_count: number;
-    air_date: string;
-    episode_number: number;
-    episode_type: string;
-    production_code: string;
-    runtime: number;
-    season_number: number;
-    show_id: number;
-    still_path: string;
-  };
-  name: string;
-  next_episode_to_air: {
-    id: number;
-    name: string;
-    overview: string;
-    vote_average: number;
-    vote_count: number;
-    air_date: string;
-    episode_number: number;
-    episode_type: string;
-    production_code: string;
-    runtime: number;
-    season_number: number;
-    show_id: number;
-    still_path: string | null;
-  };
-  networks: {
-    id: number;
-    logo_path: string;
-    name: string;
-    origin_country: string;
-  }[];
-  number_of_episodes?: number;
-  number_of_seasons?: number;
-  origin_country: string[];
-  original_language: string;
-  original_name: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  production_companies: {
-    id: number;
-    logo_path: string;
-    name: string;
-    origin_country: string;
-  }[];
-  production_countries: {
-    iso_3166_1: string;
-    name: string;
-  }[];
-  seasons: {
-    air_date: string;
-    episode_count: number;
-    id: number;
-    name: string;
-    overview: string;
-    poster_path: string;
-    season_number: number;
-    vote_average: number;
-  }[];
-  spoken_languages: {
-    english_name: string;
-    iso_639_1: string;
-    name: string;
-  }[];
-  status: string;
-  tagline: string;
-  type: string;
-  vote_average: number;
-  vote_count: number;
-}
-
-type TMDBTitle = TMDBMovie | TMDBTVShow;
-
-export default class TMDBSearchTitlePlugin extends AbstractAPIPlugin implements ITitleSearchPlugin {
-  public readonly pluginUUID = TMDB_SEARCH_TITLES;
+  public readonly pluginUUID = ExternalSearchSources.TMDB_SEARCH_V3;
 
   private apiKey: string;
+
+  fuseOptions: IFuseOptions<any> = {
+    findAllMatches: true,
+    keys: ['title', 'originalTitle'],
+    threshold: 0.6,
+    distance: 30,
+    includeScore: true,
+    shouldSort: true,
+    minMatchCharLength: 1,
+    ignoreFieldNorm: false, // Can improve matching, or not...
+  };
+
+  constructor() {
+    super();
+  }
 
   public init(config: TitleSearchPluginConfig): boolean {
     if ('apiKey' in config.options && config.options.apiKey.length > 1) {
@@ -290,20 +117,34 @@ export default class TMDBSearchTitlePlugin extends AbstractAPIPlugin implements 
         .map((title) => this.mapTMDBTitleToTitleSearchResult(title))
         .sort((a, b) => b.weight - a.weight);
 
-      const fuzzySearchResults: TitleSearchResult[] = this.filterResultsWithFuse(query, titleSearchResults).map(
-        (result) => result.item,
-      );
+      const fuzeResults = this.filterResultsWithFuse(query, titleSearchResults);
 
-      const combinedResults: TitleSearchResult[] = [...fuzzySearchResults];
+      const combinedResults: TitleSearchResult[] = [
+        ...fuzeResults.map((result) => {
+          return { ...result.item, score: result.score };
+        }),
+      ];
 
-      const fuzzySearchResultIds = new Set(fuzzySearchResults.map((result) => result.id));
+      const fuzzySearchResultIds = new Set(fuzeResults.map((result) => result.item.id));
       for (const titleResult of titleSearchResults) {
         if (fuzzySearchResultIds.has(titleResult.id) === false) {
           combinedResults.push(titleResult);
         }
       }
 
-      return combinedResults;
+      combinedResults.forEach((result) => {
+        const TMDB_WEIGHT = 0.3;
+        const FUZEJS_WEIGHT = 1 - TMDB_WEIGHT;
+
+        let score = 0.0;
+        if ('score' in result) {
+          score = (result as any).score!;
+        }
+
+        result.weight = parseFloat((result.weight * TMDB_WEIGHT + score * FUZEJS_WEIGHT).toFixed(3));
+      });
+
+      return combinedResults.slice(0, maxResults).sort((a, b) => b.weight - a.weight);
     }
 
     tmdbTitles.sort((a, b) => {
@@ -325,18 +166,16 @@ export default class TMDBSearchTitlePlugin extends AbstractAPIPlugin implements 
 
     const fuzzySearchResults: FuseResult<TitleSearchResult>[] = this.filterResultsWithFuse(query, titleSearchResults);
 
+    const TMDB_WEIGHT = 0.0;
+    const FUZEJS_WEIGHT = 1 - TMDB_WEIGHT;
     const simpleAdditiveWeightingResults: TitleSearchResult[] = fuzzySearchResults.map((result) => {
       (result as any).item.originalWeight = result.item.weight; // Save original weight for debugging
-      result.item.weight = parseFloat(
-        (result.item.weight * TMDB_POPULARITY_CRITERIA_WEIGHT + result.score! * FUZEJS_SCORE_CRITERIA_WEIGHT).toFixed(
-          3,
-        ),
-      );
+      result.item.weight = parseFloat((result.item.weight * TMDB_WEIGHT + result.score! * FUZEJS_WEIGHT).toFixed(3));
 
       return result.item;
     });
 
-    if (TMDB_POPULARITY_CRITERIA_WEIGHT > 0.0) {
+    if (TMDB_WEIGHT > 0.0) {
       simpleAdditiveWeightingResults.sort((a, b) => b.weight - a.weight);
     }
 
@@ -354,7 +193,7 @@ export default class TMDBSearchTitlePlugin extends AbstractAPIPlugin implements 
     });
   }
 
-  public async searchById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
+  public async searchDetailsById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
     if (this.canCall() === false) {
       this.logger.warn(`Rate limit exceeded (${this.pluginUUID})`);
 
@@ -561,7 +400,7 @@ export default class TMDBSearchTitlePlugin extends AbstractAPIPlugin implements 
   }
 
   private filterResultsWithFuse(query: string, results: TitleSearchResult[]): FuseResult<TitleSearchResult>[] {
-    const fuse = new Fuse(results, fuseOptions);
+    const fuse = new Fuse(results, this.fuseOptions);
     const fuseResults = fuse.search(query);
     fuseResults.forEach((result: FuseSortFunctionArg) => {
       result.score = 1.0 - result.score; // Invert score to be more intuitive for our use case
