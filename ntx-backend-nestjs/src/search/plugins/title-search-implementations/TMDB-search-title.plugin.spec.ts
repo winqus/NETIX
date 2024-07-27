@@ -101,7 +101,7 @@ describe('TMDBSearchTitlePlugin', () => {
 
       const results = await plugin.search('shrek 2');
 
-      expect(results).toHaveLength(1);
+      expect(results[0]['originalTitle']).toEqual('Shrek 2');
     });
   });
 
