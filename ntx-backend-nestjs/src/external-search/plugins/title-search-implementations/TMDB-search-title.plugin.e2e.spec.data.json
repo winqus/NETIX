@@ -40,7 +40,7 @@
     { "query": "forrest gump", "expected": "Forrest Gump", "expectedPositionRange": [0, 0] },
     { "query": "frankenstein", "expected": "Frankenstein", "expectedPositionRange": [0, 0] },
     { "query": "frozen", "expected": "Frozen", "expectedPositionRange": [0, 0] },
-    { "query": "frozen 2", "expected": "Frozen II", "expectedPositionRange": [0, 0] },
+    { "query": "frozen 2", "type": "MOVIE", "expected": "Frozen II", "expectedPositionRange": [0, 0] },
     { "query": "fullmetal alchemist", "expected": "Fullmetal Alchemist", "expectedPositionRange": [0, 0] },
     { "query": "fullmetal alchemist brotherhood", "expected": "Fullmetal Alchemist: Brotherhood", "expectedPositionRange": [0, 0] },
     { "query": "gladiator", "expected": "Gladiator", "expectedPositionRange": [0, 0] },

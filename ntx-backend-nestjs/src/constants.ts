@@ -1,13 +1,14 @@
 export enum ENVIRONMENTS {
-  DEVELOPMENT = 'development',
   PRODUCTION = 'production',
+  DEVELOPMENT = 'development',
   TEST = 'test',
+  CI_TEST = 'ci-test',
 }
 
 export const ENV_FILES = {
+  [ENVIRONMENTS.PRODUCTION]: '.env.production',
   [ENVIRONMENTS.DEVELOPMENT]: '.env',
   [ENVIRONMENTS.TEST]: '.env.test',
-  [ENVIRONMENTS.PRODUCTION]: '.env.production',
 };
 
 export const ENV = 'NODE_ENV';

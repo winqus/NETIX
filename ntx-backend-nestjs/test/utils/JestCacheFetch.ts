@@ -1,21 +1,25 @@
 import * as fs from 'fs';
+import * as zlib from 'zlib';
 
 const DEFAULT_RESPONSE_STATUS = 200;
-const ENCODING = 'utf8';
 const JSON_STRINGIFY_REPLACER = null;
 const JSON_STRINGIFY_SPACE = undefined;
 const DEFAULT_REAL_FETCH_RESPONSE_DELAY_MS = 100;
 const DEFAULT_REGEX = /./;
+const DEFAULT_USES_FILE_COMPRESSION = true;
 
 const DEFAULT_FORWARD_FETCH_IF_NOT_CACHED = true;
 const NOT_FOUND_CACHED_RESPONSE_STATUS = 404;
 const NOT_FOUND_CACHED_RESPONSE_BODY = null;
+
+const COMPRESSED_FILE_EXTENSION = '.gz';
 
 interface JestCacheFetchConfig {
   cacheFilePath: string;
   forwardFetchIfNotCached: boolean;
   realFetchResponseDelayMs: number;
   cacheUrlOnlyMatchingRegex: RegExp;
+  usesFileCompression: boolean;
 }
 
 export type JestCacheFetchArgs = Partial<JestCacheFetchConfig> & { cacheFilePath: string };
@@ -31,6 +35,7 @@ export class JestCacheFetch {
       forwardFetchIfNotCached: config.forwardFetchIfNotCached ?? DEFAULT_FORWARD_FETCH_IF_NOT_CACHED,
       realFetchResponseDelayMs: config.realFetchResponseDelayMs ?? DEFAULT_REAL_FETCH_RESPONSE_DELAY_MS,
       cacheUrlOnlyMatchingRegex: config.cacheUrlOnlyMatchingRegex ?? DEFAULT_REGEX,
+      usesFileCompression: config.usesFileCompression ?? DEFAULT_USES_FILE_COMPRESSION,
     };
 
     this._originalFetch = global.fetch;
@@ -59,9 +64,23 @@ export class JestCacheFetch {
   }
 
   loadCache() {
-    if (fs.existsSync(this._config.cacheFilePath)) {
-      const fileContent = fs.readFileSync(this._config.cacheFilePath, ENCODING);
-      const jsonData = JSON.parse(fileContent);
+    let filePath = this._config.cacheFilePath;
+
+    if (this._config.usesFileCompression) {
+      filePath += COMPRESSED_FILE_EXTENSION;
+    }
+
+    if (fs.existsSync(filePath)) {
+      const fileContent = fs.readFileSync(filePath);
+
+      let jsonData;
+      if (this._config.usesFileCompression) {
+        const decompressedData = zlib.gunzipSync(fileContent);
+        jsonData = JSON.parse(decompressedData.toString());
+      } else {
+        jsonData = JSON.parse(fileContent.toString());
+      }
+
       Object.entries(jsonData).forEach(([key, value]) => this._cache.set(key, value));
     }
   }
@@ -72,10 +91,19 @@ export class JestCacheFetch {
       return;
     }
 
-    fs.writeFileSync(
-      this._config.cacheFilePath,
-      JSON.stringify(cacheObject, JSON_STRINGIFY_REPLACER, JSON_STRINGIFY_SPACE),
-    );
+    const jsonString = JSON.stringify(cacheObject, JSON_STRINGIFY_REPLACER, JSON_STRINGIFY_SPACE);
+
+    let filePath = this._config.cacheFilePath;
+    let data;
+
+    if (this._config.usesFileCompression) {
+      data = zlib.gzipSync(jsonString);
+      filePath += COMPRESSED_FILE_EXTENSION;
+    } else {
+      data = jsonString;
+    }
+
+    fs.writeFileSync(filePath, data);
   }
 
   setupCachedFetch() {

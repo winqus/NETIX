@@ -1,2 +1,11 @@
-export const TEST_DIRECTORY = 'test';
-export const TEST_CACHE_DIRECTORY = '.cache';
+import { ENVIRONMENTS } from '@ntx/constants';
+
+export const TEST_DIRECTORIES = {
+  [ENVIRONMENTS.TEST]: 'test',
+  [ENVIRONMENTS.CI_TEST]: 'test',
+};
+
+export const TEST_CACHE_DIRECTORIES = {
+  [ENVIRONMENTS.TEST]: '.cache',
+  [ENVIRONMENTS.CI_TEST]: '.ci-data',
+};

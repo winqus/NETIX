@@ -1,18 +1,19 @@
 import { ConfigModule } from '@nestjs/config/dist/config.module';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
 import { TitleType } from '@ntx/external-search/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import * as Joi from 'joi';
 import * as path from 'path';
 import { ENV_FILES, ENVIRONMENTS } from '../../../../src/constants';
-import { TEST_CACHE_DIRECTORY, TEST_DIRECTORY } from '../../../../test/constants';
+import { TEST_CACHE_DIRECTORIES, TEST_DIRECTORIES } from '../../../../test/constants';
 import { JestCacheFetch } from '../../../../test/utils/JestCacheFetch';
 import stubLoggerService from '../../../../test/utils/stubLoggerService';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 import TMDBSearchTitlePlugin from './TMDB-search-title.plugin';
 
+const COMPRESSED_CACHE_FILE = true;
 const SAVED_CACHE_FILENAME = 'titleSearchTMDB_OkResponseCache.json';
 
 describe('TMDBSearchTitlePlugin expected titles', () => {
@@ -58,47 +59,68 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
   /********************************************************************************************************************
     Test/service setup and teardown, helper functions
   /*******************************************************************************************************************/
-  beforeAll(() => {
-    fetchMock.dontMock();
+  beforeAll(async () => {
+    if (process.env.NODE_ENV !== ENVIRONMENTS.CI_TEST) {
+      await Test.createTestingModule({
+        imports: [
+          ConfigModule.forRoot({
+            envFilePath: [ENV_FILES[ENVIRONMENTS.TEST]],
+            isGlobal: true,
+            validationSchema: Joi.object({
+              NODE_ENV: Joi.string().valid(ENVIRONMENTS.TEST).required(),
+              TMDB_API_KEY: Joi.string().required(),
+            }),
+            validationOptions: {
+              abortEarly: false,
+            },
+          }),
+        ],
+      }).compile();
+    }
 
-    cacheFilePath = path.resolve(process.cwd(), TEST_DIRECTORY, TEST_CACHE_DIRECTORY, SAVED_CACHE_FILENAME);
+    if (process.env.NODE_ENV === ENVIRONMENTS.TEST) {
+      fetchMock.dontMock();
+    } else {
+      fetchMock.doMock();
+      fetchMock.enableMocks();
+    }
+
+    if (process.env.NODE_ENV === ENVIRONMENTS.CI_TEST) {
+      cacheFilePath = path.resolve(
+        process.cwd(),
+        TEST_DIRECTORIES[ENVIRONMENTS.CI_TEST],
+        TEST_CACHE_DIRECTORIES[ENVIRONMENTS.CI_TEST],
+        SAVED_CACHE_FILENAME,
+      );
+    } else {
+      cacheFilePath = path.resolve(
+        process.cwd(),
+        TEST_DIRECTORIES[ENVIRONMENTS.TEST],
+        TEST_CACHE_DIRECTORIES[ENVIRONMENTS.TEST],
+        SAVED_CACHE_FILENAME,
+      );
+    }
+
     cacheFetch = new JestCacheFetch({
       cacheFilePath,
       cacheUrlOnlyMatchingRegex: /api\.themoviedb\.org/,
       forwardFetchIfNotCached: true,
       realFetchResponseDelayMs: 5,
+      usesFileCompression: COMPRESSED_CACHE_FILE,
     });
 
     cacheFetch.initialize(true);
   });
 
-  afterEach(() => {
-    cacheFetch.saveCache();
-  });
-
   afterAll(() => {
-    cacheFetch.finalize(true);
+    if (process.env.NODE_ENV === ENVIRONMENTS.TEST) {
+      cacheFetch.finalize(true);
+    } else {
+      cacheFetch.finalize(false);
+    }
   });
 
   beforeEach(async () => {
-    fetchMock.dontMock();
-
-    const _module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          envFilePath: ENV_FILES[ENVIRONMENTS.TEST],
-          isGlobal: true,
-          validationSchema: Joi.object({
-            NODE_ENV: Joi.string().valid(ENVIRONMENTS.TEST).required(),
-            TMDB_API_KEY: Joi.string().required(),
-          }),
-          validationOptions: {
-            abortEarly: false,
-          },
-        }),
-      ],
-    }).compile();
-
     plugin = new TMDBSearchTitlePlugin(logger);
 
     const config: TitleSearchPluginConfig = {
@@ -107,9 +129,7 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
       timeBetweenCallsMs: 5,
     };
 
-    const result = plugin.init(config);
-
-    if (result === false) {
+    if (plugin.init(config) === false) {
       throw new Error('Failed to initialize plugin');
     }
   });
