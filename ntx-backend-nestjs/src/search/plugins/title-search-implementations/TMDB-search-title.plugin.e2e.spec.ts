@@ -44,7 +44,7 @@ describe('TMDBSearchTitlePlugin expected titles', () => {
           query,
           results,
           ['title', 'weight', 'type', 'releaseDate'],
-          // ['title', 'weight', 'type', 'releaseDate', 'originalWeight'],
+          // ['title', 'weight', 'type', 'releaseDate', 'originalWeight'], // For debugging
           expected,
         );
       }
