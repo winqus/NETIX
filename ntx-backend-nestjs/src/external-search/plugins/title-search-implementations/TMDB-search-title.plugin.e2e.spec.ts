@@ -1,7 +1,7 @@
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { Test, TestingModule } from '@nestjs/testing';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
-import { TitleType } from '@ntx/search/interfaces/TitleType.enum';
+import { TitleType } from '@ntx/external-search/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import * as Joi from 'joi';
 import * as path from 'path';

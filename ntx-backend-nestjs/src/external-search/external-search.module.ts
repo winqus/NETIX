@@ -7,4 +7,4 @@ import { SearchController } from './search.controller';
   providers: [TitleSearchPluginLoaderService],
   controllers: [SearchController],
 })
-export class SearchModule {}
+export class ExternalSearchModule {}

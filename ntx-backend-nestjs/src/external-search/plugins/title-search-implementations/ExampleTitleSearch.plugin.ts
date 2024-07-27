@@ -1,4 +1,4 @@
-import { TitleDetailedSearchResult } from 'src/search/interfaces/TitleDetailedSearchResult.interface';
+import { TitleDetailedSearchResult } from 'src/external-search/interfaces/TitleDetailedSearchResult.interface';
 import AbstractTitleSearchPlugin from '../../../common/AbstractAPIPlugin';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleType } from '../../interfaces/TitleType.enum';
