@@ -127,8 +127,6 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
   });
 
   beforeEach(async () => {
-    // plugin = new TMDBSearchTitlePlugin(logger);
-
     const config: TitleSearchPluginConfig = {
       usePlugin: true,
       options: { apiKey: process.env.TMDB_API_KEY! },

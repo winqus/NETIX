@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ExternalTitleSearchController } from './external-title-search.controller';
 import { ExternalTitleSearchService } from './external-title-search.service';
 import { TMDBSearchTitleService } from './plugins/tmdb-search-title/TMDB-search-title.service';
