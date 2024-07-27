@@ -24,7 +24,7 @@ const fuseOptions: IFuseOptions<any> = {
   includeScore: true,
   shouldSort: true,
   minMatchCharLength: 1,
-  ignoreFieldNorm: false, // Can improve matching
+  ignoreFieldNorm: false, // Can improve matching, or not...
 };
 
 const TMDB_POPULARITY_CRITERIA_WEIGHT = 0.0;

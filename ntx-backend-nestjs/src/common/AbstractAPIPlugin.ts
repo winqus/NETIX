@@ -1,5 +1,5 @@
 import { LoggerService } from '@nestjs/common/services/logger.service';
-
+// TODO: move file to src/search//interfaces
 export default abstract class {
   abstract readonly pluginUUID: string;
   protected lastCallTime: number = 0;
