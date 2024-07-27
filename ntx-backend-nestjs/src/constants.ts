@@ -1,8 +1,16 @@
 export enum ENVIRONMENTS {
-  DEVELOPMENT = 'development',
   PRODUCTION = 'production',
+  DEVELOPMENT = 'development',
   TEST = 'test',
+  CI_TEST = 'ci-test',
 }
+
+export const ENV_FILES = {
+  [ENVIRONMENTS.PRODUCTION]: '.env.production',
+  [ENVIRONMENTS.DEVELOPMENT]: '.env',
+  [ENVIRONMENTS.TEST]: '.env.test',
+};
+
 export const ENV = 'NODE_ENV';
 export const PORT = 'PORT';
 export const DEFAULT_PORT = 3055;

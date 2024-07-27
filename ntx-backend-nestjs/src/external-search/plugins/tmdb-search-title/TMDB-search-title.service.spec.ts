@@ -1,35 +1,42 @@
-import { LoggerService } from '@nestjs/common';
+import { TestBed } from '@automock/jest';
+import { Logger } from '@nestjs/common';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
 import { TitleType } from '../../interfaces/TitleType.enum';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import TMBDSearchTitlePlugin from './TMDB-search-title.plugin';
+import { TMDBSearchTitleService } from './TMDB-search-title.service';
 
-const mockLogger: LoggerService = {
-  log: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-} as LoggerService;
+describe('TMDBSearchTitleService', () => {
+  let plugin: TMDBSearchTitleService;
+  let logger: jest.Mocked<Logger>;
 
-jest.mock('@nestjs/common/services/logger.service', () => ({
-  Logger: jest.fn(() => mockLogger),
-}));
-
-(global as any).mockLogger = mockLogger;
-
-describe('TMBDSearchTitlePlugin', () => {
-  let plugin: TMBDSearchTitlePlugin;
-
-  beforeEach(() => {
+  beforeAll(async () => {
     fetchMock.doMock();
-    plugin = new TMBDSearchTitlePlugin(mockLogger);
+  });
+
+  beforeEach(async () => {
+    const { unit } = TestBed.create(TMDBSearchTitleService).compile();
+    plugin = unit;
+
+    logger = {
+      log: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+      verbose: jest.fn(),
+    } as unknown as jest.Mocked<Logger>;
+
+    (plugin as any).logger = logger;
+
     plugin.init({
       usePlugin: true,
       options: { apiKey: 'testApiKey' },
       timeBetweenCallsMs: 1000,
     });
+  });
+
+  it('should be defined', () => {
+    expect(plugin).toBeDefined();
   });
 
   describe('init', () => {
@@ -72,14 +79,14 @@ describe('TMBDSearchTitlePlugin', () => {
       await plugin.search('test query');
       const results = await plugin.search('test query');
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
+      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
       expect(results).toEqual([]);
     });
 
     it('should return empty array if query is empty or null', async () => {
       const results = await plugin.search('');
 
-      expect(mockLogger.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
       expect(results).toEqual([]);
     });
 
@@ -101,7 +108,7 @@ describe('TMBDSearchTitlePlugin', () => {
 
       const results = await plugin.search('shrek 2');
 
-      expect(results).toHaveLength(1);
+      expect(results[0]['originalTitle']).toEqual('Shrek 2');
     });
   });
 
@@ -109,17 +116,17 @@ describe('TMBDSearchTitlePlugin', () => {
     it('should return null if rate limit exceeded', async () => {
       fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
 
-      await plugin.searchById('1', TitleType.MOVIE);
-      const result = await plugin.searchById('1', TitleType.MOVIE);
+      await plugin.searchDetailsById('1', TitleType.MOVIE);
+      const result = await plugin.searchDetailsById('1', TitleType.MOVIE);
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
+      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
       expect(result).toBeNull();
     });
 
     it('should return null if ID is empty or null', async () => {
-      const result = await plugin.searchById('', TitleType.MOVIE);
+      const result = await plugin.searchDetailsById('', TitleType.MOVIE);
 
-      expect(mockLogger.error).toHaveBeenCalledWith('ID is empty or null');
+      expect(logger.error).toHaveBeenCalledWith('ID is empty or null');
       expect(result).toBeNull();
     });
 
@@ -128,7 +135,7 @@ describe('TMBDSearchTitlePlugin', () => {
         status: resp.http_api_themoviedb_org_3_movie_809.status,
       });
 
-      const result = await plugin.searchById('1', TitleType.MOVIE);
+      const result = await plugin.searchDetailsById('1', TitleType.MOVIE);
 
       expect(result).not.toBeNull();
 
@@ -150,7 +157,7 @@ describe('TMBDSearchTitlePlugin', () => {
         status: resp.http_api_themoviedb_org_3_tv_111110.status,
       });
 
-      const result = await plugin.searchById('111110', TitleType.SERIES);
+      const result = await plugin.searchDetailsById('111110', TitleType.SERIES);
 
       expect(result).not.toBeNull();
 
@@ -180,9 +187,9 @@ describe('TMBDSearchTitlePlugin', () => {
     });
 
     it('should return null for an unknown title type', async () => {
-      const result = await plugin.searchById('1', 'UNKNOWN' as any);
+      const result = await plugin.searchDetailsById('1', 'UNKNOWN' as any);
 
-      expect(mockLogger.error).toHaveBeenCalledWith('Unknown title type');
+      expect(logger.error).toHaveBeenCalledWith('Unknown title type');
       expect(result).toBeNull();
     });
   });

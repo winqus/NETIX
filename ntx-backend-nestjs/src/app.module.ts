@@ -18,7 +18,7 @@ import {
   QUEUE_UI_ROUTE,
 } from './constants';
 import { DatabaseModule } from './database/database.module';
-import { SearchModule } from './search/search.module';
+import { ExternalSearchModule } from './external-search/external-search.module';
 import { ThumbnailsModule } from './thumbnails/thumbnails.module';
 import { VideosModule } from './videos/videos.module';
 
@@ -49,7 +49,7 @@ import { VideosModule } from './videos/videos.module';
         limit: DEFAULT_THROTTLE_LIMIT,
       },
     ]),
-    SearchModule,
+    ExternalSearchModule,
     ThumbnailsModule,
     VideosModule,
   ],
