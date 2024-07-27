@@ -1,5 +1,5 @@
 import { TitleDetailedSearchResult } from 'src/external-search/interfaces/TitleDetailedSearchResult.interface';
-import AbstractTitleSearchPlugin from '../../../common/AbstractAPIPlugin';
+import AbstractTitleSearchPlugin from '../../interfaces/AbstractAPIPlugin';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleType } from '../../interfaces/TitleType.enum';
 import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';

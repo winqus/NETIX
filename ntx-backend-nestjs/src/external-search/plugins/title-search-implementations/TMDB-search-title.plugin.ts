@@ -7,13 +7,13 @@
 */
 
 const Fuse = require('fuse.js');
-import AbstractAPIPlugin from '@ntx/common/AbstractAPIPlugin';
 import { normalize } from '@ntx/common/utils/mathUtils';
-import { TMDB_SEARCH_TITLES } from '@ntx/external-search/constants';
-import { TitleDetailedSearchResult } from '@ntx/external-search/interfaces/TitleDetailedSearchResult.interface';
-import { TitleSearchResult } from '@ntx/external-search/interfaces/TitleSearchResult.interface';
-import { TitleType } from '@ntx/external-search/interfaces/TitleType.enum';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
+import { TMDB_SEARCH_TITLES } from '../../constants';
+import AbstractAPIPlugin from '../../interfaces/AbstractAPIPlugin';
+import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
+import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
+import { TitleType } from '../../interfaces/TitleType.enum';
 import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 
 const fuseOptions: IFuseOptions<any> = {
