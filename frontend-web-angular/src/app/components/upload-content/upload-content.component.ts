@@ -1,18 +1,20 @@
-import { environment } from '../../../environments/environment';
-import { Component } from '@angular/core';
+import { environment } from '@ntx/environments/environment';
+import { Component, OnInit } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
-import { ButtonComponent } from '../shared/button/button.component';
-import { MetadataService } from '../../services/metadata/metadata.service';
-import MetadataDTO from '../../models/metadata.dto';
-import { formatDate, formatTime } from '../../utils/utils';
+import { MetadataService } from '@ntx/app/services/metadata/metadata.service';
+import MetadataDTO from '@ntx/app/models/metadata.dto';
+import { formatDate, formatTime } from '@ntx/app/utils/utils';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import { ImageUploadComponent } from './components/image-upload/image-upload.component';
+import { MediaConfigService } from '@ntx/app/services/mediaConfig.service';
 
 @Component({
   selector: 'app-upload-content',
   standalone: true,
-  imports: [InputComponent, ButtonComponent],
+  imports: [InputComponent, FileUploadComponent, ImageUploadComponent],
   templateUrl: './upload-content.component.html',
 })
-export class UploadContentComponent {
+export class UploadContentComponent implements OnInit {
   searchResults: MetadataDTO[] = [];
   titles: string[] = [];
 
@@ -23,7 +25,22 @@ export class UploadContentComponent {
   duration: string = '';
   selectedMetadataJson: string = '';
 
-  constructor(private metadataSearch: MetadataService) {}
+  imageAccept: string = '';
+  videoAccept: string = '';
+  imageMaxSize: number = 0;
+  videoMaxSize: number = 0;
+
+  constructor(
+    private metadataSearch: MetadataService,
+    private mediaConfig: MediaConfigService
+  ) {}
+
+  async ngOnInit(): Promise<any> {
+    this.imageAccept = this.mediaConfig.getAllowedImageFormats().join(',');
+    this.videoAccept = this.mediaConfig.getAllowedVideoFormats().join(',');
+    this.imageMaxSize = this.mediaConfig.getMaxImageSize();
+    this.videoMaxSize = this.mediaConfig.getMaxVideoSize();
+  }
 
   searchByTitle(search: string) {
     this.metadataSearch.getDataFromTitle(search).subscribe({
@@ -74,5 +91,15 @@ export class UploadContentComponent {
     this.duration = formatTime(metadata.details?.runtime);
     this.selectedMetadataJson = JSON.stringify(metadata, null, 4);
     this.isMetadataFilled = true;
+  }
+
+  searchValueChange(searchValue: string) {
+    if (searchValue == '') {
+      this.title = '';
+      this.date = '';
+      this.duration = '';
+      this.selectedMetadataJson = '';
+      this.isMetadataFilled = false;
+    }
   }
 }

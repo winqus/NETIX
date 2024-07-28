@@ -39,3 +39,7 @@ export function formatTime(time?: number, isSeconds: boolean = false): string {
 function padZero(num: number): string {
   return num < 10 ? `0${num}` : num.toString();
 }
+
+export function generateRandomId(): string {
+  return Math.random().toString(36).substring(2, 9);
+}

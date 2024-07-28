@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
-import content from '../../../assets/i18n/en/content.json';
-import { Subscription, ignoreElements } from 'rxjs';
-import { LayoutService } from '../../services/layout.service';
+import { NavbarComponent } from '@ntx/app/components/navbar/navbar.component';
+import content from '@ntx/assets/i18n/en/content.json';
+import { Subscription } from 'rxjs';
+import { LayoutService } from '@ntx/app/services/layout.service';
 
 @Component({
   selector: 'app-main-layout',

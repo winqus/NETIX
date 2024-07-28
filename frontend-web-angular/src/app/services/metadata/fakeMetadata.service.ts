@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { IMetadataService } from './IMetadata.interface';
-import MetadataDTO from '../../models/metadata.dto';
-import { MetadataDTOMapper } from '../../mappers/metadataMapper';
+import MetadataDTO from '@ntx/app/models/metadata.dto';
+import { MetadataDTOMapper } from '@ntx/app/mappers/metadataMapper';
 
 @Injectable({
   providedIn: 'root',

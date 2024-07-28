@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { SvgIconsComponent } from '../../svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
 import { debounceTime, Subject } from 'rxjs';
-import { APP_SETTINGS } from '../../../config/app-settings';
+import { APP_SETTINGS } from '@ntx/app/config/app-settings';
 
 export interface InputProps {
   title?: string;
@@ -21,7 +21,6 @@ export interface InputProps {
   standalone: true,
   imports: [SvgIconsComponent],
   templateUrl: './input.component.html',
-  styleUrl: './input.component.scss',
 })
 export class InputComponent implements OnChanges {
   @Input() props: InputProps = {};
@@ -40,7 +39,7 @@ export class InputComponent implements OnChanges {
     iconName: '',
     disabled: false,
     readonly: false,
-    searchCharLimit: APP_SETTINGS.MINSEARCHLIMIT,
+    searchCharLimit: APP_SETTINGS.MIN_SEARCH_LIMIT,
     results: [],
   };
 

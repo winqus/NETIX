@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { MovieCardComponent } from '../movie-card/movie-card.component';
 import { MovieCardSkeletonComponent } from '../movie-card-skeleton/movie-card-skeleton.component';
-import { MediaItem } from '../../models/mediaItem';
-import { MovieService } from '../../services/movie.service';
+import { MediaItem } from '@ntx/app/models/mediaItem';
+import { MovieService } from '@ntx/app/services/movie.service';
 
 @Component({
   selector: 'app-example',

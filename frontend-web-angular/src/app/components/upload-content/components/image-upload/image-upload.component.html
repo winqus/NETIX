@@ -1,0 +1,40 @@
+<div class="relative w-full h-full bg-gray-700 rounded-lg" [class.dragging-over]="isDraggingOver" (dragover)="onDragOver($event)" (drop)="onDrop($event)" (dragleave)="onDragLeave($event)">
+  <label
+    [for]="props.readonly ? fileUploadId : null"
+    class="w-full h-full input input-bordered flex items-center justify-center m-0 p-0"
+    [class.cursor-pointer]="props.readonly"
+    [class.cursor-default]="!props.readonly"
+    [class.bg-neutral-900]="!props.readonly"
+    [class.bg-neutral-400]="isDraggingOver"
+  >
+    <input #fileInput type="file" [accept]="props.accept" class="hidden" [id]="fileUploadId" [readonly]="props.readonly" (change)="onFileSelected($event)" />
+    @if (imageUrl) {
+      <img #imageElement class="w-full h-full rounded-lg m-auto" [class.hidden]="!imageCropped" [src]="imageUrl" id="myImage" alt="Preview" />
+      <button class="btn-sm btn-circle absolute top-0 left-0 bg-black flex items-center justify-center m-1" (click)="clearFileInput($event)">
+        <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
+      </button>
+      <button class="btn-sm btn-circle absolute bottom-0 right-0 bg-black flex items-center justify-center m-1" onclick="croppModal.showModal()">
+        <app-svg-icons name="crop" size="15" color="white"></app-svg-icons>
+      </button>
+    } @else {
+      {{ props.title }}
+    }
+  </label>
+</div>
+<div class="block mb-1 text-sm font-medium overflow-hidden text-ellipsis whitespace-nowrap">{{ file?.name }}</div>
+
+<dialog #croppModal id="croppModal" class="modal">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold">Crop</h3>
+      <form method="dialog">
+        <button class="btn-sm btn-circle bg-black flex items-center justify-center">
+          <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
+        </button>
+      </form>
+    </div>
+    <div class="flex justify-center items-center">
+      <app-image-cropper [props]="{ imageUrl: originalImgUrl! }" (cropped)="setCropedImage($event)"></app-image-cropper>
+    </div>
+  </div>
+</dialog>
