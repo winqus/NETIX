@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { getSearchByIdUrl, getSearchByTitleUrl } from '../../config/api-endpoints';
+import { getSearchByIdUrl, getSearchByTitleUrl } from '@ntx/app/config/api-endpoints';
 import { HttpClient } from '@angular/common/http';
-import MetadataDTO from '../../models/metadata.dto';
-import { MetadataDTOMapper } from '../../mappers/metadataMapper';
+import MetadataDTO from '@ntx/app/models/metadata.dto';
+import { MetadataDTOMapper } from '@ntx/app/mappers/metadataMapper';
 import { map, Observable } from 'rxjs';
 import { IMetadataService } from './IMetadata.interface';
 

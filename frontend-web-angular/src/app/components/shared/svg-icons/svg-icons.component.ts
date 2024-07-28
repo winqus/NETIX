@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { SafeHtmlPipe } from '../../../pipes/safe-html.pipe';
+import { SafeHtmlPipe } from '@ntx/app/pipes/safe-html.pipe';
 
 @Component({
   selector: 'app-svg-icons',

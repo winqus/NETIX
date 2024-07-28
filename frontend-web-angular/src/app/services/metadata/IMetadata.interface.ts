@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import MetadataDTO from '../../models/metadata.dto';
+import MetadataDTO from '@ntx/app/models/metadata.dto';
 
 export interface IMetadataService {
   getDataFromTitle(search: string): Observable<MetadataDTO[]>;
