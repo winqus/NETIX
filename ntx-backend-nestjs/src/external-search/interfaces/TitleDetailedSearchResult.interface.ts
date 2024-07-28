@@ -1,4 +1,4 @@
-import { TitleType } from './TitleType.enum';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 
 export interface TitleDetailedSearchResult {
   title: string;
