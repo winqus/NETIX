@@ -36,8 +36,8 @@ export class UploadContentComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<any> {
-    this.imageAccept = this.mediaConfig.getImageFormats().join(',');
-    this.videoAccept = this.mediaConfig.getVideoFormats().join(',');
+    this.imageAccept = this.mediaConfig.getAllowedImageFormats().join(',');
+    this.videoAccept = this.mediaConfig.getAllowedVideoFormats().join(',');
     this.imageMaxSize = this.mediaConfig.getMaxImageSize();
     this.videoMaxSize = this.mediaConfig.getMaxVideoSize();
   }

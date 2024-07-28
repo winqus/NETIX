@@ -44,7 +44,7 @@ export class ImageUploadComponent extends FileUploadComponent {
   cropImage() {
     if (this.imageElement) {
       this.imageCropService
-        .autoCropImage(this.imageElement.nativeElement, this.mediaConfig.getImageFormatToStore())
+        .autoCropImage(this.imageElement.nativeElement, this.mediaConfig.getImageExportFormat())
         .then((blob) => {
           this.imageUrl = URL.createObjectURL(blob);
         })

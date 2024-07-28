@@ -6,7 +6,7 @@ export interface UploadConfig {
   videoFormats: string[];
   maxImageSize: number;
   maxVideoSize: number;
-  imageFormatsToExport: string;
+  imageExportFormat: string;
 }
 
 @Injectable({
@@ -19,7 +19,7 @@ export class MediaConfigService {
     videoFormats: ['.mkv'],
     maxImageSize: 2 * 1024 * 1024 * 1024,
     maxVideoSize: 10 * 1024 * 1024 * 1024,
-    imageFormatsToExport: '.webp',
+    imageExportFormat: '.webp',
   };
   constructor() {
     this.fetchConfig();
@@ -34,15 +34,15 @@ export class MediaConfigService {
     return of(this.config);
   }
 
-  getImageFormats(): string[] {
+  getAllowedImageFormats(): string[] {
     return this.config!.imageFormats;
   }
 
-  getImageFormatToStore(): string {
-    return this.config!.imageFormatsToExport;
+  getImageExportFormat(): string {
+    return this.config!.imageExportFormat;
   }
 
-  getVideoFormats(): string[] {
+  getAllowedVideoFormats(): string[] {
     return this.config!.videoFormats;
   }
 

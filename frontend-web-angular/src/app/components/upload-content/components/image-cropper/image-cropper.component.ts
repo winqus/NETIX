@@ -48,7 +48,7 @@ export class ImageCropperComponent implements OnInit {
           const croppedImageUrl = URL.createObjectURL(blob);
           this.cropped.emit(croppedImageUrl);
         }
-      }, this.mediaConfig.getImageFormatToStore());
+      }, this.mediaConfig.getImageExportFormat());
     }
   }
 }

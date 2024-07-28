@@ -57,7 +57,7 @@ export class FileUploadComponent implements OnInit, OnChanges {
       return;
     }
 
-    if (this.props.maxSize > Number.MAX_VALUE && file.size > this.props.maxSize!) {
+    if (file.size > this.props.maxSize!) {
       return;
     }
 
