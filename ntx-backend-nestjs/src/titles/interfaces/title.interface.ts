@@ -1,31 +1,19 @@
+import { Entity } from '@ntx/common/interfaces/entity.interface';
+import { Name } from '@ntx/common/interfaces/name.interface';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { ThumbnailCategory } from '@ntx/thumbnails/interfaces/thumbnailCategory.enum';
-import { ThumbnailFormat } from '@ntx/thumbnails/interfaces/thumbnailFormat.enum';
-import { VideoCategory } from '@ntx/videos/interfaces/videoCategory.enum';
+import { Thumbnail } from '@ntx/thumbnails/interfaces/thumbnail.interface';
 import { Document } from 'mongoose';
-import { TitleCategory } from './titleCategory.enum';
+import { MovieDetails } from './movieDetails.interface';
+import { SeriesDetails } from './seriesDetails.interface';
 
-export interface TitleTitle {
-  type: TitleCategory;
-  title: string;
-  language: string;
-}
-
-export interface TitleVideo {
-  type: VideoCategory;
-  uuid: string;
-}
-
-export interface TitleThumbnail {
-  type: ThumbnailCategory;
-  uuid: string;
-  formart: ThumbnailFormat;
-}
-
-export interface Title extends Document {
+export interface Title extends Entity, Document {
   readonly uuid: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
   readonly type: TitleType;
-  readonly titles: TitleTitle;
-  readonly videos?: { list: TitleVideo[] };
-  readonly thumbnails?: { list: TitleThumbnail[] };
+  readonly thumbnails: [Thumbnail];
+  readonly names: [Name];
+  readonly releaseDate: Date;
+  readonly details: MovieDetails | SeriesDetails;
+  readonly externalInformationUUID?: string;
 }

@@ -1,73 +1,51 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { ThumbnailFormat } from '@ntx/thumbnails/interfaces/thumbnailFormat.enum';
+import { NameSubschema } from '@ntx/common/subschemas/name.subschema';
+import { UUIDSubschema } from '@ntx/common/subschemas/uuid.subschema';
+import { ThumbnailSchema } from '@ntx/thumbnails/schemas/thumbnail.schema';
+import { VideoSchema } from '@ntx/videos/schemas/video.schema';
 import * as mongoose from 'mongoose';
-import { ThumbnailCategory } from '../../thumbnails/interfaces/thumbnailCategory.enum';
-import { VideoCategory } from '../../videos/interfaces/videoCategory.enum';
-import { TitleCategory } from '../interfaces/titleCategory.enum';
+import { SeasonSchema } from './season.schema';
 
-export const TitleSchema = new mongoose.Schema({
-  uuid: {
-    type: mongoose.Schema.Types.UUID,
-    required: true,
-    default: () => new mongoose.Types.UUID(),
+export const MovieDetailsSchema = new mongoose.Schema(
+  {
+    uuid: UUIDSubschema,
+    runtimeMinutes: { type: Number, required: true },
+    videos: [VideoSchema],
   },
-  type: {
-    type: String,
-    enum: Object.values(TitleType),
-    required: true,
+  { timestamps: true },
+);
+
+export const SeriesDetailsSchema = new mongoose.Schema(
+  {
+    uuid: UUIDSubschema,
+    seasonCount: { type: Number, required: true },
+    episodesCount: { type: Number, required: true },
+    seasons: [SeasonSchema],
   },
-  titles: [
-    {
-      type: {
-        type: String,
-        enum: Object.values(TitleCategory),
-        required: true,
-      },
-      title: {
-        type: String,
-        required: true,
-      },
-      language: {
-        type: String,
-        default: null,
-      },
+  { timestamps: true },
+);
+
+export const TitleSchema = new mongoose.Schema(
+  {
+    uuid: UUIDSubschema,
+    type: {
+      type: String,
+      enum: Object.values(TitleType),
+      required: true,
     },
-  ],
-  videos: {
-    list: [
-      {
-        type: {
-          type: String,
-          enum: Object.values(VideoCategory),
-          required: true,
-        },
-        uuid: {
-          type: mongoose.Schema.Types.UUID,
-          required: true,
-        },
-      },
-    ],
-    default: null,
+    thumbnails: [ThumbnailSchema],
+    names: [NameSubschema],
+    releaseDate: Date,
+    details: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+      default: null,
+    },
+    externalInformationUUID: {
+      type: mongoose.Schema.Types.UUID,
+      ref: 'ExternallySourcedInformation',
+      default: null,
+    },
   },
-  thumbnails: {
-    list: [
-      {
-        type: {
-          type: String,
-          enum: Object.values(ThumbnailCategory),
-          required: true,
-        },
-        uuid: {
-          type: mongoose.Schema.Types.UUID,
-          required: true,
-        },
-        format: {
-          type: String,
-          enum: Object.values(ThumbnailFormat),
-          required: true,
-        },
-      },
-    ],
-    default: null,
-  },
-});
+  { timestamps: true },
+);
