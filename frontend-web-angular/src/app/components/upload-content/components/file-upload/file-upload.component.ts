@@ -1,7 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { generateRandomId } from '@ntx/app/utils/utils';
 import { SvgIconsComponent } from '@ntx/app/components/shared/svg-icons/svg-icons.component';
-import { retry } from 'rxjs';
 
 export interface InputProps {
   title?: string;
