@@ -2,13 +2,14 @@
   <div class="w-1/2 min-w-[500px] h-[70%] flex flex-col outline outline-1 outline-offset-0 outline-gray-700 bg-transparent p-6 rounded-lg">
     <div class="flex flex-row h-full">
       <div class="flex flex-col items-center mr-6">
-        <app-image-upload class="w-60 h-80 aspect-3/2" title="Thumbnail Select" [accept]="mediaConfig.getImageFormats()" [readonly]="isMetadataFilled"></app-image-upload>
+        <app-image-upload class="h-[300px] w-[200px]" title="Thumbnail Select" [props]="{ accept: imageAccept, maxSize: imageMaxSize, readonly: isMetadataFilled }"></app-image-upload>
       </div>
       <div class="flex flex-col flex-auto">
         <app-input
           [props]="{ type: 'text', title: 'Enter video title or ID...', iconName: 'search', placeholder: 'Cars...', searchCharLimit: '3', results: titles }"
           (searchEvent)="searchByTitle($event)"
           (optionSelected)="onOptionSelected($event)"
+          (changedValue)="searchValueChange($event)"
         ></app-input>
         <app-input [props]="{ type: 'text', title: 'Title', placeholder: 'Title', value: title, readonly: true }"></app-input>
         <app-input [props]="{ type: 'text', title: 'Date', placeholder: 'Date', value: date, readonly: true }"></app-input>
@@ -18,8 +19,8 @@
       </div>
     </div>
     <div class="flex flex-row content-between place-content-between">
-      <app-file-upload title="Video Select" [accept]="mediaConfig.getVideoFormats()" [maxSize]="mediaConfig.getMaxVideoSize()" [readonly]="isMetadataFilled"></app-file-upload>
-      <app-button label="UPLOAD" [disabled]="true"></app-button>
+      <app-file-upload class="w-[200px]" title="Video Select" [props]="{ accept: videoAccept, maxSize: videoMaxSize, readonly: isMetadataFilled }"></app-file-upload>
+      <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" disabled="false">UPLOAD</button>
     </div>
   </div>
 </div>

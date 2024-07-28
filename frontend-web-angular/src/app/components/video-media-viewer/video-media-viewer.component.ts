@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, Subscription, debounceTime, firstValueFrom, fromEvent, map, timer } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '../../services/layout.service';
-import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
 import { MediaItem } from '../../models/mediaItem';
 import { formatTime } from '../../utils/utils';
 

@@ -40,10 +40,6 @@ function padZero(num: number): string {
   return num < 10 ? `0${num}` : num.toString();
 }
 
-/**
- * Utility function to generate a unique identifier
- * @returns a unique identifier string
- */
-export function generateUniqueId(): string {
+export function generateRandomId(): string {
   return Math.random().toString(36).substring(2, 9);
 }

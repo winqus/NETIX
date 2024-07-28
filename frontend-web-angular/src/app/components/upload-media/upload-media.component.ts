@@ -4,7 +4,7 @@
 
 import { Component } from '@angular/core';
 import { UploadMediaService } from '../../services/upload-media.service';
-import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
 import { VideoFileSelectionComponent } from './components/file-selection/file-selection.component';
 import { UploadConstraintsDTO } from '../../models/uploadConstraints.dto';
 import { UploadService } from '../../services/upload.service';

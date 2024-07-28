@@ -1,31 +1,33 @@
 import { Injectable } from '@angular/core';
-import { MediaConfigService } from './media-config.service';
+import { APP_SETTINGS } from '../config/app-settings';
 import Cropper from 'cropperjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImageCropService {
-  constructor(private mediaConfig: MediaConfigService) {}
+  constructor() {}
 
-  autoCropImage(imageElement: HTMLImageElement, aspectRatio: number = 2 / 3): Promise<Blob> {
+  getCropperConfig(aspectRatio: number = APP_SETTINGS.ASPECT_RATIO_TWO_THIRDS): Cropper.Options {
+    return {
+      aspectRatio: aspectRatio,
+      viewMode: 1,
+      autoCropArea: 1,
+      responsive: true, // Ensure the cropper is responsive
+      scalable: true,
+      zoomable: true,
+    };
+  }
+
+  autoCropImage(imageElement: HTMLImageElement, formatToStore: string): Promise<Blob> {
     return new Promise((resolve, reject) => {
       if (!imageElement) {
         reject(new Error('Image element is not provided'));
         return;
       }
 
-      const formatToStore = this.mediaConfig.getImageFormatToStore();
-
       const cropper = new Cropper(imageElement, {
-        aspectRatio: aspectRatio,
-        viewMode: 1,
-        autoCropArea: 1,
-        background: false,
-        movable: false,
-        zoomable: false,
-        cropBoxResizable: false,
-        center: true,
+        ...this.getCropperConfig(),
         ready() {
           try {
             const croppedCanvas = cropper.getCroppedCanvas();

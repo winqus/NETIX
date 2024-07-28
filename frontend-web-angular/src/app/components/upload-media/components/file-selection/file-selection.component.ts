@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { SvgIconsComponent } from '../../../svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../../../shared/svg-icons/svg-icons.component';
 import { UploadConstraintsDTO } from '../../../../models/uploadConstraints.dto';
 import { AlertCardComponent } from '../../../shared/alert-card/alert-card.component';
 
