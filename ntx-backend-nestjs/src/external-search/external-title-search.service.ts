@@ -73,7 +73,7 @@ export class ExternalTitleSearchService {
       }
 
       if (titleDetails == null) {
-        this.logger.warn('No results found');
+        this.logger.warn(`No results found for ID: ${id}, type: ${type}, in source: ${sourceUUID}`);
 
         return Result.fail('No results found');
       }
