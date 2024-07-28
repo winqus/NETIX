@@ -1,7 +1,7 @@
 import { Component, HostListener, Input } from '@angular/core';
-import { MediaItem } from '../../models/mediaItem';
+import { MediaItem } from '@ntx/app/models/mediaItem';
 import { Router } from '@angular/router';
-import { VideoState } from '../../models/watchableVideo.dto';
+import { VideoState } from '@ntx/app/models/watchableVideo.dto';
 
 @Component({
   selector: 'app-movie-card',
