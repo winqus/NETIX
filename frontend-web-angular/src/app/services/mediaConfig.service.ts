@@ -19,7 +19,7 @@ export class MediaConfigService {
     videoFormats: ['.mkv'],
     maxImageSize: 2 * 1024 * 1024 * 1024,
     maxVideoSize: 10 * 1024 * 1024 * 1024,
-    imageExportFormat: '.webp',
+    imageExportFormat: 'webp',
   };
   constructor() {
     this.fetchConfig();

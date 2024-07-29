@@ -13,6 +13,7 @@ export interface InputProps {
   disabled?: boolean;
   readonly?: boolean;
   searchCharLimit?: string;
+  searchFailed?: boolean;
   results?: string[];
 }
 
@@ -40,6 +41,7 @@ export class InputComponent implements OnChanges {
     disabled: false,
     readonly: false,
     searchCharLimit: APP_SETTINGS.MIN_SEARCH_LIMIT,
+    searchFailed: false,
     results: [],
   };
 
@@ -48,7 +50,7 @@ export class InputComponent implements OnChanges {
 
   constructor() {
     this.searchSubject.pipe(debounceTime(500)).subscribe((searchText) => {
-      if (this.props.searchCharLimit != undefined && searchText.length >= parseInt(this.props.searchCharLimit, 10)) {
+      if (this.props.searchFailed || (this.props.searchCharLimit != undefined && searchText.length >= parseInt(this.props.searchCharLimit, 10))) {
         this.searchEvent.emit(searchText);
         this.tempIconName = this.props.iconName!;
         this.props.iconName = 'throbber';

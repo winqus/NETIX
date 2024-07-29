@@ -2,11 +2,25 @@
   <div class="w-1/2 min-w-[500px] h-[70%] flex flex-col outline outline-1 outline-offset-0 outline-gray-700 bg-transparent p-6 rounded-lg">
     <div class="flex flex-row h-full">
       <div class="flex flex-col items-center mr-6">
-        <app-image-upload class="h-[300px] w-[200px]" title="Thumbnail Select" [props]="{ accept: imageAccept, maxSize: imageMaxSize, readonly: isMetadataFilled }"></app-image-upload>
+        <app-image-upload
+          class="h-[300px] w-[200px]"
+          title="Thumbnail Select"
+          [props]="{ accept: imageAccept, maxSize: imageMaxSize, readonly: isMetadataFilled }"
+          (filePassed)="recieveImageFile($event)"
+        ></app-image-upload>
       </div>
       <div class="flex flex-col flex-auto">
         <app-input
-          [props]="{ type: 'text', title: 'Enter video title or ID...', iconName: 'search', placeholder: 'Cars...', searchCharLimit: '3', results: titles }"
+          [props]="{
+            type: 'text',
+            title: 'Enter video title or ID...',
+            iconName: 'search',
+            placeholder: 'Cars...',
+            searchCharLimit: '3',
+            value: searchValue,
+            results: titles,
+            searchFailed: searchFailed
+          }"
           (searchEvent)="searchByTitle($event)"
           (optionSelected)="onOptionSelected($event)"
           (changedValue)="searchValueChange($event)"
@@ -19,8 +33,40 @@
       </div>
     </div>
     <div class="flex flex-row content-between place-content-between">
-      <app-file-upload class="w-[200px]" title="Video Select" [props]="{ accept: videoAccept, maxSize: videoMaxSize, readonly: isMetadataFilled }"></app-file-upload>
-      <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" disabled="false">UPLOAD</button>
+      <app-file-upload
+        class="w-[200px]"
+        title="Video Select"
+        [props]="{ accept: videoAccept, maxSize: videoMaxSize, readonly: isMetadataFilled }"
+        (filePassed)="recieveVideoFile($event)"
+      ></app-file-upload>
+      <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" [disabled]="!checkIfReadyToUpload()" (click)="uploadFiles()" onclick="uploadModal.showModal()">UPLOAD</button>
     </div>
   </div>
 </div>
+
+<dialog #croppModal id="uploadModal" class="modal">
+  <div class="modal-box w-[400px]">
+    <div class="flex justify-center items-center mb-4">
+      <h3 class="text-lg font-bold">Upload</h3>
+    </div>
+    <div class="flex-col justify-center items-center">
+      <div class="w-full flex items-center p-2">
+        <app-svg-icons [name]="getIconNameFromStatus(imageUploading)" size="20" [color]="getColorFromStatus(imageUploading)"></app-svg-icons>
+        <div class="flex-grow text-center">
+          <div class="block mb-1 font-medium">Image {{ getTextFromStatus(imageUploading) }}</div>
+        </div>
+      </div>
+      <div class="w-full flex items-center p-2">
+        <app-svg-icons [name]="getIconNameFromStatus(videoUploading)" size="20" [color]="getColorFromStatus(videoUploading)"></app-svg-icons>
+        <div class="flex-grow text-center">
+          <div class="block mb-1 font-medium">Video {{ getTextFromStatus(videoUploading) }}</div>
+        </div>
+      </div>
+      <div class="flex justify-center p-2">
+        <form method="dialog">
+          <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" [disabled]="closeButtonStatus()" (click)="finishUplaod()">Close</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</dialog>
