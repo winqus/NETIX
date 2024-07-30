@@ -12,7 +12,7 @@ import { ImageService } from '@ntx/app/services/image.service';
 import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
 
 export enum Status {
-  uplading,
+  uploading,
   completed,
   failed,
 }
@@ -35,8 +35,8 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   metadata: MetadataDTO | null = null;
   isMetadataFilled: boolean = false;
   isUploading: boolean = false;
-  imageUploading: Status = Status.uplading;
-  videoUploading: Status = Status.uplading;
+  imageUploading: Status = Status.uploading;
+  videoUploading: Status = Status.uploading;
   searchValue: string = '';
   videoFile: File | null = null;
   imageFile: File | null = null;
@@ -49,6 +49,53 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   videoAccept: string = '';
   imageMaxSize: number = 0;
   videoMaxSize: number = 0;
+
+  searchProp = {
+    type: 'text',
+    title: 'Enter video title or ID...',
+    iconName: 'search',
+    placeholder: 'Cars...',
+    searchCharLimit: '3',
+    value: this.searchValue,
+    results: this.titles,
+    searchFailed: this.searchFailed,
+  };
+
+  titleProp = {
+    type: 'text',
+    title: 'Title',
+    placeholder: 'Title',
+    value: this.title,
+    readonly: true,
+  };
+
+  dateProp = {
+    type: 'text',
+    title: 'Date',
+    placeholder: 'Date',
+    value: this.date,
+    readonly: true,
+  };
+
+  durationProp = {
+    type: 'text',
+    title: 'Duration',
+    placeholder: '00:00:00',
+    value: this.duration,
+    readonly: true,
+  };
+
+  imageProp = {
+    accept: this.imageAccept,
+    maxSize: this.imageMaxSize,
+    readonly: this.isMetadataFilled,
+  };
+
+  fileProp = {
+    accept: this.videoAccept,
+    maxSize: this.videoMaxSize,
+    readonly: this.isMetadataFilled,
+  };
 
   constructor(
     private metadataSearch: MetadataService,
@@ -170,87 +217,87 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   getIconNameFromStatus(status: Status): string {
-    switch (status) {
-      case Status.uplading:
-        return 'throbber';
-      case Status.completed:
-        return 'check_circle';
-      case Status.failed:
-        return 'x_circle';
-      default:
-        return '';
-    }
+    return (
+      {
+        [Status.uploading]: 'throbber',
+        [Status.completed]: 'check_circle',
+        [Status.failed]: 'x_circle',
+      }[status] || ''
+    );
   }
 
   getColorFromStatus(status: Status): string {
-    switch (status) {
-      case Status.completed:
-        return 'green';
-      case Status.failed:
-        return 'red';
-      default:
-        return 'white';
-    }
+    return (
+      {
+        [Status.uploading]: 'white',
+        [Status.completed]: 'green',
+        [Status.failed]: 'red',
+      }[status] || 'white'
+    );
   }
 
   getTextFromStatus(status: Status): string {
-    switch (status) {
-      case Status.uplading:
-        return 'is being uploaded...';
-      case Status.completed:
-        return 'upload is completed.';
-      case Status.failed:
-        return 'upload failed.';
-    }
+    return (
+      {
+        [Status.uploading]: 'is being uploaded...',
+        [Status.completed]: 'upload is completed.',
+        [Status.failed]: 'upload failed.',
+      }[status] || ''
+    );
   }
 
   async uploadFiles() {
     this.isUploading = true;
-    const compressImg = await this.imageService.compressImage(this.imageFile!);
-    this.upload.uploadThumbnail(compressImg, this.metadata!.id).subscribe({
-      error: (error) => {
-        this.imageUploading = Status.failed;
-        console.error('Error uploading image', error);
-      },
-      complete: () => {
-        this.imageUploading = Status.completed;
-        if (!environment.production) {
-          console.log('Image upload completed');
-        }
-      },
-    });
+    try {
+      const compressImg = await this.imageService.compressImage(this.imageFile!);
+      this.upload.uploadThumbnail(compressImg, this.metadata!.id).subscribe({
+        error: (error) => {
+          this.imageUploading = Status.failed;
+          console.error('Error uploading image', error);
+        },
+        complete: () => {
+          this.imageUploading = Status.completed;
+          if (!environment.production) {
+            console.log('Image upload completed');
+          }
+        },
+      });
 
-    this.upload.uploadVideo(this.videoFile!, this.metadata!.id).subscribe({
-      error: (error) => {
-        this.videoUploading = Status.failed;
+      this.upload.uploadVideo(this.videoFile!, this.metadata!.id).subscribe({
+        error: (error) => {
+          this.videoUploading = Status.failed;
 
-        console.error('Error uploading video', error);
-      },
-      complete: () => {
-        this.videoUploading = Status.completed;
-        if (!environment.production) {
-          console.log('Video upload completed');
-        }
-      },
-    });
+          console.error('Error uploading video', error);
+        },
+        complete: () => {
+          this.videoUploading = Status.completed;
+          if (!environment.production) {
+            console.log('Video upload completed');
+          }
+        },
+      });
+    } finally {
+      this.isUploading = false;
+    }
   }
 
   closeButtonStatus(): boolean {
-    if (this.imageUploading != Status.uplading && this.videoUploading != Status.uplading) {
-      return false;
-    }
-
-    return true;
+    return this.imageUploading === Status.uploading && this.videoUploading === Status.uploading;
   }
 
   finishUplaod() {
+    this.resetMetadata();
+    this.videoFileComponent.clearFile();
+    this.imageFileComponent.clearFile();
+  }
+
+  private resetMetadata(): void {
     this.metadata = null;
     this.searchValue = '';
     this.title = '';
     this.date = '';
     this.duration = '';
     this.selectedMetadataJson = '';
-    this.videoFileComponent.clearFile();
-    this.imageFileComponent.clearFile();
+    this.isMetadataFilled = false;
   }
 }

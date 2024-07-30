@@ -1,4 +1,3 @@
-// TODO clean code
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 import { ImageService } from '@ntx/app/services/image.service';
