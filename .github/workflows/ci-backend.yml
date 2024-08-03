@@ -1,0 +1,51 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - 'ntx-backend-nestjs/**'
+
+jobs:
+  backend:
+    name: Backend Build and Test
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ntx-backend-nestjs/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/ntx-backend-nestjs/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ntx-backend-nestjs
+        run: npm install
+
+      - name: Run lint
+        working-directory: ntx-backend-nestjs
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: ntx-backend-nestjs
+        run: npm run test
+
+      - name: Build
+        working-directory: ntx-backend-nestjs
+        run: npm run build
+
