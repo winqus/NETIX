@@ -4,13 +4,12 @@ import { IsEnum, IsString, MinLength } from 'class-validator';
 export class CreateTitleFromExternalSourceDTO {
   @IsString()
   @MinLength(1)
-  readonly externalTitleID: string;
+  externalTitleID: string;
 
   @IsEnum(TitleType)
-  @IsEnum(TitleType)
-  readonly type: TitleType;
+  type: TitleType;
 
   @IsString()
   @MinLength(1)
-  readonly externalSourceUUID: string;
+  externalSourceUUID: string;
 }

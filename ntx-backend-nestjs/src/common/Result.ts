@@ -15,7 +15,7 @@ export class Result<T> {
     this.isSuccess = isSuccess;
     this.isFailure = !isSuccess;
     this.error = error || null;
-    this._value = value || null;
+    this._value = value != null ? value : null;
 
     Object.freeze(this);
   }

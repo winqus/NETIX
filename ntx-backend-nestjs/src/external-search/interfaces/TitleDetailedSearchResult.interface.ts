@@ -17,11 +17,13 @@ export interface MovieDetails {
 export interface SeriesDetails {
   numberOfSeasons?: number;
   numberOfEpisodes?: number;
-  seasons: {
-    id: string;
-    name: string;
-    seasonNumber: number;
-    episodeCount: number;
-    releaseDate: string | null;
-  };
+  seasons: [
+    {
+      id: string;
+      name: string;
+      seasonNumber: number;
+      episodeCount: number;
+      releaseDate: string | null;
+    },
+  ];
 }

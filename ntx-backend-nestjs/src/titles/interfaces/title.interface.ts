@@ -6,14 +6,12 @@ import { Document } from 'mongoose';
 import { MovieDetails } from './movieDetails.interface';
 import { SeriesDetails } from './seriesDetails.interface';
 
-export interface Title extends Entity, Document {
-  readonly uuid: string;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-  readonly type: TitleType;
-  readonly thumbnails: [Thumbnail];
-  readonly names: [Name];
-  readonly releaseDate: Date;
-  readonly details: MovieDetails | SeriesDetails;
-  readonly externalInformationUUID?: string;
+export type TitleDocument = Title & Document;
+
+export interface Title extends Entity {
+  type: TitleType;
+  thumbnails: Thumbnail[];
+  names: Name[];
+  releaseDate: Date;
+  details: MovieDetails | SeriesDetails;
 }

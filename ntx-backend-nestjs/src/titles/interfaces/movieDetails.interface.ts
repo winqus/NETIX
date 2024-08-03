@@ -3,5 +3,5 @@ import { Video } from '@ntx/videos/interfaces/video.interface';
 
 export interface MovieDetails extends Entity {
   runtimeMinutes: number;
-  videos: [Video];
+  videos: Video[];
 }

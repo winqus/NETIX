@@ -8,10 +8,9 @@ export const SeasonSchema = new mongoose.Schema(
   {
     uuid: UUIDSubschema,
     seasonNumber: { type: Number, required: true },
-    episodesCount: { type: Number, required: true },
     names: [NameSubschema],
     thumbnails: [ThumbnailSchema],
-    releaseDate: { type: Date },
+    releaseDate: { type: Date, default: null },
     episodes: [EpisodeSchema],
   },
   { timestamps: true },

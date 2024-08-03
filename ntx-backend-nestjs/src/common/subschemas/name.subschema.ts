@@ -6,7 +6,7 @@ export const NameSubschema = {
     enum: Object.values(NameCategory),
     required: true,
   },
-  title: {
+  value: {
     type: String,
     required: true,
   },
