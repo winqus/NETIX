@@ -10,12 +10,6 @@ jobs:
     name: Backend Build and Test
     runs-on: ubuntu-latest
 
-    services:
-      mongo:
-        image: mongo:latest
-        ports:
-          - 27017:27017
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
