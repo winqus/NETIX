@@ -19,6 +19,7 @@ import {
 } from './constants';
 import { DatabaseModule } from './database/database.module';
 import { ExternalSearchModule } from './external-search/external-search.module';
+import { LoggerModule } from './logger/logger.module';
 import { ThumbnailsModule } from './thumbnails/thumbnails.module';
 import { TitlesModule } from './titles/titles.module';
 import { VideosModule } from './videos/videos.module';
