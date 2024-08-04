@@ -46,58 +46,6 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   imageMaxSize: number = 0;
   videoMaxSize: number = 0;
 
-  searchProp = {
-    type: 'text',
-    title: 'Enter video title or ID...',
-    iconName: 'search',
-    placeholder: 'Cars...',
-    searchCharLimit: '3',
-    value: this.searchValue,
-    results: this.titles,
-    searchFailed: this.searchFailed,
-  };
-
-  titleProp = {
-    type: 'text',
-    title: 'Title',
-    placeholder: 'Title',
-    value: this.title,
-    readonly: true,
-  };
-
-  dateProp = {
-    type: 'text',
-    title: 'Date',
-    placeholder: 'Date',
-    value: this.date,
-    readonly: true,
-  };
-
-  durationProp = {
-    type: 'text',
-    title: 'Duration',
-    placeholder: '00:00:00',
-    value: this.duration,
-    readonly: true,
-  };
-
-  imageProp = {
-    accept: this.imageAccept,
-    maxSize: this.imageMaxSize,
-    readonly: this.isMetadataFilled,
-  };
-
-  fileProp = {
-    accept: this.videoAccept,
-    maxSize: this.videoMaxSize,
-    readonly: this.isMetadataFilled,
-  };
-
-  uploadStatusProp = {
-    imageUploading: this.imageUploading,
-    videoUploading: this.videoUploading,
-  };
-
   constructor(
     private metadataSearch: MetadataService,
     private upload: UploadService,
@@ -193,11 +141,7 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
 
   searchValueChange(searchValue: string) {
     if (searchValue == '') {
-      this.title = '';
-      this.date = '';
-      this.duration = '';
-      this.selectedMetadataJson = '';
-      this.isMetadataFilled = false;
+      this.resetMetadata();
     }
   }
 
@@ -237,7 +181,6 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
       this.upload.uploadVideo(this.videoFile!, this.metadata!.id).subscribe({
         error: (error) => {
           this.videoUploading = Status.failed;
-
           console.error('Error uploading video', error);
         },
         complete: () => {
@@ -253,7 +196,7 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   closeButtonStatus(): boolean {
-    return this.imageUploading === Status.uploading && this.videoUploading === Status.uploading;
+    return this.imageUploading === Status.uploading || this.videoUploading === Status.uploading;
   }
 
   finishUplaod() {

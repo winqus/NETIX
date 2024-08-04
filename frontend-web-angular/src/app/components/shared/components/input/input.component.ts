@@ -40,17 +40,18 @@ export class InputComponent implements OnChanges {
     iconName: '',
     disabled: false,
     readonly: false,
-    searchCharLimit: APP_SETTINGS.MIN_SEARCH_LIMIT,
     searchFailed: false,
     results: [],
   };
 
   tempIconName: string = '';
+  searchCharLimit = APP_SETTINGS.MIN_SEARCH_LIMIT;
+
   private searchSubject = new Subject<string>();
 
   constructor() {
     this.searchSubject.pipe(debounceTime(500)).subscribe((searchText) => {
-      if (this.props.searchFailed || (this.props.searchCharLimit != undefined && searchText.length >= parseInt(this.props.searchCharLimit, 10))) {
+      if (this.props.searchFailed || (this.searchCharLimit != undefined && searchText.length >= parseInt(this.searchCharLimit, 10))) {
         this.searchEvent.emit(searchText);
         this.tempIconName = this.props.iconName!;
         this.props.iconName = 'throbber';
