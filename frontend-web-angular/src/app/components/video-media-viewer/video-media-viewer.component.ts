@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, Subscription, debounceTime, firstValueFrom, fromEvent, map, timer } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '@ntx/app/services/layout.service';
-import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../shared/components/svg-icons/svg-icons.component';
 import { MediaItem } from '@ntx/app/models/mediaItem';
 import { formatTime } from '@ntx/app/utils/utils';
 

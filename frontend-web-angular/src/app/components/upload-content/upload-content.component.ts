@@ -1,30 +1,26 @@
-import { environment } from '@ntx/environments/environment';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { environment } from '@ntx/environments/environment';
 import { formatDate, formatTime } from '@ntx/app/utils/utils';
+import { KeyCode } from '../shared/constants/key-code.constants';
 import { MetadataService } from '@ntx/app/services/metadata/metadata.service';
 import { UploadService } from '@ntx/app/services/upload/upload.service';
 import { MediaConfigService } from '@ntx/app/services/mediaConfig.service';
+import { ImageService } from '@ntx/app/services/image.service';
 import MetadataDTO from '@ntx/app/models/metadata.dto';
-import { InputComponent } from '../shared/input/input.component';
+import { InputComponent } from '../shared/components/input/input.component';
+import { Status } from '../shared/enum/upload-status.enum';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
-import { ImageService } from '@ntx/app/services/image.service';
-import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
-
-export enum Status {
-  uploading,
-  completed,
-  failed,
-}
+import { UploadStatusComponent } from './components/upload-status/upload-status.component';
 
 @Component({
   selector: 'app-upload-content',
   standalone: true,
-  imports: [InputComponent, FileUploadComponent, ImageUploadComponent, SvgIconsComponent],
+  imports: [InputComponent, FileUploadComponent, ImageUploadComponent, UploadStatusComponent],
   templateUrl: './upload-content.component.html',
 })
 export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('croppModal') croppModal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('croppModal') cropModalElement!: ElementRef<HTMLDialogElement>;
   @ViewChild(FileUploadComponent) videoFileComponent!: FileUploadComponent;
   @ViewChild(ImageUploadComponent) imageFileComponent!: ImageUploadComponent;
 
@@ -97,6 +93,11 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
     readonly: this.isMetadataFilled,
   };
 
+  uploadStatusProp = {
+    imageUploading: this.imageUploading,
+    videoUploading: this.videoUploading,
+  };
+
   constructor(
     private metadataSearch: MetadataService,
     private upload: UploadService,
@@ -120,19 +121,19 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   preventEscClose() {
-    if (this.croppModal && this.croppModal.nativeElement) {
-      this.croppModal.nativeElement.addEventListener('keydown', this.preventEsc);
+    if (this.cropModalElement && this.cropModalElement.nativeElement) {
+      this.cropModalElement.nativeElement.addEventListener('keydown', this.preventEsc);
     }
   }
 
   removeEscPrevent() {
-    if (this.croppModal && this.croppModal.nativeElement) {
-      this.croppModal.nativeElement.removeEventListener('keydown', this.preventEsc);
+    if (this.cropModalElement && this.cropModalElement.nativeElement) {
+      this.cropModalElement.nativeElement.removeEventListener('keydown', this.preventEsc);
     }
   }
 
   preventEsc = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
+    if (event.key === KeyCode.Escape) {
       event.preventDefault();
     }
   };
@@ -214,36 +215,6 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
 
   compressImage() {
     this.imageService.compressImage(this.imageFile!);
-  }
-
-  getIconNameFromStatus(status: Status): string {
-    return (
-      {
-        [Status.uploading]: 'throbber',
-        [Status.completed]: 'check_circle',
-        [Status.failed]: 'x_circle',
-      }[status] || ''
-    );
-  }
-
-  getColorFromStatus(status: Status): string {
-    return (
-      {
-        [Status.uploading]: 'white',
-        [Status.completed]: 'green',
-        [Status.failed]: 'red',
-      }[status] || 'white'
-    );
-  }
-
-  getTextFromStatus(status: Status): string {
-    return (
-      {
-        [Status.uploading]: 'is being uploaded...',
-        [Status.completed]: 'upload is completed.',
-        [Status.failed]: 'upload failed.',
-      }[status] || ''
-    );
   }
 
   async uploadFiles() {

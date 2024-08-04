@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 import { ImageService } from '@ntx/app/services/image.service';
 import { MediaConfigService } from '@ntx/app/services/mediaConfig.service';
-import { SvgIconsComponent } from '@ntx/app/components/shared/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/components/shared/components/svg-icons/svg-icons.component';
 import { ImageCropperComponent } from '../image-cropper/image-cropper.component';
 
 @Component({
