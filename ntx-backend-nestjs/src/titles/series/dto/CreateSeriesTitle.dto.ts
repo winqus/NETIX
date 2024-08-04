@@ -1,9 +1,9 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { NameDTO } from '@ntx/titles/dto/Name.dto';
 import { Type } from 'class-transformer';
-import { IsDate, IsEnum, IsPositive, Min, ValidateNested } from 'class-validator';
-import { NameDTO } from './Name.dto';
+import { IsDate, IsEnum, ValidateNested } from 'class-validator';
 
-export class CreateMovieTitleDTO {
+export class CreateSeriesTitleDTO {
   @IsEnum(TitleType)
   type: TitleType;
 
@@ -13,8 +13,4 @@ export class CreateMovieTitleDTO {
 
   @IsDate()
   releaseDate: Date;
-
-  @IsPositive()
-  @Min(1)
-  runtimeMinutes: number;
 }

@@ -6,7 +6,7 @@ import { TITLE_MODEL } from './titles.constants';
 
 @Injectable()
 export class TitlesRepository extends EntityRepository<Title> {
-  constructor(@Inject(TITLE_MODEL) titleModel: Model<Title & Document>) {
-    super(titleModel);
+  constructor(@Inject(TITLE_MODEL) model: Model<Title & Document>) {
+    super(model);
   }
 }

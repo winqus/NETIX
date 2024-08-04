@@ -5,9 +5,8 @@ import { Episode } from './episode.interface';
 
 export interface Season extends Entity {
   seasonNumber: number;
-  episodeCount: number;
-  names: [Name];
-  thumbnails: [Thumbnail];
+  names: Name[];
+  thumbnails: Thumbnail[];
   releaseDate: Date;
-  episodes: [Episode];
+  episodes: Episode[];
 }

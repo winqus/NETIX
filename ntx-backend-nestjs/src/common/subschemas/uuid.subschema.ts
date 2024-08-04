@@ -1,9 +1,6 @@
-import * as mongoose from 'mongoose';
-import * as uuid from 'uuid';
+import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 
 export const UUIDSubschema = {
-  type: mongoose.Schema.Types.UUID,
-  required: true,
-  default: () => uuid.v4(),
-  immutable: true,
+  type: String,
+  default: () => generateUUIDv4(),
 };

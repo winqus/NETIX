@@ -1,17 +1,18 @@
 import { NameSubschema } from '@ntx/common/subschemas/name.subschema';
 import { UUIDSubschema } from '@ntx/common/subschemas/uuid.subschema';
 import { ThumbnailSchema } from '@ntx/thumbnails/schemas/thumbnail.schema';
+import { VideoRefSubschema } from '@ntx/titles/schemas/relatedVideo.subschema';
 import * as mongoose from 'mongoose';
-import { EpisodeSchema } from './episode.schema';
+import { Episode } from '../interfaces/episode.interface';
 
-export const SeasonSchema = new mongoose.Schema(
+export const EpisodeSchema = new mongoose.Schema<Episode>(
   {
     uuid: UUIDSubschema,
-    seasonNumber: { type: Number, required: true },
+    episodeNumber: { type: Number, required: true },
     names: [NameSubschema],
+    runtimeMinutes: { type: Number, required: true },
     thumbnails: [ThumbnailSchema],
-    releaseDate: { type: Date, default: null },
-    episodes: [EpisodeSchema],
+    videos: [VideoRefSubschema],
   },
   { timestamps: true },
 );

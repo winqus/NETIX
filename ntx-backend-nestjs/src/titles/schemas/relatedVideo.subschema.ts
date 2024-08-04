@@ -1,7 +1,7 @@
 import { VideoCategory } from '@ntx/videos/interfaces/videoCategory.enum';
 import * as mongoose from 'mongoose';
 
-export const RelatedVideoSubschema = {
+export const VideoRefSubschema = {
   uuid: {
     type: mongoose.Schema.Types.UUID,
     ref: 'Video',

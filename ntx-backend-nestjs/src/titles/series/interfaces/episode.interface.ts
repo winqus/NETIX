@@ -5,8 +5,8 @@ import { Video } from '@ntx/videos/interfaces/video.interface';
 
 export interface Episode extends Entity {
   episodeNumber: number;
-  names: [Name];
+  names: Name[];
   runtimeMinutes: number;
-  thumbnails: [Thumbnail];
-  videos: [Video];
+  thumbnails: Thumbnail[];
+  videos: Video[];
 }

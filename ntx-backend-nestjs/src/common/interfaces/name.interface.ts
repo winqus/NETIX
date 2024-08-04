@@ -1,7 +1,7 @@
 import { NameCategory } from '@ntx/titles/interfaces/nameCategory.enum';
 
 export interface Name {
-  name: string;
+  value: string;
   type: NameCategory;
   language: string;
 }
