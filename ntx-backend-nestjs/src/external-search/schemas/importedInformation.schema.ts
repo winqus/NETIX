@@ -7,6 +7,7 @@ export const ImportedInformationSchema = new mongoose.Schema(
     sourceUUID: { type: String, required: true },
     externalEntityID: { type: String, required: true },
     providedForEntity: UUIDSubschema,
+    tag: { type: String, default: '' },
     details: { type: Object, default: null },
   },
   { timestamps: true },

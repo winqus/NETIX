@@ -54,7 +54,7 @@ export class MoviesService {
 
   public async createFromExternalSource(externalTitle: TitleDetailedSearchResult): Promise<Result<MovieTitle>> {
     try {
-      if (externalTitle.id == null || externalTitle.sourceUUID == null) {
+      if (externalTitle == null || externalTitle.id == null || externalTitle.sourceUUID == null) {
         this.logger.error('No external source or id provided as args');
 
         return Result.fail('No external source or id');
@@ -66,7 +66,7 @@ export class MoviesService {
 
       if (isAlreadyImported) {
         return Result.fail(
-          `${externalTitle.type} title (${externalTitle}) from source (${externalTitle.sourceUUID}) already exists`,
+          `${externalTitle.type} title (${externalTitle.id}) from source (${externalTitle.sourceUUID}) already exists`,
         );
       }
 
@@ -94,7 +94,7 @@ export class MoviesService {
         new MovieCreatedFromExternalSourceEvent(createdMovie, externalTitle),
       );
 
-      return movieResult;
+      return Result.ok(createdMovie);
     } catch (error) {
       this.logger.error(error);
 
