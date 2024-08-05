@@ -4,9 +4,6 @@ import { IsDate, IsEnum, IsPositive, Min, ValidateNested } from 'class-validator
 import { NameDTO } from '../../dto/Name.dto';
 
 export class CreateMovieTitleDTO {
-  @IsEnum(TitleType)
-  type: TitleType;
-
   @ValidateNested({ each: true })
   @Type(() => NameDTO)
   names: NameDTO[];

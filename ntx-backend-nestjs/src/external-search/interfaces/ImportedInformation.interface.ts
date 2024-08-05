@@ -4,5 +4,6 @@ export interface ImportedInformation extends Entity {
   sourceUUID: string;
   externalEntityID: string;
   providedForEntity: string;
+  tag: string;
   details: any;
 }
