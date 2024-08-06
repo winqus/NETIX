@@ -7,7 +7,7 @@ import { Title } from '../interfaces/title.interface';
 export const TitleSchema = new mongoose.Schema<Title>(
   {
     uuid: UUIDSubschema,
-    thumbnails: [ThumbnailSchema],
+    thumbnail: { type: ThumbnailSchema, default: null },
     names: [NameSubschema],
     releaseDate: Date,
   },

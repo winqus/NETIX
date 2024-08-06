@@ -68,7 +68,7 @@ describe('MoviesService', () => {
         uuid: mockUUID,
         createdAt: fixedDate,
         updatedAt: fixedDate,
-        thumbnails: [],
+        thumbnail: undefined,
         type: TitleType.MOVIE,
         video: undefined,
       };
@@ -116,7 +116,7 @@ describe('MoviesService', () => {
         uuid: mockUUID,
         createdAt: fixedDate,
         updatedAt: fixedDate,
-        thumbnails: [],
+        thumbnail: undefined,
         names: [{ type: NameCategory.Primary, value: externalTitle.title, language: '' }],
         releaseDate: new Date(externalTitle.releaseDate),
         runtimeMinutes: (externalTitle.details as MovieDetails).runtime,

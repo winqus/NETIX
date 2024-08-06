@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { NtxEvent } from '@ntx/common/events';
 import MovieCreatedFromExternalSourceEvent from '@ntx/common/events/MovieCreatedFromExternalSourceEvent';
 import SeriesCreatedFromExternalSourceEvent from '@ntx/common/events/SeriesCreatedFromExternalSourceEvent';
 import TitleCreatedFromExternalSourceEvent from '@ntx/common/events/TitleCreatedFromExternalSourceEvent';
 import { Result } from '@ntx/common/Result';
-import { NtxEvent } from '@ntx/events.constants';
 import { ImportedInformationRepository } from './imported-information.repository';
 import { ImportedInformation } from './interfaces/ImportedInformation.interface';
 

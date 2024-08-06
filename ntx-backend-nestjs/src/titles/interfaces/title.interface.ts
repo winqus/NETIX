@@ -4,7 +4,7 @@ import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { Thumbnail } from '@ntx/thumbnails/interfaces/thumbnail.interface';
 
 export interface Title extends Entity {
-  thumbnails: Thumbnail[];
+  thumbnail?: Thumbnail;
   names: Name[];
   releaseDate: Date;
   type: TitleType;

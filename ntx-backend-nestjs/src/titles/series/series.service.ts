@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { NtxEvent } from '@ntx/common/events';
 import SeriesCreatedFromExternalSourceEvent from '@ntx/common/events/SeriesCreatedFromExternalSourceEvent';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { Result } from '@ntx/common/Result';
-import { NtxEvent } from '@ntx/events.constants';
 import { ImportedInformationService } from '@ntx/external-search/imported-information.service';
 import { TitleDetailedSearchResult } from '@ntx/external-search/interfaces/TitleDetailedSearchResult.interface';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
@@ -33,7 +33,7 @@ export class SeriesService {
         uuid: generateUUIDv4(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        thumbnails: [],
+        thumbnail: undefined,
         names: createDTO.names,
         releaseDate: createDTO.releaseDate,
         type: TitleType.SERIES,

@@ -24,5 +24,6 @@ import { TitlesService } from './titles.service';
     SeriesRepository,
     SeriesService,
   ],
+  exports: [TitlesService],
 })
 export class TitlesModule {}

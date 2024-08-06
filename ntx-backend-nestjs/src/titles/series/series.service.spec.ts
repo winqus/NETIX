@@ -64,7 +64,7 @@ describe('SeriesService', () => {
         uuid: mockUUID,
         createdAt: fixedDate,
         updatedAt: fixedDate,
-        thumbnails: [],
+        thumbnail: undefined,
         type: TitleType.SERIES,
         seasons: [],
       };
@@ -111,7 +111,7 @@ describe('SeriesService', () => {
         uuid: mockUUID,
         createdAt: fixedDate,
         updatedAt: fixedDate,
-        thumbnails: [],
+        thumbnail: undefined,
         names: [{ type: NameCategory.Primary, value: externalTitle.title, language: '' }],
         releaseDate: new Date(externalTitle.releaseDate),
         seasons: [],

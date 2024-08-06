@@ -7,6 +7,6 @@ export interface Episode extends Entity {
   episodeNumber: number;
   names: Name[];
   runtimeMinutes: number;
-  thumbnails: Thumbnail[];
-  videos: Video[];
+  thumbnail: Thumbnail;
+  video?: Video;
 }

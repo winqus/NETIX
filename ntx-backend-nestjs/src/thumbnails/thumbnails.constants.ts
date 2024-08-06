@@ -22,4 +22,5 @@ export const THUMBNAIL_QUEUE_JOBS = {
   PROCESS_THUMBNAIL: 'process-thumbnail',
 };
 
-export const THUMBNAIL_CREATED_EVENT = 'thumbnail.created';
+export const THUMBNAIL_SCHEMA_NAME = 'Thumbnail';
+export const THUMBNAIL_MODEL = 'THUMBNAIL_MODEL';

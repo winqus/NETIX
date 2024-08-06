@@ -1,4 +1,4 @@
 export enum ThumbnailCategory {
-  Large = 'Large',
+  Normal = 'Normal',
   Small = 'Small',
 }

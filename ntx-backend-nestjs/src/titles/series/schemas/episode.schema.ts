@@ -11,8 +11,8 @@ export const EpisodeSchema = new mongoose.Schema<Episode>(
     episodeNumber: { type: Number, required: true },
     names: [NameSubschema],
     runtimeMinutes: { type: Number, required: true },
-    thumbnails: [ThumbnailSchema],
-    videos: [VideoRefSubschema],
+    thumbnail: { type: ThumbnailSchema, default: null },
+    video: VideoRefSubschema,
   },
   { timestamps: true },
 );

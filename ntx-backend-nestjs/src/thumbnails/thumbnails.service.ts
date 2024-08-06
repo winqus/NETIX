@@ -13,11 +13,11 @@ export class ThumbnailsService {
 
   constructor(@InjectQueue(THUMBNAIL_QUEUE) private readonly thumbnailQueue: Queue) {}
 
-  async processThumbnailForTitle(titleID: string, file: Express.Multer.File): Promise<Result<void>> {
-    this.logger.log(`Processing thumbnail (${file.originalname}) for title ${titleID}`);
+  async processThumbnailForTitle(titleUUID: string, file: Express.Multer.File): Promise<Result<void>> {
+    this.logger.log(`Processing thumbnail (${file.originalname}) for title ${titleUUID}`);
 
     await this.thumbnailQueue.add(THUMBNAIL_QUEUE_JOBS.PROCESS_THUMBNAIL, {
-      titleID: titleID,
+      titleUUID: titleUUID,
       filePath: file.path,
     } as ProcessThumbnailJobData);
 

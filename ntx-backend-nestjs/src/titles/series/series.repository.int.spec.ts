@@ -46,7 +46,6 @@ describe('SeriesRepository with seriesModel, mongodb-memory-server', () => {
     expect(newSeries.uuid).toBeDefined();
     expect(newSeries.type).toBe(TitleType.SERIES);
     expect(newSeries.seasons).toBeDefined();
-    expect(newSeries.thumbnails).toBeDefined();
     expect(newSeries.releaseDate).toBeDefined();
     expect(newSeries.names.length).toEqual(1);
     expect(newSeries.createdAt).toBeDefined();
@@ -83,7 +82,5 @@ describe('SeriesRepository with seriesModel, mongodb-memory-server', () => {
     expect(newSeries.seasons[0].episodes[0].episodeNumber).toEqual(1);
     expect(newSeries.seasons[0].episodes[0].names.length).toEqual(1);
     expect(newSeries.seasons[0].episodes[0].runtimeMinutes).toEqual(30);
-    expect(newSeries.seasons[0].episodes[0].thumbnails).toBeDefined();
-    expect(newSeries.seasons[0].episodes[0].videos).toBeDefined();
   });
 });

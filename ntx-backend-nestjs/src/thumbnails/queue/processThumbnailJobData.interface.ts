@@ -1,4 +1,4 @@
 export interface ProcessThumbnailJobData {
-  titleID: string;
+  titleUUID: string;
   filePath: string;
 }

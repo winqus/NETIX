@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NtxEvent } from '@ntx/common/events';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { Result } from '@ntx/common/Result';
-import { NtxEvent } from '@ntx/events.constants';
 import { ImportedInformationService } from '@ntx/external-search/imported-information.service';
 import {
   MovieDetails,
@@ -34,7 +34,7 @@ export class MoviesService {
         uuid: generateUUIDv4(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        thumbnails: [],
+        thumbnail: undefined,
         names: createDTO.names,
         releaseDate: createDTO.releaseDate,
         type: TitleType.MOVIE,

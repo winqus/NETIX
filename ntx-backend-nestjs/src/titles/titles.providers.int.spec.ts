@@ -60,7 +60,6 @@ describe('Title Model and subtypes with mongodb-memory-server', () => {
 
     expect(newMovie.uuid).toBeDefined();
     expect(newMovie.type).toBe(TitleType.MOVIE);
-    expect(newMovie.thumbnails).toBeDefined();
     expect(newMovie.names.length).toEqual(1);
     expect(newMovie.runtimeMinutes).toBe(136);
     expect(newMovie.createdAt).toBeDefined();
@@ -73,7 +72,6 @@ describe('Title Model and subtypes with mongodb-memory-server', () => {
     expect(newSeries.uuid).toBeDefined();
     expect(newSeries.type).toBe(TitleType.SERIES);
     expect(newSeries.seasons).toBeDefined();
-    expect(newSeries.thumbnails).toBeDefined();
     expect(newSeries.releaseDate).toBeDefined();
     expect(newSeries.names.length).toEqual(1);
     expect(newSeries.createdAt).toBeDefined();
@@ -110,8 +108,7 @@ describe('Title Model and subtypes with mongodb-memory-server', () => {
     expect(newSeries.seasons[0].episodes[0].episodeNumber).toEqual(1);
     expect(newSeries.seasons[0].episodes[0].names.length).toEqual(1);
     expect(newSeries.seasons[0].episodes[0].runtimeMinutes).toEqual(30);
-    expect(newSeries.seasons[0].episodes[0].thumbnails).toBeDefined();
-    expect(newSeries.seasons[0].episodes[0].videos).toBeDefined();
+    expect(newSeries.seasons[0].episodes[0].thumbnail).toBeDefined();
   });
 
   it(`should create get at least 2 titles`, async () => {

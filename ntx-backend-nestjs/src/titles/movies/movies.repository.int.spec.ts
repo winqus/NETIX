@@ -44,8 +44,6 @@ describe('MoviesRepository with movieModel, mongodb-memory-server', () => {
 
     expect(newMovie.uuid).toBeDefined();
     expect(newMovie.type).toBe(TitleType.MOVIE);
-    expect(newMovie.thumbnails).toBeDefined();
-    expect(newMovie.video).toBeDefined();
     expect(newMovie.names.length).toEqual(1);
     expect(newMovie.runtimeMinutes).toBe(136);
     expect(newMovie.createdAt).toBeDefined();
