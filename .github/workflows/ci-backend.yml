@@ -42,5 +42,3 @@ jobs:
       - name: Run tests
         working-directory: ntx-backend-nestjs
         run: npm run test-ci
-
-
