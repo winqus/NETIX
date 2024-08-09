@@ -4,7 +4,6 @@ import { Test } from '@nestjs/testing';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
 import fetchMock from 'jest-fetch-mock';
-import * as Joi from 'joi';
 import * as path from 'path';
 import { ENV_FILES, ENVIRONMENTS } from '../../../../src/constants';
 import { TEST_DATA_DIRECTORY, TEST_DIRECTORY } from '../../../../test/constants';
@@ -76,12 +75,6 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
         ConfigModule.forRoot({
           envFilePath: [ENV_FILES[ENVIRONMENTS.TEST]],
           isGlobal: true,
-          validationSchema: Joi.object({
-            TMDB_API_KEY: Joi.string().required(),
-          }),
-          validationOptions: {
-            abortEarly: false,
-          },
         }),
       ],
     }).compile();
@@ -111,9 +104,10 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
   });
 
   beforeEach(async () => {
+    const tmdb_api_key = process.env.TMDB_API_KEY || 'stub-tmdb-api-key';
     const config: TitleSearchPluginConfig = {
       usePlugin: true,
-      options: { apiKey: process.env.TMDB_API_KEY! },
+      options: { apiKey: tmdb_api_key },
       timeBetweenCallsMs: 5,
     };
 
