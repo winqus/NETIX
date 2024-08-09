@@ -2,7 +2,6 @@ export enum ENVIRONMENTS {
   PRODUCTION = 'production',
   DEVELOPMENT = 'development',
   TEST = 'test',
-  CI_TEST = 'ci-test',
 }
 
 export const ENV_FILES = {
