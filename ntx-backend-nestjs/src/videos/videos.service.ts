@@ -1,12 +1,10 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
 import { Result } from '@ntx/common/Result';
 import { Queue } from 'bullmq';
 import { Model } from 'mongoose';
-import VideoProcessedEvent from './events/VideoProcessedEvent';
 import { Video } from './interfaces/video.interface';
-import { VIDEO_MODEL, VIDEO_PROCESSED_EVENT, VIDEO_QUEUE, VIDEO_QUEUE_JOBS } from './videos.constants';
+import { VIDEO_MODEL, VIDEO_QUEUE, VIDEO_QUEUE_JOBS } from './videos.constants';
 
 @Injectable()
 export class VideosService {
@@ -26,11 +24,5 @@ export class VideosService {
     });
 
     return Result.ok();
-  }
-
-  @OnEvent(VIDEO_PROCESSED_EVENT)
-  async handleVideoProcessedEvent(payload: VideoProcessedEvent) {
-    await this.videoModel.create({ uuid: payload.videoID });
-    this.logger.log(`Saved video ${payload.videoID} to database`);
   }
 }

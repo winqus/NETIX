@@ -3,8 +3,9 @@
  * Payload classes can be found in the `src/common/events` directory.
  */
 export enum NtxEvent {
-  TitleCreatedFromExternalSource = 'titles.CreatedFromExternalSource',
-  MovieCreatedFromExternalSource = 'titles.MovieCreatedFromExternalSource',
-  SeriesCreatedFromExternalSource = 'titles.SeriesCreatedFromExternalSource',
-  ThumbnailCreatedForTitle = 'thumbnail.CreatedForTitle',
+  TitleCreatedFromExternalSource = 'Title.Created.FromExternalSource',
+  MovieCreatedFromExternalSource = 'Title.MovieCreated.FromExternalSource',
+  SeriesCreatedFromExternalSource = 'Title.SeriesCreated.FromExternalSource',
+  ThumbnailCreatedForTitle = 'Thumbnail.Created.ForTitle',
+  VideoCreatedForTitle = 'Video.Created.ForTitle',
 }

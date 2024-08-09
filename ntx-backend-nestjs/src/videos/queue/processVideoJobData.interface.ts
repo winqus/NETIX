@@ -1,4 +1,4 @@
 export interface ProcessVideoJobData {
-  titleID: string;
+  titleUUID: string;
   filePath: string;
 }

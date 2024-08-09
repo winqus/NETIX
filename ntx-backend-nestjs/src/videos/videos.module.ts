@@ -7,11 +7,12 @@ import { VideoProcessor } from './queue/video.processor';
 import { VIDEO_QUEUE } from './videos.constants';
 import { VideosController } from './videos.controller';
 import { videosProviders } from './videos.providers';
+import { VideosRepository } from './videos.repository';
 import { VideosService } from './videos.service';
 
 @Module({
   controllers: [VideosController],
-  providers: [VideosService, VideoProcessor, ...videosProviders],
+  providers: [VideosService, VideoProcessor, VideosRepository, ...videosProviders],
   imports: [
     DatabaseModule,
     BullModule.registerQueue({

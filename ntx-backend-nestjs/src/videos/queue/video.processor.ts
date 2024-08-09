@@ -1,21 +1,18 @@
 import { OnQueueEvent, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NtxEvent } from '@ntx/common/events';
+import VideoCreatedForTitleEvent from '@ntx/common/events/VideoCreatedEvent';
+import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { Job } from 'bullmq';
 import * as fse from 'fs-extra';
 import { v4 as uuidv4 } from 'uuid';
 import { Result } from '../../common/Result';
 import { import_FileTypeFromFile } from '../../utility/importFileType';
 import { jobLogErrorAndThrowError, jobLogWithTimestamp } from '../../utility/queueJobLogAndThrowError';
-import VideoProcessedEvent from '../events/VideoProcessedEvent';
-import {
-  VIDEO_DIR,
-  VIDEO_FILE,
-  VIDEO_PROCESSED_EVENT,
-  VIDEO_QUEUE,
-  VIDEO_QUEUE_CONCURRENCY,
-  VIDEO_QUEUE_JOBS,
-} from '../videos.constants';
+import { Video } from '../interfaces/video.interface';
+import { VIDEO_DIR, VIDEO_FILE, VIDEO_QUEUE, VIDEO_QUEUE_CONCURRENCY, VIDEO_QUEUE_JOBS } from '../videos.constants';
+import { VideosRepository } from '../videos.repository';
 import { ProcessVideoJobData } from './processVideoJobData.interface';
 
 @Processor(VIDEO_QUEUE, {
@@ -24,7 +21,10 @@ import { ProcessVideoJobData } from './processVideoJobData.interface';
 export class VideoProcessor extends WorkerHost {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly eventEmitter: EventEmitter2) {
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly repository: VideosRepository,
+  ) {
     super();
   }
 
@@ -36,16 +36,21 @@ export class VideoProcessor extends WorkerHost {
   }
 
   async handleVideoProcessing(job: Job<ProcessVideoJobData>, _token?: string): Promise<Result<any>> {
-    const { filePath, titleID } = job.data;
+    const { filePath, titleUUID } = job.data;
 
-    if (typeof filePath !== 'string' || typeof titleID !== 'string' || titleID.length === 0 || filePath.length === 0) {
+    if (
+      typeof filePath !== 'string' ||
+      typeof titleUUID !== 'string' ||
+      titleUUID.length === 0 ||
+      filePath.length === 0
+    ) {
       await jobLogErrorAndThrowError(job, 'Invalid job data');
     } else if (fse.pathExistsSync(filePath) === false) {
       await jobLogErrorAndThrowError(job, `File not found at ${filePath}`);
     }
 
     await job.updateProgress(10);
-    await jobLogWithTimestamp(job, `Processing video for title ${titleID}, file path: ${filePath}`);
+    await jobLogWithTimestamp(job, `Processing video for title ${titleUUID}, file path: ${filePath}`);
 
     const fileTypeFromFile = await import_FileTypeFromFile();
     await fileTypeFromFile(filePath)
@@ -74,11 +79,18 @@ export class VideoProcessor extends WorkerHost {
 
     await job.updateProgress(100);
     await jobLogWithTimestamp(job, 'Video processing complete');
-    this.eventEmitter.emit(VIDEO_PROCESSED_EVENT, new VideoProcessedEvent(titleID, newVideoID));
 
-    this.logger.log(`Video processing complete for title ${titleID}, new video ID: ${newVideoID}`);
+    const newVideo = await this.repository.create({
+      uuid: generateUUIDv4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Video);
 
-    return Result.ok({ newVideoID });
+    this.eventEmitter.emit(NtxEvent.VideoCreatedForTitle, new VideoCreatedForTitleEvent(titleUUID, newVideo));
+
+    this.logger.log(`Video processing complete for title ${titleUUID}, new video ID: ${newVideo.uuid}`);
+
+    return Result.ok(newVideo);
   }
 
   @OnQueueEvent('active')

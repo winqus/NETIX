@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NtxEvent } from '@ntx/common/events';
 import SeriesCreatedFromExternalSourceEvent from '@ntx/common/events/SeriesCreatedFromExternalSourceEvent';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
@@ -7,8 +7,6 @@ import { Result } from '@ntx/common/Result';
 import { ImportedInformationService } from '@ntx/external-search/imported-information.service';
 import { TitleDetailedSearchResult } from '@ntx/external-search/interfaces/TitleDetailedSearchResult.interface';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
-import VideoProcessedEvent from '@ntx/videos/events/VideoProcessedEvent';
-import { VIDEO_PROCESSED_EVENT } from '@ntx/videos/videos.constants';
 import { validateOrReject } from 'class-validator';
 import { NameCategory } from '../interfaces/nameCategory.enum';
 import { CreateSeriesTitleDTO } from './dto/CreateSeriesTitle.dto';
