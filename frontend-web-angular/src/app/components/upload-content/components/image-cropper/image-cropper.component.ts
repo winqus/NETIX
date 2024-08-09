@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { ImageCropService } from '@ntx/app/services/image-crop.service';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { ImageService } from '@ntx/app/services/image.service';
 import { CropperComponent, AngularCropperjsModule } from 'angular-cropperjs';
 import { MediaConfigService } from '@ntx/app/services/mediaConfig.service';
 
@@ -13,9 +13,9 @@ export interface InputProps {
   imports: [AngularCropperjsModule],
   templateUrl: './image-cropper.component.html',
 })
-export class ImageCropperComponent implements OnInit {
+export class ImageCropperComponent implements OnInit, OnChanges {
   @Input() props: InputProps = {};
-  @Output() cropped = new EventEmitter<string>();
+  @Output() cropped = new EventEmitter<Blob>();
 
   @ViewChild('angularCropper')
   public angularCropper: CropperComponent = new CropperComponent();
@@ -29,7 +29,7 @@ export class ImageCropperComponent implements OnInit {
   };
 
   constructor(
-    public imageCropService: ImageCropService,
+    public imageCropService: ImageService,
     private mediaConfig: MediaConfigService
   ) {
     this.cropperOptions = this.imageCropService.getCropperConfig();
@@ -41,12 +41,15 @@ export class ImageCropperComponent implements OnInit {
     }
   }
 
+  ngOnChanges(): void {
+    this.props = { ...this.defaultProps, ...this.props };
+  }
+
   cropImg() {
     if (this.angularCropper.cropper) {
       this.angularCropper.cropper.getCroppedCanvas().toBlob((blob: Blob | null) => {
         if (blob) {
-          const croppedImageUrl = URL.createObjectURL(blob);
-          this.cropped.emit(croppedImageUrl);
+          this.cropped.emit(blob);
         }
       }, this.mediaConfig.getImageExportFormat());
     }

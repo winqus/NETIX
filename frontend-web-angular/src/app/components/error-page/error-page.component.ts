@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/internal/operators/map';
 
@@ -16,7 +16,7 @@ export interface ErrorPageProps {
   imports: [],
   templateUrl: './error-page.component.html',
 })
-export class ErrorPageComponent {
+export class ErrorPageComponent implements OnInit {
   errorCode = '';
   errorMessage = '';
   infoMessage = '';
@@ -25,7 +25,7 @@ export class ErrorPageComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {

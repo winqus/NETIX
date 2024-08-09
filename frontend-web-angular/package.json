@@ -23,7 +23,9 @@
     "@angular/router": "^17.1.0",
     "@auth0/auth0-angular": "^2.2.3",
     "angular-cropperjs": "^14.0.1",
+    "browser-image-compression": "^2.0.2",
     "hls.js": "^1.5.7",
+    "jimp": "^0.22.12",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

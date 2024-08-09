@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../shared/components/svg-icons/svg-icons.component';
 // import { AuthService } from '@auth0/auth0-angular';
 import { CommonModule } from '@angular/common';
 

@@ -4,14 +4,14 @@
 
 import { Component } from '@angular/core';
 import { UploadMediaService } from '@ntx/app/services/upload-media.service';
-import { SvgIconsComponent } from '../shared/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '../shared/components/svg-icons/svg-icons.component';
 import { VideoFileSelectionComponent } from './components/file-selection/file-selection.component';
 import { UploadConstraintsDTO } from '@ntx/app/models/uploadConstraints.dto';
 import { UploadService } from '@ntx/app/services/upload.service';
 import { PermissionResponseDTO } from '@ntx/app/models/uploadPermission.dto';
 import { UploadMetadataRequestDTO } from '@ntx/app/models/uploadMetadata.dto';
 import { Router } from '@angular/router';
-import { AlertCardComponent } from '../shared/alert-card/alert-card.component';
+import { AlertCardComponent } from '../shared/components/alert-card/alert-card.component';
 
 enum UploadSteps {
   FileSelection,

@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { generateRandomId } from '@ntx/app/utils/utils';
-import { SvgIconsComponent } from '@ntx/app/components/shared/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/components/shared/components/svg-icons/svg-icons.component';
 
 export interface InputProps {
   title?: string;
@@ -17,7 +17,7 @@ export interface InputProps {
 })
 export class FileUploadComponent implements OnInit, OnChanges {
   @Input() props: InputProps = {};
-  @Output() filePassed = new EventEmitter<File>();
+  @Output() filePassed = new EventEmitter<File | null>();
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -29,7 +29,7 @@ export class FileUploadComponent implements OnInit, OnChanges {
   };
 
   fileUploadId: string = '';
-  file?: File;
+  file: File | null = null;
   isDraggingOver: boolean = false;
 
   ngOnInit() {
@@ -49,23 +49,25 @@ export class FileUploadComponent implements OnInit, OnChanges {
     }
 
     const file = input.files[0];
-    this.validateAndSetFile(file);
+    if (this.validateFile(file)) {
+      this.setFile(file);
+    }
   }
 
-  validateAndSetFile(file: File) {
+  validateFile(file: File): boolean {
     if (!this.props || !this.props.maxSize) {
-      return;
+      return false;
     }
 
     if (file.size > this.props.maxSize!) {
-      return;
+      return false;
     }
 
     if (this.props.accept && !this.isFileTypeAccepted(file)) {
-      return;
+      return false;
     }
 
-    this.setFile(file);
+    return true;
   }
 
   isFileTypeAccepted(file: File): boolean {
@@ -94,12 +96,16 @@ export class FileUploadComponent implements OnInit, OnChanges {
   clearFileInput(event: Event) {
     event.stopPropagation();
     event.preventDefault();
+    this.clearFile();
+  }
 
+  clearFile() {
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
 
-    this.file = undefined;
+    this.file = null;
+    this.filePassed.emit(this.file);
   }
 
   onDragOver(event: DragEvent) {
@@ -112,9 +118,11 @@ export class FileUploadComponent implements OnInit, OnChanges {
     event.stopPropagation();
     this.isDraggingOver = false;
 
-    if (event.dataTransfer && event.dataTransfer.files.length) {
+    if (event.dataTransfer && event.dataTransfer.files.length && this.props.readonly) {
       const file = event.dataTransfer.files[0];
-      this.validateAndSetFile(file);
+      if (this.validateFile(file)) {
+        this.setFile(file);
+      }
     }
   }
 
