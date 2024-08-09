@@ -10,8 +10,8 @@
     <app-file-selection [file]="video" [constraints]="uploadConstraints" (filePassed)="handleVideoFile($event)" [isVideo]="true"></app-file-selection>
     <div class="flex-[2] content-center">
       <div class="flex justify-center justify-self-stretch">
+        <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Next</button>
         @if (video) {
-          <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Next</button>
         } @else {
           <button class="btn btn-disabled rounded-md">Next</button>
         }
@@ -34,8 +34,8 @@
       <div class="flex justify-center items-end">
         <div class="flex flex-row justify-between w-[40%] gap-10">
           <button class="btn btn-primary rounded-md" (click)="goToFileSelection()">Back</button>
+          <button class="btn btn-primary rounded-md" (click)="goToThumnNailSelection()">Next</button>
           @if (mediaTitle && mediaDate) {
-            <button class="btn btn-primary rounded-md" (click)="goToThumnNailSelection()">Next</button>
           } @else {
             <button class="btn btn-disabled rounded-md">Next</button>
           }
@@ -48,8 +48,8 @@
       <div class="flex justify-center items-end">
         <div class="flex flex-row justify-between w-[40%] gap-10">
           <button class="btn btn-primary rounded-md" (click)="goToDetailsFilling()">Back</button>
+          <button class="btn btn-info rounded-md" (click)="goToUploading()">Confirm</button>
           @if (mediaThumbnail) {
-            <button class="btn btn-info rounded-md" (click)="goToUploading()">Confirm</button>
           } @else {
             <button class="btn btn-disabled rounded-md">Confirm</button>
           }

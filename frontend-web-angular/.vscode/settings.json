@@ -32,5 +32,9 @@
     "titleBar.inactiveBackground": "#2e000a99",
     "titleBar.inactiveForeground": "#e7e7e799"
   },
-  "peacock.color": "#2e000a"
+  "peacock.color": "#2e000a",
+
+  "material-icon-theme.files.associations": {
+    "*.interface.ts": "angular"
+  }
 }

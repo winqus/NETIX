@@ -1,0 +1,50 @@
+# Auto-detect text files and perform LF normalization
+* text=auto
+
+.*      text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.jade  text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.less  text eol=lf
+*.scss  text eol=lf
+*.md    text eol=lf
+*.sh    text eol=lf
+*.txt   text eol=lf
+*.xml   text eol=lf
+*.ts    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.env   text eol=lf
+*.ts    text eol=lf
+*.graphql text eol=lf
+*.tsconfig text eol=lf
+*.prettierrc text eol=lf
+*.eslintrc text eol=lf
+*.dockerignore text eol=lf
+*.editorconfig text eol=lf
+*.gitignore text eol=lf
+
+# Binary files should be excluded from text processing
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.otf   binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
+*.bz2   binary
+*.mp4   binary
+*.mkv   binary
+*.mp3   binary
+*.mov   binary
+*.avi   binary

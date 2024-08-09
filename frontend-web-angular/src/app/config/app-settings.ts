@@ -1,0 +1,9 @@
+export const APP_SETTINGS = {
+  APP_NAME: 'Netix',
+  VERSION: '1.0.0',
+
+  MIN_SEARCH_LIMIT: '3',
+  ASPECT_RATIO_TWO_THIRDS: 2 / 3,
+  MAX_IMAGE_SIZE_MB: 0.1,
+  MAX_IMAGE_HEIGHT: 1920,
+};

@@ -7,6 +7,12 @@
   </div>
   @if (!isUploadRoute) {
     <button [routerLink]="['/upload']" [disabled]="isUploadRoute" class="btn btn-ghost rounded-md hover:bg-black">
+      <!-- <app-svg-icons name="upload" size="20" color="white"></app-svg-icons> -->
+      sa
+    </button>
+  }
+  @if (!isUploadRoute2) {
+    <button [routerLink]="['/upload2']" [disabled]="isUploadRoute2" class="btn btn-ghost rounded-md hover:bg-black">
       <app-svg-icons name="upload" size="20" color="white"></app-svg-icons>
     </button>
   }

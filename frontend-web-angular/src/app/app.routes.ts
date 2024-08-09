@@ -6,6 +6,7 @@ import appMessages from '../assets/i18n/en/appMessages.json';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { UploadMediaComponent } from './components/upload-media/upload-media.component';
 import { VideoMediaViewerComponent } from './components/video-media-viewer/video-media-viewer.component';
+import { UploadContentComponent } from './components/upload-content/upload-content.component';
 // import { AuthGuard } from '@auth0/auth0-angular';
 
 export const routes: Routes = [
@@ -20,6 +21,12 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     // canActivateChild: [AuthGuard],
     children: [{ path: '', component: UploadMediaComponent }],
+  },
+  {
+    path: 'upload2',
+    component: MainLayoutComponent,
+    // canActivateChild: [AuthGuard],
+    children: [{ path: '', component: UploadContentComponent }],
   },
   {
     path: 'watch',
