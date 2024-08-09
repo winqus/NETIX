@@ -1,22 +1,23 @@
 import { TestBed } from '@automock/jest';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { Test } from '@nestjs/testing';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
-import { TitleType } from '@ntx/external-search/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import * as Joi from 'joi';
 import * as path from 'path';
 import { ENV_FILES, ENVIRONMENTS } from '../../../../src/constants';
-import { TEST_CACHE_DIRECTORIES, TEST_DIRECTORIES } from '../../../../test/constants';
+import { TEST_DATA_DIRECTORY, TEST_DIRECTORY } from '../../../../test/constants';
 import { JestCacheFetch } from '../../../../test/utils/JestCacheFetch';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 import { TMDBSearchTitleService } from './TMDB-search-title.service';
 
-const COMPRESSED_CACHE_FILE = true;
-const SAVED_CACHE_FILENAME = 'titleSearchTMDB_OkResponseCache.json';
-
 describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
+  const FORWARD_FETCH_IF_NOT_CACHED = false;
+  const COMPRESSED_CACHE_FILE = true;
+  const SAVED_CACHE_FILENAME = 'titleSearchTMDB_OkResponseCache.json';
+
   let plugin: TMDBSearchTitleService;
   let cacheFilePath;
   let cacheFetch: JestCacheFetch;
@@ -63,51 +64,34 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
     Test/service setup and teardown, helper functions
   /*******************************************************************************************************************/
   beforeAll(async () => {
-    if (process.env.NODE_ENV !== ENVIRONMENTS.CI_TEST) {
-      await Test.createTestingModule({
-        imports: [
-          ConfigModule.forRoot({
-            envFilePath: [ENV_FILES[ENVIRONMENTS.TEST]],
-            isGlobal: true,
-            validationSchema: Joi.object({
-              NODE_ENV: Joi.string().valid(ENVIRONMENTS.TEST).required(),
-              TMDB_API_KEY: Joi.string().required(),
-            }),
-            validationOptions: {
-              abortEarly: false,
-            },
+    /* If using fetch cached data  ************************************************************* */
+    // fetchMock.doMock();
+    // fetchMock.enableMocks();
+    /* Else - using real fetch call to api (not using cached data, or refreshing the cache file) */
+    fetchMock.dontMock();
+    /* ***************************************************************************************** */
+
+    await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          envFilePath: [ENV_FILES[ENVIRONMENTS.TEST]],
+          isGlobal: true,
+          validationSchema: Joi.object({
+            TMDB_API_KEY: Joi.string().required(),
           }),
-        ],
-      }).compile();
-    }
+          validationOptions: {
+            abortEarly: false,
+          },
+        }),
+      ],
+    }).compile();
 
-    if (process.env.NODE_ENV === ENVIRONMENTS.TEST) {
-      fetchMock.dontMock();
-    } else {
-      fetchMock.doMock();
-      fetchMock.enableMocks();
-    }
-
-    if (process.env.NODE_ENV === ENVIRONMENTS.CI_TEST) {
-      cacheFilePath = path.resolve(
-        process.cwd(),
-        TEST_DIRECTORIES[ENVIRONMENTS.CI_TEST],
-        TEST_CACHE_DIRECTORIES[ENVIRONMENTS.CI_TEST],
-        SAVED_CACHE_FILENAME,
-      );
-    } else {
-      cacheFilePath = path.resolve(
-        process.cwd(),
-        TEST_DIRECTORIES[ENVIRONMENTS.TEST],
-        TEST_CACHE_DIRECTORIES[ENVIRONMENTS.TEST],
-        SAVED_CACHE_FILENAME,
-      );
-    }
+    cacheFilePath = path.resolve(process.cwd(), TEST_DIRECTORY, TEST_DATA_DIRECTORY, SAVED_CACHE_FILENAME);
 
     cacheFetch = new JestCacheFetch({
       cacheFilePath,
       cacheUrlOnlyMatchingRegex: /api\.themoviedb\.org/,
-      forwardFetchIfNotCached: true,
+      forwardFetchIfNotCached: FORWARD_FETCH_IF_NOT_CACHED,
       realFetchResponseDelayMs: 5,
       usesFileCompression: COMPRESSED_CACHE_FILE,
     });
@@ -119,7 +103,7 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
   });
 
   afterAll(() => {
-    if (process.env.NODE_ENV === ENVIRONMENTS.TEST) {
+    if ((FORWARD_FETCH_IF_NOT_CACHED as boolean) === true) {
       cacheFetch.finalize(true);
     } else {
       cacheFetch.finalize(false);

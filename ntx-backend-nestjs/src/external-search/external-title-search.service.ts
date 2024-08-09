@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { Result } from '@ntx/common/Result';
 import { ExternalSearchSources, getConfigForSource } from './external-search.constants';
 import { TitleDetailedSearchResult } from './interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from './interfaces/TitleSearchResult.interface';
-import { TitleType } from './interfaces/TitleType.enum';
 import { TMDBSearchTitleService } from './plugins/tmdb-search-title/TMDB-search-title.service';
 
 @Injectable()
@@ -73,7 +73,7 @@ export class ExternalTitleSearchService {
       }
 
       if (titleDetails == null) {
-        this.logger.warn('No results found');
+        this.logger.warn(`No results found for ID: ${id}, type: ${type}, in source: ${sourceUUID}`);
 
         return Result.fail('No results found');
       }

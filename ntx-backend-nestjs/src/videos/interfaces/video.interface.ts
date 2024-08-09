@@ -1,5 +1,3 @@
-import { Document } from 'mongoose';
+import { Entity } from '@ntx/common/interfaces/entity.interface';
 
-export interface Video extends Document {
-  readonly uuid: string;
-}
+export interface Video extends Entity {}

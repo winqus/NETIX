@@ -1,8 +1,8 @@
 import { TestBed } from '@automock/jest';
 import { Logger } from '@nestjs/common';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
-import { TitleType } from '../../interfaces/TitleType.enum';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 import { TMDBSearchTitleService } from './TMDB-search-title.service';
 

@@ -11,7 +11,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@ntx/*": ["./src/*"]
+      "@ntx/*": ["./src/*"],
+      "@ntx-test/*": ["./test/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

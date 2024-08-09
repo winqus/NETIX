@@ -1,8 +1,8 @@
 import { BadRequestException, Controller, Get, HttpException, Logger, Param, Query } from '@nestjs/common';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { CONTROLLER_BASE_PATH, CONTROLLER_VERSION, ExternalSearchSources } from './external-search.constants';
 import { ExternalTitleSearchService } from './external-title-search.service';
-import { TitleType } from './interfaces/TitleType.enum';
 
 @Controller({
   path: CONTROLLER_BASE_PATH,

@@ -1,6 +1,6 @@
-import { TitleDetailedSearchResult } from 'src/external-search/interfaces/TitleDetailedSearchResult.interface';
-import { TitleSearchResult } from 'src/external-search/interfaces/TitleSearchResult.interface';
-import { TitleType } from 'src/external-search/interfaces/TitleType.enum';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { TitleDetailedSearchResult } from '@ntx/external-search/interfaces/TitleDetailedSearchResult.interface';
+import { TitleSearchResult } from '@ntx/external-search/interfaces/TitleSearchResult.interface';
 
 export interface TitleSearchPluginConfig {
   usePlugin: boolean;

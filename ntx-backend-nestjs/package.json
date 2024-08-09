@@ -13,7 +13,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --verbose=false",
+    "test": "jest --verbose=false --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -35,6 +35,8 @@
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/throttler": "^6.0.0",
     "bullmq": "^5.8.7",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "file-type": "^19.2.0",
     "fs-extra": "^11.2.0",
     "fuse.js": "^7.0.0",
@@ -65,7 +67,9 @@
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
     "jest-fetch-mock": "^3.0.3",
+    "mongodb-memory-server": "^10.0.0",
     "prettier": "^3.0.0",
+    "redis-memory-server": "^0.11.0",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.0",
@@ -82,7 +86,8 @@
     ],
     "rootDir": "src",
     "moduleNameMapper": {
-      "^@ntx/(.*)$": "<rootDir>/$1"
+      "^@ntx/(.*)$": "<rootDir>/$1",
+      "^@ntx-test/(.*)$": "<rootDir>/../test/$1"
     },
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {

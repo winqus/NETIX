@@ -1,14 +1,18 @@
 import { OnQueueEvent, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Result } from '@ntx/common/Result';
+import { NtxEvent } from '@ntx/common/events';
+import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { Job } from 'bullmq';
-import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as sharp from 'sharp';
-import { Result } from 'src/common/Result';
-import ThumbnailCreatedEvent from '../events/ThumbnailCreatedEvent';
+import ThumbnailCreatedForTitleEvent from '../../common/events/ThumbnailCreatedEvent';
+import { Thumbnail } from '../interfaces/thumbnail.interface';
+import { ThumbnailCategory } from '../interfaces/thumbnailCategory.enum';
+import { ThumbnailFormat } from '../interfaces/thumbnailFormat.enum';
 import {
-  THUMBNAIL_CREATED_EVENT,
   THUMBNAIL_DIR,
   THUMBNAIL_FILE,
   THUMBNAIL_QUEUE,
@@ -16,6 +20,7 @@ import {
   THUMBNAIL_QUEUE_JOBS,
   thumbnailFileName,
 } from '../thumbnails.constants';
+import { ThumbnailsRepository } from '../thumbnails.repository';
 import { ProcessThumbnailJobData } from './processThumbnailJobData.interface';
 
 @Processor(THUMBNAIL_QUEUE, {
@@ -24,7 +29,10 @@ import { ProcessThumbnailJobData } from './processThumbnailJobData.interface';
 export class ThumbnailProcessor extends WorkerHost {
   private readonly logger = new Logger(ThumbnailProcessor.name);
 
-  constructor(private readonly eventEmitter: EventEmitter2) {
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly repository: ThumbnailsRepository,
+  ) {
     super();
   }
 
@@ -38,7 +46,7 @@ export class ThumbnailProcessor extends WorkerHost {
   }
 
   async handleThumbnailProcessing(job: Job<ProcessThumbnailJobData>, _token?: string): Promise<Result<any>> {
-    const { filePath, titleID } = job.data;
+    const { filePath, titleUUID: titleID } = job.data;
     await job.updateProgress(10);
 
     const outputFilePath = path.join(THUMBNAIL_DIR, thumbnailFileName(titleID));
@@ -51,13 +59,27 @@ export class ThumbnailProcessor extends WorkerHost {
       })
       .webp()
       .toFile(outputFilePath);
+    await job.updateProgress(80);
 
-    // TODO: remove the old file after processing instead of this
-    fs.writeFileSync(filePath.concat('.remove'), '');
+    // TODO: remove the old file after processing, this fails due to EPERM for some reason
+    // await fse.removeSync(filePath);
 
+    await job.updateProgress(90);
+
+    const newThumbnail = await this.repository.create({
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      uuid: generateUUIDv4(),
+      type: ThumbnailCategory.Normal,
+      format: ThumbnailFormat.WEBP,
+    } as Thumbnail);
+    await job.updateProgress(95);
+
+    this.eventEmitter.emit(
+      NtxEvent.ThumbnailCreatedForTitle,
+      new ThumbnailCreatedForTitleEvent(job.data.titleUUID, newThumbnail),
+    );
     await job.updateProgress(100);
-
-    this.eventEmitter.emit(THUMBNAIL_CREATED_EVENT, new ThumbnailCreatedEvent(job.data.titleID, job.data.titleID));
 
     return Result.ok(outputFilePath);
   }

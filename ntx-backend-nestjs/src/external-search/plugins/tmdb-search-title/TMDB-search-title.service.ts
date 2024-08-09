@@ -8,13 +8,13 @@
 
 const Fuse = require('fuse.js');
 import { Injectable, Logger } from '@nestjs/common';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { normalize } from '@ntx/common/utils/mathUtils';
 import { ExternalSearchSources } from '@ntx/external-search/external-search.constants';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
 import AbstractAPIPlugin from '../../interfaces/AbstractAPIPlugin';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
-import { TitleType } from '../../interfaces/TitleType.enum';
 import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
 import { TMDBMovie } from './interfaces/TMDBMovie';
 import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
