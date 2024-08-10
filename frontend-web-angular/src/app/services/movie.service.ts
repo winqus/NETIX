@@ -3,7 +3,7 @@ import { Observable, of, delay, map } from 'rxjs';
 import { MediaItem } from '../models/mediaItem';
 import { MediaItemMapper } from '../mappers/mediaItemMapper';
 import movieTestData from './movieTestData';
-import { API_CONFIG } from '../config/api.config';
+import { API_CONFIG } from '../config/api-endpoints';
 import { HttpClient } from '@angular/common/http';
 import WatchableVideoDTO from '../models/watchableVideo.dto';
 import { WatchableVideoDTOMapper } from '../mappers/WatchableVideoDTOMapper';
