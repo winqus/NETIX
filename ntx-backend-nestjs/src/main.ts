@@ -6,8 +6,10 @@ import { LoggerService } from './logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: LoggerService,
+    bufferLogs: true,
   });
+
+  app.useLogger(app.get(LoggerService));
 
   app.enableVersioning({
     type: VersioningType.URI,
