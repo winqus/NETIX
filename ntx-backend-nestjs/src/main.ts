@@ -2,9 +2,12 @@ import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DEFAULT_CONTROLLER_VERSION, DEFAULT_PORT, ENV, GLOBAL_ROUTE_PREFIX, PORT } from './constants';
+import { LoggerService } from './logger/logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: LoggerService,
+  });
 
   app.enableVersioning({
     type: VersioningType.URI,
