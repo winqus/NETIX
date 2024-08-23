@@ -23,13 +23,23 @@ export class LoggerService implements NestLoggerService {
       level: process.env.NODE_ENV === 'development' ? 'debug' : 'warn',
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        winston.format.printf((info) => `${info.timestamp} ${info.level.toUpperCase()}: ${info.message}`),
+        winston.format.printf((info) => {
+          const { level, message, timestamp } = info;
+          const location = info.location ? `[${info.location}]` : '';
+
+          return `${timestamp} ${level.toUpperCase()}: ${location} ${message}`;
+        }),
       ),
       transports: [
         new winston.transports.Console({
           format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.printf((info) => `${info.timestamp} ${info.level.toUpperCase()}: ${info.message}`),
+            winston.format.colorize({ all: true }),
+            winston.format.printf((info) => {
+              const { level, message, timestamp } = info;
+              const location = info.location ? `[${info.location}]` : '';
+
+              return `${timestamp} ${level.toUpperCase()}: ${location} ${message}`;
+            }),
           ),
         }),
         new winston.transports.DailyRotateFile({
@@ -48,14 +58,13 @@ export class LoggerService implements NestLoggerService {
   }
 
   log(message: any, ...optionalParams: any[]) {
-    console.log('WORKS console');
     this.logger.info(this.formatMessage(message, ...optionalParams));
   }
 
   error(message: any, ...optionalParams: any[]) {
-    console.log('WORKS error');
     const stack = optionalParams[0] || '';
-    this.logger.error(this.formatMessage(`${message} - ${stack}`, ...optionalParams.slice(1)));
+    const location = this.getCallerLocation();
+    this.logger.error(this.formatMessage(`${message} - ${stack}`, ...optionalParams.slice(1)), { location });
   }
 
   warn(message: any, ...optionalParams: any[]) {
@@ -84,19 +93,35 @@ export class LoggerService implements NestLoggerService {
     return context ? `[${context}] ${message}` : message;
   }
 
-  // Static Methods
+  private getCallerLocation(): string {
+    const stack = new Error().stack;
+    if (!stack) {
+      return '';
+    }
+
+    const stackLines = stack.split('\n');
+
+    const callerStackLine = stackLines.find((line) => !line.includes('LoggerService.') && line.includes('.ts'));
+
+    if (callerStackLine) {
+      const match = callerStackLine.match(/(\S+\.ts):(\d+):(\d+)/);
+      if (match) {
+        return `${match[1]}:${match[2]}`;
+      }
+    }
+
+    return '';
+  }
+
   static logBuffer: LogBufferRecord[] = [];
   static staticInstanceRef?: LoggerService;
   static logLevels?: LogLevel[];
   private static isBufferAttached = false;
 
-  static WrapBuffer() {
-    // Buffer wrapping logic here
-  }
+  static WrapBuffer() {}
 
   static overrideLogger(logger: LoggerService | LogLevel[] | boolean) {
     if (typeof logger === 'boolean') {
-      // handle boolean logic
     } else if (Array.isArray(logger)) {
       LoggerService.logLevels = logger;
     } else {
@@ -104,9 +129,7 @@ export class LoggerService implements NestLoggerService {
     }
   }
 
-  static flush() {
-    // Logic to flush buffer
-  }
+  static flush() {}
 
   static attachBuffer() {
     LoggerService.isBufferAttached = true;
