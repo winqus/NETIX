@@ -9,7 +9,16 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  app.useLogger(app.get(LoggerService));
+  const logger = app.get(LoggerService);
+  app.useLogger(logger);
+
+  process.on('uncaughtException', (err) => {
+    logger.error('Uncaught Exception:', err.stack);
+  });
+
+  process.on('unhandledRejection', (reason, _promise) => {
+    logger.error('Unhandled Promise Rejection:', reason);
+  });
 
   app.enableVersioning({
     type: VersioningType.URI,
