@@ -1,8 +1,10 @@
 import { VersioningType } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import 'winston-daily-rotate-file';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 import { DEFAULT_CONTROLLER_VERSION, DEFAULT_PORT, ENV, GLOBAL_ROUTE_PREFIX, PORT } from './constants';
 
 async function bootstrap() {
@@ -29,6 +31,8 @@ async function bootstrap() {
           }),
           winston.format.colorize({ all: true }),
         ),
+        handleExceptions: true,
+        handleRejections: true,
       }),
       new winston.transports.DailyRotateFile({
         filename: 'logs/%DATE%-error.log',
@@ -44,6 +48,9 @@ async function bootstrap() {
     ],
   });
   app.useLogger(logger);
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   app.enableVersioning({
     type: VersioningType.URI,
