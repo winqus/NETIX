@@ -35,11 +35,11 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: npm run lint
 
+      - name: Build
+        working-directory: ntx-web-fe-angular
+        run: npm run build -- --configuration production
+
       - name: Run tests
         working-directory: ntx-web-fe-angular
         run: npm run test
         continue-on-error: true #Change to false when test are written
-
-      - name: Build
-        working-directory: ntx-web-fe-angular
-        run: npm run build -- --configuration production
