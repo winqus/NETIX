@@ -1,0 +1,89 @@
+@startuml NETIX_LVL3_NTX-BE
+
+skinparam FrameBackgroundColor white
+
+frame "[C4 LVL3] NTX-BE Components" {
+    skinparam {
+        componentBackgroundColor<<component>> #0D1F3D
+        componentFontColor<<component>> #FFFFFF
+        componentBorderColor<<component>> #FFFFFF
+        databaseBackgroundColor<<component>> #0D1F3D
+        databaseFontColor<<component>> #FFFFFF
+        databaseBorderColor<<component>> #FFFFFF
+        defaultTextAlignment<<component>> center
+    }
+    component "NTX-BE-API" <<interface>> {
+        interface THUMBNAILS_API
+        interface VIDEOS_API
+        interface MOVIES_API
+        interface LIBRARY_API
+        interface SERIES_API
+    }
+    interface IdP_API
+    interface FS_API
+    interface REDIS_API
+    interface TMDB_API
+    interface MongoDB_API
+    interface "MongoDB_API" as MongoDB_API_2
+
+    component [NTX-BE] <<container>> {
+        component "<<module>>\nMovies" <<component>> as Movies
+        component "<<module>>\nLibrary" <<component>> as Library
+        component "<<module>>\nSeries" <<component>> as Series
+        component "<<module>>\nThumbnails" <<component>> as Thumbnails
+        component "<<module>>\nVideos" <<component>> as Videos
+        component "<<module>>\nFileStorage" <<component>> as FileStorage
+        component "<<module>>\nExternalSearch" <<component>> as ExternalSearch
+        component "<<module>>\nTitles" <<component>> as Titles
+        component "<<module>>\nAuth" <<component>> as Auth
+
+        Auth -down-( IdP_API
+        Auth -up- Auth_API
+
+        FileStorage --( FS_API
+        FileStorage -up- Storage_API
+
+        Videos -down-( Auth_API
+        Videos -up-( MongoDB_API
+        Videos -up-( REDIS_API
+        Videos --( Storage_API
+        Videos -- Videos_API
+        Videos -up- VIDEOS_API
+
+        Thumbnails -down-( Auth_API
+        Thumbnails -up-( MongoDB_API
+        Thumbnails -up-( REDIS_API
+        Thumbnails --( Storage_API
+        Thumbnails -- Thumbnails_API
+        Thumbnails -up- THUMBNAILS_API
+
+        Titles --( MongoDB_API_2
+        Titles -up- Titles_API
+
+        Movies -down-( Auth_API
+        Movies -down-( Titles_API
+        Movies --( Videos_API
+        Movies --( Thumbnails_API
+        Movies -- Movies_API
+        Movies -up- MOVIES_API
+
+        Library -down-( Auth_API
+        Library -down-( ExtS_API
+        Library --( Series_API
+        Library --( Movies_API
+        Library -up- LIBRARY_API
+
+        Series -down-( Auth_API
+        Series -down-( Titles_API
+        Series --( Videos_API
+        Series --( Thumbnails_API
+        Series -- Series_API
+        Series -up- SERIES_API
+
+
+
+        ExternalSearch --( TMDB_API
+        ExternalSearch -up- ExtS_API
+    }
+}
+@enduml
