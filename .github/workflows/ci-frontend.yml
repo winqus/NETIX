@@ -3,7 +3,7 @@ name: Frontend CI
 on:
   pull_request:
     paths:
-      - 'frontend-web-angular/**'
+      - 'ntx-web-fe-angular/**'
 
 jobs:
   frontend:
@@ -22,24 +22,24 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
-          path: frontend-web-angular/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/frontend-web-angular/package-lock.json') }}
+          path: ntx-web-fe-angular/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/ntx-web-fe-angular/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies
-        working-directory: frontend-web-angular
+        working-directory: ntx-web-fe-angular
         run: npm install
 
       - name: Run lint
-        working-directory: frontend-web-angular
+        working-directory: ntx-web-fe-angular
         run: npm run lint
 
       - name: Run tests
-        working-directory: frontend-web-angular
+        working-directory: ntx-web-fe-angular
         run: npm run test
         continue-on-error: true #Change to false when test are written
 
       - name: Build
-        working-directory: frontend-web-angular
+        working-directory: ntx-web-fe-angular
         run: npm run build -- --configuration production
