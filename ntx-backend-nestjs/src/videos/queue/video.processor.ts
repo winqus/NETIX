@@ -2,7 +2,6 @@ import { OnQueueEvent, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bull
 import { Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NtxEvent } from '@ntx/common/events';
-import VideoCreatedForTitleEvent from '@ntx/common/events/VideoCreatedEvent';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { Job } from 'bullmq';
 import * as fse from 'fs-extra';
@@ -86,7 +85,7 @@ export class VideoProcessor extends WorkerHost {
       updatedAt: new Date(),
     } as Video);
 
-    this.eventEmitter.emit(NtxEvent.VideoCreatedForTitle, new VideoCreatedForTitleEvent(titleUUID, newVideo));
+    // this.eventEmitter.emit(NtxEvent.VideoCreatedForTitle, new VideoCreatedForTitleEvent(titleUUID, newVideo));
 
     this.logger.log(`Video processing complete for title ${titleUUID}, new video ID: ${newVideo.uuid}`);
 

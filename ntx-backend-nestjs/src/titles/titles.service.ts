@@ -1,7 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { NtxEvent } from '@ntx/common/events';
-import ThumbnailCreatedForTitleEvent from '@ntx/common/events/ThumbnailCreatedEvent';
 import { Result } from '@ntx/common/Result';
 import { isValidUUID } from '@ntx/utility/isValidUUID';
 import { validateOrReject } from 'class-validator';
@@ -68,16 +65,16 @@ export class TitlesService {
     }
   }
 
-  @OnEvent(NtxEvent.ThumbnailCreatedForTitle)
-  private async handleThumbnailCreatedForTitleEvent(payload: ThumbnailCreatedForTitleEvent) {
-    const { titleUUID, thumbnail } = payload;
+  // @OnEvent(NtxEvent.ThumbnailCreatedForTitle)
+  // private async handleThumbnailCreatedForTitleEvent(payload: ThumbnailCreatedForTitleEvent) {
+  //   const { titleUUID, thumbnail } = payload;
 
-    const setThumbnailDTO = new SetTitleThumbnailDTO();
-    setThumbnailDTO.titleUUID = titleUUID;
-    setThumbnailDTO.thumbnail = thumbnail;
+  //   const setThumbnailDTO = new SetTitleThumbnailDTO();
+  //   setThumbnailDTO.titleUUID = titleUUID;
+  //   setThumbnailDTO.thumbnail = thumbnail;
 
-    await this.setThumbnail(setThumbnailDTO);
-  }
+  //   await this.setThumbnail(setThumbnailDTO);
+  // }
 
   // TODO: Handle Video Created Event, assign video ID to title
   // @OnEvent(VIDEO_PROCESSED_EVENT)

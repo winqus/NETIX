@@ -19,9 +19,6 @@ import {
 } from './constants';
 import { DatabaseModule } from './database/database.module';
 import { ExternalSearchModule } from './external-search/external-search.module';
-import { ThumbnailsModule } from './thumbnails/thumbnails.module';
-import { TitlesModule } from './titles/titles.module';
-import { VideosModule } from './videos/videos.module';
 
 @Module({
   imports: [
@@ -51,9 +48,6 @@ import { VideosModule } from './videos/videos.module';
       },
     ]),
     ExternalSearchModule,
-    ThumbnailsModule,
-    VideosModule,
-    TitlesModule,
   ],
   controllers: [AppController],
   providers: [
