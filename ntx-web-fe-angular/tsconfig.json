@@ -4,7 +4,11 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@ntx/*": ["./src/*"]
+      "@ntx/*": ["./src/*"],
+      "@ntx-app/*": ["./src/app/*"],
+      "@ntx-core/*": ["./src/app/core/*"],
+      "@ntx-pages/*": ["./src/app/pages/*"],
+      "@ntx-shared/*": ["./src/app/shared/*"]
     },
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,

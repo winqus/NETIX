@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { EmptyLayoutComponent } from './layouts/empty-layout/empty-layout.component';
-import { ErrorPageComponent } from './components/error-page/error-page.component';
-import appMessages from '../assets/i18n/en/appMessages.json';
-import { MovieListComponent } from './components/movie-list/movie-list.component';
-import { UploadMediaComponent } from './components/upload-media/upload-media.component';
-import { VideoMediaViewerComponent } from './components/video-media-viewer/video-media-viewer.component';
-import { UploadContentComponent } from './components/upload-content/upload-content.component';
+import appMessages from '@ntx/assets/i18n/en/appMessages.json';
+import { MainLayoutComponent } from '@ntx-core/layouts/main-layout/main-layout.component';
+import { EmptyLayoutComponent } from '@ntx-core/layouts/empty-layout/empty-layout.component';
+import { ErrorPageComponent } from '@ntx-pages/error-page/error-page.component';
+import { MovieListComponent } from '@ntx-pages/movie-list/movie-list.component';
+import { UploadMediaComponent } from '@ntx-pages/upload-media-(legacy)/upload-media.component';
+import { VideoMediaViewerComponent } from '@ntx-pages/video-media-viewer/video-media-viewer.component';
+import { UploadContentComponent } from '@ntx-pages/upload-content/upload-content.component';
 // import { AuthGuard } from '@auth0/auth0-angular';
 
 export const routes: Routes = [
