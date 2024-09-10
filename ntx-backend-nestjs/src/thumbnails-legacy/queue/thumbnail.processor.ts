@@ -8,7 +8,6 @@ import { Job } from 'bullmq';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as sharp from 'sharp';
-import ThumbnailCreatedForTitleEvent from '../../common/events/ThumbnailCreatedEvent';
 import { Thumbnail } from '../interfaces/thumbnail.interface';
 import { ThumbnailCategory } from '../interfaces/thumbnailCategory.enum';
 import { ThumbnailFormat } from '../interfaces/thumbnailFormat.enum';
@@ -75,10 +74,10 @@ export class ThumbnailProcessor extends WorkerHost {
     } as Thumbnail);
     await job.updateProgress(95);
 
-    this.eventEmitter.emit(
-      NtxEvent.ThumbnailCreatedForTitle,
-      new ThumbnailCreatedForTitleEvent(job.data.titleUUID, newThumbnail),
-    );
+    // this.eventEmitter.emit(
+    //   NtxEvent.ThumbnailCreatedForTitle,
+    //   new ThumbnailCreatedForTitleEvent(job.data.titleUUID, newThumbnail),
+    // );
     await job.updateProgress(100);
 
     return Result.ok(outputFilePath);

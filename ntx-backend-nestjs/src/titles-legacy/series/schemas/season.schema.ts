@@ -1,6 +1,6 @@
 import { NameSubschema } from '@ntx/common/subschemas/name.subschema';
 import { UUIDSubschema } from '@ntx/common/subschemas/uuid.subschema';
-import { ThumbnailSchema } from '@ntx/thumbnails/schemas/thumbnail.schema';
+import { ThumbnailSchema } from '@ntx/thumbnails-legacy/schemas/thumbnail.schema';
 import * as mongoose from 'mongoose';
 import { Season } from '../interfaces/season.interface';
 import { EpisodeSchema } from './episode.schema';

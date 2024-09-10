@@ -1,6 +1,6 @@
 import TitleCreatedFromExternalSourceEvent from '@ntx/common/events/TitleCreatedFromExternalSourceEvent';
 import { TitleDetailedSearchResult } from '@ntx/external-search/interfaces/TitleDetailedSearchResult.interface';
-import { SeriesTitle } from '@ntx/titles/series/interfaces/seriesTitle.interface';
+import { SeriesTitle } from '@ntx/titles-legacy/series/interfaces/seriesTitle.interface';
 
 export default class SeriesCreatedFromExternalSourceEvent extends TitleCreatedFromExternalSourceEvent {
   constructor(

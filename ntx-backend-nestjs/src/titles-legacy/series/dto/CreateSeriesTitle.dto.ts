@@ -1,5 +1,5 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { NameDTO } from '@ntx/titles/dto/Name.dto';
+import { NameDTO } from '@ntx/titles-legacy/dto/Name.dto';
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, ValidateNested } from 'class-validator';
 
