@@ -1,7 +1,7 @@
 import { NameSubschema } from '@ntx/common/subschemas/name.subschema';
 import { UUIDSubschema } from '@ntx/common/subschemas/uuid.subschema';
-import { ThumbnailSchema } from '@ntx/thumbnails/schemas/thumbnail.schema';
-import { VideoRefSubschema } from '@ntx/titles/schemas/relatedVideo.subschema';
+import { ThumbnailSchema } from '@ntx/thumbnails-legacy/schemas/thumbnail.schema';
+import { VideoRefSubschema } from '@ntx/titles-legacy/schemas/relatedVideo.subschema';
 import * as mongoose from 'mongoose';
 import { Episode } from '../interfaces/episode.interface';
 

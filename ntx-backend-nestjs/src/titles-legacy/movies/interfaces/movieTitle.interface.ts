@@ -1,4 +1,4 @@
-import { Title } from '@ntx/titles/interfaces/title.interface';
+import { Title } from '@ntx/titles-legacy/interfaces/title.interface';
 
 export interface MovieTitle extends Title {
   runtimeMinutes: number;

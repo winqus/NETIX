@@ -1,4 +1,4 @@
-import { Thumbnail } from '@ntx/thumbnails/interfaces/thumbnail.interface';
+import { Thumbnail } from '@ntx/thumbnails-legacy/interfaces/thumbnail.interface';
 import { IsObject, IsUUID } from 'class-validator';
 
 export class SetTitleThumbnailDTO {

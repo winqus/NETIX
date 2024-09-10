@@ -1,4 +1,4 @@
-import { NameCategory } from '@ntx/titles/interfaces/nameCategory.enum';
+import { NameCategory } from '@ntx/titles-legacy/interfaces/nameCategory.enum';
 
 export interface Name {
   value: string;

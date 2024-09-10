@@ -9,8 +9,8 @@ export const VIDEO_FILE = {
   EXTENTION: 'mkv',
   FIELD_NAME: 'video',
 };
-export const VIDEO_TEMP_DIR = './data/upload/temp/videos/';
-export const VIDEO_DIR = './data/videos/';
+export const VIDEO_TEMP_DIR = './data/upload/temp/videos-legacy/';
+export const VIDEO_DIR = './data/videos-legacy/';
 export const videoFileName = (ID: string) => `v${ID}.mkv`;
 
 export const VIDEO_QUEUE = 'video-queue';
