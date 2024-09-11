@@ -20,26 +20,13 @@ import {
 } from './app.constants';
 import { DatabaseModule } from './database/database.module';
 import { ExternalSearchModule } from './external-search/external-search.module';
+import { JobQueueModule } from './job-queue/job-queue.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        connection: {
-          host: configService.get(QUEUE_HOST),
-          port: configService.get(QUEUE_PORT),
-          password: configService.get(QUEUE_PASSWORD),
-        },
-      }),
-      inject: [ConfigService],
-    }),
-    BullBoardModule.forRoot({
-      route: QUEUE_UI_ROUTE,
-      adapter: ExpressAdapter,
-    }),
+    JobQueueModule.forRootAsync(),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([

@@ -31,7 +31,9 @@ CLIENT_ORIGIN_URL='http://localhost:4200'
 # AUTH0_DOMAIN=<none for now>
 NODE_ENV='development'
 USE_MEMORY_MONGO=false # set to true for a temporary in-memory database (will log to console the connection string)
-IN_MEMORY_MONGO_PORT=57017 # if not used, port will be random
+IN_MEMORY_MONGO_PORT=57017 # if commented, port will be random
+USE_MEMORY_REDIS=false # set to true for a temporary in-memory database (will log to console the connection string)
+IN_MEMORY_REDIS_PORT=6380 # if commented, port will be random
 ```
 
 
