@@ -1,5 +1,5 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { DATABASE_CONNECTION } from '@ntx/database/constants';
+import { DATABASE_CONNECTION } from '@ntx/database/database.constants';
 import { Mongoose } from 'mongoose';
 import { MovieTitleSchema } from './movies/schemas/movieTitle.schema';
 import { TitleSchema } from './schemas/title.schema';

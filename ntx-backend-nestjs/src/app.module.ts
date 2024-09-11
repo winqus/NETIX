@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
 import {
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL,
@@ -16,7 +17,7 @@ import {
   QUEUE_PASSWORD,
   QUEUE_PORT,
   QUEUE_UI_ROUTE,
-} from './constants';
+} from './app.constants';
 import { DatabaseModule } from './database/database.module';
 import { ExternalSearchModule } from './external-search/external-search.module';
 

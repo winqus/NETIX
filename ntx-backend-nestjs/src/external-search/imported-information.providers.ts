@@ -1,4 +1,4 @@
-import { DATABASE_CONNECTION } from '@ntx/database/constants';
+import { DATABASE_CONNECTION } from '@ntx/database/database.constants';
 import { Mongoose } from 'mongoose';
 import { IMPORTED_INFORMATION_MODEL, IMPORTED_INFORMATION_SCHEMA_NAME } from './imported-information.constants';
 import { ImportedInformationSchema } from './schemas/importedInformation.schema';
