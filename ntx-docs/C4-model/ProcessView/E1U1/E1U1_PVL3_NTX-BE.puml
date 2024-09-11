@@ -1,0 +1,45 @@
+/' ********************************************************************************************
+    PlantUML syntax notes:
+    ++ Activate the target (optionally a color may follow this)
+    -- Deactivate the source
+    ** Create an instance of the target
+    !! Destroy an instance of the target
+   ***************************************************************************************** '/
+
+@startuml E1U1_PVL3_NTX-BE
+!include MagicDraw.puml
+mainframe E1U1_PVL3_NTX-BE
+
+box "<<module>>\nMovies"
+    participant MoviesCtrl as ": MoviesController"
+    participant MoviesSrv as ": MoviesService"
+    participant Movie as ": Movie"
+end box
+box "<<module>>\nImages"
+    participant PosterSrv as ": PosterService"
+end box
+
+[o-> MoviesCtrl++ : POST /api/v1/movies\n(json body: CreateMovieDTO) + file
+    MoviesCtrl -> MoviesCtrl : validate CreateMovieDTO\nand file
+    alt validation errors
+        [o<<-- MoviesCtrl : error (status 400)
+    else else
+        MoviesCtrl -> MoviesSrv++ : createMovie(dto: CreateMovieDTO)
+            MoviesSrv -> PosterSrv++ : createPoster(file: File)
+                note right: creates optimized\nposter of all sizes\n(L, M, S, XS)
+                PosterSrv -> PosterSrv : generate posterID
+                PosterSrv -> PosterSrv : addCreatePosterJob(file, posterID)
+            MoviesSrv <<-- PosterSrv : posterID: string
+            PosterSrv -> PosterSrv : process CreatePoster job
+            MoviesSrv -->> Movie** : <<create>>
+            deactivate PosterSrv
+            MoviesSrv ->> Movie++ : save movie data
+            MoviesSrv -> MoviesSrv : map Movie to MovieDTO
+            deactivate Movie
+        MoviesCtrl <<-- MoviesSrv : MovieDTO
+        deactivate MoviesSrv
+    [o<<-- MoviesCtrl : response 201\n(json body: MovieDTO)
+    end
+@enduml
+
+
