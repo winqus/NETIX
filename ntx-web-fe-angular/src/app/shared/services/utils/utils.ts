@@ -43,3 +43,18 @@ function padZero(num: number): string {
 export function generateRandomId(): string {
   return Math.random().toString(36).substring(2, 9);
 }
+
+/**
+ * Method is use to download file.
+ * @param data - Array Buffer data
+ * @param type - type of the document.
+ */
+export function downLoadFile(data: any, type: string): Blob {
+  const blob = new Blob([data], { type: type });
+  const url = window.URL.createObjectURL(blob);
+  const pwa = window.open(url);
+  if (!pwa || pwa.closed || typeof pwa.closed == 'undefined') {
+    alert('Please disable your Pop-up blocker and try again.');
+  }
+  return blob;
+}

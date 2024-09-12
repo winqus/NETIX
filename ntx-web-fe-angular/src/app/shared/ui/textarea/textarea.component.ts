@@ -15,12 +15,12 @@ export interface InputProps {
 }
 
 @Component({
-  selector: 'app-input',
+  selector: 'app-textarea',
   standalone: true,
   imports: [],
-  templateUrl: './input.component.html',
+  templateUrl: './textarea.component.html',
 })
-export class InputComponent implements OnChanges {
+export class TextareaComponent implements OnChanges {
   @Input() props: InputProps = {};
 
   @Output() changedValue = new EventEmitter<string>();

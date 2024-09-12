@@ -1,0 +1,24 @@
+<div class="justify-center items-center">
+  <div class="flex flex-col rounded-lg">
+    <div class="flex flex-row">
+      <div class="flex flex-col h-full mr-6 gap-6">
+        <app-image-upload
+          class="h-[300px] w-[200px]"
+          title="Thumbnail Select"
+          [props]="{ accept: imageAccept, maxSize: imageMaxSize, readonly: false }"
+          (filePassed)="recieveImageFile($event)"
+        ></app-image-upload>
+        <app-input class="w-full" [props]="{ type: 'text', title: '', placeholder: 'URL', value: title }"></app-input>
+      </div>
+      <div class="flex flex-col flex-auto">
+        <app-input [props]="{ type: 'text', title: 'Title', placeholder: 'Title', value: title }"></app-input>
+        <app-textarea class="h-full" [props]="{ type: 'text', title: 'Summary', placeholder: 'Summary...', value: title }"></app-textarea>
+        <app-input [props]="{ type: 'text', title: 'Date', placeholder: 'YYYY-MM-DD', value: date }"></app-input>
+        <app-input [props]="{ type: 'text', title: 'Duration', placeholder: '00:00:00', value: duration }"></app-input>
+      </div>
+    </div>
+    <div class="flex flex-row justify-end">
+      <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" [disabled]="!checkIfReadyToUpload()" (click)="uploadFiles()" onclick="uploadModal.showModal()">UPLOAD</button>
+    </div>
+  </div>
+</div>
