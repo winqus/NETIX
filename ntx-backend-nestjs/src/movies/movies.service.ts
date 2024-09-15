@@ -1,14 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { createValidatedObject } from '@ntx/common/utils/classValidationUtils';
 import { FileInStorage } from '@ntx/file-storage/types';
+import { PosterService } from '@ntx/images/poster.service';
+import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/CreateMovieDTO';
 import { MovieDTO } from './dto/MovieDTO';
+import { Movie } from './entities/movie.entity';
+import { MoviesRepository } from './movies.repository';
 
 @Injectable()
 export class MoviesService {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor() {}
+  constructor(
+    private readonly moviesRepo: MoviesRepository,
+    private readonly posterSrv: PosterService,
+  ) {}
 
   public async createMovie(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
     if (posterFile == null) {
@@ -22,17 +31,30 @@ export class MoviesService {
       throw error;
     }
 
-    // TODO: Create Movie Entity
-    // TODO: create poster
-    // TODO: Save to repo
+    const posterID = await this.posterSrv.createPoster(posterFile);
 
-    const newMovieDTO = new MovieDTO();
-    newMovieDTO.id = 'tempID';
-    newMovieDTO.name = dto.name;
-    newMovieDTO.summary = dto.summary;
-    newMovieDTO.originallyReleasedAt = dto.originallyReleasedAt;
-    newMovieDTO.runtimeMinutes = dto.runtimeMinutes;
-    newMovieDTO.posterID = 'tempPosterID';
+    const newMovie = await createValidatedObject(Movie, {
+      uuid: generateUUIDv4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      posterID: posterID,
+      name: dto.name,
+      type: TitleType.MOVIE,
+      originallyReleasedAt: dto.originallyReleasedAt,
+      summary: dto.summary,
+      runtimeMinutes: dto.runtimeMinutes,
+    } as Movie);
+
+    await this.moviesRepo.create(newMovie);
+
+    const newMovieDTO = createValidatedObject(MovieDTO, {
+      id: newMovie.uuid,
+      name: newMovie.name,
+      summary: newMovie.summary,
+      originallyReleasedAt: newMovie.originallyReleasedAt,
+      runtimeMinutes: newMovie.runtimeMinutes,
+      posterID: newMovie.posterID,
+    } as MovieDTO);
 
     return newMovieDTO;
   }

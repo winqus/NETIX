@@ -21,4 +21,9 @@ export const MOVIES_SUMMARY_LENGTH_MAX = 1000;
 export const MOVIES_RUNTIME_MINS_MIN = 1;
 export const MOVIES_RUNTIME_MINS_MAX = 12000;
 
+/* Mongoose */
+export const MOVIES_MODEL_TOKEN = 'MOVIES_MODEL';
+export const MOVIES_SCHEMA_NAME = 'Movie';
+
+/* Errors */
 export const MOVIES_NO_FILE_PROVIDED_ERROR = 'No file provided';

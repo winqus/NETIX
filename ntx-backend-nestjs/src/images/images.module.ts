@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { PosterService } from './poster.service';
 
-@Module({})
+@Module({
+  providers: [PosterService],
+  exports: [PosterService],
+})
 export class ImagesModule {}

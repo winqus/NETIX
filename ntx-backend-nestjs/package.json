@@ -17,7 +17,7 @@
     "test-ci": "jest --ci --silent --bail --detectOpenHandles --maxWorkers=50% --force-exit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --testTimeout=600000",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker-compose:up": "docker-compose up -d",
     "docker-compose:stop": "docker-compose stop",
