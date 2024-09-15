@@ -7,9 +7,12 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import { resolve } from 'path';
 import { DEFAULT_THROTTLE_LIMIT, DEFAULT_THROTTLE_TTL } from './app.constants';
 import { DatabaseModule } from './database/database.module';
 import { ExternalSearchModule } from './external-search/external-search.module';
+import { FileStorageModule } from './file-storage/file-storage.module';
+import { StorageType } from './file-storage/types';
 import { ImagesModule } from './images/images.module';
 import { JobQueueModule } from './job-queue/job-queue.module';
 import { MoviesModule } from './movies/movies.module';
@@ -18,6 +21,13 @@ import { MoviesModule } from './movies/movies.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    FileStorageModule.forRoot(
+      StorageType.LocalFileSystem,
+      {
+        [StorageType.LocalFileSystem]: { setup: { storageBaseDirPath: resolve('.temp-data/storage') } },
+      },
+      true,
+    ),
     JobQueueModule.forRootAsync(),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),

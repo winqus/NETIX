@@ -1,5 +1,6 @@
 import * as fse from 'fs-extra';
 import { resolve } from 'path';
+import { finished } from 'stream';
 import {
   FILE_ALREADY_EXISTS,
   FILE_STORAGE_CONTAINER_DELIM,
@@ -8,9 +9,16 @@ import {
   INVALID_CONTAINER_NAME,
   INVALID_FILE_NAME,
 } from '../file-storage.constants';
-import { FileStorageArgs, FileStorageConfig, FileStorageUploadSingleFileArgs } from '../file-storage.interfaces';
+import {
+  FileStorageArgs,
+  FileStorageConfig,
+  FileStorageDeleteFileArgs,
+  FileStorageUploadSingleFileArgs,
+  FileStorageUploadStreamArgs,
+} from '../file-storage.interfaces';
 import { FileStorageConfigFactory } from '../file-storage.types';
 import { FileStorage } from '../FileStorage';
+import { FileInStorage, WritableStreamWithDoneEvent } from '../types';
 import { defaultFactory } from './file-storage-local-config-default.factory';
 import { FileStorageLocalSetup } from './file-storage-local.types';
 
@@ -52,7 +60,7 @@ export class FileStorageLocal implements FileStorage {
     return fullLocalFilePath;
   }
 
-  public async uploadSingleFile(args: FileStorageUploadSingleFileArgs): Promise<void> {
+  public async uploadSingleFile(args: FileStorageUploadSingleFileArgs): Promise<FileInStorage> {
     const { container, fileName, content } = args;
 
     const filePath = this.transformToLocalFilePath({ container, fileName });
@@ -63,6 +71,45 @@ export class FileStorageLocal implements FileStorage {
 
     await fse.ensureFile(filePath);
 
-    return fse.writeFile(filePath, content);
+    await fse.writeFile(filePath, content);
+
+    return {
+      container,
+      fileName,
+    };
+  }
+
+  public async uploadStream(args: FileStorageUploadStreamArgs): Promise<WritableStreamWithDoneEvent> {
+    const { container, fileName } = args;
+
+    const filePath = this.transformToLocalFilePath({ container, fileName });
+
+    if (fse.existsSync(filePath)) {
+      throw new Error(FILE_ALREADY_EXISTS);
+    }
+
+    await fse.ensureFile(filePath);
+
+    const writeStream = fse.createWriteStream(filePath);
+    finished(writeStream, (error) => writeStream.emit('done', error));
+
+    return writeStream;
+  }
+
+  public async deleteFile(args: FileStorageDeleteFileArgs): Promise<boolean> {
+    const { container, fileName } = args;
+
+    const filePath = this.transformToLocalFilePath({ container, fileName });
+
+    return new Promise((resolve, reject) => {
+      fse
+        .remove(filePath)
+        .then(() => {
+          resolve(true);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
   }
 }

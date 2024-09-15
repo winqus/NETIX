@@ -8,3 +8,7 @@ export interface FileStorageArgs {
 export interface FileStorageUploadSingleFileArgs extends FileStorageArgs {
   content: Buffer | Uint8Array;
 }
+
+export interface FileStorageUploadStreamArgs extends FileStorageArgs {}
+
+export interface FileStorageDeleteFileArgs extends FileStorageArgs {}

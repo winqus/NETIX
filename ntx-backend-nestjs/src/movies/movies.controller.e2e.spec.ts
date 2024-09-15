@@ -1,0 +1,108 @@
+import { ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
+import { ConfigFactory, ConfigModule } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX } from '@ntx/app.constants';
+import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
+import { StorageType } from '@ntx/file-storage/types';
+import { resolve } from 'path';
+import * as request from 'supertest';
+import { CreateMovieDTO } from './dto/CreateMovieDTO';
+import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
+import { MoviesModule } from './movies.module';
+
+const validCreateMovieDto: CreateMovieDTO = {
+  name: 'test-name',
+  summary: 'short-test-summary',
+  originallyReleasedAt: new Date('1999-01-05'),
+  runtimeMinutes: 123,
+};
+
+const validTestImagePath = 'test/images/1_sm_284x190.webp';
+
+const tempStoragePath = resolve('.temp-test-data');
+
+const { storageType, options } = {
+  storageType: StorageType.LocalFileSystem,
+  options: {
+    [StorageType.LocalFileSystem]: { setup: { storageBaseDirPath: tempStoragePath } },
+  },
+};
+
+describe('Movies API (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const testConfigurationFactory: ConfigFactory = () => ({
+      // Nothing for now
+    });
+
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          load: [testConfigurationFactory],
+        }),
+        FileStorageModule.forRoot(storageType, options, true),
+        MoviesModule,
+      ],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    // app.useLogger(new ConsoleLogger()); // For debugging tests
+    app.enableVersioning({ type: VersioningType.URI, defaultVersion: DEFAULT_CONTROLLER_VERSION });
+    app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
+
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('POST /api/v1/movies', () => {
+    it('should successfully create a movie with valid input', async () => {
+      const createMovieDto = validCreateMovieDto;
+      const testImagePath = validTestImagePath;
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/movies')
+        .field('name', createMovieDto.name)
+        .field('summary', createMovieDto.summary)
+        .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
+        .field('runtimeMinutes', createMovieDto.runtimeMinutes)
+        .attach(MOVIES_POSTER_FILE_FIELD_NAME, testImagePath);
+
+      expect(response.status).toBe(HttpStatus.CREATED);
+      expect(response).toBeDefined();
+      expect(response.body).toHaveProperty('id');
+    });
+
+    it('should return 400 when no poster file is provided', async () => {
+      const createMovieDto = validCreateMovieDto;
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/movies')
+        .field('name', createMovieDto.name)
+        .field('summary', createMovieDto.summary)
+        .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
+        .field('runtimeMinutes', createMovieDto.runtimeMinutes);
+
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);
+    });
+
+    it('should return 400 when name is not provided', async () => {
+      const createMovieDto = validCreateMovieDto;
+      const testImagePath = validTestImagePath;
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/movies')
+        .field('summary', createMovieDto.summary)
+        .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
+        .field('runtimeMinutes', createMovieDto.runtimeMinutes)
+        .attach(MOVIES_POSTER_FILE_FIELD_NAME, testImagePath);
+
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+  });
+});

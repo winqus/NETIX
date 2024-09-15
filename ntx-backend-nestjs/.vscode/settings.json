@@ -33,4 +33,7 @@
     120
   ],
   "jest.runMode": "on-demand",
+  "jestrunner.debugOptions": {
+     "args": ["--testTimeout=600000"] 
+  },
 }
