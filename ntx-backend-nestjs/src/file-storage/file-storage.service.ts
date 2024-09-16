@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Readable } from 'stream';
 import { FILE_STORAGE_STRATEGY_TOKEN } from './file-storage.constants';
 import {
   FileStorageDeleteFileArgs,
+  FileStorageDownloadFileArgs,
+  FileStorageDownloadStreamArgs,
   FileStorageUploadSingleFileArgs,
   FileStorageUploadStreamArgs,
 } from './file-storage.interfaces';
@@ -22,5 +25,13 @@ export class FileStorageService implements FileStorage {
 
   public async deleteFile(args: FileStorageDeleteFileArgs): Promise<boolean> {
     return this.fileStorageStrategy.deleteFile(args);
+  }
+
+  public async downloadFile(args: FileStorageDownloadFileArgs): Promise<Buffer> {
+    return this.fileStorageStrategy.downloadFile(args);
+  }
+
+  public async downloadStream(args: FileStorageDownloadStreamArgs): Promise<Readable> {
+    return this.fileStorageStrategy.downloadStream(args);
   }
 }

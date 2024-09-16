@@ -4,11 +4,10 @@ import { APP_GUARD } from '@nestjs/core/constants';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
 import { resolve } from 'path';
 import { DEFAULT_THROTTLE_LIMIT, DEFAULT_THROTTLE_TTL } from './app.constants';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { ExternalSearchModule } from './external-search/external-search.module';
 import { FileStorageModule } from './file-storage/file-storage.module';

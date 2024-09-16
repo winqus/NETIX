@@ -12,3 +12,7 @@ export interface FileStorageUploadSingleFileArgs extends FileStorageArgs {
 export interface FileStorageUploadStreamArgs extends FileStorageArgs {}
 
 export interface FileStorageDeleteFileArgs extends FileStorageArgs {}
+
+export interface FileStorageDownloadFileArgs extends FileStorageArgs {}
+
+export interface FileStorageDownloadStreamArgs extends FileStorageArgs {}

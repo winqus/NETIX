@@ -1,6 +1,6 @@
 import * as fse from 'fs-extra';
 import { resolve } from 'path';
-import { finished } from 'stream';
+import { finished, Readable } from 'stream';
 import {
   FILE_ALREADY_EXISTS,
   FILE_STORAGE_CONTAINER_DELIM,
@@ -13,6 +13,8 @@ import {
   FileStorageArgs,
   FileStorageConfig,
   FileStorageDeleteFileArgs,
+  FileStorageDownloadFileArgs,
+  FileStorageDownloadStreamArgs,
   FileStorageUploadSingleFileArgs,
   FileStorageUploadStreamArgs,
 } from '../file-storage.interfaces';
@@ -111,5 +113,21 @@ export class FileStorageLocal implements FileStorage {
           reject(error);
         });
     });
+  }
+
+  public async downloadFile(args: FileStorageDownloadFileArgs): Promise<Buffer> {
+    const { container, fileName } = args;
+
+    const filePath = this.transformToLocalFilePath({ container, fileName });
+
+    return fse.readFile(filePath);
+  }
+
+  public async downloadStream(args: FileStorageDownloadStreamArgs): Promise<Readable> {
+    const { container, fileName } = args;
+
+    const filePath = this.transformToLocalFilePath({ container, fileName });
+
+    return fse.createReadStream(filePath);
   }
 }

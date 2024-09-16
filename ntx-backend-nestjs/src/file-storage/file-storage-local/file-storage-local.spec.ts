@@ -11,7 +11,7 @@ import { FileStorage } from '../FileStorage';
 import { StorageType } from '../types';
 import { generateRandomFileName } from '../utils/name.utils';
 
-const tempStoragePath = resolve('.temp-store-' + Date.now());
+const tempStoragePath = resolve('.temp-test-data-store' + Date.now());
 
 const { storageType, options } = {
   storageType: StorageType.LocalFileSystem,
@@ -26,7 +26,10 @@ async function createRandomTempFile(fileStorage: FileStorage, container: string,
 
   await fileStorage.uploadSingleFile({ container, fileName, content });
 
-  return fileName;
+  const filePath = resolve(tempStoragePath, container.replaceAll('.', sep), fileName);
+  assert(fse.existsSync(filePath));
+
+  return { fileName, filePath };
 }
 
 describe('FileStorageLocal', () => {
@@ -43,7 +46,7 @@ describe('FileStorageLocal', () => {
   });
 
   afterAll(async () => {
-    fse.rm(tempStoragePath, { recursive: true });
+    await fse.rm(tempStoragePath, { recursive: true });
   });
 
   describe('uploadSingleFile', () => {
@@ -83,9 +86,7 @@ describe('FileStorageLocal', () => {
   describe('deleteFile', () => {
     it('deletes existing file', async () => {
       const container = 'container-del';
-      const fileName = await createRandomTempFile(fileStorageSrv, container, 'contents-for-deletion');
-      const filePath = resolve(tempStoragePath, container, fileName);
-      assert(fse.existsSync(filePath));
+      const { fileName, filePath } = await createRandomTempFile(fileStorageSrv, container, 'contents-for-deletion');
 
       await fileStorageSrv.deleteFile({ container, fileName });
 
@@ -100,6 +101,56 @@ describe('FileStorageLocal', () => {
       const promise = fileStorageSrv.deleteFile({ container, fileName });
 
       await expect(promise).rejects.toThrow(INVALID_FILE_NAME);
+    });
+  });
+
+  describe('downloadFile', () => {
+    it('downloads and existing file when valid args provided', async () => {
+      const container = 'container.with-some-file';
+      const expectedContents = 'some-random-contents';
+      const { fileName } = await createRandomTempFile(fileStorageSrv, container, expectedContents);
+
+      const downloadedFileBuffer = await fileStorageSrv.downloadFile({ container, fileName });
+
+      expect(downloadedFileBuffer.toString()).toBe(expectedContents);
+    });
+
+    it('should throw an error when non existing fileName is provided', async () => {
+      const container = 'container-with-file';
+      await createRandomTempFile(fileStorageSrv, container, 'some-random-contents2');
+      const nonExistingFileName = `some-non-existing-file-${Date.now()}`;
+
+      const promise = fileStorageSrv.downloadFile({ container, fileName: nonExistingFileName });
+
+      expect(promise).rejects.toThrow(/ENOENT/);
+    });
+  });
+
+  describe('downloadStream', () => {
+    it('downloads stream of an existing file', async () => {
+      const container = 'container.with-streamed-file';
+      const expectedContents = 'some-random-streamed-contents';
+      const { fileName } = await createRandomTempFile(fileStorageSrv, container, expectedContents);
+
+      const downloadedStream = await fileStorageSrv.downloadStream({ container, fileName });
+      const chunks: Buffer[] = [];
+      downloadedStream.on('data', (chunk) => chunks.push(chunk));
+      downloadedStream.on('end', () => {
+        const downloadedContents = Buffer.concat(chunks).toString();
+        expect(downloadedContents).toBe(expectedContents);
+      });
+    });
+
+    it('should throw an error when non existing fileName is provided', async () => {
+      const container = 'container-with-streamed-file';
+      await createRandomTempFile(fileStorageSrv, container, 'some-random-contents2');
+      const nonExistingFileName = `some-non-existing-file-${Date.now()}`;
+
+      const readableStream = await fileStorageSrv.downloadStream({ container, fileName: nonExistingFileName });
+
+      readableStream.on('error', (error) => {
+        expect(error.message).toMatch(/ENOENT/);
+      });
     });
   });
 });

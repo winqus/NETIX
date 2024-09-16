@@ -63,17 +63,19 @@ export class JobQueueModule {
   }
 
   static register(queueName: string): DynamicModule {
+    const bullQueueModule = BullModule.registerQueue({
+      name: queueName,
+    });
+
+    const bullBoardModule = BullBoardModule.forFeature({
+      name: queueName,
+      adapter: BullMQAdapter,
+    });
+
     return {
       module: JobQueueModule,
-      imports: [
-        BullModule.registerQueue({
-          name: queueName,
-        }),
-        BullBoardModule.forFeature({
-          name: queueName,
-          adapter: BullMQAdapter,
-        }),
-      ],
+      imports: [bullQueueModule, bullBoardModule],
+      exports: [bullQueueModule, bullBoardModule],
     };
   }
 }
