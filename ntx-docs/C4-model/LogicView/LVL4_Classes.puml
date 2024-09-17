@@ -1,0 +1,36 @@
+' TODO class diagram. Likely single big one, maybe grouped (boxes) by module.
+@startuml NETIX_CLASSES
+mainframe NETIX_CLASSES
+skinparam mainframeBackgroundColor #FFFFFF
+
+class Entity {
+  +uuid: string
+  +createdAt: Date
+  +updatedAt: Date
+}
+
+class Poster {
+  posterID: string
+  size: string
+}
+
+class Title {
+  +posterID: string
+  +name: string
+  +type: string
+}
+
+Title o-right- Poster
+
+class Movie extends Title {
+  +originallyReleasedAt: Date
+  +summary: string
+  +runtimeMinutes: number
+}
+
+' class Series extends Title {
+' }
+
+Entity <|-- Title
+
+@enduml

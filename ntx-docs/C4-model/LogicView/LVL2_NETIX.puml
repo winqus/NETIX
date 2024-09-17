@@ -1,0 +1,47 @@
+@startuml NETIX_LVL2
+
+skinparam FrameBackgroundColor white
+
+frame "[C4 LVL2] Containers" {
+    interface NTX_WEB_UI
+    interface TMDB_API
+
+    component [NETIX] <<system>> {
+        skinparam {
+            componentBackgroundColor<<container>> #0D1F3D
+            componentFontColor<<container>> #FFFFFF
+            componentBorderColor<<container>> #FFFFFF
+            databaseBackgroundColor<<container>> #0D1F3D
+            databaseFontColor<<container>> #FFFFFF
+            databaseBorderColor<<container>> #FFFFFF
+            defaultTextAlignment<<container>> center
+        }
+
+        database "<<File System>>\nNTFS / Ext4" <<container>> as FileSystem
+        database "<<DBMS>>\nMongoDB" <<container>> as MongoDB
+        database "<<In-Memory Database>>\nRedis" <<container>> as REDIS
+        component "<<Angular web app>>\nNTX-FE-UI" <<container>> as NTX_FE
+        component "<<NestJS web app>>\nNTX-BE" <<container>> as NTX_BE
+        component "<<IdentityProvider>>\nAuthentik" <<container>> as IdP
+
+        NTX_FE -up- NTX_WEB_UI
+        NTX_BE -up-( TMDB_API
+
+        NTX_BE -left- NTX_BE_API
+        NTX_FE -right-( NTX_BE_API
+
+        FileSystem -up- FS_API
+        NTX_BE -down-( FS_API
+
+        MongoDB -up- MongoDB_API
+        NTX_BE -down-( MongoDB_API
+
+        REDIS -up- Redis_API
+        NTX_BE -down-( Redis_API
+
+        IdP -up- IdP_API
+        NTX_FE --( IdP_API
+        NTX_BE --( IdP_API
+    }
+}
+@enduml

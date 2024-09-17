@@ -1,0 +1,50 @@
+@startuml MagicDraw
+
+!$MainColor ?= "#C2E3D3"
+!$SecondaryColor ?= "#3f6854"
+!$Trasnparent ?= "#ffffff00"
+
+autonumber 1 "0:"
+skinparam activationBackgroundColor $MainColor
+
+skinparam maxMessageSize 200
+
+skinparam defaultParticipant ":"
+
+skinparam backgroundColor white
+skinparam defaultFontColor black
+skinparam defaultFontSize 12
+skinparam defaultTextAlignment center
+
+skinparam participant {
+   BorderColor $SecondaryColor
+   BackgroundColor $MainColor|$Trasnparent
+   FontSize 12
+   FontColor black
+   FontStyle Bold
+   Shadowing true
+   BorderThickness 1
+   BorderRoundCorner 0
+}
+
+skinparam sequence {
+    ArrowColor black
+    LifeLineBorderColor $SecondaryColor
+    LifeLineBackgroundColor $MainColor
+    BorderThickness 5
+    GroupBackgroundColor $Trasnparent
+    MessageAlign center
+    MainFrameBackgroundColor white
+    BoxBackgroundColor $Trasnparent
+    ParticipantBorderThickness 1
+}
+
+skinparam actor{
+    BorderColor black
+    BackgroundColor $MainColor
+}
+
+skinparam frame{
+    BackgroundColor white
+}
+@enduml
