@@ -5,7 +5,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { resolve } from 'path';
-import { DEFAULT_THROTTLE_LIMIT, DEFAULT_THROTTLE_TTL } from './app.constants';
+import {
+  DEFAULT_THROTTLE_LIMIT,
+  DEFAULT_THROTTLE_TTL,
+  ENV_FILE,
+  FILE_STORAGE_BASE_DIR_PATH,
+  TEMP_FILE_STORAGE_BASE_DIR_PATH,
+} from './app.constants';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
@@ -16,14 +22,22 @@ import { ImagesModule } from './images/images.module';
 import { JobQueueModule } from './job-queue/job-queue.module';
 import { MoviesModule } from './movies/movies.module';
 
+function getStorageBaseDirPath() {
+  if (process.env.USE_TEMPORARY_FILE_STORAGE === 'true') {
+    return resolve(TEMP_FILE_STORAGE_BASE_DIR_PATH);
+  } else {
+    return resolve(FILE_STORAGE_BASE_DIR_PATH);
+  }
+}
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ENV_FILE }),
     DatabaseModule,
     FileStorageModule.forRoot(
       StorageType.LocalFileSystem,
       {
-        [StorageType.LocalFileSystem]: { setup: { storageBaseDirPath: resolve('.temp-data/storage') } },
+        [StorageType.LocalFileSystem]: { setup: { storageBaseDirPath: getStorageBaseDirPath() } },
       },
       true,
     ),

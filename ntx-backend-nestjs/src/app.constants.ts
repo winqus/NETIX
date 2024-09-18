@@ -4,13 +4,8 @@ export enum ENVIRONMENTS {
   TEST = 'test',
 }
 
-export const ENV_FILES = {
-  [ENVIRONMENTS.PRODUCTION]: '.env.production',
-  [ENVIRONMENTS.DEVELOPMENT]: '.env',
-  [ENVIRONMENTS.TEST]: '.env.test',
-};
-
 export const ENV = 'NODE_ENV';
+export const ENV_FILE = '.env';
 export const PORT = 'PORT';
 export const DEFAULT_PORT = 3055;
 
@@ -23,3 +18,6 @@ export const QUEUE_HOST = 'REDIS_HOST';
 export const QUEUE_PORT = 'REDIS_PORT';
 export const QUEUE_PASSWORD = 'REDIS_PASSWORD';
 export const QUEUE_UI_ROUTE = '/queues';
+
+export const FILE_STORAGE_BASE_DIR_PATH = './data/storage';
+export const TEMP_FILE_STORAGE_BASE_DIR_PATH = './.temp-data/storage';

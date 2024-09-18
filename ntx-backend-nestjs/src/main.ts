@@ -65,6 +65,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
+  app.enableShutdownHooks();
 
   await app.listen(configSrv.get(PORT, DEFAULT_PORT));
 
