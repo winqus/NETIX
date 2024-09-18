@@ -23,12 +23,6 @@ export const routes: Routes = [
     // canActivateChild: [AuthGuard],
     children: [{ path: '', component: CreateTitleComponent }],
   },
-  // {
-  //   path: 'upload2',
-  //   component: MainLayoutComponent,
-  //   // canActivateChild: [AuthGuard],
-  //   children: [{ path: '', component: UploadContentComponent }],
-  // },
   {
     path: 'watch',
     component: MainLayoutComponent,

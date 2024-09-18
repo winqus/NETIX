@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CreateTitleComponent } from './create-title.component';
-import { UploadContentComponent } from '@ntx-pages/create-title/upload-content/upload-content.component';
+import { UploadTitleComponent } from '@ntx-pages/create-title/upload-title/upload-title.component';
 import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
 import { By } from '@angular/platform-browser';
 
@@ -27,7 +27,7 @@ describe('CreateTitleComponent', () => {
   });
 
   it('should render UploadContentComponent', () => {
-    const uploadContentElement = fixture.debugElement.query(By.directive(UploadContentComponent));
+    const uploadContentElement = fixture.debugElement.query(By.directive(UploadTitleComponent));
     expect(uploadContentElement).toBeTruthy();
   });
 });

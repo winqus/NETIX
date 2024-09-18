@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UploadContentComponent } from './upload-content.component';
+import { UploadTitleComponent } from './upload-title.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
 // import { HttpClient, HttpHandler } from '@angular/common/http';
 
 describe('UploadContentComponent', () => {
-  let component: UploadContentComponent;
-  let fixture: ComponentFixture<UploadContentComponent>;
+  let component: UploadTitleComponent;
+  let fixture: ComponentFixture<UploadTitleComponent>;
   let mockUploadService: any;
 
   beforeEach(async () => {
     mockUploadService = jasmine.createSpyObj('UploadService', ['uploadMovieMetadata']);
     await TestBed.configureTestingModule({
-      imports: [UploadContentComponent, ReactiveFormsModule],
+      imports: [UploadTitleComponent, ReactiveFormsModule],
       providers: [{ provide: UploadService, useValue: mockUploadService }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(UploadContentComponent);
+    fixture = TestBed.createComponent(UploadTitleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

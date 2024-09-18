@@ -8,12 +8,12 @@ import { environment } from '@ntx/environments/environment';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-upload-content',
+  selector: 'app-upload-title',
   standalone: true,
   imports: [ImageUploadComponent, ReactiveFormsModule],
-  templateUrl: './upload-content.component.html',
+  templateUrl: './upload-title.component.html',
 })
-export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy {
+export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('croppModal') cropModalElement!: ElementRef<HTMLDialogElement>;
   @ViewChild(ImageUploadComponent) imageFileComponent!: ImageUploadComponent;
 
