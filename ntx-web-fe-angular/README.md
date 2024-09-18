@@ -6,7 +6,6 @@ In the **ntx-web-fe-angular** repository folder, run commands in the terminal or
 
 - `npm install` (installs needed dependencies)
 - create **.env** file (check below)
-
 - for the first time (or when .env file is changed) run `npm run start-with-env`, other times use `npm run start`.
 
 The env command will set the environment variables for the Angular app in the **src/environments/** files. **DO NOT COMMIT THE ENVIROMENT/ FILES WITH SENSITIVE DATA**.
@@ -45,30 +44,32 @@ Run `ng serve` for a dev server. Navigate to [`http://localhost:4200/`](http://l
 ├───app
 │   ├───core
 │   │   ├───layouts
+│   │   │   ├───empty-layout
+│   │   │   └───main-layout
 │   │   ├───pipes
 │   │   └───providers
 │   ├───pages
-│   │   ├───upload-content
-│   │   │   └───components
-│   │   │       ├───file-upload
-│   │   │       ├───image-cropper
-│   │   ├───upload-media-(legacy)
-│   │   │   └───components
-│   │   │       └───file-selection
+│   │   ├───create-title
+│   │   │   └───upload-title
+│   │   │       └───components
+│   │   │           ├───file-upload
+│   │   │           ├───image-cropper
+│   │   │           └───image-upload
+│   │   ├───error-page
+│   │   ├───movie-card
+│   │   ├───movie-card-skeleton
+│   │   ├───movie-list
+│   │   ├───navbar
 │   │   └───video-media-viewer
 │   └───shared
 │       ├───config
-│       ├───constants
-│       ├───enum
 │       ├───mappers
 │       ├───models
 │       ├───services
-│       │   ├───metadata
 │       │   ├───upload
 │       │   └───utils
 │       └───ui
 │           ├───alert-card
-│           ├───input
 │           └───svg-icons
 └───environments
 ```
