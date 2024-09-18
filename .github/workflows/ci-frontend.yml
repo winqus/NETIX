@@ -41,4 +41,4 @@ jobs:
 
       - name: Run tests
         working-directory: ntx-web-fe-angular
-        run: npm run test
+        run: npm run test-ci
