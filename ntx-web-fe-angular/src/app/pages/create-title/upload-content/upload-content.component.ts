@@ -5,6 +5,7 @@ import { ImageUploadComponent } from './components/image-upload/image-upload.com
 import { FieldRestrictions, MediaConstants, KeyCode } from '@ntx/app/shared/config/constants';
 import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
 import { environment } from '@ntx/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-upload-content',
@@ -21,6 +22,8 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
   imageAccept: string = '';
   imageMaxSize: number = 0;
 
+  errorMessage: string = '';
+
   mocieTitleCreationForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
     summary: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.summary.minLength), Validators.maxLength(FieldRestrictions.summary.maxLength)]),
@@ -35,7 +38,8 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
 
   constructor(
     private imageService: ImageService,
-    private upload: UploadService
+    private upload: UploadService,
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<any> {
@@ -57,16 +61,16 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
       formData.append('poster', this.imageFile as Blob);
 
       this.upload.uploadMovieMetadata(formData).subscribe({
-        error: (error) => {
-          console.error('Error uploading mocmetadata', error);
+        next: (response) => {
+          if (environment.development) console.log('Upload successful:', response);
+          const movieId = response.id;
+          this.router.navigate(['/movie', movieId]);
         },
-        complete: () => {
-          if (!environment.production) {
-            console.log('Image upload completed');
-          }
+        error: (error) => {
+          this.errorMessage = error;
+          if (environment.development) console.error('Error uploading metadata:', error);
         },
       });
-      console.log('Form submitted:', formData);
     }
   }
 
@@ -96,12 +100,10 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   };
 
-  recieveImageFile(file: File | null) {
-    this.imageFile = file;
-  }
-
-  compressImage() {
-    this.imageService.compressImage(this.imageFile!);
+  async recieveImageFile(file: File | null) {
+    if (file !== null) {
+      this.imageFile = await this.imageService.compressImage(file);
+    }
   }
 
   getErrorMessage(controlName: string): string {
