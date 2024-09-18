@@ -97,6 +97,10 @@
       "^@ntx-test/(.*)$": "<rootDir>/../test/$1"
     },
     "testRegex": ".*\\.spec\\.ts$",
+    "testPathIgnorePatterns": [
+      "<rootDir>/.*-legacy/",
+      ".*-legacy/.*"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

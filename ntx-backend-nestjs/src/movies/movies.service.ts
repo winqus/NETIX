@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { createValidatedObject } from '@ntx/common/utils/classValidationUtils';
 import { FileInStorage } from '@ntx/file-storage/types';
@@ -23,14 +23,14 @@ export class MoviesService {
   public async createMovie(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
     try {
       if (posterFile == null) {
-        throw new Error('posterFile can not be null or empty');
+        throw new BadRequestException('posterFile can not be null or empty');
       }
 
       try {
         await validateOrReject(dto);
       } catch (error) {
         this.logger.error('Invalid CreateMovieManuallyDTO');
-        throw error;
+        throw new BadRequestException(error);
       }
 
       const movieHash = this.createMovieHash(dto);
@@ -38,7 +38,7 @@ export class MoviesService {
       const alreadyExists = await this.moviesRepo.existsByHash(movieHash);
       if (alreadyExists) {
         this.logger.error(`Movie with hash ${movieHash} already exists.`);
-        throw new Error(`Movie with these contents already exists`);
+        throw new ConflictException(`Movie with these contents already exists`);
       }
 
       const posterID = await this.posterSrv.addCreatePosterJob(posterFile);

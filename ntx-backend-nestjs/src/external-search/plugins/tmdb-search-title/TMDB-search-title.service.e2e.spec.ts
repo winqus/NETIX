@@ -1,11 +1,11 @@
 import { TestBed } from '@automock/jest';
+import { ConfigFactory } from '@nestjs/config';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { Test } from '@nestjs/testing';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
 import fetchMock from 'jest-fetch-mock';
 import * as path from 'path';
-import { ENV_FILES, ENVIRONMENTS } from '../../../../src/constants';
 import { TEST_DATA_DIRECTORY, TEST_DIRECTORY } from '../../../../test/constants';
 import { JestCacheFetch } from '../../../../test/utils/JestCacheFetch';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
@@ -20,6 +20,10 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
   let plugin: TMDBSearchTitleService;
   let cacheFilePath;
   let cacheFetch: JestCacheFetch;
+
+  const testConfigurationFactory: ConfigFactory = () => ({
+    // Nothing for now
+  });
 
   /********************************************************************************************************************
     Test Case(s)
@@ -73,8 +77,8 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
     await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
-          envFilePath: [ENV_FILES[ENVIRONMENTS.TEST]],
           isGlobal: true,
+          load: [testConfigurationFactory],
         }),
       ],
     }).compile();

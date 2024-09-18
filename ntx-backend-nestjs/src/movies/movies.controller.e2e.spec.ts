@@ -1,21 +1,23 @@
-import { ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
+import { HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigFactory, ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX } from '@ntx/app.constants';
+import { DatabaseModule } from '@ntx/database/database.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { StorageType } from '@ntx/file-storage/types';
+import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import { resolve } from 'path';
 import * as request from 'supertest';
 import { CreateMovieDTO } from './dto/CreateMovieDTO';
 import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
 import { MoviesModule } from './movies.module';
 
-const validCreateMovieDto: CreateMovieDTO = {
-  name: 'test-name',
-  summary: 'short-test-summary',
+const getRandomValidMovieDto = (): CreateMovieDTO => ({
+  name: `test-name-${Math.random()}`,
+  summary: `short-test-summary-${Math.random()}`,
   originallyReleasedAt: new Date('1999-01-05'),
   runtimeMinutes: 123,
-};
+});
 
 const validTestImagePath = 'test/images/1_sm_284x190.webp';
 
@@ -33,7 +35,12 @@ describe('Movies API (e2e)', () => {
 
   beforeAll(async () => {
     const testConfigurationFactory: ConfigFactory = () => ({
-      // Nothing for now
+      NODE_ENV: 'test',
+      USE_MEMORY_MONGO: 'true',
+      IN_MEMORY_MONGO_PORT: '57017',
+      USE_MEMORY_REDIS: 'true',
+      IN_MEMORY_REDIS_PORT: '6380',
+      USE_TEMPORARY_FILE_STORAGE: 'true',
     });
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -41,8 +48,11 @@ describe('Movies API (e2e)', () => {
         ConfigModule.forRoot({
           isGlobal: true,
           load: [testConfigurationFactory],
+          ignoreEnvFile: true,
         }),
+        DatabaseModule,
         FileStorageModule.forRoot(storageType, options, true),
+        JobQueueModule.forRootAsync(),
         MoviesModule,
       ],
     }).compile();
@@ -61,7 +71,7 @@ describe('Movies API (e2e)', () => {
 
   describe('POST /api/v1/movies', () => {
     it('should successfully create a movie with valid input', async () => {
-      const createMovieDto = validCreateMovieDto;
+      const createMovieDto = getRandomValidMovieDto();
       const testImagePath = validTestImagePath;
 
       const response = await request(app.getHttpServer())
@@ -78,7 +88,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 400 when no poster file is provided', async () => {
-      const createMovieDto = validCreateMovieDto;
+      const createMovieDto = getRandomValidMovieDto();
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/movies')
@@ -92,7 +102,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 400 when name is not provided', async () => {
-      const createMovieDto = validCreateMovieDto;
+      const createMovieDto = getRandomValidMovieDto();
       const testImagePath = validTestImagePath;
 
       const response = await request(app.getHttpServer())
@@ -103,6 +113,29 @@ describe('Movies API (e2e)', () => {
         .attach(MOVIES_POSTER_FILE_FIELD_NAME, testImagePath);
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    it('should fail to create the same movie twice', async () => {
+      const createMovieDto = getRandomValidMovieDto();
+      const testImagePath = validTestImagePath;
+
+      const createMovie = async () => {
+        return await request(app.getHttpServer())
+          .post('/api/v1/movies')
+          .field('name', createMovieDto.name)
+          .field('summary', createMovieDto.summary)
+          .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
+          .field('runtimeMinutes', createMovieDto.runtimeMinutes)
+          .attach(MOVIES_POSTER_FILE_FIELD_NAME, testImagePath);
+      };
+
+      const firstResponse = await createMovie();
+      const secondResponse = await createMovie();
+
+      expect(firstResponse.status).toBe(HttpStatus.CREATED);
+      expect(firstResponse.body).toHaveProperty('id');
+      expect(secondResponse.status).toBe(HttpStatus.CONFLICT);
+      expect(secondResponse.body.message).toMatch('already exists');
     });
   });
 });

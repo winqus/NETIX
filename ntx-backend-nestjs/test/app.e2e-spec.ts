@@ -1,54 +1,44 @@
 import { INestApplication } from '@nestjs/common';
+import { ConfigFactory, ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { GLOBAL_ROUTE_PREFIX } from '@ntx/app.constants';
 import { AppModule } from '@ntx/app.module';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { RedisMemoryServer } from 'redis-memory-server';
 import * as request from 'supertest';
-import createBasicMongoMemoryServer from './utils/createBasicMongoMemoryServer';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  let mongoServer: MongoMemoryServer;
-  let redisServer: RedisMemoryServer;
 
   beforeAll(async () => {
-    mongoServer = await createBasicMongoMemoryServer();
-    const uri = mongoServer.getUri();
-    process.env.MONGODB_URI = uri;
-
-    redisServer = await RedisMemoryServer.create({
-      instance: {
-        ip: '127.0.0.1',
-        port: 6379,
-      },
-      binary: {
-        version: '7.2.4',
-      },
+    const testConfigurationFactory: ConfigFactory = () => ({
+      NODE_ENV: 'test',
+      USE_MEMORY_MONGO: 'true',
+      IN_MEMORY_MONGO_PORT: '57017',
+      USE_MEMORY_REDIS: 'true',
+      IN_MEMORY_REDIS_PORT: '6380',
+      USE_TEMPORARY_FILE_STORAGE: 'true',
     });
-    process.env.REDIS_HOST = await redisServer.getHost();
-    process.env.REDIS_PORT = (await redisServer.getPort()).toString();
-    // process.env.REDIS_PASSWORD = undefined;
-  });
 
-  beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          load: [testConfigurationFactory],
+          ignoreEnvFile: true,
+        }),
+        AppModule,
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
     await app.init();
   });
 
-  afterEach(async () => {
-    jest.resetAllMocks();
-  });
-
   afterAll(async () => {
-    jest.restoreAllMocks();
-    await mongoServer.stop();
+    await app.close();
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
+    return request(app.getHttpServer()).get('/api').expect(200).expect('Hello World!');
   });
 });
