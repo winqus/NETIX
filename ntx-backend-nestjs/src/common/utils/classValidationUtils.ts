@@ -7,7 +7,7 @@ import { validateOrReject } from 'class-validator';
  * @param obj - The plain object to transform and validate.
  * @returns A promise that resolves to an instance of the class.
  */
-export async function createValidatedObject<T extends object>(cls: new (...args: any[]) => T, obj: any): Promise<T> {
+export async function createValidatedObject<T extends object>(cls: new (...args: any[]) => T, obj: T): Promise<T> {
   const instance = plainToInstance(cls, obj);
 
   await validateOrReject(instance);

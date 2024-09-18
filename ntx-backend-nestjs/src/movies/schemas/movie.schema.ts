@@ -5,13 +5,14 @@ export type MovieDocument = Movie & mongoose.Document;
 
 export const MovieSchema = new mongoose.Schema<Movie>(
   {
-    uuid: { type: String, required: true },
+    uuid: { type: String, required: true, unique: true },
     posterID: { type: String, required: true },
     name: { type: String, required: true },
     type: { type: String, required: true },
     originallyReleasedAt: { type: Date, required: true },
     summary: { type: String, required: true },
     runtimeMinutes: { type: Number, required: true },
+    hash: { type: String, required: true, unique: true },
   },
   { timestamps: true },
 );

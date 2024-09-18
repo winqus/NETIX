@@ -22,6 +22,9 @@ export class Movie implements Title {
   @Matches(TitleType.MOVIE)
   type: TitleType;
 
+  @IsString()
+  hash: string;
+
   @IsDate()
   originallyReleasedAt: Date;
 

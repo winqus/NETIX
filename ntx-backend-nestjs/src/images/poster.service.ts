@@ -11,7 +11,7 @@ export class PosterService {
 
   constructor(@InjectQueue(IMAGES_CREATE_POSTER_QUEUE) private readonly posterQueue: CreatePosterQueue) {}
 
-  public async createPoster(file: FileInStorage): Promise<string> {
+  public async addCreatePosterJob(file: FileInStorage): Promise<string> {
     try {
       const posterID = generateUUIDv4();
 

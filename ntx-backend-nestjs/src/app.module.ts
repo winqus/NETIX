@@ -18,7 +18,7 @@ import { MoviesModule } from './movies/movies.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     DatabaseModule,
     FileStorageModule.forRoot(
       StorageType.LocalFileSystem,

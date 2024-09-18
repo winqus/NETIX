@@ -1,4 +1,5 @@
 import { VersioningType } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -8,12 +9,17 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 
 async function bootstrap() {
+  require('dotenv').config({ override: true });
+
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
 
+  const configSrv = app.get(ConfigService);
+  const env = configSrv.get(ENV);
+
   const logger = WinstonModule.createLogger({
-    level: process.env.NODE_ENV === 'development' ? 'debug' : 'warn',
+    level: env === 'development' ? 'debug' : 'warn',
     format: winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.ms(),
@@ -60,8 +66,8 @@ async function bootstrap() {
   app.enableCors();
   app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
 
-  await app.listen(process.env[PORT] || DEFAULT_PORT);
+  await app.listen(configSrv.get(PORT, DEFAULT_PORT));
 
-  console.log(`✨ Application (ENV: ${process.env[ENV]}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`);
+  console.log(`✨ Application (ENV: ${env}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`);
 }
 bootstrap();
