@@ -1,24 +1,90 @@
-<div class="justify-center items-center">
-  <div class="flex flex-col rounded-lg">
-    <div class="flex flex-row">
-      <div class="flex flex-col h-full mr-6 gap-6">
-        <app-image-upload
-          class="h-[300px] w-[200px]"
-          title="Thumbnail Select"
-          [props]="{ accept: imageAccept, maxSize: imageMaxSize, readonly: false }"
-          (filePassed)="recieveImageFile($event)"
-        ></app-image-upload>
-        <app-input class="w-full" [props]="{ type: 'text', title: '', placeholder: 'URL', value: title }"></app-input>
+<form [formGroup]="mocieTitleCreationForm" (submit)="onSubmit()">
+  <div class="h-[420px] justify-center items-center">
+    <div class="h-full flex flex-col rounded-lg gap-5">
+      <div class="h-full flex flex-row">
+        <div class="flex flex-col h-full mr-6">
+          <app-image-upload
+            class="h-[300px] w-[200px]"
+            title="Thumbnail Select"
+            [props]="{ accept: imageAccept, maxSize: imageMaxSize, readonly: false }"
+            (filePassed)="recieveImageFile($event)"
+          ></app-image-upload>
+        </div>
+        <div class="flex flex-col flex-auto h-full pr-1">
+          <div role="tablist" class="tabs tabs-lifted">
+            <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Movie" checked="checked" />
+            <div role="tabpanel" class="tab-content bg-base-100 rounded-lg p-1 border-[#101010]">
+              <!-- Title Field -->
+              <label for="title" class="form-control w-full">
+                <div class="label py-0">
+                  <span class="label-text font-bold">Title</span>
+                </div>
+                <input formControlName="title" id="title" class="input input-bordered input-sm w-full p-2 rounded-md" [class]="{ 'input-error': isInvalid('title') }" type="text" placeholder="Title" />
+                <div class="label py-0 mb-2">
+                  <span class="label-text-alt text-error">{{ getErrorMessage('title') }}</span>
+                </div>
+              </label>
+
+              <!-- Summary Field -->
+              <label for="summary" class="form-control w-full flex-1 flex flex-col"
+                ><div class="label py-0">
+                  <span class="label-text font-bold">Summary</span>
+                </div>
+                <textarea
+                  formControlName="summary"
+                  id="summary"
+                  class="textarea textarea-bordered textarea-xs w-full font-mono text-sm p-2 mb-2 rounded-md resize-none read-only:bg-neutral-900 flex-1"
+                  [class]="{ 'textarea-error': isInvalid('summary') }"
+                  placeholder="Summary..."
+                ></textarea>
+                <div class="label py-0 mb-2">
+                  <span class="label-text-alt text-error">{{ getErrorMessage('summary') }}</span>
+                </div>
+              </label>
+
+              <!-- Date Field -->
+              <label for="originallyReleasedAt" class="form-control w-full"
+                ><div class="label py-0">
+                  <span class="label-text font-bold">Original release</span>
+                </div>
+                <input
+                  formControlName="originallyReleasedAt"
+                  id="originallyReleasedAt"
+                  class="input input-bordered input-sm w-full p-2 rounded-md"
+                  [class]="{ 'input-error': isInvalid('originallyReleasedAt') }"
+                  type="date"
+                />
+                <div class="label py-0 mb-2">
+                  <span class="label-text-alt text-error">{{ getErrorMessage('originallyReleasedAt') }}</span>
+                </div>
+              </label>
+
+              <!-- Duration Field -->
+              <label for="runtimeMinutes" class="form-control w-full"
+                ><div class="label py-0">
+                  <span class="label-text font-bold">Runtime in minutes</span>
+                </div>
+                <input
+                  formControlName="runtimeMinutes"
+                  id="runtimeMinutes"
+                  class="input input-bordered input-sm w-full p-2 rounded-md"
+                  [class]="{ 'input-error': isInvalid('runtimeMinutes') }"
+                  type="text"
+                  placeholder="Duration"
+                />
+                <div class="label py-0 mb-2">
+                  <span class="label-text-alt text-error">{{ getErrorMessage('runtimeMinutes') }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="flex flex-col flex-auto">
-        <app-input [props]="{ type: 'text', title: 'Title', placeholder: 'Title', value: title }"></app-input>
-        <app-textarea class="h-full" [props]="{ type: 'text', title: 'Summary', placeholder: 'Summary...', value: title }"></app-textarea>
-        <app-input [props]="{ type: 'text', title: 'Date', placeholder: 'YYYY-MM-DD', value: date }"></app-input>
-        <app-input [props]="{ type: 'text', title: 'Duration', placeholder: '00:00:00', value: duration }"></app-input>
+
+      <!-- Submit Button -->
+      <div class="flex flex-row justify-end">
+        <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" type="submit" [disabled]="!isFormValid()">CREATE</button>
       </div>
-    </div>
-    <div class="flex flex-row justify-end">
-      <button class="btn btn-square btn-primary btn-outline w-fit py-2 px-4" [disabled]="!checkIfReadyToUpload()" (click)="uploadFiles()" onclick="uploadModal.showModal()">UPLOAD</button>
     </div>
   </div>
-</div>
+</form>

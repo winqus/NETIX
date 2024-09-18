@@ -18,7 +18,7 @@ export const routes: Routes = [
     children: [{ path: '', component: MovieListComponent }],
   },
   {
-    path: 'upload',
+    path: 'createTitle',
     component: MainLayoutComponent,
     // canActivateChild: [AuthGuard],
     children: [{ path: '', component: CreateTitleComponent }],

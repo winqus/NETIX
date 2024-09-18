@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { CropperComponent, AngularCropperjsModule } from 'angular-cropperjs';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { MediaConfigService } from '@ntx-shared/services/mediaConfig.service';
+import { MediaConstants } from '@ntx/app/shared/config/constants';
 
 export interface InputProps {
   imageUrl?: string;
@@ -28,10 +28,7 @@ export class ImageCropperComponent implements OnInit, OnChanges {
     imageUrl: '',
   };
 
-  constructor(
-    public imageCropService: ImageService,
-    private mediaConfig: MediaConfigService
-  ) {
+  constructor(public imageCropService: ImageService) {
     this.cropperOptions = this.imageCropService.getCropperConfig();
   }
 
@@ -54,7 +51,7 @@ export class ImageCropperComponent implements OnInit, OnChanges {
         if (blob) {
           this.cropped.emit(blob);
         }
-      }, this.mediaConfig.getImageExportFormat());
+      }, MediaConstants.image.exportFormat);
     }
   }
 }

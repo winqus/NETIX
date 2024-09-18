@@ -1,60 +1,73 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { environment } from '@ntx/environments/environment';
-import { formatDate, formatTime, downLoadFile } from '@ntx-shared/services/utils/utils';
-import { KeyCode } from '@ntx-shared/constants/key-code.constants';
-import { MetadataService } from '@ntx-shared/services/metadata/metadata.service';
-import { UploadService } from '@ntx-shared/services/upload/upload.service';
-import { MediaConfigService } from '@ntx-shared/services/mediaConfig.service';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ImageService } from '@ntx-shared/services/image.service';
-import MetadataDTO from '@ntx-shared/models/metadata.dto';
-import { InputComponent } from '@ntx-shared/ui/input/input.component';
-import { TextareaComponent } from '@ntx-shared/ui/textarea/textarea.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
-import { HttpClient } from '@angular/common/http';
+import { FieldRestrictions, MediaConstants, KeyCode } from '@ntx/app/shared/config/constants';
+import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
+import { environment } from '@ntx/environments/environment';
 
 @Component({
   selector: 'app-upload-content',
   standalone: true,
-  imports: [InputComponent, TextareaComponent, ImageUploadComponent],
+  imports: [ImageUploadComponent, ReactiveFormsModule],
   templateUrl: './upload-content.component.html',
 })
 export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('croppModal') cropModalElement!: ElementRef<HTMLDialogElement>;
   @ViewChild(ImageUploadComponent) imageFileComponent!: ImageUploadComponent;
 
-  searchResults: MetadataDTO[] = [];
-  searchFailed: boolean = false;
-  titles: string[] = [];
-
-  metadata: MetadataDTO | null = null;
-  isMetadataFilled: boolean = false;
-  isUploading: boolean = false;
-  searchValue: string = '';
-  videoFile: File | null = null;
   imageFile: File | null = null;
-  title: string = '';
-  date: string = '';
-  duration: string = '';
-  selectedMetadataJson: string = '';
 
   imageAccept: string = '';
-  videoAccept: string = '';
   imageMaxSize: number = 0;
-  videoMaxSize: number = 0;
+
+  mocieTitleCreationForm = new FormGroup({
+    title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
+    summary: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.summary.minLength), Validators.maxLength(FieldRestrictions.summary.maxLength)]),
+    originallyReleasedAt: new FormControl('', [Validators.required]),
+    runtimeMinutes: new FormControl('', [
+      Validators.required,
+      Validators.min(FieldRestrictions.runtimeMinutes.min),
+      Validators.max(FieldRestrictions.runtimeMinutes.max),
+      Validators.pattern(FieldRestrictions.runtimeMinutes.pattern),
+    ]),
+  });
 
   constructor(
-    private metadataSearch: MetadataService,
-    private upload: UploadService,
-    private mediaConfig: MediaConfigService,
     private imageService: ImageService,
-    private httpClient: HttpClient
+    private upload: UploadService
   ) {}
 
   async ngOnInit(): Promise<any> {
-    this.imageAccept = this.mediaConfig.getAllowedImageFormats().join(',');
-    this.videoAccept = this.mediaConfig.getAllowedVideoFormats().join(',');
-    this.imageMaxSize = this.mediaConfig.getMaxImageSize();
-    this.videoMaxSize = this.mediaConfig.getMaxVideoSize();
+    this.imageAccept = MediaConstants.image.formats.join(',');
+    this.imageMaxSize = MediaConstants.image.maxSize;
+  }
+
+  isFormValid(): boolean {
+    return this.mocieTitleCreationForm.valid && this.imageFile !== null;
+  }
+
+  onSubmit() {
+    if (this.mocieTitleCreationForm.valid) {
+      const formData = new FormData();
+      formData.append('title', this.mocieTitleCreationForm.get('title')?.value as string);
+      formData.append('summary', this.mocieTitleCreationForm.get('summary')?.value as string);
+      formData.append('originallyReleasedAt', this.mocieTitleCreationForm.get('originallyReleasedAt')?.value as string);
+      formData.append('runtimeMinutes', this.mocieTitleCreationForm.get('runtimeMinutes')?.value as string);
+      formData.append('poster', this.imageFile as Blob);
+
+      this.upload.uploadMovieMetadata(formData).subscribe({
+        error: (error) => {
+          console.error('Error uploading mocmetadata', error);
+        },
+        complete: () => {
+          if (!environment.production) {
+            console.log('Image upload completed');
+          }
+        },
+      });
+      console.log('Form submitted:', formData);
+    }
   }
 
   ngAfterViewInit() {
@@ -83,107 +96,49 @@ export class UploadContentComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   };
 
-  searchByTitle(search: string) {
-    this.searchFailed = false;
-    this.metadataSearch.getDataFromTitle(search).subscribe({
-      next: (results) => {
-        this.searchResults = results;
-        this.titles = this.searchResults.map((result) => result.title);
-      },
-      error: (error) => {
-        this.searchFailed = true;
-        console.error('Error fetching search results', error);
-      },
-      complete: () => {
-        if (!environment.production) {
-          console.log('Search completed');
-        }
-      },
-    });
-  }
-
-  searchById(id: string, type: string, source: string): void {
-    this.metadataSearch.getDataFromId(id, type, source).subscribe({
-      next: (result) => {
-        this.metadata = result;
-        this.fillMetadata(this.metadata);
-      },
-      error: (error) => {
-        console.error('Error fetching details', error);
-      },
-      complete: () => {
-        if (!environment.production) {
-          console.log('Detail fetch completed');
-        }
-      },
-    });
-  }
-
-  async downloadAndCropImage(imageUrl: string) {
-    try {
-      await this.httpClient.get(imageUrl, { responseType: 'blob' }).subscribe((response) => this.recieveImageFile(new File([downLoadFile(response, 'application/ms-excel')], 'downloadedImage.jpg')));
-
-      // const imageFile = new File([imageBlob], 'downloadedImage.jpg', { type: imageBlob.type });
-    } catch (error) {
-      console.error('Error downloading image:', error);
-    }
-  }
-
-  onOptionSelected(option: string) {
-    this.metadata = this.searchResults.find((result) => result.title === option) || null;
-    this.titles = [];
-
-    if (this.metadata != null) {
-      this.searchById(this.metadata.id, this.metadata.type.toString(), this.metadata.sourceUUID);
-    }
-  }
-
-  fillMetadata(metadata: MetadataDTO) {
-    this.title = metadata.title;
-    this.date = formatDate(metadata.releaseDate);
-    this.duration = formatTime(metadata.details?.runtime);
-    this.selectedMetadataJson = JSON.stringify(metadata, null, 4);
-    this.isMetadataFilled = true;
-  }
-
   recieveImageFile(file: File | null) {
     this.imageFile = file;
-  }
-
-  checkIfReadyToUpload() {
-    return this.isMetadataFilled && this.videoFile !== null && this.imageFile !== null && !this.isUploading;
   }
 
   compressImage() {
     this.imageService.compressImage(this.imageFile!);
   }
 
-  async uploadFiles() {
-    this.isUploading = true;
-    try {
-      const compressImg = await this.imageService.compressImage(this.imageFile!);
-      this.upload.uploadThumbnail(compressImg, this.metadata!.id).subscribe({
-        error: (error) => {
-          console.error('Error uploading image', error);
-        },
-        complete: () => {
-          if (!environment.production) {
-            console.log('Image upload completed');
-          }
-        },
-      });
-    } finally {
-      this.isUploading = false;
+  getErrorMessage(controlName: string): string {
+    const control = this.mocieTitleCreationForm.get(controlName);
+    if (control?.touched && control.invalid) {
+      if (control.errors?.['required']) {
+        return 'This field is required';
+      } else if (control.errors?.['minlength']) {
+        const requiredLength = control.errors['minlength'].requiredLength;
+        return `Minimum length is ${requiredLength}`;
+      } else if (control.errors?.['maxlength']) {
+        const requiredLength = control.errors['maxlength'].requiredLength;
+        return `Maximum length is ${requiredLength}`;
+      } else if (control.errors?.['min']) {
+        const minValue = control.errors['min'].min;
+        return `Minimum value is ${minValue}`;
+      } else if (control.errors?.['max']) {
+        const maxValue = control.errors['max'].max;
+        return `Maximum value is ${maxValue}`;
+      } else if (control.errors?.['pattern']) {
+        return this.getPatternErrorMessage(controlName);
+      }
+    }
+    return '';
+  }
+
+  private getPatternErrorMessage(controlName: string): string {
+    switch (controlName) {
+      case 'runtimeMinutes':
+        return FieldRestrictions.runtimeMinutes.patternRrror;
+      default:
+        return 'Invalid format';
     }
   }
 
-  private resetMetadata(): void {
-    this.metadata = null;
-    this.searchValue = '';
-    this.title = '';
-    this.date = '';
-    this.duration = '';
-    this.selectedMetadataJson = '';
-    this.isMetadataFilled = false;
+  isInvalid(controlName: string): boolean {
+    const control = this.mocieTitleCreationForm.get(controlName);
+    return !!(control && control.invalid && control.touched);
   }
 }
