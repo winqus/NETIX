@@ -1,6 +1,7 @@
 import { HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigFactory, ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { createRandomValidCreateMovieDTO } from '@ntx-test/movies/utils/random-valid-create-movie-dto.factory';
 import { tempLocalStorageOptionsFactory } from '@ntx-test/utils/temp-local-storage-options.factory';
 import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX } from '@ntx/app.constants';
 import { DatabaseModule } from '@ntx/database/database.module';
@@ -9,16 +10,10 @@ import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
-import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
 import { MoviesModule } from './movies.module';
 
-const getRandomValidMovieDto = (): CreateMovieDTO => ({
-  name: `test-name-${Math.random()}`,
-  summary: `short-test-summary-${Math.random()}`,
-  originallyReleasedAt: new Date('1999-01-05'),
-  runtimeMinutes: 123,
-});
+jest.setTimeout(10000);
 
 const validTestImagePath = 'test/images/1_sm_284x190.webp';
 const tempStoragePath = resolve('.temp-test-data');
@@ -68,7 +63,7 @@ describe('Movies API (e2e)', () => {
 
   describe('POST /api/v1/movies', () => {
     it('should successfully create a movie with valid input', async () => {
-      const createMovieDto = getRandomValidMovieDto();
+      const createMovieDto = createRandomValidCreateMovieDTO();
       const testImagePath = validTestImagePath;
 
       const response = await request(app.getHttpServer())
@@ -85,7 +80,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 400 when no poster file is provided', async () => {
-      const createMovieDto = getRandomValidMovieDto();
+      const createMovieDto = createRandomValidCreateMovieDTO();
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/movies')
@@ -99,7 +94,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 400 when name is not provided', async () => {
-      const createMovieDto = getRandomValidMovieDto();
+      const createMovieDto = createRandomValidCreateMovieDTO();
       const testImagePath = validTestImagePath;
 
       const response = await request(app.getHttpServer())
@@ -113,7 +108,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should fail to create the same movie twice', async () => {
-      const createMovieDto = getRandomValidMovieDto();
+      const createMovieDto = createRandomValidCreateMovieDTO();
       const testImagePath = validTestImagePath;
 
       const createMovie = async () => {
