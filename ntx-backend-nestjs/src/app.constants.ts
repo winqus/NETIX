@@ -19,5 +19,5 @@ export const QUEUE_PORT = 'REDIS_PORT';
 export const QUEUE_PASSWORD = 'REDIS_PASSWORD';
 export const QUEUE_UI_ROUTE = '/queues';
 
-export const FILE_STORAGE_BASE_DIR_PATH = './data/storage';
-export const TEMP_FILE_STORAGE_BASE_DIR_PATH = './.temp-data/storage';
+export const DEFAULT_FILE_STORAGE_BASE_DIR_PATH = './data/storage';
+export const DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH = './.temp-data/storage';

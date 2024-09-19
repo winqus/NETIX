@@ -6,11 +6,11 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { resolve } from 'path';
 import {
+  DEFAULT_FILE_STORAGE_BASE_DIR_PATH,
+  DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH,
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL,
   ENV_FILE,
-  FILE_STORAGE_BASE_DIR_PATH,
-  TEMP_FILE_STORAGE_BASE_DIR_PATH,
 } from './app.constants';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -24,9 +24,11 @@ import { MoviesModule } from './movies/movies.module';
 
 function getStorageBaseDirPath() {
   if (process.env.USE_TEMPORARY_FILE_STORAGE === 'true') {
-    return resolve(TEMP_FILE_STORAGE_BASE_DIR_PATH);
+    const tempDirPath = process.env.TEMP_FILE_STORAGE_BASE_DIR_PATH || DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH;
+
+    return resolve(tempDirPath);
   } else {
-    return resolve(FILE_STORAGE_BASE_DIR_PATH);
+    return resolve(DEFAULT_FILE_STORAGE_BASE_DIR_PATH);
   }
 }
 
