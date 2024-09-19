@@ -11,9 +11,12 @@ describe('AppController (e2e)', () => {
   beforeAll(async () => {
     const testConfigurationFactory: ConfigFactory = () => ({
       USE_MEMORY_MONGO: 'true',
+      IN_MEMORY_MONGO_PORT: 57019,
       USE_MEMORY_REDIS: 'true',
       USE_TEMPORARY_FILE_STORAGE: 'true',
     });
+
+    Object.assign(process.env, testConfigurationFactory());
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
@@ -27,12 +30,14 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useLogger(false);
     app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
     await app.init();
   });
 
   afterAll(async () => {
-    await app.close();
+    jest.restoreAllMocks();
+    app?.close();
   });
 
   it('/ (GET)', () => {
