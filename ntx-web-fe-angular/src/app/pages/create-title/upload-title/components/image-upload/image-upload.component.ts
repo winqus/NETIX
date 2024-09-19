@@ -1,9 +1,9 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { MediaConfigService } from '@ntx-shared/services/mediaConfig.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
-import { FileUploadComponent } from '@ntx-pages/upload-content/components/file-upload/file-upload.component';
-import { ImageCropperComponent } from '@ntx-pages/upload-content/components/image-cropper/image-cropper.component';
+import { FileUploadComponent } from '@ntx-pages/create-title/upload-title/components/file-upload/file-upload.component';
+import { ImageCropperComponent } from '@ntx-pages/create-title/upload-title/components/image-cropper/image-cropper.component';
+import { MediaConstants as MediaConstants } from '@ntx/app/shared/config/constants';
 
 @Component({
   selector: 'app-image-upload',
@@ -20,10 +20,7 @@ export class ImageUploadComponent extends FileUploadComponent {
   imageUrl: string | null = null;
   imageCropped: boolean = false;
 
-  constructor(
-    private imageService: ImageService,
-    private mediaConfig: MediaConfigService
-  ) {
+  constructor(private imageService: ImageService) {
     super();
   }
 
@@ -44,8 +41,8 @@ export class ImageUploadComponent extends FileUploadComponent {
   }
 
   setImage(blob: Blob) {
-    const croppedFile = new File([blob], 'th.' + this.mediaConfig.getImageExportFormat(), {
-      type: 'image/' + this.mediaConfig.getImageExportFormat(),
+    const croppedFile = new File([blob], 'th.' + MediaConstants.image.exportFormat, {
+      type: 'image/' + MediaConstants.image.exportFormat,
       lastModified: Date.now(),
     });
 

@@ -22,12 +22,8 @@ export class NavbarComponent {
     // public auth: AuthService
   ) {}
 
-  get isUploadRoute(): boolean {
-    return this.router.url === '/upload';
-  }
-
-  get isUploadRoute2(): boolean {
-    return this.router.url === '/upload2';
+  get isCreateTitleRoute(): boolean {
+    return this.router.url === '/createTitle';
   }
 
   logout(): void {

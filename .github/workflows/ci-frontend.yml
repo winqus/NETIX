@@ -41,5 +41,4 @@ jobs:
 
       - name: Run tests
         working-directory: ntx-web-fe-angular
-        run: npm run test
-        continue-on-error: true #Change to false when test are written
+        run: npm run test-ci

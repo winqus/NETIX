@@ -1,19 +1,13 @@
-<nav class="navbar bg-base-100 fixed w-full z-10 top-0">
+<nav class="navbar bg-base-100 w-full z-10 top-0">
   <div class="container mx-auto flex flex-wrap items-center">
     <!-- Title -->
     <div class="flex-1">
       <a href="/" class="btn btn-ghost normal-case text-2xl">{{ props.title }}</a>
     </div>
   </div>
-  @if (!isUploadRoute) {
-    <button [routerLink]="['/upload']" [disabled]="isUploadRoute" class="btn btn-ghost rounded-md hover:bg-black">
-      <!-- <app-svg-icons name="upload" size="20" color="white"></app-svg-icons> -->
-      sa
-    </button>
-  }
-  @if (!isUploadRoute2) {
-    <button [routerLink]="['/upload2']" [disabled]="isUploadRoute2" class="btn btn-ghost rounded-md hover:bg-black">
-      <app-svg-icons name="upload" size="20" color="white"></app-svg-icons>
+  @if (!isCreateTitleRoute) {
+    <button [routerLink]="['/createTitle']" [disabled]="isCreateTitleRoute" class="btn btn-ghost rounded-md hover:bg-black">
+      <app-svg-icons name="plus_square" size="20" color="white"></app-svg-icons>
     </button>
   }
   <!-- @if (auth.isAuthenticated$ | async; as isAuthenticated) {
