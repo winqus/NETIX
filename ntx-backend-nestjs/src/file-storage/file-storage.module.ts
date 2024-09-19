@@ -43,7 +43,7 @@ export class FileStorageModule implements OnApplicationShutdown {
       options = { ...options, [StorageType.LocalFileSystem]: { setup: { storageBaseDirPath: tempDirPath } } };
 
       new Logger('FileStorageModule').warn(
-        `FileStorage will use temp dir "${DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH}" that's removed on shutdown (e.g. Ctrl+C)`,
+        `FileStorage will use temp dir: \n"${tempDirPath}" that's removed on shutdown (e.g. Ctrl+C)`,
       );
     }
 
