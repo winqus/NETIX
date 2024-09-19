@@ -13,7 +13,7 @@ frame "[C4 LVL3] NTX-BE Components" {
         defaultTextAlignment<<component>> center
     }
     component "NTX-BE-API" <<interface>> {
-        interface THUMBNAILS_API
+        interface IMAGES_API
         interface VIDEOS_API
         interface MOVIES_API
         interface LIBRARY_API
@@ -30,7 +30,7 @@ frame "[C4 LVL3] NTX-BE Components" {
         component "<<module>>\nMovies" <<component>> as Movies
         component "<<module>>\nLibrary" <<component>> as Library
         component "<<module>>\nSeries" <<component>> as Series
-        component "<<module>>\nThumbnails" <<component>> as Thumbnails
+        component "<<module>>\nImages" <<component>> as Images
         component "<<module>>\nVideos" <<component>> as Videos
         component "<<module>>\nFileStorage" <<component>> as FileStorage
         component "<<module>>\nExternalSearch" <<component>> as ExternalSearch
@@ -50,12 +50,12 @@ frame "[C4 LVL3] NTX-BE Components" {
         Videos -- Videos_API
         Videos -up- VIDEOS_API
 
-        Thumbnails -down-( Auth_API
-        Thumbnails -up-( MongoDB_API
-        Thumbnails -up-( REDIS_API
-        Thumbnails --( Storage_API
-        Thumbnails -- Thumbnails_API
-        Thumbnails -up- THUMBNAILS_API
+        Images -down-( Auth_API
+        Images -up-( MongoDB_API
+        Images -up-( REDIS_API
+        Images --( Storage_API
+        Images -- Images_API
+        Images -up- IMAGES_API
 
         Titles --( MongoDB_API_2
         Titles -up- Titles_API
@@ -63,7 +63,7 @@ frame "[C4 LVL3] NTX-BE Components" {
         Movies -down-( Auth_API
         Movies -down-( Titles_API
         Movies --( Videos_API
-        Movies --( Thumbnails_API
+        Movies --( Images_API
         Movies -- Movies_API
         Movies -up- MOVIES_API
 
@@ -76,7 +76,7 @@ frame "[C4 LVL3] NTX-BE Components" {
         Series -down-( Auth_API
         Series -down-( Titles_API
         Series --( Videos_API
-        Series --( Thumbnails_API
+        Series --( Images_API
         Series -- Series_API
         Series -up- SERIES_API
 

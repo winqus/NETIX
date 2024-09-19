@@ -3,34 +3,24 @@
 mainframe NETIX_CLASSES
 skinparam mainframeBackgroundColor #FFFFFF
 
-class Entity {
+interface Entity {
   +uuid: string
   +createdAt: Date
   +updatedAt: Date
 }
 
-class Poster {
-  posterID: string
-  size: string
-}
-
-class Title {
+interface Title {
   +posterID: string
   +name: string
   +type: string
 }
 
-Title o-right- Poster
-
-class Movie extends Title {
+class Movie {
   +originallyReleasedAt: Date
   +summary: string
   +runtimeMinutes: number
 }
-
-' class Series extends Title {
-' }
-
-Entity <|-- Title
+Movie --|> Entity
+Movie --|> Title
 
 @enduml

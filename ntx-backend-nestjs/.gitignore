@@ -1,5 +1,6 @@
 # added
 data/
+.temp*/
 
 # compiled output
 /dist

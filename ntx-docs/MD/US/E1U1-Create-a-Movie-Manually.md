@@ -10,7 +10,6 @@ interface CreateMovieDTO {
     summary: string; // 1-1000
     originallyReleasedAt: Date;
     runtimeMinutes: number // 1-12000 (integer)
-    poster: File;
 }
 
 interface MovieDTO {
@@ -26,7 +25,7 @@ interface MovieDTO {
 ## Movie Controller Routes
 `POST /api/v1/movies`
 
-* Body: `CreateMovieDTO`
+* Body: `CreateMovieDTO`, file attached as `poster` (multipart/form-data)
 * Response status: 201
 * Response body: `MovieDTO`
 
