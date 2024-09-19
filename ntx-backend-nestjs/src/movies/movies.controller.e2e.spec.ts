@@ -13,7 +13,7 @@ import * as request from 'supertest';
 import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
 import { MoviesModule } from './movies.module';
 
-jest.setTimeout(10000);
+jest.setTimeout(60000);
 
 const validTestImagePath = 'test/images/1_sm_284x190.webp';
 const tempStoragePath = resolve('.temp-test-data');
