@@ -1,7 +1,7 @@
 import { DynamicModule, Logger, Module, OnApplicationShutdown, Provider } from '@nestjs/common';
 import { FILE_STORAGE_BASE_DIR_PATH, TEMP_FILE_STORAGE_BASE_DIR_PATH } from '@ntx/app.constants';
-import { FileStorage } from './FileStorage';
-import { FileStorageLocal } from './file-storage-local/FileStorageLocal';
+import { FileStorageLocal } from './file-storage-local/file-storage-local.class';
+import { FileStorage } from './file-storage.abstract';
 import { FILE_STORAGE_STRATEGY_TOKEN } from './file-storage.constants';
 import { FileStorageService } from './file-storage.service';
 import { FileStorageModuleOptions, StorageType } from './types';

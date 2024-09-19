@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
+import { FileStorage } from './file-storage.abstract';
 import { FILE_STORAGE_STRATEGY_TOKEN } from './file-storage.constants';
 import {
   FileStorageDeleteFileArgs,
@@ -8,7 +9,6 @@ import {
   FileStorageUploadSingleFileArgs,
   FileStorageUploadStreamArgs,
 } from './file-storage.interfaces';
-import { FileStorage } from './FileStorage';
 import { FileInStorage, WritableStreamWithDoneEvent } from './types';
 
 @Injectable()

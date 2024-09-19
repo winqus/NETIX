@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { FileStorage } from '../FileStorage';
+import { FileStorage } from '../file-storage.abstract';
 import { FileInStorage } from '../types';
 import { generateRandomFileName } from '../utils/name.utils';
 

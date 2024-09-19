@@ -4,10 +4,10 @@ import * as fse from 'fs-extra';
 import { resolve, sep } from 'path';
 import { once, Readable } from 'stream';
 import { pipeline } from 'stream/promises';
+import { FileStorage } from '../file-storage.abstract';
 import { INVALID_FILE_NAME } from '../file-storage.constants';
 import { FileStorageModule } from '../file-storage.module';
 import { FileStorageService } from '../file-storage.service';
-import { FileStorage } from '../FileStorage';
 import { StorageType } from '../types';
 import { generateRandomFileName } from '../utils/name.utils';
 

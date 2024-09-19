@@ -10,12 +10,12 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
-import { SimpleValidationPipe } from '@ntx/common/pipes/simpleValidation.pipe';
-import { fileInStorageFromRaw } from '@ntx/file-storage/factories/fileInStoreFromRaw.factory';
+import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
+import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
 import { FileToStorageContainerInterceptor } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
 import { validateOrReject } from 'class-validator';
-import { CreateMovieDTO } from './dto/CreateMovieDTO';
-import { MovieDTO } from './dto/MovieDTO';
+import { CreateMovieDTO } from './dto/create-movie.dto';
+import { MovieDTO } from './dto/movie.dto';
 import {
   MOVIES_CONTROLLER_BASE_PATH,
   MOVIES_CONTROLLER_VERSION,

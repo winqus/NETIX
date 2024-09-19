@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FileStorageLocal } from './file-storage-local/FileStorageLocal';
+import { FileStorageLocal } from './file-storage-local/file-storage-local.class';
 import { FILE_STORAGE_STRATEGY_TOKEN } from './file-storage.constants';
 import { FileStorageModule } from './file-storage.module';
 import { FileStorageService } from './file-storage.service';

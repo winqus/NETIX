@@ -1,6 +1,7 @@
 import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import { finished, Readable } from 'stream';
+import { FileStorage } from '../file-storage.abstract';
 import {
   FILE_ALREADY_EXISTS,
   FILE_STORAGE_CONTAINER_DELIM,
@@ -19,7 +20,6 @@ import {
   FileStorageUploadStreamArgs,
 } from '../file-storage.interfaces';
 import { FileStorageConfigFactory } from '../file-storage.types';
-import { FileStorage } from '../FileStorage';
 import { FileInStorage, WritableStreamWithDoneEvent } from '../types';
 import { defaultFactory } from './file-storage-local-config-default.factory';
 import { FileStorageLocalSetup } from './file-storage-local.types';

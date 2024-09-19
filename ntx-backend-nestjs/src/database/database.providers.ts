@@ -82,7 +82,7 @@ async function makeRegularRedis(configSrv: ConfigService): Promise<RedisConnecti
 
 async function makeInMemoryRedis(configSrv: ConfigService): Promise<RedisConnectionOptions> {
   let port = configSrv.get(IN_MEMORY_REDIS_PORT);
-  port = port != null ? parseInt(port, 10) : REDIS_DEFAULT_PORT;
+  port = port != null ? parseInt(port, 10) : undefined;
 
   let binaryOptions = undefined;
 

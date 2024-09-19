@@ -4,7 +4,7 @@ import { generateTempFileName } from '@ntx/utility/fileNameUtils';
 import multerFileMimeTypeFilter from '@ntx/utility/multerFileMimeTypeFilter';
 import { extname } from 'path';
 import { FileStorageService } from '../file-storage.service';
-import FileStorageEngine from '../multer/FileStorageEngine.multer';
+import FileStorageEngine from '../multer/file-storage-engine.multer';
 
 export type FileToStorageContainerInterceptorArgs = {
   field: string;

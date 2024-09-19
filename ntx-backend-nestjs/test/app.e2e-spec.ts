@@ -10,11 +10,8 @@ describe('AppController (e2e)', () => {
 
   beforeAll(async () => {
     const testConfigurationFactory: ConfigFactory = () => ({
-      NODE_ENV: 'test',
       USE_MEMORY_MONGO: 'true',
-      IN_MEMORY_MONGO_PORT: '57017',
       USE_MEMORY_REDIS: 'true',
-      IN_MEMORY_REDIS_PORT: '6380',
       USE_TEMPORARY_FILE_STORAGE: 'true',
     });
 

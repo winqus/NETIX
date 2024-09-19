@@ -1,13 +1,13 @@
 import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { createValidatedObject } from '@ntx/common/utils/classValidationUtils';
+import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
+import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { PosterService } from '@ntx/images/poster.service';
-import { generateHash } from '@ntx/utility/generateHash';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { validateOrReject } from 'class-validator';
-import { CreateMovieDTO } from './dto/CreateMovieDTO';
-import { MovieDTO } from './dto/MovieDTO';
+import { CreateMovieDTO } from './dto/create-movie.dto';
+import { MovieDTO } from './dto/movie.dto';
 import { Movie } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
 

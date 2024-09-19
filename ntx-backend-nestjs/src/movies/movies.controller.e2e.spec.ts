@@ -6,12 +6,12 @@ import { DatabaseModule } from '@ntx/database/database.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { StorageType } from '@ntx/file-storage/types';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
+import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
-import { CreateMovieDTO } from './dto/CreateMovieDTO';
+import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
 import { MoviesModule } from './movies.module';
-
 const getRandomValidMovieDto = (): CreateMovieDTO => ({
   name: `test-name-${Math.random()}`,
   summary: `short-test-summary-${Math.random()}`,
@@ -35,11 +35,8 @@ describe('Movies API (e2e)', () => {
 
   beforeAll(async () => {
     const testConfigurationFactory: ConfigFactory = () => ({
-      NODE_ENV: 'test',
       USE_MEMORY_MONGO: 'true',
-      IN_MEMORY_MONGO_PORT: '57017',
       USE_MEMORY_REDIS: 'true',
-      IN_MEMORY_REDIS_PORT: '6380',
       USE_TEMPORARY_FILE_STORAGE: 'true',
     });
 
@@ -58,6 +55,7 @@ describe('Movies API (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useLogger(false);
     // app.useLogger(new ConsoleLogger()); // For debugging tests
     app.enableVersioning({ type: VersioningType.URI, defaultVersion: DEFAULT_CONTROLLER_VERSION });
     app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
@@ -66,6 +64,7 @@ describe('Movies API (e2e)', () => {
   });
 
   afterAll(async () => {
+    await fse.rm(tempStoragePath, { recursive: true });
     await app.close();
   });
 

@@ -47,7 +47,7 @@ const targetBinaryFilename = 'redis-server.exe';
     console.error('Error downloading Redis binary:', error);
   }
 
-  console.log('Redis binary installation completed. Finilizing and exiting...');
+  console.log('Redis binary installation completed. Finalizing and exiting...');
 })();
 
 async function downloadFile(redisBinaryUrl, zipPath) {
