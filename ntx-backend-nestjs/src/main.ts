@@ -1,12 +1,31 @@
-import { VersioningType } from '@nestjs/common';
+import { INestApplication, Logger, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
-import { DEFAULT_CONTROLLER_VERSION, DEFAULT_PORT, ENV, GLOBAL_ROUTE_PREFIX, PORT } from './app.constants';
+import {
+  DEFAULT_CONTROLLER_VERSION,
+  DEFAULT_PORT,
+  ENV,
+  ENVIRONMENTS,
+  GLOBAL_ROUTE_PREFIX,
+  PORT,
+} from './app.constants';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
+
+async function bootstrapSwagger(app: INestApplication<any>) {
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('NTX-BE API')
+    .setDescription('NETIX backend API description')
+    .setVersion('1.0')
+    .build();
+
+  const openAPIdocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('swagger', app, openAPIdocument);
+}
 
 async function bootstrap() {
   require('dotenv').config({ override: true });
@@ -67,8 +86,15 @@ async function bootstrap() {
   app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
   app.enableShutdownHooks();
 
+  if (env === ENVIRONMENTS.DEVELOPMENT) {
+    await bootstrapSwagger(app);
+  }
+
   await app.listen(configSrv.get(PORT, DEFAULT_PORT));
 
+  if (env === ENVIRONMENTS.DEVELOPMENT) {
+    new Logger('Swagger').verbose(`📚 Swagger is running on: ${await app.getUrl()}/swagger`);
+  }
   console.log(`✨ Application (ENV: ${env}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`);
 }
 bootstrap();
