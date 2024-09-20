@@ -3,6 +3,11 @@
 mainframe NETIX_CLASSES
 skinparam mainframeBackgroundColor #FFFFFF
 
+enum TitleType {
+  MOVIE
+  SERIES
+}
+
 interface Entity {
   +uuid: string
   +createdAt: Date
@@ -12,8 +17,11 @@ interface Entity {
 interface Title {
   +posterID: string
   +name: string
-  +type: string
+  +type: TitleType
+  +hash: string;
 }
+
+Title --> TitleType
 
 class Movie {
   +originallyReleasedAt: Date
