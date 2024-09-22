@@ -1,4 +1,6 @@
+import { ApiBodyOptions, getSchemaPath } from '@nestjs/swagger';
 import { FileToStorageContainerInterceptorArgs } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
+import { CreateMovieDTO } from './dto/create-movie.dto';
 
 export const MOVIES_CONTROLLER_BASE_PATH = 'movies';
 export const MOVIES_CONTROLLER_VERSION = '1';
@@ -27,3 +29,16 @@ export const MOVIES_SCHEMA_NAME = 'Movie';
 
 /* Errors */
 export const MOVIES_NO_FILE_PROVIDED_ERROR = 'No file provided';
+
+/* Swagger */
+export const MOVIES_SWAGGER_TAG = 'movies';
+export const MOVIES_CREATE_SWAGGER_API_BODY_OPTIONS: ApiBodyOptions = {
+  schema: {
+    type: 'object',
+    allOf: [
+      { $ref: getSchemaPath(CreateMovieDTO) },
+      { properties: { poster: { type: 'string', format: 'binary' } }, required: ['poster'] },
+    ],
+  },
+  description: 'Body combines properties of CreateMovieDTO and a <i>poster</i> file in multipart/form-data format.',
+};

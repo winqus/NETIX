@@ -12,19 +12,34 @@ import {
   ENVIRONMENTS,
   GLOBAL_ROUTE_PREFIX,
   PORT,
+  SWAGGER_DESCRIPTION,
+  SWAGGER_JSON_ROUTE,
+  SWAGGER_ROUTE,
+  SWAGGER_TAGS,
+  SWAGGER_TITLE,
+  SWAGGER_VERSION,
+  SWAGGER_YAML_ROUTE,
 } from './app.constants';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 
 async function bootstrapSwagger(app: INestApplication<any>) {
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('NTX-BE API')
-    .setDescription('NETIX backend API description')
-    .setVersion('1.0')
-    .build();
+  const swaggerDocBuilder = new DocumentBuilder()
+    .setTitle(SWAGGER_TITLE)
+    .setDescription(SWAGGER_DESCRIPTION)
+    .setVersion(SWAGGER_VERSION);
 
-  const openAPIdocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('swagger', app, openAPIdocument);
+  SWAGGER_TAGS.forEach((tag) => {
+    swaggerDocBuilder.addTag(tag);
+  });
+
+  const swaggerConfig = swaggerDocBuilder.build();
+
+  const openAPIdocument = SwaggerModule.createDocument(app, swaggerConfig, {});
+  SwaggerModule.setup(SWAGGER_ROUTE, app, openAPIdocument, {
+    jsonDocumentUrl: SWAGGER_JSON_ROUTE,
+    yamlDocumentUrl: SWAGGER_YAML_ROUTE,
+  });
 }
 
 async function bootstrap() {
@@ -38,7 +53,7 @@ async function bootstrap() {
   const env = configSrv.get(ENV);
 
   const logger = WinstonModule.createLogger({
-    level: env === 'development' ? 'debug' : 'warn',
+    level: env === ENVIRONMENTS.DEVELOPMENT ? 'debug' : 'warn',
     format: winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.ms(),
@@ -93,8 +108,10 @@ async function bootstrap() {
   await app.listen(configSrv.get(PORT, DEFAULT_PORT));
 
   if (env === ENVIRONMENTS.DEVELOPMENT) {
-    new Logger('Swagger').verbose(`📚 Swagger is running on: ${await app.getUrl()}/swagger`);
+    new Logger('Bootstrap').verbose(`📚 Swagger OpenAPI docs are running on: ${await app.getUrl()}/swagger`);
   }
-  console.log(`✨ Application (ENV: ${env}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`);
+  new Logger('Bootstrap').verbose(
+    `✨ Application (ENV: ${env}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`,
+  );
 }
 bootstrap();
