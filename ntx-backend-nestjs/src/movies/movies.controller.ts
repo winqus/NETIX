@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
@@ -21,9 +22,12 @@ import {
   MOVIES_CONTROLLER_VERSION,
   MOVIES_NO_FILE_PROVIDED_ERROR,
   MOVIES_POSTER_STORAGE_ARGS as MOVIES_POSTER_FILE_STORAGE_ARGS,
+  MOVIES_SWAGGER_TAG,
 } from './movies.constants';
 import { MoviesService } from './movies.service';
+import { ApiDocsForPostMovies } from './swagger';
 
+@ApiTags(MOVIES_SWAGGER_TAG)
 @Controller({
   path: MOVIES_CONTROLLER_BASE_PATH,
   version: MOVIES_CONTROLLER_VERSION,
@@ -35,6 +39,7 @@ export class MoviesController {
   constructor(private readonly moviesSrv: MoviesService) {}
 
   @Post()
+  @ApiDocsForPostMovies()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
   public async create(@UploadedFile() file: Express.Multer.File, @Body() dto: CreateMovieDTO): Promise<MovieDTO> {
     try {
