@@ -1,8 +1,6 @@
 import { getUploadMovieUrl } from '@ntx/app/shared/config/api-endpoints';
 import convertRouteToPath from 'cypress/support/convertRoute';
-import { makeRandomMovieRuntime, makeRandomMovieSummary, makeRandomMovieTitle } from 'cypress/support/randomDataFactory';
-
-// cy.intercept -- waits for back end response
+import { makeLongRandomMovieTitle, makeRandomMovieReleaseDate, makeRandomMovieRuntime, makeRandomMovieSummary, makeRandomMovieTitle } from 'cypress/support/randomDataFactory';
 
 describe('create movie', () => {
   beforeEach(() => {
@@ -21,7 +19,7 @@ describe('create movie', () => {
 
     cy.get('#title').type(makeRandomMovieTitle());
     cy.get('#summary').type(makeRandomMovieSummary());
-    cy.get('#originallyReleasedAt').type('2002-09-11');
+    cy.get('#originallyReleasedAt').type(makeRandomMovieReleaseDate());
     cy.get('#runtimeMinutes').type(makeRandomMovieRuntime().toString());
 
     cy.get('.relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
@@ -34,12 +32,22 @@ describe('create movie', () => {
 
     cy.get('#title').type(makeRandomMovieTitle());
     cy.get('#summary').type(makeRandomMovieSummary());
-    cy.get('#originallyReleasedAt').type('2002-09-11');
+    cy.get('#originallyReleasedAt').type(makeRandomMovieReleaseDate());
     cy.get('#runtimeMinutes').type(makeRandomMovieRuntime().toString());
 
     cy.get('.relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
 
     cy.get('.btn').contains('CREATE').click();
     cy.wait('@BE_CreateMovie').its('response.statusCode').should('eq', 201);
+    // TODO check url after successful input
+    // cy.url().should('include', '/movie');
+  });
+
+  it('should throw error label', () => {
+    cy.visit('/createTitle');
+
+    cy.get('#title').type(makeLongRandomMovieTitle());
+    cy.get('#summary').type(makeRandomMovieSummary());
+    cy.get('[for="title"] > .mb-2 > .label-text-alt').should('be.visible').and('contain.text', 'Maximum length is 200');
   });
 });

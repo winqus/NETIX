@@ -1,6 +1,16 @@
-export const makeRandomMovieTitle = () => 'T' + Math.random().toString(36).substring(2, 15).toUpperCase();
-export const makeRandomMovieSummary = () => 'S' + Math.random().toString(36).substring(2, 15).toUpperCase();
-export const makeRandomMovieRuntime = () => Math.floor(Math.random() * 1000);
+import { faker } from '@faker-js/faker';
+
+export const makeRandomMovieTitle = () => 'T_' + faker.number.int();
+export const makeLongRandomMovieTitle = () => 'T_' + faker.string.alpha({ length: 200 });
+export const makeRandomMovieSummary = () => faker.lorem.sentences(2);
+export const makeRandomMovieReleaseDate = () => {
+  const date = faker.date.anytime();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+export const makeRandomMovieRuntime = () => faker.number.int({ min: 1, max: 12000 });
 
 // example
 // export const randomBuildingCode = () => 'b' + Math.random().toString(36).substring(2, 6).toUpperCase();
