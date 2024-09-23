@@ -1,0 +1,61 @@
+/' ********************************************************************************************
+    PlantUML syntax notes:
+    ++ Activate the target (optionally a color may follow this)
+    -- Deactivate the source
+    ** Create an instance of the target
+    !! Destroy an instance of the target
+
+   ***************************************************************************************** '/
+
+@startuml E1U1_PVL1
+!include MagicDraw.puml
+mainframe E1U1_Create_Movie_Manually_PVL1
+
+actor Manager as Mngr
+participant "NETIX" as NTX 
+
+activate Mngr
+
+Mngr -> NTX++   : Open movie creation form
+Mngr <<-- NTX   : Display empty movie creation form
+
+loop while validation errors present
+    Mngr -> NTX     : Fill form data
+    NTX -> NTX      : Validate form data
+    alt validation errors
+        Mngr <<-- NTX   : Display errors
+    else else
+        Mngr <<-- NTX   : No errors
+    end
+end
+
+loop while poster invalid
+    Mngr -> NTX     :  Select poster file or enter URL
+    alt validation errors
+        NTX -> NTX      : Disable manual poster\n crop adjustment
+        Mngr <<-- NTX   : Display errors
+    else else
+        NTX -> NTX      : Automatically crop poster
+        NTX -> NTX      : Enable manual poster\n crop adjustment
+        Mngr <<-- NTX   : Display poster preview
+    end
+end
+
+opt Manager selects to adjust poster crop
+    Mngr -> NTX     : Selects to adjust poster
+    NTX -->> Mngr   : Shows cropping view
+    Mngr -> NTX     : Adjusts crop
+    Mngr <<-- NTX   : Update poster preview
+end
+
+Mngr <<- NTX    : Enable submission
+
+Mngr -> NTX     : Submit form data
+NTX -> NTX      : Process submission
+
+alt processing succeeded
+    Mngr <<-- NTX   : Redirect to movie inspection page
+else else
+    Mngr <<-- NTX   : Display error message
+end 
+@enduml

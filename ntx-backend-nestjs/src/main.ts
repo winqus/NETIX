@@ -1,19 +1,59 @@
-import { VersioningType } from '@nestjs/common';
+import { INestApplication, Logger, VersioningType } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
+import {
+  DEFAULT_CONTROLLER_VERSION,
+  DEFAULT_PORT,
+  ENV,
+  ENVIRONMENTS,
+  GLOBAL_ROUTE_PREFIX,
+  PORT,
+  SWAGGER_DESCRIPTION,
+  SWAGGER_JSON_ROUTE,
+  SWAGGER_ROUTE,
+  SWAGGER_TAGS,
+  SWAGGER_TITLE,
+  SWAGGER_VERSION,
+  SWAGGER_YAML_ROUTE,
+} from './app.constants';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
-import { DEFAULT_CONTROLLER_VERSION, DEFAULT_PORT, ENV, GLOBAL_ROUTE_PREFIX, PORT } from './constants';
+
+async function bootstrapSwagger(app: INestApplication<any>) {
+  const swaggerDocBuilder = new DocumentBuilder()
+    .setTitle(SWAGGER_TITLE)
+    .setDescription(SWAGGER_DESCRIPTION)
+    .setVersion(SWAGGER_VERSION);
+
+  SWAGGER_TAGS.forEach((tag) => {
+    swaggerDocBuilder.addTag(tag);
+  });
+
+  const swaggerConfig = swaggerDocBuilder.build();
+
+  const openAPIdocument = SwaggerModule.createDocument(app, swaggerConfig, {});
+  SwaggerModule.setup(SWAGGER_ROUTE, app, openAPIdocument, {
+    jsonDocumentUrl: SWAGGER_JSON_ROUTE,
+    yamlDocumentUrl: SWAGGER_YAML_ROUTE,
+  });
+}
 
 async function bootstrap() {
+  require('dotenv').config({ override: true });
+
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
 
+  const configSrv = app.get(ConfigService);
+  const env = configSrv.get(ENV);
+
   const logger = WinstonModule.createLogger({
-    level: process.env.NODE_ENV === 'development' ? 'debug' : 'warn',
+    level: env === ENVIRONMENTS.DEVELOPMENT ? 'debug' : 'warn',
     format: winston.format.combine(
       winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       winston.format.ms(),
@@ -59,9 +99,19 @@ async function bootstrap() {
 
   app.enableCors();
   app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
+  app.enableShutdownHooks();
 
-  await app.listen(process.env[PORT] || DEFAULT_PORT);
+  if (env === ENVIRONMENTS.DEVELOPMENT) {
+    await bootstrapSwagger(app);
+  }
 
-  console.log(`✨ Application (ENV: ${process.env[ENV]}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`);
+  await app.listen(configSrv.get(PORT, DEFAULT_PORT));
+
+  if (env === ENVIRONMENTS.DEVELOPMENT) {
+    new Logger('Bootstrap').verbose(`📚 Swagger OpenAPI docs are running on: ${await app.getUrl()}/swagger`);
+  }
+  new Logger('Bootstrap').verbose(
+    `✨ Application (ENV: ${env}) is running on: ${await app.getUrl()}/${GLOBAL_ROUTE_PREFIX}`,
+  );
 }
 bootstrap();

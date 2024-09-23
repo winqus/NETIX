@@ -29,7 +29,14 @@ REDIS_PASSWORD='pass_r1'
 CLIENT_ORIGIN_URL='http://localhost:4200'
 # AUTH0_AUDIENCE=<none for now>
 # AUTH0_DOMAIN=<none for now>
+
+### DEVELOPMENT ONLY ###
 NODE_ENV='development'
+USE_MEMORY_MONGO=true # set to true for a temporary in-memory database (will log to console the connection string)
+IN_MEMORY_MONGO_PORT=57017 # if commented, port will be random
+USE_MEMORY_REDIS=true # set to true for a temporary in-memory database (will log to console the connection string)
+IN_MEMORY_REDIS_PORT=6380 # if commented, port will be random
+USE_TEMPORARY_FILE_STORAGE=true # set to true to use a temp file storage (its destroyed on server shutdown with Ctrl+C)
 ```
 
 

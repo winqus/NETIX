@@ -1,4 +1,4 @@
-import { DATABASE_CONNECTION } from '@ntx/database/constants';
+import { DATABASE_CONNECTION } from '@ntx/database/database.constants';
 import { Mongoose } from 'mongoose';
 import { VideoSchema } from './schemas/video.schema';
 import { VIDEO_MODEL, VIDEO_SCHEMA_NAME } from './videos.constants';

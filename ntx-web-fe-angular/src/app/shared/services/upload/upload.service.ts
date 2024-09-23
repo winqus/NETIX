@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { getUploadThumbnail, getUploadVideo } from '@ntx-shared/config/api-endpoints';
+import { getUploadMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { IUploadService } from './IUpload.interface';
 
 @Injectable({
@@ -10,29 +10,10 @@ import { IUploadService } from './IUpload.interface';
 export class UploadService implements IUploadService {
   constructor(private http: HttpClient) {}
 
-  uploadThumbnail(imageFile: File, contentId: string): Observable<any> {
-    const url = getUploadThumbnail(contentId);
+  uploadMovieMetadata(formData: FormData): Observable<any> {
+    const url = getUploadMovieUrl();
     const httpOptions = {};
 
-    const body = new FormData();
-    const imageBlob = new Blob([imageFile]);
-    body.append('thumbnail', imageBlob, imageFile.name);
-
-    return this.http.post(url, body, httpOptions);
-  }
-
-  uploadVideo(videoFile: File, contentId: string): Observable<any> {
-    const url = getUploadVideo(contentId);
-
-    const body = new FormData();
-    body.append('video', videoFile, videoFile.name);
-
-    return this.http.post(url, body, {
-      headers: new HttpHeaders({
-        Accept: '*/*',
-      }),
-      reportProgress: true,
-      responseType: 'json',
-    });
+    return this.http.post(url, formData, httpOptions);
   }
 }

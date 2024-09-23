@@ -1,0 +1,35 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": "src",
+  "moduleNameMapper": {
+    "^@ntx/(.*)$": "<rootDir>/$1",
+    "^@ntx-test/(.*)$": "<rootDir>/../test/$1"
+  },
+  "testRegex": ".*\\.spec\\.ts$",
+  "testPathIgnorePatterns": [
+    "<rootDir>/.*-legacy/",
+    ".*-legacy/.*",
+    "<rootDir>/movies/.*\\.e2e\\.spec\\.ts"
+  ],
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "collectCoverageFrom": [
+    "**/*.(t|j)s"
+  ],
+  "coverageDirectory": "../coverage",
+  "testEnvironment": "node",
+  "setupFiles": [
+    "<rootDir>/../setupJest.js"
+  ],
+  "ci": true,
+  "silent": true,
+  "bail": true,
+  "maxWorkers": 1,
+  "detectOpenHandles": true,
+  "forceExit": true
+}

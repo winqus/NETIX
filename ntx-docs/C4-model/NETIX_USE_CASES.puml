@@ -1,0 +1,11 @@
+@startuml NETIX_USE_CASES
+mainframe NETIX_USE_CASES
+
+actor Manager
+
+component [NETIX] <<sub-system>> {
+    usecase (E1U1 Create a Movie Manually) as E1U1
+
+    Manager - E1U1
+}
+@enduml
