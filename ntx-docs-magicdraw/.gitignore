@@ -1,0 +1,55 @@
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore backup and autosave files
+*.bak
+*.autosave
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+.temp*/
+
+# Ignore MagicDraw project lock files (to prevent conflicts during teamwork)
+*.lock
+
+# Ignore MagicDraw derived files
+*.class
+*.mf
+*.project
+*.umlcache
+*.metadata
+
+# Ignore configuration files for personal settings (optional, depending on your use case)
+*.prefs
+
+# Ignore MagicDraw report output files
+*.html
+*.pdf
+*.docx
+*.txt
+
+# Ignore Teamwork Cloud files (only needed if not using TWC)
+twc*
+
+# Ignore any IDE-specific files (for example, if using Eclipse or IntelliJ IDEA)
+.idea/
+*.iml
+*.classpath
+*.project
+
+# If using a temporary directory for exports, ignore the export folder
+export/
+
+# Ignore other build or generated output directories
+out/
+build/
+
+# Optional: Ignore model diagram images if not needed for version control
+*.png
+*.jpg
+*.jpeg
