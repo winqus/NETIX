@@ -54,7 +54,7 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
   onSubmit() {
     if (this.mocieTitleCreationForm.valid) {
       const formData = new FormData();
-      formData.append('title', this.mocieTitleCreationForm.get('title')?.value as string);
+      formData.append('name', this.mocieTitleCreationForm.get('title')?.value as string);
       formData.append('summary', this.mocieTitleCreationForm.get('summary')?.value as string);
       formData.append('originallyReleasedAt', this.mocieTitleCreationForm.get('originallyReleasedAt')?.value as string);
       formData.append('runtimeMinutes', this.mocieTitleCreationForm.get('runtimeMinutes')?.value as string);
@@ -66,9 +66,9 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
           const movieId = response.id;
           this.router.navigate(['/movie', movieId]);
         },
-        error: (error) => {
-          this.errorMessage = error;
-          if (environment.development) console.error('Error uploading metadata:', error);
+        error: (errorResponse) => {
+          this.errorMessage = errorResponse.error.message;
+          if (environment.development) console.error('Error uploading metadata:', errorResponse);
         },
       });
     }

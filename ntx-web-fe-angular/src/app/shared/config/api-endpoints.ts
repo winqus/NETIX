@@ -16,6 +16,6 @@ export const SERVER = {
   },
 };
 
-export function getUploadMovieMetadataUrl(): string {
+export function getUploadMovieUrl(): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.uploadMetadata}`;
 }
