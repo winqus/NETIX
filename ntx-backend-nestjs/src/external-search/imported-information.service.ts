@@ -1,9 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { NtxEvent } from '@ntx/common/events';
-import MovieCreatedFromExternalSourceEvent from '@ntx/common/events/MovieCreatedFromExternalSourceEvent';
-import SeriesCreatedFromExternalSourceEvent from '@ntx/common/events/SeriesCreatedFromExternalSourceEvent';
-import TitleCreatedFromExternalSourceEvent from '@ntx/common/events/TitleCreatedFromExternalSourceEvent';
 import { Result } from '@ntx/common/Result';
 import { ImportedInformationRepository } from './imported-information.repository';
 import { ImportedInformation } from './interfaces/ImportedInformation.interface';
@@ -75,40 +70,41 @@ export class ImportedInformationService {
     }
   }
 
-  @OnEvent(NtxEvent.TitleCreatedFromExternalSource)
-  @OnEvent(NtxEvent.MovieCreatedFromExternalSource)
-  @OnEvent(NtxEvent.SeriesCreatedFromExternalSource)
-  private async handleTitleCreateFromExternalSource(
-    payload:
-      | TitleCreatedFromExternalSourceEvent
-      | MovieCreatedFromExternalSourceEvent
-      | SeriesCreatedFromExternalSourceEvent,
-  ) {
-    const { createdTitle, externalTitle } = payload;
-    if (createdTitle == null || externalTitle == null) {
-      this.logger.error('No payload provided');
+  // TODO: keep, modify or remove when working on E1U2
+  // @OnEvent(NtxEvent.TitleCreatedFromExternalSource)
+  // @OnEvent(NtxEvent.MovieCreatedFromExternalSource)
+  // @OnEvent(NtxEvent.SeriesCreatedFromExternalSource)
+  // private async handleTitleCreateFromExternalSource(
+  //   payload:
+  //     | TitleCreatedFromExternalSourceEvent
+  //     | MovieCreatedFromExternalSourceEvent
+  //     | SeriesCreatedFromExternalSourceEvent,
+  // ) {
+  //   const { createdTitle, externalTitle } = payload;
+  //   if (createdTitle == null || externalTitle == null) {
+  //     this.logger.error('No payload provided');
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const sourceUUID = externalTitle.sourceUUID;
-    const extEntityID = externalTitle.id;
-    const titleUUID = createdTitle.uuid;
-    const infoTag = createdTitle.type || null;
+  //   const sourceUUID = externalTitle.sourceUUID;
+  //   const extEntityID = externalTitle.id;
+  //   const titleUUID = createdTitle.uuid;
+  //   const infoTag = createdTitle.type || null;
 
-    this.registerImportedInformation(sourceUUID, extEntityID, titleUUID, externalTitle, infoTag)
-      .then((result) => {
-        const value = result.getValue();
-        if (result.isSuccess) {
-          this.logger.log(`Registered imported ${createdTitle.type} from ${value.sourceUUID} (${value.uuid})`);
-        } else {
-          this.logger.error(
-            `Failed to register ${createdTitle.type} ${value.providedForEntity} from ${value.sourceUUID}`,
-          );
-        }
-      })
-      .catch((error) => {
-        this.logger.error(`Failed to register ${createdTitle.type} title`, error);
-      });
-  }
+  //   this.registerImportedInformation(sourceUUID, extEntityID, titleUUID, externalTitle, infoTag)
+  //     .then((result) => {
+  //       const value = result.getValue();
+  //       if (result.isSuccess) {
+  //         this.logger.log(`Registered imported ${createdTitle.type} from ${value.sourceUUID} (${value.uuid})`);
+  //       } else {
+  //         this.logger.error(
+  //           `Failed to register ${createdTitle.type} ${value.providedForEntity} from ${value.sourceUUID}`,
+  //         );
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       this.logger.error(`Failed to register ${createdTitle.type} title`, error);
+  //     });
+  // }
 }
