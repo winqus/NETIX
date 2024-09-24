@@ -55,7 +55,7 @@ export class UploadTitleComponent implements OnInit {
       formData.append('runtimeMinutes', this.movieTitleCreationForm.get('runtimeMinutes')?.value as string);
       formData.append('poster', this.imageFile as Blob);
 
-      this.upload.uploadMovieMetadata(formData).subscribe({
+      this.uploadMovie.uploadMovieMetadata(formData).subscribe({
         next: (response) => {
           if (environment.development) console.log('Upload successful:', response);
           const movieId = response.id;

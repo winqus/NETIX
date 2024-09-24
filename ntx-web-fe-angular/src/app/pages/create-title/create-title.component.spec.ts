@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CreateTitleComponent } from './create-title.component';
 import { UploadTitleComponent } from '@ntx-pages/create-title/upload-title/upload-title.component';
-import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
+import { UploadService } from '@ntx/app/shared/services/movie/upload.service';
 import { By } from '@angular/platform-browser';
 
 describe('CreateTitleComponent', () => {
