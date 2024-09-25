@@ -43,7 +43,6 @@ export class PosterService {
         fileName: fileName,
       });
 
-      // return this.streamToBuffer(posterStream);
       return posterStream;
     } catch (error) {
       this.logger.error('Failed to find poster ${posterID}: ', error.message);
