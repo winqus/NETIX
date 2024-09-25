@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsString, Length, Max, Min } from 'class-validator';
+import { IsDate, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
 import {
   MOVIES_NAME_LENGTH_MAX,
   MOVIES_NAME_LENGTH_MIN,
@@ -11,6 +11,12 @@ import {
 export class MovieDTO {
   @IsString()
   id: string;
+
+  @IsDate()
+  createdAt: Date;
+
+  @IsDate()
+  updatedAt: Date;
 
   @IsString()
   @Length(MOVIES_NAME_LENGTH_MIN, MOVIES_NAME_LENGTH_MAX)
@@ -30,4 +36,8 @@ export class MovieDTO {
 
   @IsString()
   posterID: string;
+
+  @IsString()
+  @IsOptional()
+  videoID?: string;
 }

@@ -13,6 +13,7 @@ export const MovieSchema = new mongoose.Schema<Movie>(
     summary: { type: String, required: true },
     runtimeMinutes: { type: Number, required: true },
     hash: { type: String, required: true, unique: true },
+    videoID: { type: String, default: null },
   },
   { timestamps: true },
 );
