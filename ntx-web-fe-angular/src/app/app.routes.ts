@@ -8,6 +8,7 @@ import { MovieListComponent } from '@ntx-pages/movie-list/movie-list.component';
 import { VideoMediaViewerComponent } from '@ntx-pages/video-media-viewer/video-media-viewer.component';
 // import { UploadContentComponent } from '@ntx-pages/upload-content/upload-content.component';
 import { CreateTitleComponent } from '@ntx-pages/create-title/create-title.component';
+import { InspectMovieComponent } from './pages/inspect-movie/inspect-movie.component';
 // import { AuthGuard } from '@auth0/auth0-angular';
 
 export const routes: Routes = [
@@ -22,6 +23,15 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     // canActivateChild: [AuthGuard],
     children: [{ path: '', component: CreateTitleComponent }],
+  },
+  {
+    path: 'inspect/movies',
+    component: MainLayoutComponent,
+    // canActivateChild: [AuthGuard],
+    children: [
+      { path: '', redirectTo: '/error/404', pathMatch: 'full' },
+      { path: ':id', component: InspectMovieComponent },
+    ],
   },
   {
     path: 'watch',

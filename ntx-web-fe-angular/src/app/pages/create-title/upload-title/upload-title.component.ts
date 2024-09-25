@@ -64,7 +64,7 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (response) => {
           if (environment.development) console.log('Upload successful:', response);
           const movieId = response.id;
-          this.router.navigate(['/movie', movieId]);
+          this.router.navigate(['/inspect/movies', movieId]);
         },
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;
