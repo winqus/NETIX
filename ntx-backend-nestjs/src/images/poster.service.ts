@@ -4,7 +4,12 @@ import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { Readable } from 'stream';
-import { IMAGES_CREATE_POSTER_JOBNAME, IMAGES_CREATE_POSTER_QUEUE, IMAGES_POSTER_CONTAINER } from './images.constants';
+import {
+  IMAGES_CREATE_POSTER_JOBNAME,
+  IMAGES_CREATE_POSTER_QUEUE,
+  IMAGES_POSTER_CONTAINER,
+  POSTER_EXTENTION,
+} from './images.constants';
 import { PosterSize } from './images.types';
 import { CreatePosterQueue } from './queues/create-poster.types';
 import { makePosterFileName } from './utils/images.utils';
@@ -37,7 +42,7 @@ export class PosterService {
 
   public async findOne(id: string, size: PosterSize): Promise<Readable> {
     try {
-      const fileName = makePosterFileName(id, size, 'webp');
+      const fileName = makePosterFileName(id, size, POSTER_EXTENTION);
       const posterStream = await this.fileStorageSrv.downloadStream({
         container: IMAGES_POSTER_CONTAINER,
         fileName: fileName,

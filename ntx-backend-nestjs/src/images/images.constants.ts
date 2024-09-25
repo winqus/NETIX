@@ -3,6 +3,9 @@ import { PosterSize } from './images.types';
 export const POSTER_CONTROLLER_BASE_PATH = 'poster';
 export const POSTER_CONTROLLER_VERSION = '1';
 
+export const POSTER_MIME_TYPE = 'image/webp';
+export const POSTER_EXTENTION = 'webp';
+
 export const IMAGES_POSTER_CONTAINER = 'posters';
 export const IMAGES_CREATE_POSTER_JOBNAME = 'create-poster-job';
 export const IMAGES_CREATE_POSTER_QUEUE = 'images-create-poster-queue';
