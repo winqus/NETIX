@@ -1,7 +1,7 @@
 import { BadRequestException, Controller, Get, HttpException, Logger, Param, Query } from '@nestjs/common';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { CONTROLLER_BASE_PATH, CONTROLLER_VERSION, ExternalSearchSources } from './external-search.constants';
+import { CONTROLLER_BASE_PATH, CONTROLLER_VERSION, ExternalProviders } from './external-providers.constants';
 import { ExternalTitleSearchService } from './external-title-search.service';
 
 @Controller({
@@ -42,7 +42,7 @@ export class ExternalTitleSearchController {
   async searchDetails(
     @Param('id') id: string,
     @Query('type') type: TitleType,
-    @Query('source') source = ExternalSearchSources.TMDB_SEARCH_V3,
+    @Query('source') source = ExternalProviders.TMDB_SEARCH_V3,
   ) {
     try {
       const titleDetails = await this.extTitleSearchService.searchDetailsByTitleId(id, type, source);

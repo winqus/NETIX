@@ -10,7 +10,7 @@ const Fuse = require('fuse.js');
 import { Injectable, Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { normalize } from '@ntx/common/utils/mathUtils';
-import { ExternalSearchSources } from '@ntx/external-search/external-search.constants';
+import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
 import AbstractAPIPlugin from '../../interfaces/AbstractAPIPlugin';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
@@ -27,7 +27,7 @@ import { TMDBTitle } from './interfaces/TMDBTitle';
 export class TMDBSearchTitleService extends AbstractAPIPlugin implements ITitleSearchPlugin {
   private readonly logger = new Logger(this.constructor.name);
 
-  public readonly pluginUUID = ExternalSearchSources.TMDB_SEARCH_V3;
+  public readonly pluginUUID = ExternalProviders.TMDB_SEARCH_V3;
 
   private apiKey: string;
 

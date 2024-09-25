@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { Result } from '@ntx/common/Result';
-import { ExternalSearchSources, getConfigForSource } from './external-search.constants';
+import { ExternalProviders, getConfigForSource } from './external-providers.constants';
 import { TitleDetailedSearchResult } from './interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from './interfaces/TitleSearchResult.interface';
 import { TMDBSearchTitleService } from './plugins/tmdb-search-title/TMDB-search-title.service';
@@ -11,7 +11,7 @@ export class ExternalTitleSearchService {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(private readonly tmdbSearchService: TMDBSearchTitleService) {
-    if (tmdbSearchService.init(getConfigForSource(ExternalSearchSources.TMDB_SEARCH_V3)!) === false) {
+    if (tmdbSearchService.init(getConfigForSource(ExternalProviders.TMDB_SEARCH_V3)!) === false) {
       this.logger.error('Failed to initialize TMDB search service');
 
       throw new Error('Failed to initialize TMDB search service');
@@ -45,7 +45,7 @@ export class ExternalTitleSearchService {
   async searchDetailsByTitleId(
     id: string,
     type: TitleType,
-    sourceUUID = ExternalSearchSources.TMDB_SEARCH_V3,
+    sourceUUID = ExternalProviders.TMDB_SEARCH_V3,
   ): Promise<Result<TitleDetailedSearchResult>> {
     try {
       if (id == null || id === '') {
@@ -63,7 +63,7 @@ export class ExternalTitleSearchService {
       let titleDetails = null;
 
       switch (sourceUUID) {
-        case ExternalSearchSources.TMDB_SEARCH_V3:
+        case ExternalProviders.TMDB_SEARCH_V3:
           titleDetails = await this.tmdbSearchService.searchDetailsById(id, type);
           break;
         default:

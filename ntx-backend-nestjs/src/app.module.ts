@@ -15,7 +15,7 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-import { ExternalSearchModule } from './external-search/external-search.module';
+import { ExternalProvidersModule } from './external-providers/external-providers.module';
 import { FileStorageModule } from './file-storage/file-storage.module';
 import { StorageType } from './file-storage/types';
 import { ImagesModule } from './images/images.module';
@@ -52,7 +52,7 @@ function getStorageBaseDirPath() {
         limit: DEFAULT_THROTTLE_LIMIT,
       },
     ]),
-    ExternalSearchModule,
+    ExternalProvidersModule,
     ImagesModule,
     MoviesModule,
   ],

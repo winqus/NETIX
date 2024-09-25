@@ -1,11 +1,11 @@
 import { PluginConfig, PluginConfigLUT } from './plugins/interfaces/PluginConfigLUT.interface';
 
-export enum ExternalSearchSources {
+export enum ExternalProviders {
   TMDB_SEARCH_V3 = 'TMDB_SEARCH_V3',
 }
 
 export const pluginConfig: PluginConfigLUT = {
-  [ExternalSearchSources.TMDB_SEARCH_V3]: {
+  [ExternalProviders.TMDB_SEARCH_V3]: {
     usePlugin: true,
     options: {
       apiKey: process.env['TMDB_API_KEY'] || '',
@@ -14,9 +14,9 @@ export const pluginConfig: PluginConfigLUT = {
   },
 };
 
-export const getConfigForSource = (source: ExternalSearchSources): PluginConfig | undefined => {
+export const getConfigForSource = (source: ExternalProviders): PluginConfig | undefined => {
   const pluginConfig: PluginConfigLUT = {
-    [ExternalSearchSources.TMDB_SEARCH_V3]: {
+    [ExternalProviders.TMDB_SEARCH_V3]: {
       usePlugin: true,
       options: {
         apiKey: process.env['TMDB_API_KEY'] || '',
