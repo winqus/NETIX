@@ -6,7 +6,7 @@ import { TEST_DATA_DIRECTORY, TEST_DIRECTORY } from '@ntx-test/constants';
 import { JestCacheFetch } from '@ntx-test/utils/JestCacheFetch';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
-import { TitleSearchResult } from '@ntx/external-search/interfaces/TitleSearchResult.interface';
+import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
 import fetchMock from 'jest-fetch-mock';
 import * as path from 'path';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';

@@ -19,4 +19,4 @@ import { TMDBSearchTitleService } from './plugins/tmdb-search-title/TMDB-search-
   controllers: [ExternalTitleSearchController],
   exports: [ExternalTitleSearchService, ImportedInformationService],
 })
-export class ExternalSearchModule {}
+export class ExternalProvidersModule {}
