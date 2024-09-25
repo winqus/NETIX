@@ -8,6 +8,7 @@ import {
   IMAGES_POSTER_CONTAINER,
   IMAGES_POSTER_QUEUE_CONCURRENCY,
   IMAGES_POSTER_SIZES,
+  POSTER_EXTENTION,
 } from '../images.constants';
 import { PosterSize } from '../images.types';
 import { makePosterFileName } from '../utils/images.utils';
@@ -63,7 +64,7 @@ export class CreatePosterWorker extends WorkerHost {
 
         const storageDestination: FileInStorage = {
           container: IMAGES_POSTER_CONTAINER,
-          fileName: makePosterFileName(posterID, size, 'webp'),
+          fileName: makePosterFileName(posterID, size, POSTER_EXTENTION),
         };
 
         const uploadStream = await this.fileStorageSrv.uploadStream(storageDestination);
