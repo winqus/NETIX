@@ -60,16 +60,50 @@ export class MoviesService {
 
       const newMovieDTO = createValidatedObject(MovieDTO, {
         id: newMovie.uuid,
+        createdAt: newMovie.createdAt,
+        updatedAt: newMovie.updatedAt,
         name: newMovie.name,
         summary: newMovie.summary,
         originallyReleasedAt: newMovie.originallyReleasedAt,
         runtimeMinutes: newMovie.runtimeMinutes,
         posterID: newMovie.posterID,
-      } as MovieDTO);
+        videoID: newMovie.videoID,
+      });
 
       return newMovieDTO;
     } catch (error) {
       this.logger.error(`Failed to create movie ${dto.name}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async findOne(id: string): Promise<MovieDTO> {
+    try {
+      if (id == null) {
+        throw new BadRequestException('id can not be null');
+      }
+
+      const movie = await this.moviesRepo.findByUUID(id);
+
+      if (movie == null) {
+        throw new BadRequestException('requested movie does not exist');
+      }
+
+      const movieDTO = createValidatedObject(MovieDTO, {
+        id: movie.uuid,
+        createdAt: movie.createdAt,
+        updatedAt: movie.updatedAt,
+        name: movie.name,
+        summary: movie.summary,
+        originallyReleasedAt: movie.originallyReleasedAt,
+        runtimeMinutes: movie.runtimeMinutes,
+        posterID: movie.posterID,
+        videoID: movie.videoID,
+      });
+
+      return movieDTO;
+    } catch (error) {
+      this.logger.error(`Failed to find movie with this ${id}: ${error.message}`);
       throw error;
     }
   }

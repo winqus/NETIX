@@ -1,6 +1,6 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { Title } from '@ntx/common/interfaces/title.interface';
-import { IsDate, IsInt, IsPositive, IsString, Length, Matches, Max, Min } from 'class-validator';
+import { IsDate, IsInt, IsOptional, IsPositive, IsString, Length, Matches, Max, Min } from 'class-validator';
 
 export class Movie implements Title {
   @IsString()
@@ -37,4 +37,8 @@ export class Movie implements Title {
   @Min(1)
   @Max(12_000)
   runtimeMinutes: number;
+
+  @IsString()
+  @IsOptional()
+  videoID?: string;
 }

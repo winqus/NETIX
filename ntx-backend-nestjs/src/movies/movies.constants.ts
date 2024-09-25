@@ -29,6 +29,7 @@ export const MOVIES_SCHEMA_NAME = 'Movie';
 
 /* Errors */
 export const MOVIES_NO_FILE_PROVIDED_ERROR = 'No file provided';
+export const MOVIES_NO_ID_PROVIDED_ERROR = 'No id provided';
 
 /* Swagger */
 export const MOVIES_SWAGGER_TAG = 'movies';
