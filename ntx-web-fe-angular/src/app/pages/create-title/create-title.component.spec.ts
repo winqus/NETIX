@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CreateTitleComponent } from './create-title.component';
 import { UploadTitleComponent } from '@ntx-pages/create-title/upload-title/upload-title.component';
-import { UploadService } from '@ntx/app/shared/services/movie/upload.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { By } from '@angular/platform-browser';
 
 describe('CreateTitleComponent', () => {
@@ -14,7 +14,7 @@ describe('CreateTitleComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [CreateTitleComponent],
-      providers: [{ provide: UploadService, useValue: mockUploadService }],
+      providers: [{ provide: MovieService, useValue: mockUploadService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CreateTitleComponent);
