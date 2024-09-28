@@ -52,7 +52,7 @@ function getStorageBaseDirPath() {
         limit: DEFAULT_THROTTLE_LIMIT,
       },
     ]),
-    ExternalProvidersModule,
+    ExternalProvidersModule.forRoot(),
     ImagesModule,
     MoviesModule,
   ],
