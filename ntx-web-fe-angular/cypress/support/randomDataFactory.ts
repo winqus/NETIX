@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 
-export const makeRandomMovieTitle = () => faker.commerce.productDescription();
-export const makeLongRandomMovieTitle = () => 'T_' + faker.string.alpha({ length: 200 });
+export const makeRandomMovieName = (maxLength = 20) => faker.commerce.productDescription().slice(0, maxLength).trim();
+export const makeLongRandomMovieName = () => 'T_' + faker.string.alpha({ length: 200 }).trim();
 export const makeRandomMovieSummary = () => faker.lorem.sentences(2);
 export const makeRandomMovieReleaseDate = () => {
   const date = faker.date.anytime();

@@ -1,4 +1,10 @@
 /// <reference types="cypress" />
+
+import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
+import convertRouteToPath from './convertRoute';
+import { getMovieUrl } from '@ntx/app/shared/config/api-endpoints';
+import { makeRandomMovieName, makeRandomMovieSummary, makeRandomMovieReleaseDate, makeRandomMovieRuntime } from './randomDataFactory';
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -35,3 +41,28 @@
 //     }
 //   }
 // }
+
+/* ALL COMMANDS DEFINED HERE SHOULD BE DECLARED IN cypress/support/cypress.d.ts */
+
+Cypress.Commands.add('createMovieWithPoster', (args: any): Cypress.Chainable<MovieDTO> => {
+  const { name, summary, releaseDate, runtime } = args || {};
+
+  const CREATE_MOVIE_REQUEST_TOKEN = 'create-movie-request';
+  cy.intercept('POST', convertRouteToPath(getMovieUrl())).as(CREATE_MOVIE_REQUEST_TOKEN);
+
+  cy.visit('/createTitle');
+
+  cy.get('#title').type(name || makeRandomMovieName(), { delay: 0 });
+  cy.get('#summary').type(summary || makeRandomMovieSummary(), { delay: 0 });
+  cy.get('#originallyReleasedAt').type(releaseDate || makeRandomMovieReleaseDate(), { delay: 0 });
+  cy.get('#runtimeMinutes').type(runtime || makeRandomMovieRuntime().toString(), { delay: 0 });
+
+  cy.get('.relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
+
+  cy.get('.btn').contains('CREATE').click();
+  return cy.wait('@' + CREATE_MOVIE_REQUEST_TOKEN).then((interception) => {
+    const response = interception.response!;
+    expect(response.statusCode).to.equal(201);
+    return response.body as MovieDTO;
+  });
+});
