@@ -35,5 +35,5 @@ export const KeyCode = {
 };
 
 export const TimeDelays = {
-  posterProcessingDelay: 3000,
+  posterProcessingDelay: 500,
 };
