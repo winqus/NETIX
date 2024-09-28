@@ -15,6 +15,8 @@ import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import {
   POSTER_CONTROLLER_BASE_PATH,
   POSTER_CONTROLLER_VERSION,
+  POSTER_EXTENTION,
+  POSTER_MIME_TYPE,
   POSTER_NO_ID_PROVIDED_ERROR,
   POSTER_SWAGGER_TAG,
 } from './images.constants';
@@ -45,11 +47,11 @@ export class PostersController {
         size = PosterSize.M;
       }
 
-      const fileName = makePosterFileName(id, size, 'webp');
+      const fileName = makePosterFileName(id, size, POSTER_EXTENTION);
       const fileStream = await this.posterSrv.findOne(id, size);
 
       return new StreamableFile(fileStream, {
-        type: 'image/webp',
+        type: POSTER_MIME_TYPE,
         disposition: `attachment; filename="${fileName}"`,
       });
     } catch (error) {

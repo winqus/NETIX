@@ -12,10 +12,23 @@ export const API_CONFIG = {
 export const SERVER = {
   baseUrl: environment.api.serverUrl + '/api',
   endpoints: {
-    uploadMetadata: '/v1/movies',
+    movies: '/v1/movies',
+    poster: '/v1/poster',
   },
 };
 
-export function getUploadMovieUrl(): string {
-  return `${SERVER.baseUrl}${SERVER.endpoints.uploadMetadata}`;
+export function getMovieUrl(_id?: string): string {
+  if (_id) {
+    return `${SERVER.baseUrl}${SERVER.endpoints.movies}/${_id}`;
+  } else {
+    return `${SERVER.baseUrl}${SERVER.endpoints.movies}`;
+  }
+}
+
+export function getPoster(_id: string, _size?: string) {
+  if (_size) {
+    return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}?size=${_size}`;
+  } else {
+    return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
+  }
 }

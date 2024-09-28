@@ -84,5 +84,6 @@ export class ImageUploadComponent extends FileUploadComponent {
 
     this.imageUrl = '';
     this.isDraggingOver = false;
+    this.filePassed.emit(null);
   }
 }

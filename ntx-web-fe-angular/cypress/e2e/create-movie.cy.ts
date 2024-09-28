@@ -1,10 +1,10 @@
-import { getUploadMovieUrl } from '@ntx/app/shared/config/api-endpoints';
+import { getMovieUrl } from '@ntx/app/shared/config/api-endpoints';
 import convertRouteToPath from 'cypress/support/convertRoute';
 import { makeLongRandomMovieTitle, makeRandomMovieReleaseDate, makeRandomMovieRuntime, makeRandomMovieSummary, makeRandomMovieTitle } from 'cypress/support/randomDataFactory';
 
 describe('create movie', () => {
   beforeEach(() => {
-    cy.intercept(convertRouteToPath(getUploadMovieUrl())).as('BE_CreateMovie');
+    cy.intercept(convertRouteToPath(getMovieUrl())).as('BE_CreateMovie');
   });
 
   it('shoudl navigate to create title page', () => {

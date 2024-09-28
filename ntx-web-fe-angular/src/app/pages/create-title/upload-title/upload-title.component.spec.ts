@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UploadTitleComponent } from './upload-title.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
+import { UploadService } from '@ntx-shared/services/upload/upload.service';
 
 describe('UploadContentComponent', () => {
   let component: UploadTitleComponent;
@@ -30,10 +30,10 @@ describe('UploadContentComponent', () => {
   });
 
   it('should return true when form is valid and imageFile is set', () => {
-    component.mocieTitleCreationForm.controls['title'].setValue('Test Title');
-    component.mocieTitleCreationForm.controls['summary'].setValue('Test Summary');
-    component.mocieTitleCreationForm.controls['originallyReleasedAt'].setValue('2022-01-01');
-    component.mocieTitleCreationForm.controls['runtimeMinutes'].setValue('120');
+    component.movieTitleCreationForm.controls['title'].setValue('Test Title');
+    component.movieTitleCreationForm.controls['summary'].setValue('Test Summary');
+    component.movieTitleCreationForm.controls['originallyReleasedAt'].setValue('2022-01-01');
+    component.movieTitleCreationForm.controls['runtimeMinutes'].setValue('120');
     component.imageFile = new File([], 'test.jpg');
     expect(component.isFormValid()).toBeTrue();
   });

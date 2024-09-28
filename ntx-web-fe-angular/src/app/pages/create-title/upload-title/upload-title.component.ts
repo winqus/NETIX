@@ -24,7 +24,7 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   errorMessage: string = '';
 
-  mocieTitleCreationForm = new FormGroup({
+  movieTitleCreationForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
     summary: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.summary.minLength), Validators.maxLength(FieldRestrictions.summary.maxLength)]),
     originallyReleasedAt: new FormControl('', [Validators.required]),
@@ -48,23 +48,23 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isFormValid(): boolean {
-    return this.mocieTitleCreationForm.valid && this.imageFile !== null;
+    return this.movieTitleCreationForm.valid && this.imageFile !== null;
   }
 
   onSubmit() {
-    if (this.mocieTitleCreationForm.valid) {
+    if (this.movieTitleCreationForm.valid) {
       const formData = new FormData();
-      formData.append('name', this.mocieTitleCreationForm.get('title')?.value as string);
-      formData.append('summary', this.mocieTitleCreationForm.get('summary')?.value as string);
-      formData.append('originallyReleasedAt', this.mocieTitleCreationForm.get('originallyReleasedAt')?.value as string);
-      formData.append('runtimeMinutes', this.mocieTitleCreationForm.get('runtimeMinutes')?.value as string);
+      formData.append('name', this.movieTitleCreationForm.get('title')?.value as string);
+      formData.append('summary', this.movieTitleCreationForm.get('summary')?.value as string);
+      formData.append('originallyReleasedAt', this.movieTitleCreationForm.get('originallyReleasedAt')?.value as string);
+      formData.append('runtimeMinutes', this.movieTitleCreationForm.get('runtimeMinutes')?.value as string);
       formData.append('poster', this.imageFile as Blob);
 
       this.upload.uploadMovieMetadata(formData).subscribe({
         next: (response) => {
           if (environment.development) console.log('Upload successful:', response);
           const movieId = response.id;
-          this.router.navigate(['/movie', movieId]);
+          this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
         },
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;
@@ -101,13 +101,12 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   async recieveImageFile(file: File | null) {
-    if (file !== null) {
-      this.imageFile = await this.imageService.compressImage(file);
-    }
+    console.log(file);
+    this.imageFile = file;
   }
 
   getErrorMessage(controlName: string): string {
-    const control = this.mocieTitleCreationForm.get(controlName);
+    const control = this.movieTitleCreationForm.get(controlName);
     if (control?.touched && control.invalid) {
       if (control.errors?.['required']) {
         return 'This field is required';
@@ -140,7 +139,7 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isInvalid(controlName: string): boolean {
-    const control = this.mocieTitleCreationForm.get(controlName);
+    const control = this.movieTitleCreationForm.get(controlName);
     return !!(control && control.invalid && control.touched);
   }
 }
