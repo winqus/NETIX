@@ -28,21 +28,19 @@ export class InspectMovieComponent implements OnInit {
 
   ngOnInit(): void {
     const movieId = this.route.snapshot.paramMap.get('id') || '';
-    const navigation = window.history.state;
+    const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
 
     this.uploadService.getMovieMetadata(movieId).subscribe({
       next: (response) => {
         if (environment.development) console.log('Upload successful:', response);
         this.movie = response;
-        // this.loadPoster(this.movie?.posterID, PosterSize.L);
 
         if (this.isFromCreation) {
           timer(3000).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
         } else {
           this.loadPoster(this.movie!.posterID, PosterSize.L);
         }
-        console.log(this.posterUrl);
         if (environment.development) console.log(this.movie);
       },
       error: (errorResponse) => {
@@ -55,12 +53,10 @@ export class InspectMovieComponent implements OnInit {
     this.posterService.getPoster(id, size).subscribe({
       next: (blob: Blob) => {
         this.posterUrl = URL.createObjectURL(blob);
-        console.log(this.posterUrl);
       },
       error: (errorResponse) => {
         if (environment.development) console.error('Error loading poster:', errorResponse);
         this.posterUrl = null;
-        console.log('no image wtf');
       },
     });
   }

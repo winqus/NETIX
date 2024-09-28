@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UploadTitleComponent } from './upload-title.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
+import { UploadService } from '@ntx-shared/services/upload/upload.service';
 
 describe('UploadContentComponent', () => {
   let component: UploadTitleComponent;
