@@ -11,6 +11,14 @@ export class MoviesRepository extends EntityRepository<Movie> {
     super(model);
   }
 
+  public async findAllByName(name: string): Promise<MovieDocument[]> {
+    const query: FilterQuery<MovieDocument> = {
+      name: { $regex: new RegExp(name, 'i') },
+    };
+
+    return this.model.find(query).exec();
+  }
+
   public async existsByID(uuid: string): Promise<boolean> {
     const query: FilterQuery<MovieDocument> = {
       uuid,

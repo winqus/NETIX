@@ -7,6 +7,7 @@ import { PosterService } from '@ntx/images/poster.service';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
+import { MovieSearchResultDTO } from './dto/movie-search-result.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { Movie } from './entities/movie.entity';
 import { MoviesRepository } from './movies.repository';
@@ -104,6 +105,38 @@ export class MoviesService {
       return movieDTO;
     } catch (error) {
       this.logger.error(`Failed to find movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async findAllByName(name: string): Promise<MovieSearchResultDTO[]> {
+    try {
+      if (!name) {
+        throw new BadRequestException('name can not be null or empty');
+      }
+
+      const movies = await this.moviesRepo.findAllByName(name);
+
+      if (!movies.length) {
+        throw new BadRequestException('No movies found with the given name');
+      }
+
+      const movieSearchResults = movies.map((movie) => {
+        return {
+          providerID: 'ntx' as const, // Literal type 'ntx'
+          resultWeight: 1 as const, // Literal type 1
+          shortMovieMetadata: {
+            title: movie.name,
+            type: movie.type,
+            releaseDate: movie.originallyReleasedAt.toISOString(),
+            posterID: movie.posterID || '', // Handle optional posterID
+          },
+        };
+      });
+
+      return movieSearchResults;
+    } catch (error) {
+      this.logger.error(`Failed to find movies by name "${name}": ${error.message}`);
       throw error;
     }
   }

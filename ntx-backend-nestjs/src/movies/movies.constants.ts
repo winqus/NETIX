@@ -43,3 +43,8 @@ export const MOVIES_CREATE_SWAGGER_API_BODY_OPTIONS: ApiBodyOptions = {
   },
   description: 'Body combines properties of CreateMovieDTO and a <i>poster</i> file in multipart/form-data format.',
 };
+
+export enum ExternalProviders {
+  NTX = 'ntx',
+  TMDB = 'tmdb',
+}
