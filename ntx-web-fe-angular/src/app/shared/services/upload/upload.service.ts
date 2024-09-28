@@ -10,7 +10,7 @@ import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
   providedIn: 'root',
 })
 export class UploadService implements IUploadService {
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   uploadMovieMetadata(formData: FormData): Observable<MovieDTO> {
     const url = getMovieUrl();
