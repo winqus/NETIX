@@ -4,7 +4,7 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 import { getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { IUploadService } from './IUpload.service.interface';
 import { MovieDTO } from '../../models/movie.dto';
-import { MovieDTOMapper } from '../../mappers/MovieDTO.mapper';
+import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
 
 @Injectable({
   providedIn: 'root',
