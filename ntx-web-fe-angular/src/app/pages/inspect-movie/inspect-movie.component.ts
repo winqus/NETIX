@@ -6,8 +6,7 @@ import { UploadService } from '@ntx-shared/services/upload/upload.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
-import { PosterProcessingService } from '@ntx-shared/services/posters/posterProcessing.service';
-import { switchMap, timer } from 'rxjs';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -24,7 +23,6 @@ export class InspectMovieComponent implements OnInit {
   constructor(
     private uploadService: UploadService,
     private posterService: PosterService,
-    private posterProcessingService: PosterProcessingService,
     private route: ActivatedRoute
   ) {}
 
@@ -41,10 +39,6 @@ export class InspectMovieComponent implements OnInit {
 
         if (this.isFromCreation) {
           timer(3000).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
-
-          this.posterProcessingService.onPosterReady().subscribe(() => {
-            this.loadPoster(this.movie!.posterID, PosterSize.L);
-          });
         } else {
           this.loadPoster(this.movie!.posterID, PosterSize.L);
         }

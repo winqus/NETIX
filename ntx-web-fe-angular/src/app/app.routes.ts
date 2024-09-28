@@ -4,9 +4,7 @@ import { MainLayoutComponent } from '@ntx-core/layouts/main-layout/main-layout.c
 import { EmptyLayoutComponent } from '@ntx-core/layouts/empty-layout/empty-layout.component';
 import { ErrorPageComponent } from '@ntx-pages/error-page/error-page.component';
 import { MovieListComponent } from '@ntx-pages/movie-list/movie-list.component';
-// import { UploadMediaComponent } from '@ntx-pages/upload-media-(legacy)/upload-media.component';
 import { VideoMediaViewerComponent } from '@ntx-pages/video-media-viewer/video-media-viewer.component';
-// import { UploadContentComponent } from '@ntx-pages/upload-content/upload-content.component';
 import { CreateTitleComponent } from '@ntx-pages/create-title/create-title.component';
 import { InspectMovieComponent } from './pages/inspect-movie/inspect-movie.component';
 // import { AuthGuard } from '@auth0/auth0-angular';
