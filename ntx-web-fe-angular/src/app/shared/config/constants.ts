@@ -33,3 +33,7 @@ export const MediaConstants = {
 export const KeyCode = {
   Escape: 'Escape',
 };
+
+export const TimeDelays = {
+  posterProcessingDelay: 3000,
+};

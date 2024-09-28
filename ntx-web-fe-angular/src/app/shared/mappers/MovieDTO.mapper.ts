@@ -1,7 +1,7 @@
 import { MovieDTO } from '../models/movie.dto';
 
 export class MovieDTOMapper {
-  static toMetadataItem(item: any): MovieDTO {
+  static anyToMovieDTO(item: any): MovieDTO {
     return {
       id: item.id,
       createdAt: new Date(item.createdAt),

@@ -7,6 +7,7 @@ import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component'
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { timer } from 'rxjs';
+import { TimeDelays } from '@ntx-shared/config/constants';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -37,7 +38,7 @@ export class InspectMovieComponent implements OnInit {
         this.movie = response;
 
         if (this.isFromCreation) {
-          timer(3000).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
+          timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
         } else {
           this.loadPoster(this.movie!.posterID, PosterSize.L);
         }

@@ -1,9 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InspectMovieComponent } from './inspect-movie.component';
 import { UploadService } from '@ntx-shared/services/upload/upload.service';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { ActivatedRoute } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 

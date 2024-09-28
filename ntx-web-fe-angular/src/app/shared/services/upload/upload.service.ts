@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { getMovieUrl } from '@ntx-shared/config/api-endpoints';
-import { IUploadService } from './IUpload.interface';
+import { IUploadService } from './IUpload.service.interface';
 import { MovieDTO } from '../../models/movie.dto';
 import { MovieDTOMapper } from '../../mappers/MovieDTO.mapper';
 
@@ -12,11 +12,19 @@ import { MovieDTOMapper } from '../../mappers/MovieDTO.mapper';
 export class UploadService implements IUploadService {
   constructor(private http: HttpClient) {}
 
-  uploadMovieMetadata(formData: FormData): Observable<any> {
+  uploadMovieMetadata(formData: FormData): Observable<MovieDTO> {
     const url = getMovieUrl();
     const httpOptions = {};
 
-    return this.http.post(url, formData, httpOptions);
+    return this.http.post(url, formData, httpOptions).pipe(
+      map((response: any) => {
+        return MovieDTOMapper.anyToMovieDTO(response);
+      }),
+      catchError((error) => {
+        console.error('Error fetching movie metadata:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   getMovieMetadata(id: string): Observable<MovieDTO> {
@@ -25,7 +33,7 @@ export class UploadService implements IUploadService {
 
     return this.http.get(url, httpOptions).pipe(
       map((response: any) => {
-        return MovieDTOMapper.toMetadataItem(response);
+        return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
         console.error('Error fetching movie metadata:', error);

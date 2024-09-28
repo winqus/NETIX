@@ -32,4 +32,3 @@ export function getPoster(_id: string, _size?: string) {
     return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
   }
 }
-// http://localhost:3055/api/v1/poster/79c650b3-9e0d-4640-99d4-4138753fee55?size=L
