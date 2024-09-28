@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common/services/logger.service';
 
-const mockLogger = {
+export const loggerMock = {
   log: jest.fn(),
   error: jest.fn(),
   warn: jest.fn(),
@@ -9,7 +9,7 @@ const mockLogger = {
 } as unknown as jest.Mocked<Logger>;
 
 export default (service: any): jest.Mocked<Logger> => {
-  jest.replaceProperty(service, 'logger', mockLogger);
+  jest.replaceProperty(service, 'logger', loggerMock);
 
-  return mockLogger;
+  return loggerMock;
 };

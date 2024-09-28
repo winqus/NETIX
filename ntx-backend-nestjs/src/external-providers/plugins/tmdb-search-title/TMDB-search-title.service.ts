@@ -27,7 +27,7 @@ import { TMDBTitle } from './interfaces/TMDBTitle';
 export class TMDBSearchTitleService extends AbstractAPIPlugin implements ITitleSearchPlugin {
   private readonly logger = new Logger(this.constructor.name);
 
-  public readonly pluginUUID = ExternalProviders.TMDB_SEARCH_V3;
+  public readonly pluginUUID = ExternalProviders.TMDB;
 
   private apiKey: string;
 
