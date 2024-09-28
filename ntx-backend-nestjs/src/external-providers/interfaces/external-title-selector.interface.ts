@@ -1,4 +1,4 @@
-import { ExternalTitleSearchResult, ExternalTitleSearchResultCandidate } from '../external-providers.types';
+import { ExternalTitleSearchResultCandidate, ExternalTitleSearchResultItem } from '../external-providers.types';
 
 export interface ExternalTitleSelectionArgs {
   candidates: ExternalTitleSearchResultCandidate[];
@@ -6,5 +6,5 @@ export interface ExternalTitleSelectionArgs {
 }
 
 export interface IExternalTitleSelector {
-  select(args: ExternalTitleSelectionArgs): Promise<ExternalTitleSearchResult[]>;
+  select(args: ExternalTitleSelectionArgs): Promise<ExternalTitleSearchResultItem[]>;
 }

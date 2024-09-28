@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExternalProvidersModule } from './external-providers.module';
-import { ExternalTitleService } from './external-title-search.service';
+import { ExternalTitleService } from './external-title.service';
 
 describe('ExternalProvidersModule', () => {
   describe('forRoot', () => {

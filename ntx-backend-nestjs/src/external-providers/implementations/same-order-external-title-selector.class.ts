@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { ExternalTitleSearchResult } from '../external-providers.types';
+import { ExternalTitleSearchResultItem } from '../external-providers.types';
 import { ExternalTitleSelectionArgs, IExternalTitleSelector } from '../interfaces/external-title-selector.interface';
 
 export class SameOrderExternalTitleSelector implements IExternalTitleSelector {
@@ -7,7 +7,7 @@ export class SameOrderExternalTitleSelector implements IExternalTitleSelector {
 
   constructor() {}
 
-  public async select(args: ExternalTitleSelectionArgs): Promise<ExternalTitleSearchResult[]> {
+  public async select(args: ExternalTitleSelectionArgs): Promise<ExternalTitleSearchResultItem[]> {
     return args.candidates.map((candidate, index) => ({
       providerID: candidate.providerID,
       externalID: candidate.externalID,

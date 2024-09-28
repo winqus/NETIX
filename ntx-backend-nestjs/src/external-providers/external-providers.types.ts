@@ -1,5 +1,17 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 
+export interface ExternalTitle {
+  externalID: string;
+  providerID: string;
+  type: TitleType;
+}
+
+export interface ExternalTitleMetadata {
+  name: string;
+  originalName: string;
+  releaseDate: string;
+}
+
 export interface ExternalTitleSearchRequest {
   query: string;
   types?: TitleType[];
@@ -7,30 +19,58 @@ export interface ExternalTitleSearchRequest {
   maxResults?: number;
 }
 
-export interface ExternalTitleSearchResultDTO {
+export interface ExternalTitleSearchResult {
   size: number;
-  results: ExternalTitleSearchResult[];
+  results: ExternalTitleSearchResultItem[];
+}
+
+export interface ExternalTitleSearchResultItem {
+  providerID: string;
+  externalID: string;
+  type: TitleType;
+  metadata: ExternalTitleMetadata;
+  weight: number;
 }
 
 export interface ExternalTitleSearchResultCandidate {
   providerID: string;
   externalID: string;
   type: TitleType;
-  metadata: {
-    name: string;
-    originalName: string;
-    releaseDate: string;
-  };
+  metadata: ExternalTitleMetadata;
 }
 
-export interface ExternalTitleSearchResult {
-  providerID: string;
+export interface ExternalTitleMetadataRequest<T extends TitleType = TitleType> {
   externalID: string;
-  type: TitleType;
-  weight: number;
-  metadata: {
-    name: string;
-    originalName: string;
-    releaseDate: string;
-  };
+  providerID: string;
+  type: T;
+}
+
+export interface ExternalTitleMetadataResult<T extends TitleType = TitleType> {
+  externalID: string;
+  providerID: string;
+  type: T;
+  metadata: TitleTypeMetadataMap[T];
+}
+
+type TitleTypeMetadataMap = {
+  [TitleType.MOVIE]: ExternalMovieMetadata;
+  [TitleType.SERIES]: ExternalSeriesMetadata;
+};
+
+export interface ExternalMovieMetadata extends ExternalTitleMetadata {
+  runtime: number;
+}
+
+export interface ExternalSeriesMetadata extends ExternalTitleMetadata {
+  numberOfSeasons?: number;
+  numberOfEpisodes?: number;
+  seasons: [
+    {
+      id: string;
+      name: string;
+      seasonNumber: number;
+      episodeCount: number;
+      releaseDate: string | null;
+    },
+  ];
 }

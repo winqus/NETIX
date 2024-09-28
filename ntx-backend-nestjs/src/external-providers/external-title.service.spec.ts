@@ -1,5 +1,5 @@
 import { TestBed } from '@automock/jest';
-import { ExternalTitleService } from './external-title-search.service';
+import { ExternalTitleService } from './external-title.service';
 
 describe('ExternalTitleService', () => {
   let service: ExternalTitleService;

@@ -1,5 +1,5 @@
-import { ExternalTitleSearchRequest, ExternalTitleSearchResultDTO } from './external-providers.types';
+import { ExternalTitleSearchRequest, ExternalTitleSearchResult } from './external-providers.types';
 
 export interface IExternalTitleSearchService {
-  search(request: ExternalTitleSearchRequest): Promise<ExternalTitleSearchResultDTO>;
+  search(request: ExternalTitleSearchRequest): Promise<ExternalTitleSearchResult>;
 }
