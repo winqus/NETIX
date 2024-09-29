@@ -1,127 +1,93 @@
 import { normalize } from '@ntx/common/utils/mathUtils';
 import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
+import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-providers.types';
 import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
 import { TMDBTitleSelectionArgs, TMDBTitleSelector } from './interfaces/TMDB-title-selector.interface';
-import { TMDBTitle } from './interfaces/TMDBTitle';
+import { TMDBTitle, WeightedTMDBTitle } from './interfaces/TMDBTitle';
 import { TMDBTitleMapper } from './TMDB-title.mapper';
 
 const Fuse = require('fuse.js');
 
 const fuseOptions: IFuseOptions<any> = {
-  findAllMatches: true,
-  keys: ['title', 'originalTitle'],
+  findAllMatches: false,
+  keys: ['title', 'originalTitle', 'name', 'original_name'],
   threshold: 0.6,
   distance: 30,
   includeScore: true,
   shouldSort: true,
   minMatchCharLength: 1,
-  ignoreFieldNorm: false, // Can improve matching, or not...
+  ignoreFieldNorm: true, // Can improve matching, or not...
 };
+
+type TMDBTitleWithScore = TMDBTitle & { score: number };
+type WeightedTMDBTitleWithScore = WeightedTMDBTitle & { score: number };
 
 export class TMDBTitleSelectorFuseJS implements TMDBTitleSelector {
   public async select({ candidates, query, maxResults }: TMDBTitleSelectionArgs): Promise<TitleSearchResult[]> {
-    if (!candidates || candidates.length === 0) {
+    if (!candidates || candidates.length === 0 || !query || query.length === 0) {
       return [];
     }
 
-    if (candidates.length === 1) {
+    const candidatesLength = candidates.length;
+
+    if (maxResults == null || maxResults <= 0) {
+      maxResults = candidatesLength;
+    }
+
+    if (candidatesLength === 1) {
       const title = TMDBTitleMapper.TMDBTitle2TitleSearchResult(candidates[0]);
       title.weight = 1.0;
 
       return [title];
     }
 
-    if (!query || query.length === 0) {
-      return [];
-    }
-
-    if (maxResults == null || maxResults <= 0) {
-      maxResults = candidates.length;
-    }
-
-    if (candidates.length <= 5) {
-      candidates = this.normalizeTMDBTitlesPopularity(candidates);
-
-      const titleSearchResults: TitleSearchResult[] = candidates
-        .map((title) => TMDBTitleMapper.TMDBTitle2TitleSearchResult(title))
-        .sort((a, b) => b.weight - a.weight);
-
-      const fuzeResults = this.filterResultsWithFuse(query, titleSearchResults);
-
-      const combinedResults: TitleSearchResult[] = [
-        ...fuzeResults.map((result) => {
-          return { ...result.item, score: result.score };
-        }),
-      ];
-
-      const fuzzySearchResultIds = new Set(fuzeResults.map((result) => result.item.id));
-      for (const titleResult of titleSearchResults) {
-        if (fuzzySearchResultIds.has(titleResult.id) === false) {
-          combinedResults.push(titleResult);
-        }
-      }
-
-      combinedResults.forEach((result) => {
-        const TMDB_WEIGHT = 0.3;
-        const FUZEJS_WEIGHT = 1 - TMDB_WEIGHT;
-
-        let score = 0.0;
-        if ('score' in result) {
-          score = (result as any).score!;
-        }
-
-        result.weight = parseFloat((result.weight * TMDB_WEIGHT + score * FUZEJS_WEIGHT).toFixed(3));
-      });
-
-      return combinedResults.slice(0, maxResults).sort((a, b) => b.weight - a.weight);
-    }
-
-    candidates.sort((a, b) => {
-      return b.popularity - a.popularity;
-    });
-
-    if (candidates.length > 10) {
+    if (candidatesLength > 10) {
+      // Filter out unpopular titles as they are less likely to be relevant
       candidates = candidates.filter((title) => title.popularity > 10.0);
     }
 
-    let normalizedTitles: TMDBTitle[] = this.normalizeTMDBTitlesPopularity(candidates);
+    let normalizedTitles = this.normalizeTMDBTitlesPopularity(candidates);
+
     if (normalizedTitles.length > 10) {
+      // Filter out the bottom 3% of unpopular titles as they are less likely to be relevant
       normalizedTitles = normalizedTitles.filter((title) => title.popularity > 0.03);
     }
 
-    const titleSearchResults: TitleSearchResult[] = normalizedTitles.map((title) =>
-      TMDBTitleMapper.TMDBTitle2TitleSearchResult(title),
-    );
-
-    // TODO: extract Fuzzy search
-    const fuzzySearchResults: FuseResult<TitleSearchResult>[] = this.filterResultsWithFuse(query, titleSearchResults);
-
-    const TMDB_WEIGHT = 0.0;
-    const FUZEJS_WEIGHT = 1 - TMDB_WEIGHT;
-    const simpleAdditiveWeightingResults: TitleSearchResult[] = fuzzySearchResults.map((result) => {
-      (result as any).item.originalWeight = result.item.weight; // Save original weight for debugging
-      result.item.weight = parseFloat((result.item.weight * TMDB_WEIGHT + result.score! * FUZEJS_WEIGHT).toFixed(3));
-
-      return result.item;
+    const fuseSearchResults = this.filterResultsWithFuse(query, normalizedTitles);
+    const scoredTMDBTitles = fuseSearchResults.map((title) => {
+      return {
+        ...title.item,
+        score: title.score,
+      } as TMDBTitleWithScore;
     });
 
-    if (TMDB_WEIGHT > 0.0) {
-      simpleAdditiveWeightingResults.sort((a, b) => b.weight - a.weight);
+    if (candidatesLength <= 5) {
+      // Add remaining candidates that weren't found by Fuse.js just in case they are relevant
+      const fuzzySearchResultIds = new Set(fuseSearchResults.map((result) => result.item.id));
+      for (const candidate of candidates) {
+        if (fuzzySearchResultIds.has(candidate.id) === false) {
+          scoredTMDBTitles.push(candidate as any);
+        }
+      }
     }
 
-    return simpleAdditiveWeightingResults.slice(0, maxResults).map((result) => {
-      return {
-        id: result.id,
-        title: result.title,
-        originalTitle: result.originalTitle,
-        type: result.type,
-        weight: result.weight,
-        // originalWeight: result.originalWeight, // For debugging
-        releaseDate: result.releaseDate,
-        sourceUUID: ExternalProviders.TMDB,
-      };
+    const TMDB_WEIGHT = candidatesLength <= 5 ? 0.3 : 0.0;
+    const FUZEJS_WEIGHT = 1 - TMDB_WEIGHT;
+    const simpleAdditiveWeightedTMDBTitles = scoredTMDBTitles.map((titleItem) => {
+      (titleItem as WeightedTMDBTitleWithScore).weight = parseFloat(
+        (titleItem.popularity * TMDB_WEIGHT + titleItem.score * FUZEJS_WEIGHT).toFixed(5),
+      );
+
+      return titleItem as WeightedTMDBTitleWithScore;
     });
+
+    const results = simpleAdditiveWeightedTMDBTitles
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, maxResults)
+      .map((result) => TMDBTitleMapper.TMDBTitle2TitleSearchResult(result as WeightedTMDBTitle));
+
+    return results;
   }
 
   private normalizeTMDBTitlesPopularity(titles: TMDBTitle[]): TMDBTitle[] {
@@ -147,7 +113,8 @@ export class TMDBTitleSelectorFuseJS implements TMDBTitleSelector {
     return sortedByPopularityDesc;
   }
 
-  private filterResultsWithFuse(query: string, results: TitleSearchResult[]): FuseResult<TitleSearchResult>[] {
+  // private filterResultsWithFuse(query: string, results: TitleSearchResult[]): FuseResult<TitleSearchResult>[] {
+  private filterResultsWithFuse(query: string, results: TMDBTitle[]): FuseResult<TMDBTitleWithScore>[] {
     const fuse = new Fuse(results, fuseOptions);
     const fuseResults = fuse.search(query);
     fuseResults.forEach((result: FuseSortFunctionArg) => {
