@@ -19,19 +19,16 @@ export const MediaConstants = {
   image: {
     aspectRatio: 2 / 3,
     formats: ['.png', '.jpg', '.jpeg', '.webp'],
-    exportFormat: 'webp',
-    maxSize: 2 * 1024 * 1024 * 1024,
+    exportFileExtension: 'webp',
+    exportMimeType: 'image/webp',
     maxSizeMb: 0.1,
+    maxSizeBytes: 100 * 1024,
     maxHeight: 1920,
   },
   video: {
     formats: ['.mkv'],
     maxSize: 10 * 1024 * 1024 * 1024,
   },
-};
-
-export const KeyCode = {
-  Escape: 'Escape',
 };
 
 export const TimeDelays = {

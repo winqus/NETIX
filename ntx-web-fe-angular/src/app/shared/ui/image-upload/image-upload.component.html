@@ -1,16 +1,16 @@
-<div class="relative w-full h-full bg-gray-700 rounded-lg" [class.dragging-over]="isDraggingOver" (dragover)="onDragOver($event)" (drop)="onDrop($event)" (dragleave)="onDragLeave($event)">
+<div class="relative w-full h-full rounded-lg" [class.dragging-over]="isDraggingOver" (dragover)="onDragOver($event)" (drop)="onDrop($event)" (dragleave)="onDragLeave($event)">
   <label
-    [for]="!props.readonly ? fileUploadId : null"
+    [for]="fileUploadId"
     class="w-full h-full input input-bordered flex items-center justify-center m-0 p-0"
     [class.cursor-pointer]="!props.readonly"
     [class.cursor-default]="props.readonly"
     [class.bg-neutral-900]="props.readonly"
     [class.bg-neutral-400]="isDraggingOver"
   >
-    <input #fileInput type="file" [accept]="props.accept" class="hidden" [id]="fileUploadId" [readonly]="props.readonly" (change)="onFileSelected($event)" />
+    <input #input type="file" [size]="" [accept]="props.accept" hidden [id]="fileUploadId" [disabled]="props.readonly" (change)="onFileChanged($event)" />
     @if (imageUrl) {
-      <img #imageElement class="w-full h-full rounded-lg m-auto" [class.hidden]="!imageCropped" [src]="imageUrl" id="myImage" alt="Preview" />
-      <button class="btn-xs btn-circle absolute top-0 left-0 bg-black flex items-center justify-center m-1" (click)="clearFileInput($event)">
+      <img #image class="w-full h-full rounded-lg m-auto" [src]="imageUrl" id="myImage" alt="Preview" />
+      <button class="btn-xs btn-circle absolute top-0 left-0 bg-black flex items-center justify-center m-1" (click)="clearFile($event)">
         <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
       </button>
       <button class="btn-xs btn-circle absolute bottom-0 right-0 bg-black flex items-center justify-center m-1" type="button" onclick="croppModal.showModal()">
@@ -21,7 +21,7 @@
     }
   </label>
 </div>
-<div class="block mb-1 text-sm font-medium overflow-hidden text-ellipsis whitespace-nowrap">{{ file?.name }}</div>
+<div class="block mb-1 text-sm font-medium overflow-hidden text-ellipsis whitespace-nowrap">{{ originalImage?.name }}</div>
 
 <dialog #croppModal id="croppModal" class="modal">
   <div class="modal-box">
@@ -34,7 +34,7 @@
       </form>
     </div>
     <div class="flex justify-center items-center">
-      <app-image-cropper class="max-h-[20%]" [props]="{ imageUrl: originalImgUrl! }" (cropped)="setCropedImage($event)"></app-image-cropper>
+      <app-image-cropper class="max-h-[20%]" [props]="{ imageUrl: this.originalImgUrl! }" (cropped)="setCropedImage($event)"></app-image-cropper>
     </div>
   </div>
 </dialog>
