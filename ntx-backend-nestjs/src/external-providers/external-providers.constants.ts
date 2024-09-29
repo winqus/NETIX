@@ -1,4 +1,4 @@
-import { PluginConfig, PluginConfigLUT } from './plugins/interfaces/PluginConfigLUT.interface';
+import { PluginConfig, PluginConfigLUT } from './3rd-party-providers/interfaces/PluginConfigLUT.interface';
 
 export enum ExternalProviders {
   TMDB = 'TMDB',

@@ -1,9 +1,9 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 
-export interface ExternalTitle {
+export interface ExternalTitle<T extends TitleType = TitleType> {
   externalID: string;
   providerID: string;
-  type: TitleType;
+  type: T;
 }
 
 export interface ExternalTitleMetadata {
