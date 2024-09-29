@@ -1,5 +1,4 @@
-import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
-import { TMDBTitle } from './TMDBTitle';
+import { TMDBTitle, WeightedTMDBTitle } from './TMDBTitle';
 
 export interface TMDBTitleSelectionArgs {
   candidates: TMDBTitle[];
@@ -8,5 +7,5 @@ export interface TMDBTitleSelectionArgs {
 }
 
 export interface TMDBTitleSelector {
-  select(args: TMDBTitleSelectionArgs): Promise<TitleSearchResult[]>;
+  select(args: TMDBTitleSelectionArgs): Promise<WeightedTMDBTitle[]>;
 }

@@ -75,7 +75,7 @@ describe('TMDBService', () => {
 
       const results = await tmdb.search('shrek 2');
 
-      expect(results[0]['originalTitle']).toEqual('Shrek 2');
+      expect(results[0].metadata.originalName).toEqual('Shrek 2');
     });
   });
 

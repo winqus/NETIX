@@ -1,6 +1,6 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-providers.types';
 import { TitleDetailedSearchResult } from '@ntx/external-providers/interfaces/TitleDetailedSearchResult.interface';
-import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
 
 export interface TitleSearchPluginConfig {
   usePlugin: boolean;
@@ -10,8 +10,6 @@ export interface TitleSearchPluginConfig {
 
 export interface ITitleSearchPlugin {
   readonly pluginUUID: string;
-
-  search(query: string, type?: TitleType, maxResults?: number): Promise<TitleSearchResult[]>;
 
   searchDetailsById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null>;
 }

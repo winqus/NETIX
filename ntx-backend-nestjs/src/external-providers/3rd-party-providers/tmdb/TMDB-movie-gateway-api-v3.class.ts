@@ -30,10 +30,10 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
       options.include_adult = 'false';
     }
 
-    const { title, year, language, include_adult } = options;
+    const { query, year, language, include_adult } = options;
 
-    if (title == '' || title == null) {
-      this.logger.error('Movie title is empty or null');
+    if (query == '' || query == null) {
+      this.logger.error('Movie query is empty or null');
 
       return null;
     }
@@ -44,7 +44,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
 
     while (currentPage <= totalPages && currentPage <= maxResultPagesToSearchThrough) {
       const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(title));
+      params.append('query', encodeURIComponent(query));
       params.append('include_adult', include_adult);
       params.append('language', language);
       params.append('page', currentPage.toString());

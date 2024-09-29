@@ -30,10 +30,10 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
       options.include_adult = 'false';
     }
 
-    const { title, year, language, include_adult } = options;
+    const { query, year, language, include_adult } = options;
 
-    if (title == '' || title == null) {
-      this.logger.error('TV Show title is empty or null');
+    if (query == '' || query == null) {
+      this.logger.error('TV Show query is empty or null');
 
       return null;
     }
@@ -44,7 +44,7 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
 
     while (currentPage <= totalPages && currentPage <= maxResultPagesToSearchThrough) {
       const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(title));
+      params.append('query', encodeURIComponent(query));
       params.append('include_adult', include_adult);
       params.append('language', language);
       params.append('page', currentPage.toString());

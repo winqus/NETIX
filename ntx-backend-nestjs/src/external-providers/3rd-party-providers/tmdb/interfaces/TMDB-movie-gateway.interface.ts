@@ -3,7 +3,7 @@ import { TMDBMovieDetails } from './TMDBMovieDetails';
 import { TMDBSearchResult } from './TMDBSearchResult';
 
 export interface TMDBMovieSearchOptions {
-  title: string;
+  query: string;
   year?: string;
   language?: string;
   include_adult?: 'true' | 'false';

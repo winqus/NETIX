@@ -3,7 +3,7 @@ import {
   ExternalTitle,
   ExternalTitleMetadataRequest,
   ExternalTitleMetadataResult,
-  ExternalTitleSearchResultCandidate,
+  ExternalTitleSearchResultItem,
 } from '../external-providers.types';
 
 export interface ExternalProviderConfig {
@@ -20,7 +20,7 @@ export interface IExternalTitleProvider {
 
   exists(title: ExternalTitle): Promise<boolean>;
 
-  findByQuery(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultCandidate[]>;
+  search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]>;
 
   getMetadata<T extends TitleType>(request: ExternalTitleMetadataRequest<T>): Promise<ExternalTitleMetadataResult<T>>;
 }

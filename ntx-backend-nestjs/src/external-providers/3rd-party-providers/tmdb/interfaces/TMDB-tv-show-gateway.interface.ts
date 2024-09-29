@@ -3,7 +3,7 @@ import { TMDBTVShow } from './TMDBTVShow';
 import { TMDBTVShowDetails } from './TMDBTVShowDetails';
 
 export interface TMDBTVShowSearchOptions {
-  title: string;
+  query: string;
   year?: string;
   language?: string;
   include_adult?: string;

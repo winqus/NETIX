@@ -7,7 +7,7 @@ import { JestCacheFetch } from '@ntx-test/utils/JestCacheFetch';
 import { loggerMock } from '@ntx-test/utils/logger.utils';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
-import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
+import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-providers.types';
 import fetchMock from 'jest-fetch-mock';
 import * as path from 'path';
 import { TMDBService, TMDBSetup } from './TMDB.service';
@@ -45,18 +45,17 @@ describe('TMDBService with TMDB API calls for titles', () => {
 
   TEST_TITLE_QUERIES.forEach(({ query, expected, expectedPositionRange, type }) => {
     it(`should return search results for "${query}" with expected title "${expected}" within range [${expectedPositionRange}]`, async () => {
-      const results = await tmdb.search(query, type);
+      let options = {};
+      if (type) {
+        options = { types: [type] };
+      }
+
+      const results = await tmdb.search(query, options);
 
       const titlePosition = titlePositionInResults(expected, results);
 
       if (isWithinRange(titlePosition, expectedPositionRange) === false) {
-        consoleOutputTitleSearchResultTable(
-          query,
-          results,
-          ['title', 'weight', 'type', 'releaseDate'],
-          // ['title', 'weight', 'type', 'releaseDate', 'originalWeight'], // For debugging
-          expected,
-        );
+        consoleOutputTitleSearchResultTable(query, results, ['name', 'weight', 'type', 'releaseDate'], expected);
       }
 
       expect(results.length).toBeGreaterThan(0);
@@ -114,10 +113,10 @@ describe('TMDBService with TMDB API calls for titles', () => {
     tmdb = new TMDBService(setup, logger);
   });
 
-  const titlePositionInResults = (title: string, results: any[]): number => {
+  const titlePositionInResults = (title: string, results: ExternalTitleSearchResultItem[]): number => {
     let position = -1;
     for (let i = 0; i < results.length; i++) {
-      if (results[i].title.toLowerCase() === title.toLowerCase()) {
+      if (results[i].metadata.name.toLowerCase() === title.toLowerCase()) {
         position = i;
         break;
       }
@@ -128,8 +127,8 @@ describe('TMDBService with TMDB API calls for titles', () => {
 
   const consoleOutputTitleSearchResultTable = (
     searchTitle: string,
-    results: TitleSearchResult[],
-    tableProperties = ['title', 'weight', 'type'],
+    results: ExternalTitleSearchResultItem[],
+    tableProperties = ['name', 'weight', 'type'],
     expectedTitle?: string,
   ) => {
     const yellow = '\x1b[33m';
@@ -139,12 +138,12 @@ describe('TMDBService with TMDB API calls for titles', () => {
 
     const formattedResults = results.map((r) => {
       const result: { [key: string]: any } = {
-        [`title (search results for "${searchTitle}")${expectedTitleString}`]: r.title,
+        [`title (search results for "${searchTitle}")${expectedTitleString}`]: r.metadata.name,
       };
 
       tableProperties.forEach((prop) => {
         if (prop !== 'title') {
-          result[prop] = r[prop as keyof TitleSearchResult];
+          result[prop] = r[prop as keyof ExternalTitleSearchResultItem];
         }
       });
 

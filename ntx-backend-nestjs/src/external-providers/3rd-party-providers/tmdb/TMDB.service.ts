@@ -6,16 +6,17 @@
   https://developer.themoviedb.org/reference/tv-series-details
 */
 
-const Fuse = require('fuse.js');
 import { Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { normalize } from '@ntx/common/utils/mathUtils';
-import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
+import {
+  DEFAULT_EXTERNAL_TITLE_SEARCH_MAX_RESULTS,
+  ExternalProviders,
+} from '@ntx/external-providers/external-providers.constants';
 import {
   ExternalTitle,
   ExternalTitleMetadataRequest,
   ExternalTitleMetadataResult,
-  ExternalTitleSearchResultCandidate,
+  ExternalTitleSearchResultItem,
 } from '@ntx/external-providers/external-providers.types';
 import { APIRateLimiter } from '@ntx/external-providers/implementations/api-rate-limiter.abstract';
 import {
@@ -23,16 +24,13 @@ import {
   ExternalTitleSearchOptions,
   IExternalTitleProvider,
 } from '@ntx/external-providers/interfaces/external-title-provider.interface';
-import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
+import { IFuseOptions } from 'fuse.js';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
-import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { ITitleSearchPlugin } from '../interfaces/ITitleSearchPlugin.interface';
 import { TMDBMovieGateway } from './interfaces/TMDB-movie-gateway.interface';
 import { TMDBTitleSelector } from './interfaces/TMDB-title-selector.interface';
 import { TMDBTVShowGateway } from './interfaces/TMDB-tv-show-gateway.interface';
-import { TMDBMovie } from './interfaces/TMDBMovie';
 import { TMDBTitle } from './interfaces/TMDBTitle';
-import { TMDBTVShow } from './interfaces/TMDBTVShow';
 import { TMDBMovieGatewayAPIv3 } from './TMDB-movie-gateway-api-v3.class';
 import { TMDBTitleSelectorFuseJS } from './TMDB-title-selector-fusejs.class';
 import { TMDBTitleMapper } from './TMDB-title.mapper';
@@ -91,20 +89,25 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, I
     return metadata != null;
   }
 
-  public async findByQuery(
-    query: string,
-    options?: ExternalTitleSearchOptions,
-  ): Promise<ExternalTitleSearchResultCandidate[]> {
-    throw new Error('Method not implemented.');
-  }
+  // public async search(
+  //   query: string,
+  //   options?: ExternalTitleSearchOptions,
+  // ): Promise<ExternalTitleSearchResultCandidate[]> {
+  //   throw new Error('Method not implemented.');
+  // }
 
   public async getMetadata<T extends TitleType>(
     request: ExternalTitleMetadataRequest<T>,
   ): Promise<ExternalTitleMetadataResult<T>> {
+    const typeToSearchStrategyMap = {
+      [TitleType.MOVIE]: (ID: string) => this.tmdbMovieGateway.getDetailsByID(ID),
+      [TitleType.SERIES]: (ID: string) => this.tmdbTVShowGateway.getDetailsByID(ID),
+    };
+
     throw new Error('Method not implemented.');
   }
 
-  public async search(query: string, type?: TitleType, maxResults: number = 10): Promise<TitleSearchResult[]> {
+  public async search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]> {
     if (this.canCall() === false) {
       this.logger.warn(`Rate limit exceeded`);
 
@@ -117,37 +120,43 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, I
       return [];
     }
 
+    let { types, maxResults } = options || {};
+
+    if (!types || types.length === 0) {
+      types = Object.values(TitleType);
+    }
+
+    types.forEach((type) => {
+      if (!Object.values(TitleType).includes(type)) {
+        this.logger.error(`Unknown title type: ${type}`);
+
+        return [];
+      }
+    });
+
+    if (!maxResults || maxResults <= 0) {
+      maxResults = DEFAULT_EXTERNAL_TITLE_SEARCH_MAX_RESULTS;
+    }
+
+    const typeToSearchStrategyMap = {
+      [TitleType.MOVIE]: (args: { query: string }) => this.tmdbMovieGateway.search(args),
+      [TitleType.SERIES]: (args: { query: string }) => this.tmdbTVShowGateway.search(args),
+    };
+
     this.updateLastCallTime();
 
     let tmdbTitles: TMDBTitle[] = [];
 
-    switch (type) {
-      case TitleType.MOVIE: {
-        const apiMovieData = await this.tmdbMovieGateway.search({ title: query });
-        tmdbTitles = tmdbTitles.concat(...(apiMovieData?.map((result) => result.results) || []));
-        break;
+    for (const type of types) {
+      const apiData = await typeToSearchStrategyMap[type]({ query });
+      if (apiData != null) {
+        tmdbTitles = tmdbTitles.concat(...(apiData.map((result) => result.results) || []));
       }
-      case TitleType.SERIES: {
-        const apiTVShowData = await this.tmdbTVShowGateway.search({ title: query });
-        tmdbTitles = tmdbTitles.concat(...(apiTVShowData?.map((result) => result.results) || []));
-
-        break;
-      }
-      default:
-        const apiMovieData = await this.tmdbMovieGateway.search({ title: query });
-        const apiTVShowData = await this.tmdbTVShowGateway.search({ title: query });
-
-        tmdbTitles = tmdbTitles.concat(
-          ...(apiMovieData?.map((result) => result.results) || []),
-          ...(apiTVShowData?.map((result) => result.results) || []),
-        );
-
-        break;
     }
 
     const results = await this.tmdbTitleSelector.select({ query, candidates: tmdbTitles, maxResults });
 
-    return results;
+    return results.map((title) => TMDBTitleMapper.TMDBTitle2ExternalTitleSearchResultItem(title));
   }
 
   public async searchDetailsById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
