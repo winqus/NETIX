@@ -59,7 +59,7 @@ export class ImageCropperComponent implements OnInit, OnChanges {
             this.cropped.emit(blob);
           }
         },
-        MediaConstants.image.exportFormat,
+        MediaConstants.image.exportFileExtension,
         imageQuality
       );
     }

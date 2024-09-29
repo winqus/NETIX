@@ -19,9 +19,10 @@ export const MediaConstants = {
   image: {
     aspectRatio: 2 / 3,
     formats: ['.png', '.jpg', '.jpeg', '.webp'],
-    exportFormat: 'webp',
+    exportFileExtension: 'webp',
+    exportMimeType: 'image/webp',
     maxSizeMb: 0.1,
-    maxSizeBytes: 0.1 * 1024 * 1024,
+    maxSizeBytes: 100 * 1024,
     maxHeight: 1920,
   },
   video: {
@@ -32,5 +33,4 @@ export const MediaConstants = {
 
 export const TimeDelays = {
   posterProcessingDelay: 500,
-  imageSetToImgTagDelay: 100,
 };

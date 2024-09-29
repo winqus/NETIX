@@ -85,7 +85,7 @@ export class ImageUploadComponent implements OnInit, OnChanges {
     this.emitFile();
   }
 
-  private imageProccessing() {
+  private imageProcessing() {
     this.imageServ
       .autoCropImage(this.imageElement.nativeElement)
       .then((blob) => {
@@ -102,9 +102,9 @@ export class ImageUploadComponent implements OnInit, OnChanges {
 
     setTimeout(() => {
       if (this.imageElement) {
-        this.imageProccessing();
+        this.imageProcessing();
       }
-    }, TimeDelays.imageSetToImgTagDelay);
+    }, 100);
   }
 
   private async setCroppedImage(blob: Blob) {
@@ -113,8 +113,8 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   }
 
   private async createCroppedImageFile(blob: Blob): Promise<File> {
-    const croppedImage = new File([blob], 'th.' + MediaConstants.image.exportFormat, {
-      type: 'image/' + MediaConstants.image.exportFormat,
+    const croppedImage = new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
+      type: MediaConstants.image.exportMimeType,
       lastModified: Date.now(),
     });
 
