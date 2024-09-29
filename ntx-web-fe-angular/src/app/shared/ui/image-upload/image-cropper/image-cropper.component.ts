@@ -43,15 +43,25 @@ export class ImageCropperComponent implements OnInit, OnChanges {
   }
 
   cropImg() {
-    const canvasWidth = 500;
-    const canvasHeight = 500;
+    const canvasWidth = MediaConstants.image.maxHeight;
+    const canvasHeight = canvasWidth * MediaConstants.image.aspectRatio;
+    const imageQuality = 0.8;
 
     if (this.angularCropper.cropper) {
-      this.angularCropper.cropper.getCroppedCanvas({ width: canvasWidth, height: canvasHeight }).toBlob((blob: Blob | null) => {
-        if (blob) {
-          this.cropped.emit(blob);
-        }
-      }, MediaConstants.image.exportFormat);
+      const croppedCanvas = this.angularCropper.cropper.getCroppedCanvas({
+        width: canvasWidth,
+        height: canvasHeight,
+      });
+
+      croppedCanvas.toBlob(
+        async (blob: Blob | null) => {
+          if (blob) {
+            this.cropped.emit(blob);
+          }
+        },
+        MediaConstants.image.exportFormat,
+        imageQuality
+      );
     }
   }
 }

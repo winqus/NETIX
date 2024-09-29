@@ -1,9 +1,8 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ImageService } from '@ntx-shared/services/image.service';
-import { ImageUploadComponent } from './components/image-upload/image-upload.component';
-import { FieldRestrictions, MediaConstants, KeyCode } from '@ntx/app/shared/config/constants';
-import { UploadService } from '@ntx/app/shared/services/upload/upload.service';
+import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
+import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
+import { UploadService } from '@ntx-shared/services/upload/upload.service';
 import { environment } from '@ntx/environments/environment';
 import { Router } from '@angular/router';
 
@@ -13,15 +12,13 @@ import { Router } from '@angular/router';
   imports: [ImageUploadComponent, ReactiveFormsModule],
   templateUrl: './upload-title.component.html',
 })
-export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
+export class UploadTitleComponent implements OnInit {
   @ViewChild('croppModal') cropModalElement!: ElementRef<HTMLDialogElement>;
   @ViewChild(ImageUploadComponent) imageFileComponent!: ImageUploadComponent;
 
   imageFile: File | null = null;
 
   imageAccept: string = '';
-  imageMaxSize: number = 0;
-
   errorMessage: string = '';
 
   movieTitleCreationForm = new FormGroup({
@@ -37,14 +34,12 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
   });
 
   constructor(
-    private imageService: ImageService,
     private upload: UploadService,
     private router: Router
   ) {}
 
   async ngOnInit(): Promise<any> {
     this.imageAccept = MediaConstants.image.formats.join(',');
-    this.imageMaxSize = MediaConstants.image.maxSize;
   }
 
   isFormValid(): boolean {
@@ -74,34 +69,7 @@ export class UploadTitleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngAfterViewInit() {
-    this.preventEscClose();
-  }
-
-  ngOnDestroy() {
-    this.removeEscPrevent();
-  }
-
-  preventEscClose() {
-    if (this.cropModalElement && this.cropModalElement.nativeElement) {
-      this.cropModalElement.nativeElement.addEventListener('keydown', this.preventEsc);
-    }
-  }
-
-  removeEscPrevent() {
-    if (this.cropModalElement && this.cropModalElement.nativeElement) {
-      this.cropModalElement.nativeElement.removeEventListener('keydown', this.preventEsc);
-    }
-  }
-
-  preventEsc = (event: KeyboardEvent) => {
-    if (event.key === KeyCode.Escape) {
-      event.preventDefault();
-    }
-  };
-
   async recieveImageFile(file: File | null) {
-    console.log(file);
     this.imageFile = file;
   }
 

@@ -50,11 +50,12 @@ export class ImageService {
   }
 
   async compressImage(imageFile: File) {
+    if (imageFile.size < MediaConstants.image.maxSizeBytes) return imageFile;
     const options = {
       maxSizeMB: MediaConstants.image.maxSizeMb,
       maxWidthOrHeight: MediaConstants.image.maxHeight,
       useWebWorker: true,
     };
-    return await imageCompression(imageFile, options);
+    return imageCompression(imageFile, options);
   }
 }
