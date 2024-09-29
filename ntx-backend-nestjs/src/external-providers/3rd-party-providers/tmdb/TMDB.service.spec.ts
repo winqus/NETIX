@@ -1,13 +1,13 @@
-import { TestBed } from '@automock/jest';
 import { Logger } from '@nestjs/common';
+import { replaceLoggerPropertyWithMock } from '@ntx-test/utils/logger.utils';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import { TMDBSearchTitleService } from './TMDB-search-title.service';
+import { TMDBConfig, TMDBService, TMDBSetup } from './TMDB.service';
 
-describe('TMDBSearchTitleService', () => {
-  let plugin: TMDBSearchTitleService;
+describe('TMDBService', () => {
+  let tmdb: TMDBService;
   let logger: jest.Mocked<Logger>;
 
   beforeAll(async () => {
@@ -15,60 +15,28 @@ describe('TMDBSearchTitleService', () => {
   });
 
   beforeEach(async () => {
-    const { unit } = TestBed.create(TMDBSearchTitleService).compile();
-    plugin = unit;
-
-    logger = {
-      log: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn(),
-      verbose: jest.fn(),
-    } as unknown as jest.Mocked<Logger>;
-
-    (plugin as any).logger = logger;
-
-    plugin.init({
-      usePlugin: true,
-      options: { apiKey: 'testApiKey' },
-      timeBetweenCallsMs: 1000,
-    });
+    tmdb = new TMDBService({ apiKey: 'testApiKey', rateLimitMs: 1000 });
+    logger = replaceLoggerPropertyWithMock(tmdb);
   });
 
   it('should be defined', () => {
-    expect(plugin).toBeDefined();
+    expect(tmdb).toBeDefined();
   });
 
-  describe('init', () => {
-    it('should initialize with valid config', () => {
-      const config: TitleSearchPluginConfig = {
-        usePlugin: true,
-        options: { apiKey: 'testApiKey' },
-        timeBetweenCallsMs: 1000,
-      };
+  describe('setup', () => {
+    it('should initialize with valid setup', () => {
+      const setup: TMDBSetup = { apiKey: 'testApiKey', rateLimitMs: 1000 };
 
-      const result = plugin.init(config);
+      const tmdb = new TMDBService(setup);
+      replaceLoggerPropertyWithMock(tmdb);
 
-      expect(result).toBe(true);
+      expect(tmdb).toBeInstanceOf(TMDBService);
     });
 
     it('should throw error if API key is not provided', () => {
-      const config: TitleSearchPluginConfig = {
-        usePlugin: true,
-        options: {},
-        timeBetweenCallsMs: 1000,
-      };
+      const setup: TMDBSetup = { apiKey: '', rateLimitMs: 1000 };
 
-      expect(() => plugin.init(config)).toThrow();
-    });
-
-    it('should throw error if timeBetweenCallsMs is not provided', () => {
-      const config: TitleSearchPluginConfig = {
-        usePlugin: true,
-        options: { apiKey: 'testApiKey' },
-      } as any;
-
-      expect(() => plugin.init(config)).toThrow();
+      expect(() => new TMDBService(setup)).toThrow();
     });
   });
 
@@ -76,15 +44,15 @@ describe('TMDBSearchTitleService', () => {
     it('should return empty array if rate limit exceeded', async () => {
       fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
 
-      await plugin.search('test query');
-      const results = await plugin.search('test query');
+      await tmdb.search('test query');
+      const results = await tmdb.search('test query');
 
-      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
+      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded`);
       expect(results).toEqual([]);
     });
 
     it('should return empty array if query is empty or null', async () => {
-      const results = await plugin.search('');
+      const results = await tmdb.search('');
 
       expect(logger.error).toHaveBeenCalled();
       expect(results).toEqual([]);
@@ -106,7 +74,7 @@ describe('TMDBSearchTitleService', () => {
         ],
       );
 
-      const results = await plugin.search('shrek 2');
+      const results = await tmdb.search('shrek 2');
 
       expect(results[0]['originalTitle']).toEqual('Shrek 2');
     });
@@ -116,15 +84,15 @@ describe('TMDBSearchTitleService', () => {
     it('should return null if rate limit exceeded', async () => {
       fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
 
-      await plugin.searchDetailsById('1', TitleType.MOVIE);
-      const result = await plugin.searchDetailsById('1', TitleType.MOVIE);
+      await tmdb.searchDetailsById('1', TitleType.MOVIE);
+      const result = await tmdb.searchDetailsById('1', TitleType.MOVIE);
 
-      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${plugin.pluginUUID})`);
+      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${tmdb.pluginUUID})`);
       expect(result).toBeNull();
     });
 
     it('should return null if ID is empty or null', async () => {
-      const result = await plugin.searchDetailsById('', TitleType.MOVIE);
+      const result = await tmdb.searchDetailsById('', TitleType.MOVIE);
 
       expect(logger.error).toHaveBeenCalledWith('ID is empty or null');
       expect(result).toBeNull();
@@ -135,7 +103,7 @@ describe('TMDBSearchTitleService', () => {
         status: resp.http_api_themoviedb_org_3_movie_809.status,
       });
 
-      const result = await plugin.searchDetailsById('1', TitleType.MOVIE);
+      const result = await tmdb.searchDetailsById('1', TitleType.MOVIE);
 
       expect(result).not.toBeNull();
 
@@ -144,7 +112,7 @@ describe('TMDBSearchTitleService', () => {
         title: expect.any(String),
         originalTitle: expect.any(String),
         releaseDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
-        sourceUUID: plugin.pluginUUID,
+        sourceUUID: tmdb.pluginUUID,
         type: TitleType.MOVIE,
         details: {
           runtime: expect.any(Number),
@@ -157,7 +125,7 @@ describe('TMDBSearchTitleService', () => {
         status: resp.http_api_themoviedb_org_3_tv_111110.status,
       });
 
-      const result = await plugin.searchDetailsById('111110', TitleType.SERIES);
+      const result = await tmdb.searchDetailsById('111110', TitleType.SERIES);
 
       expect(result).not.toBeNull();
 
@@ -167,7 +135,7 @@ describe('TMDBSearchTitleService', () => {
         originalTitle: expect.any(String),
         type: TitleType.SERIES,
         releaseDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
-        sourceUUID: plugin.pluginUUID,
+        sourceUUID: tmdb.pluginUUID,
         details: {
           numberOfSeasons: expect.any(Number),
           numberOfEpisodes: expect.any(Number),
@@ -187,7 +155,7 @@ describe('TMDBSearchTitleService', () => {
     });
 
     it('should return null for an unknown title type', async () => {
-      const result = await plugin.searchDetailsById('1', 'UNKNOWN' as any);
+      const result = await tmdb.searchDetailsById('1', 'UNKNOWN' as any);
 
       expect(logger.error).toHaveBeenCalledWith('Unknown title type');
       expect(result).toBeNull();

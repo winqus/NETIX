@@ -1,14 +1,19 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 
-export interface TitleDetailedSearchResult {
+export interface TitleDetailedSearchResult<T extends TitleType = TitleType> {
   title: string;
   originalTitle: string;
   id: string;
-  type: TitleType;
+  type: T;
   releaseDate: string;
   sourceUUID: string;
-  details: MovieDetails | SeriesDetails;
+  details: TitleTypeDetailsMap[T];
 }
+
+type TitleTypeDetailsMap = {
+  [TitleType.MOVIE]: MovieDetails;
+  [TitleType.SERIES]: SeriesDetails;
+};
 
 export interface MovieDetails {
   runtime: number;

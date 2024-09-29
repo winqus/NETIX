@@ -10,14 +10,14 @@ import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearc
 import fetchMock from 'jest-fetch-mock';
 import * as path from 'path';
 import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import { TMDBSearchTitleService } from './TMDB-search-title.service';
+import { TMDBService } from './TMDB.service';
 
-describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
+describe('TMDBService with TMDB API calls for titles', () => {
   const FORWARD_FETCH_IF_NOT_CACHED = false;
   const COMPRESSED_CACHE_FILE = true;
   const SAVED_CACHE_FILENAME = 'titleSearchTMDB_OkResponseCache.json';
 
-  let plugin: TMDBSearchTitleService;
+  let plugin: TMDBService;
   let cacheFilePath;
   let cacheFetch: JestCacheFetch;
 
@@ -95,7 +95,7 @@ describe('TMDBSearchTitleService with TMDB API calls for titles', () => {
 
     cacheFetch.initialize(true);
 
-    const { unit } = TestBed.create(TMDBSearchTitleService).compile();
+    const { unit } = TestBed.create(TMDBService).compile();
     plugin = unit;
   });
 

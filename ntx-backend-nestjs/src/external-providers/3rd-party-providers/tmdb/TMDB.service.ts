@@ -7,24 +7,38 @@
 */
 
 const Fuse = require('fuse.js');
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { normalize } from '@ntx/common/utils/mathUtils';
 import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
+import { APIRateLimiter } from '@ntx/external-providers/implementations/api-rate-limiter.abstract';
+import { ExternalProviderConfig } from '@ntx/external-providers/interfaces/external-title-provider.interface';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
-import AbstractAPIPlugin from '../../interfaces/AbstractAPIPlugin';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
-import { ITitleSearchPlugin, TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
+import { ITitleSearchPlugin } from '../interfaces/ITitleSearchPlugin.interface';
 import { TMDBMovie } from './interfaces/TMDBMovie';
 import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
 import { TMDBSearchResult } from './interfaces/TMDBSearchResult';
+import { TMDBTitle } from './interfaces/TMDBTitle';
 import { TMDBTVShow } from './interfaces/TMDBTVShow';
 import { TMDBTVShowDetails } from './interfaces/TMDBTVShowDetails';
-import { TMDBTitle } from './interfaces/TMDBTitle';
+import { defaultTMDBFactory } from './TMDB.factory';
 
-@Injectable()
-export class TMDBSearchTitleService extends AbstractAPIPlugin implements ITitleSearchPlugin {
+export type TMDBSetup = {
+  enable?: boolean;
+  apiKey: string;
+  rateLimitMs?: number;
+};
+
+export interface TMDBConfig {
+  apiKey: string;
+  rateLimitMs: number;
+}
+
+export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
+  private readonly config: TMDBConfig & ExternalProviderConfig;
+
   private readonly logger = new Logger(this.constructor.name);
 
   public readonly pluginUUID = ExternalProviders.TMDB;
@@ -42,24 +56,10 @@ export class TMDBSearchTitleService extends AbstractAPIPlugin implements ITitleS
     ignoreFieldNorm: false, // Can improve matching, or not...
   };
 
-  constructor() {
+  constructor(setup: TMDBSetup) {
     super();
-  }
-
-  public init(config: TitleSearchPluginConfig): boolean {
-    if ('apiKey' in config.options && config.options.apiKey.length > 1) {
-      this.apiKey = config.options.apiKey;
-    } else {
-      throw new Error('API key not provided for ExampleTitleSearchPlugin');
-    }
-
-    if ('timeBetweenCallsMs' in config) {
-      this.timeBetweenCallsMs = config.timeBetweenCallsMs;
-    } else {
-      throw new Error('Time between calls was not provided for ExampleTitleSearchPlugin');
-    }
-
-    return true;
+    this.config = defaultTMDBFactory(setup);
+    this.initializeRateLimiter(this.config.rateLimitMs);
   }
 
   public async search(query: string, type?: TitleType, maxResults: number = 10): Promise<TitleSearchResult[]> {
@@ -226,10 +226,6 @@ export class TMDBSearchTitleService extends AbstractAPIPlugin implements ITitleS
     }
 
     return titleDetails;
-  }
-
-  private delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private async searchMovieAPI(

@@ -6,6 +6,10 @@ import {
   ExternalTitleSearchResultCandidate,
 } from '../external-providers.types';
 
+export interface ExternalProviderConfig {
+  enabled: boolean;
+}
+
 export interface ExternalTitleSearchOptions {
   types?: TitleType[];
   maxResults?: number;
