@@ -1,25 +1,27 @@
-import { TestBed } from '@automock/jest';
+import { ConsoleLogger, Logger } from '@nestjs/common';
 import { ConfigFactory } from '@nestjs/config';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { Test } from '@nestjs/testing';
 import { TEST_DATA_DIRECTORY, TEST_DIRECTORY } from '@ntx-test/constants';
 import { JestCacheFetch } from '@ntx-test/utils/JestCacheFetch';
+import { loggerMock } from '@ntx-test/utils/logger.utils';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { isWithinRange } from '@ntx/common/utils/mathUtils';
 import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
 import fetchMock from 'jest-fetch-mock';
 import * as path from 'path';
-import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import { TMDBService } from './TMDB.service';
+import { TMDBService, TMDBSetup } from './TMDB.service';
 
 describe('TMDBService with TMDB API calls for titles', () => {
   const FORWARD_FETCH_IF_NOT_CACHED = false;
   const COMPRESSED_CACHE_FILE = true;
   const SAVED_CACHE_FILENAME = 'titleSearchTMDB_OkResponseCache.json';
+  const ENABLE_LOGGER = false;
 
-  let plugin: TMDBService;
+  let tmdb: TMDBService;
   let cacheFilePath;
   let cacheFetch: JestCacheFetch;
+  const logger: Logger = ENABLE_LOGGER ? (new ConsoleLogger('TMDBService') as any) : loggerMock;
 
   const testConfigurationFactory: ConfigFactory = () => ({
     // Nothing for now
@@ -29,7 +31,7 @@ describe('TMDBService with TMDB API calls for titles', () => {
     Test Case(s)
   /*******************************************************************************************************************/
   it('should be defined', () => {
-    expect(plugin).toBeDefined();
+    expect(tmdb).toBeDefined();
   });
 
   const TEST_TITLE_QUERIES: [
@@ -43,7 +45,7 @@ describe('TMDBService with TMDB API calls for titles', () => {
 
   TEST_TITLE_QUERIES.forEach(({ query, expected, expectedPositionRange, type }) => {
     it(`should return search results for "${query}" with expected title "${expected}" within range [${expectedPositionRange}]`, async () => {
-      const results = await plugin.search(query, type);
+      const results = await tmdb.search(query, type);
 
       const titlePosition = titlePositionInResults(expected, results);
 
@@ -94,9 +96,6 @@ describe('TMDBService with TMDB API calls for titles', () => {
     });
 
     cacheFetch.initialize(true);
-
-    const { unit } = TestBed.create(TMDBService).compile();
-    plugin = unit;
   });
 
   afterAll(() => {
@@ -107,17 +106,12 @@ describe('TMDBService with TMDB API calls for titles', () => {
     }
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     const tmdb_api_key = process.env.TMDB_API_KEY || 'stub-tmdb-api-key';
-    const config: TitleSearchPluginConfig = {
-      usePlugin: true,
-      options: { apiKey: tmdb_api_key },
-      timeBetweenCallsMs: 5,
-    };
 
-    if (plugin.init(config) === false) {
-      throw new Error('Failed to initialize plugin');
-    }
+    const setup: TMDBSetup = { apiKey: tmdb_api_key, rateLimitMs: 5 };
+
+    tmdb = new TMDBService(setup, logger);
   });
 
   const titlePositionInResults = (title: string, results: any[]): number => {

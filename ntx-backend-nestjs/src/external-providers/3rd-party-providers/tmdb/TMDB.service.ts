@@ -17,12 +17,13 @@ import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
 import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
 import { TitleSearchResult } from '../../interfaces/TitleSearchResult.interface';
 import { ITitleSearchPlugin } from '../interfaces/ITitleSearchPlugin.interface';
+import { TMDBMovieGateway } from './interfaces/TMDB-movie-gateway.interface';
+import { TMDBTVShowGateway } from './interfaces/TMDB-tv-show-gateway.interface';
 import { TMDBMovie } from './interfaces/TMDBMovie';
-import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
-import { TMDBSearchResult } from './interfaces/TMDBSearchResult';
 import { TMDBTitle } from './interfaces/TMDBTitle';
 import { TMDBTVShow } from './interfaces/TMDBTVShow';
-import { TMDBTVShowDetails } from './interfaces/TMDBTVShowDetails';
+import { TMDBMovieGatewayAPIv3 } from './TMDB-movie-gateway-api-v3.class';
+import { TMDBTVShowGatewayAPIv3 } from './TMDB-tv-show-gateway-api-v3.class';
 import { defaultTMDBFactory } from './TMDB.factory';
 
 export type TMDBSetup = {
@@ -39,7 +40,10 @@ export interface TMDBConfig {
 export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
   private readonly config: TMDBConfig & ExternalProviderConfig;
 
-  private readonly logger = new Logger(this.constructor.name);
+  private readonly logger: Logger;
+
+  private readonly tmdbMovieGateway: TMDBMovieGateway;
+  private readonly tmdbTVShowGateway: TMDBTVShowGateway;
 
   public readonly pluginUUID = ExternalProviders.TMDB;
 
@@ -56,15 +60,19 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
     ignoreFieldNorm: false, // Can improve matching, or not...
   };
 
-  constructor(setup: TMDBSetup) {
+  constructor(setup: TMDBSetup, logger?: Logger) {
     super();
     this.config = defaultTMDBFactory(setup);
     this.initializeRateLimiter(this.config.rateLimitMs);
+
+    this.logger = logger || new Logger(TMDBService.name);
+    this.tmdbMovieGateway = new TMDBMovieGatewayAPIv3(this.config, this.logger);
+    this.tmdbTVShowGateway = new TMDBTVShowGatewayAPIv3(this.config, this.logger);
   }
 
   public async search(query: string, type?: TitleType, maxResults: number = 10): Promise<TitleSearchResult[]> {
     if (this.canCall() === false) {
-      this.logger.warn(`Rate limit exceeded (${this.pluginUUID})`);
+      this.logger.warn(`Rate limit exceeded`);
 
       return [];
     }
@@ -81,19 +89,19 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
 
     switch (type) {
       case TitleType.MOVIE: {
-        const apiMovieData = await this.searchMovieAPI(query);
+        const apiMovieData = await this.tmdbMovieGateway.search({ title: query });
         tmdbTitles = tmdbTitles.concat(...(apiMovieData?.map((result) => result.results) || []));
         break;
       }
       case TitleType.SERIES: {
-        const apiTVShowData = await this.searchTVShowAPI(query);
+        const apiTVShowData = await this.tmdbTVShowGateway.search({ title: query });
         tmdbTitles = tmdbTitles.concat(...(apiTVShowData?.map((result) => result.results) || []));
 
         break;
       }
       default:
-        const apiMovieData = await this.searchMovieAPI(query);
-        const apiTVShowData = await this.searchTVShowAPI(query);
+        const apiMovieData = await this.tmdbMovieGateway.search({ title: query });
+        const apiTVShowData = await this.tmdbTVShowGateway.search({ title: query });
 
         tmdbTitles = tmdbTitles.concat(
           ...(apiMovieData?.map((result) => result.results) || []),
@@ -212,11 +220,49 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
 
     switch (type) {
       case TitleType.MOVIE:
-        titleDetails = await this.getMovieDetailsByIdAPI(id);
+        const tmdbMovieDetails = await this.tmdbMovieGateway.getDetailsByID(id);
+        if (tmdbMovieDetails == null) {
+          return null;
+        }
+
+        titleDetails = {
+          id: tmdbMovieDetails.id.toString(),
+          title: tmdbMovieDetails.title,
+          originalTitle: tmdbMovieDetails.original_title,
+          type: TitleType.MOVIE,
+          releaseDate: tmdbMovieDetails.release_date,
+          sourceUUID: this.pluginUUID,
+          details: {
+            runtime: tmdbMovieDetails.runtime,
+          },
+        };
 
         break;
       case TitleType.SERIES:
-        titleDetails = await this.getTVShowDetailsByIdAPI(id);
+        const tmdbTVShowDetails = await this.tmdbTVShowGateway.getDetailsByID(id);
+        if (tmdbTVShowDetails == null) {
+          return null;
+        }
+
+        titleDetails = {
+          id: tmdbTVShowDetails.id.toString(),
+          title: tmdbTVShowDetails.name,
+          originalTitle: tmdbTVShowDetails.original_name,
+          type: TitleType.SERIES,
+          releaseDate: tmdbTVShowDetails.first_air_date,
+          sourceUUID: this.pluginUUID,
+          details: {
+            numberOfSeasons: tmdbTVShowDetails.number_of_seasons,
+            numberOfEpisodes: tmdbTVShowDetails.number_of_episodes,
+            seasons: tmdbTVShowDetails.seasons.map((season) => ({
+              id: season.id.toString(),
+              seasonNumber: season.season_number,
+              releaseDate: season.air_date,
+              episodeCount: season.episode_count,
+              name: season.name,
+            })) as any,
+          },
+        };
 
         break;
       default:
@@ -226,150 +272,6 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
     }
 
     return titleDetails;
-  }
-
-  private async searchMovieAPI(
-    title: string,
-    year?: string,
-    language = 'en-US',
-  ): Promise<TMDBSearchResult<TMDBMovie>[] | null> {
-    if (title == '' || title == null) {
-      this.logger.error('movie title is empty or null');
-
-      return null;
-    }
-
-    const allResults: TMDBSearchResult<TMDBMovie>[] = [];
-    let currentPage = 1;
-    let totalPages = 1;
-    const maxPages = 5;
-
-    while (currentPage <= totalPages && currentPage <= maxPages) {
-      const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(title));
-      params.append('include_adult', 'false');
-      params.append('language', language);
-      params.append('page', currentPage.toString());
-      if (year != null) {
-        params.append('year', year || '');
-      }
-
-      const url = `https://api.themoviedb.org/3/search/movie?${params.toString()}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-      };
-
-      const response = await fetch(url, options);
-      if (response.ok === false) {
-        this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
-
-        return null;
-      }
-
-      const data: TMDBSearchResult<TMDBMovie> = await response.json();
-      if (data == null || 'results' in data === false) {
-        this.logger.error('No movie results in data from TMDB API');
-
-        return null;
-      }
-
-      if (data.results.length === 0) {
-        break;
-      }
-
-      const filteredResults = data.results.filter(
-        (movie) => 'popularity' in movie && 'release_date' in movie && movie.release_date.length > 0,
-      );
-
-      allResults.push({
-        page: data.page,
-        results: filteredResults,
-        total_pages: data.total_pages,
-        total_results: data.total_results,
-      });
-
-      totalPages = data.total_pages;
-      currentPage++;
-      await this.delay(10);
-    }
-
-    return allResults.length > 0 ? allResults : null;
-  }
-
-  private async searchTVShowAPI(
-    title: string,
-    year?: string,
-    language = 'en-US',
-  ): Promise<TMDBSearchResult<TMDBTVShow>[] | null> {
-    if (title == '' || title == null) {
-      this.logger.error('TV show title is empty or null');
-
-      return null;
-    }
-
-    const allResults: TMDBSearchResult<TMDBTVShow>[] = [];
-    let currentPage = 1;
-    let totalPages = 1;
-    const maxPages = 5;
-
-    while (currentPage <= totalPages && currentPage <= maxPages) {
-      const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(title));
-      params.append('include_adult', 'false');
-      params.append('language', language);
-      params.append('page', currentPage.toString());
-      if (year != null) {
-        params.append('first_air_date_year', year || '');
-      }
-
-      const url = `https://api.themoviedb.org/3/search/tv?${params.toString()}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-      };
-
-      const response = await fetch(url, options);
-      if (response.ok === false) {
-        this.logger.error(`Failed to fetch TV show data from TMDB API: ${response.statusText}`);
-
-        return null;
-      }
-
-      const data: TMDBSearchResult<TMDBTVShow> = await response.json();
-      if (data == null || 'results' in data === false) {
-        this.logger.error('No TV show results in data from TMDB API');
-
-        return null;
-      }
-
-      if (data.results.length === 0) {
-        break;
-      }
-
-      const filteredResults = data.results.filter(
-        (tv_show) => 'popularity' in tv_show && 'first_air_date' in tv_show && tv_show.first_air_date.length > 0,
-      );
-
-      allResults.push({
-        page: data.page,
-        results: filteredResults,
-        total_pages: data.total_pages,
-        total_results: data.total_results,
-      });
-
-      totalPages = data.total_pages;
-      currentPage++;
-      await this.delay(10);
-    }
-
-    return allResults.length > 0 ? allResults : null;
   }
 
   private normalizeTMDBTitlesPopularity(titles: TMDBTitle[]): TMDBTitle[] {
@@ -446,105 +348,5 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin {
     }
 
     return result;
-  }
-
-  private async getMovieDetailsByIdAPI(movie_id: string): Promise<TitleDetailedSearchResult | null> {
-    if (movie_id == '' || movie_id == null) {
-      this.logger.error('movie_id is empty or null');
-
-      return null;
-    }
-
-    const params = new URLSearchParams();
-    params.append('language', 'en-US');
-
-    const url = `https://api.themoviedb.org/3/movie/${movie_id}?${params.toString()}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-    };
-
-    const response = await fetch(url, options);
-    if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
-
-      return null;
-    }
-
-    const data: TMDBMovieDetails = await response.json();
-    if (data == null || 'id' in data === false) {
-      this.logger.error('No movie results in data from TMDB API');
-
-      return null;
-    }
-
-    return {
-      id: data.id.toString(),
-      title: data.title,
-      originalTitle: data.original_title,
-      type: TitleType.MOVIE,
-      releaseDate: data.release_date,
-      sourceUUID: this.pluginUUID,
-      details: {
-        runtime: data.runtime,
-      },
-    };
-  }
-
-  private async getTVShowDetailsByIdAPI(series_id: string): Promise<TitleDetailedSearchResult | null> {
-    if (series_id == '' || series_id == null) {
-      this.logger.error('series_id is empty or null');
-
-      return null;
-    }
-
-    const params = new URLSearchParams();
-    params.append('language', 'en-US');
-
-    const url = `https://api.themoviedb.org/3/tv/${series_id}?${params.toString()}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-    };
-
-    const response = await fetch(url, options);
-    if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
-
-      return null;
-    }
-
-    const data: TMDBTVShowDetails = await response.json();
-    if (data == null || 'id' in data === false) {
-      this.logger.error('No movie results in data from TMDB API');
-
-      return null;
-    }
-
-    return {
-      id: data.id.toString(),
-      title: data.name,
-      originalTitle: data.original_name,
-      type: TitleType.SERIES,
-      releaseDate: data.first_air_date,
-      sourceUUID: this.pluginUUID,
-      details: {
-        numberOfSeasons: data['number_of_seasons'],
-        numberOfEpisodes: data['number_of_episodes'],
-        seasons: data.seasons.map((season) => ({
-          id: season.id.toString(),
-          seasonNumber: season.season_number,
-          releaseDate: season.air_date,
-          episodeCount: season.episode_count,
-          name: season.name,
-        })) as any,
-      },
-    };
   }
 }

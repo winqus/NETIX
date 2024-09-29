@@ -15,6 +15,7 @@ export const loggerMock = {
   warn: jest.fn(),
   debug: jest.fn(),
   verbose: jest.fn(),
+  fatal: jest.fn(),
 } as unknown as jest.Mocked<Logger>;
 
 /**

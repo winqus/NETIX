@@ -3,8 +3,7 @@ import { replaceLoggerPropertyWithMock } from '@ntx-test/utils/logger.utils';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
-import { TitleSearchPluginConfig } from '../interfaces/ITitleSearchPlugin.interface';
-import { TMDBConfig, TMDBService, TMDBSetup } from './TMDB.service';
+import { TMDBService, TMDBSetup } from './TMDB.service';
 
 describe('TMDBService', () => {
   let tmdb: TMDBService;

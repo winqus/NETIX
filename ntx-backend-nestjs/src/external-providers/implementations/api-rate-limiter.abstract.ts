@@ -52,10 +52,6 @@ export abstract class APIRateLimiter {
     this.lastCallTime = Date.now();
   }
 
-  protected delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   private throwIfNotInitialized() {
     if (!this.isInitialized) {
       throw new Error('Rate limiter not initialized');
