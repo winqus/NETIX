@@ -52,7 +52,13 @@ function getStorageBaseDirPath() {
         limit: DEFAULT_THROTTLE_LIMIT,
       },
     ]),
-    ExternalProvidersModule.forRoot(),
+    ExternalProvidersModule.forRoot({
+      TMDB: {
+        enable: true,
+        apiKey: process.env.TMDB_API_KEY || '',
+        rateLimitMs: 5,
+      },
+    }),
     ImagesModule,
     MoviesModule,
   ],

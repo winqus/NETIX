@@ -13,6 +13,8 @@ export interface ExternalTitleSearchOptions {
 export interface IExternalTitleProvider {
   getProviderID(): string;
 
+  isEnabled(): boolean;
+
   exists(title: ExternalTitle): Promise<boolean>;
 
   search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]>;

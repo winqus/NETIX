@@ -68,7 +68,7 @@ export class ExternalTitleService implements IExternalTitleSearchService, IExter
 
   public async getTitleMetadata<T extends TitleType>(
     request: ExternalTitleMetadataRequest<T>,
-  ): Promise<ExternalTitleMetadataResult<T>> {
+  ): Promise<ExternalTitleMetadataResult<T> | null> {
     try {
       if (!request.externalID?.trim()) {
         throw new BadRequestException('External ID is required');

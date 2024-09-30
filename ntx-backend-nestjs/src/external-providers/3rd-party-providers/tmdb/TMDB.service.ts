@@ -79,6 +79,8 @@ export class TMDBService extends APIRateLimiter implements IExternalTitleProvide
 
   public getProviderID = (): string => ExternalProviders.TMDB.toString();
 
+  public isEnabled = (): boolean => this.config.enabled;
+
   public async exists(title: ExternalTitle): Promise<boolean> {
     const metadata = await this.getMetadata(title.externalID, title.type).catch((_error) => null);
 
@@ -92,6 +94,12 @@ export class TMDBService extends APIRateLimiter implements IExternalTitleProvide
   ): Promise<ExternalTitleMetadataResult<T> | null> {
     if (this.isValidTitleType(type) === false) {
       this.logger.error(`Unknown title type: ${type}`);
+
+      return null;
+    }
+
+    if (this.isEnabled() === false) {
+      this.logger.error('Service is not enabled');
 
       return null;
     }
@@ -120,6 +128,12 @@ export class TMDBService extends APIRateLimiter implements IExternalTitleProvide
   public async search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]> {
     if (query == '' || query == null) {
       this.logger.error('Query is empty or null');
+
+      return [];
+    }
+
+    if (this.isEnabled() === false) {
+      this.logger.error('Service is not enabled');
 
       return [];
     }

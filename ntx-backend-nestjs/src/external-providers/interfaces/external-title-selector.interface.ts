@@ -1,7 +1,7 @@
-import { ExternalTitleSearchResultCandidate, ExternalTitleSearchResultItem } from '../external-providers.types';
+import { ExternalTitleSearchResultItem } from '../external-providers.types';
 
 export interface ExternalTitleSelectionArgs {
-  candidates: ExternalTitleSearchResultCandidate[];
+  candidates: ExternalTitleSearchResultItem[];
   searchedQuery: string;
 }
 

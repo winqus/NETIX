@@ -1,11 +1,7 @@
 import { normalize } from '@ntx/common/utils/mathUtils';
-import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
-import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-providers.types';
-import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
 import { FuseResult, FuseSortFunctionArg, IFuseOptions } from 'fuse.js';
 import { TMDBTitleSelectionArgs, TMDBTitleSelector } from './interfaces/TMDB-title-selector.interface';
 import { TMDBTitle, WeightedTMDBTitle } from './interfaces/TMDBTitle';
-import { TMDBTitleMapper } from './TMDB-title.mapper';
 
 const Fuse = require('fuse.js');
 

@@ -4,5 +4,5 @@ import { ExternalTitleMetadataRequest, ExternalTitleMetadataResult } from './ext
 export interface IExternalTitleMetadataService {
   getTitleMetadata<T extends TitleType>(
     request: ExternalTitleMetadataRequest<T>,
-  ): Promise<ExternalTitleMetadataResult<T>>;
+  ): Promise<ExternalTitleMetadataResult<T> | null>;
 }

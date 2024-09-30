@@ -9,7 +9,7 @@ import { FileStorageModuleOptions, StorageType } from './types';
 export function getFileStorageStrategy<S extends StorageType, E extends Record<string, unknown>>(
   storageType: S,
   config: FileStorageModuleOptions<E>[S],
-): FileStorageLocal {
+): FileStorage {
   const { setup, factory } = config as FileStorageModuleOptions<E>[S];
 
   switch (storageType) {
