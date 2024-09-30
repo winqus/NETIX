@@ -1,10 +1,5 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import {
-  ExternalTitle,
-  ExternalTitleMetadataRequest,
-  ExternalTitleMetadataResult,
-  ExternalTitleSearchResultItem,
-} from '../external-providers.types';
+import { ExternalTitle, ExternalTitleMetadataResult, ExternalTitleSearchResultItem } from '../external-providers.types';
 
 export interface ExternalProviderConfig {
   enabled: boolean;
@@ -22,5 +17,5 @@ export interface IExternalTitleProvider {
 
   search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]>;
 
-  getMetadata<T extends TitleType>(request: ExternalTitleMetadataRequest<T>): Promise<ExternalTitleMetadataResult<T>>;
+  getMetadata<T extends TitleType>(externalID: string, type: T): Promise<ExternalTitleMetadataResult<T> | null>;
 }

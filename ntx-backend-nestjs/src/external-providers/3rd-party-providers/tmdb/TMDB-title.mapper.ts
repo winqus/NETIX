@@ -1,10 +1,15 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
-import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-providers.types';
-import { TitleSearchResult } from '@ntx/external-providers/interfaces/TitleSearchResult.interface';
+import {
+  ExternalMovieMetadata,
+  ExternalSeriesMetadata,
+  ExternalTitleSearchResultItem,
+} from '@ntx/external-providers/external-providers.types';
 import { TMDBMovie } from './interfaces/TMDBMovie';
-import { TMDBTitle, WeightedTMDBTitle } from './interfaces/TMDBTitle';
+import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
+import { TMDBTitle, TMDBTitleDetails, WeightedTMDBTitle } from './interfaces/TMDBTitle';
 import { TMDBTVShow } from './interfaces/TMDBTVShow';
+import { TMDBTVShowDetails } from './interfaces/TMDBTVShowDetails';
 
 export class TMDBTitleMapper {
   public static TMDBTitle2ExternalTitleSearchResultItem(
@@ -47,5 +52,51 @@ export class TMDBTitleMapper {
     }
 
     return result as ExternalTitleSearchResultItem;
+  }
+
+  public static TMDBTitleDetails2ExternalTitleMetadata(
+    titleDetails: TMDBTitleDetails,
+  ): ExternalMovieMetadata | ExternalSeriesMetadata {
+    let type = TitleType.MOVIE;
+    if ('number_of_seasons' in titleDetails) {
+      type = TitleType.SERIES;
+    }
+
+    switch (type) {
+      case TitleType.MOVIE: {
+        const movieDetails = titleDetails as TMDBMovieDetails;
+
+        const metadata: ExternalMovieMetadata = {
+          name: movieDetails.title,
+          originalName: movieDetails.original_title,
+          releaseDate: movieDetails.release_date,
+          runtime: movieDetails.runtime,
+        };
+
+        return metadata;
+      }
+      case TitleType.SERIES: {
+        const tvShowDetails = titleDetails as TMDBTVShowDetails;
+
+        const metadata: ExternalSeriesMetadata = {
+          name: tvShowDetails.name,
+          originalName: tvShowDetails.original_name,
+          releaseDate: tvShowDetails.first_air_date,
+          numberOfSeasons: tvShowDetails.number_of_seasons,
+          numberOfEpisodes: tvShowDetails.number_of_episodes,
+          seasons: tvShowDetails.seasons.map((season) => ({
+            id: season.id.toString(),
+            seasonNumber: season.season_number,
+            releaseDate: season.air_date,
+            episodeCount: season.episode_count,
+            name: season.name,
+          })),
+        };
+
+        return metadata;
+      }
+      default:
+        throw new Error('Unknown title type');
+    }
   }
 }

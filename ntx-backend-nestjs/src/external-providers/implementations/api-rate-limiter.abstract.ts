@@ -1,22 +1,24 @@
-export function ApplyCallRateLimit(_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
-  const originalMethod = descriptor.value;
+export const ApplyCallRateLimit =
+  (options: { returnValueOnRateLimit: any }) =>
+  (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value;
 
-  descriptor.value = async function (...args: any[]) {
-    if (!this.canCall()) {
-      if (this.logger) {
-        this.logger.warn(`Rate limit exceeded`);
+    descriptor.value = async function (...args: any[]) {
+      if (!this.canCall()) {
+        if (this.logger) {
+          this.logger.error(`Rate limit exceeded`);
+        }
+
+        return options.returnValueOnRateLimit;
       }
 
-      return null;
-    }
+      this.updateLastCallTime();
 
-    this.updateLastCallTime();
+      return await originalMethod.apply(this, args);
+    };
 
-    return await originalMethod.apply(this, args);
+    return descriptor;
   };
-
-  return descriptor;
-}
 
 export abstract class APIRateLimiter {
   protected lastCallTime: number = 0;

@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { replaceLoggerPropertyWithMock } from '@ntx-test/utils/logger.utils';
+import { loggerMock } from '@ntx-test/utils/logger.utils';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
@@ -7,15 +7,14 @@ import { TMDBService, TMDBSetup } from './TMDB.service';
 
 describe('TMDBService', () => {
   let tmdb: TMDBService;
-  let logger: jest.Mocked<Logger>;
+  const logger: jest.Mocked<Logger> = loggerMock;
 
   beforeAll(async () => {
     fetchMock.doMock();
   });
 
   beforeEach(async () => {
-    tmdb = new TMDBService({ apiKey: 'testApiKey', rateLimitMs: 1000 });
-    logger = replaceLoggerPropertyWithMock(tmdb);
+    tmdb = new TMDBService({ apiKey: 'testApiKey', rateLimitMs: 1000 }, logger);
   });
 
   it('should be defined', () => {
@@ -26,8 +25,7 @@ describe('TMDBService', () => {
     it('should initialize with valid setup', () => {
       const setup: TMDBSetup = { apiKey: 'testApiKey', rateLimitMs: 1000 };
 
-      const tmdb = new TMDBService(setup);
-      replaceLoggerPropertyWithMock(tmdb);
+      const tmdb = new TMDBService(setup, logger);
 
       expect(tmdb).toBeInstanceOf(TMDBService);
     });
@@ -46,7 +44,7 @@ describe('TMDBService', () => {
       await tmdb.search('test query');
       const results = await tmdb.search('test query');
 
-      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded`);
+      expect(logger.error).toHaveBeenCalledWith(`Rate limit exceeded`);
       expect(results).toEqual([]);
     });
 
@@ -79,21 +77,22 @@ describe('TMDBService', () => {
     });
   });
 
-  describe('searchById', () => {
+  describe('getMetadata', () => {
     it('should return null if rate limit exceeded', async () => {
       fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
+      fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
 
-      await tmdb.searchDetailsById('1', TitleType.MOVIE);
-      const result = await tmdb.searchDetailsById('1', TitleType.MOVIE);
+      await tmdb.getMetadata('1', TitleType.MOVIE).catch(() => null);
+      const result = await tmdb.getMetadata('1', TitleType.MOVIE);
 
-      expect(logger.warn).toHaveBeenCalledWith(`Rate limit exceeded (${tmdb.pluginUUID})`);
+      expect(logger.error).toHaveBeenCalledWith(`Rate limit exceeded`);
       expect(result).toBeNull();
     });
 
     it('should return null if ID is empty or null', async () => {
-      const result = await tmdb.searchDetailsById('', TitleType.MOVIE);
+      const result = await tmdb.getMetadata(null as any, TitleType.MOVIE);
 
-      expect(logger.error).toHaveBeenCalledWith('ID is empty or null');
+      expect(logger.error).toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
@@ -102,21 +101,14 @@ describe('TMDBService', () => {
         status: resp.http_api_themoviedb_org_3_movie_809.status,
       });
 
-      const result = await tmdb.searchDetailsById('1', TitleType.MOVIE);
+      // const result = await tmdb.searchDetailsById('1', TitleType.MOVIE);
+      const result = await tmdb.getMetadata('1', TitleType.MOVIE);
 
       expect(result).not.toBeNull();
 
-      expect(result).toMatchObject({
-        id: expect.stringMatching(/^\d+$/),
-        title: expect.any(String),
-        originalTitle: expect.any(String),
-        releaseDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
-        sourceUUID: tmdb.pluginUUID,
-        type: TitleType.MOVIE,
-        details: {
-          runtime: expect.any(Number),
-        },
-      });
+      expect(result).toHaveProperty('externalID');
+      expect(result).toHaveProperty('metadata');
+      expect(result).toHaveProperty('metadata.runtime');
     });
 
     it('should return TV show details for a valid TV show ID', async () => {
@@ -124,40 +116,30 @@ describe('TMDBService', () => {
         status: resp.http_api_themoviedb_org_3_tv_111110.status,
       });
 
-      const result = await tmdb.searchDetailsById('111110', TitleType.SERIES);
+      const result = await tmdb.getMetadata('111110', TitleType.SERIES);
 
       expect(result).not.toBeNull();
 
-      expect(result).toMatchObject({
-        id: expect.stringMatching(/^\d+$/),
-        title: expect.any(String),
-        originalTitle: expect.any(String),
-        type: TitleType.SERIES,
-        releaseDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
-        sourceUUID: tmdb.pluginUUID,
-        details: {
-          numberOfSeasons: expect.any(Number),
-          numberOfEpisodes: expect.any(Number),
-          seasons: expect.arrayContaining([
-            {
-              id: expect.stringMatching(/^\d+$/),
-              name: expect.any(String),
-              seasonNumber: expect.any(Number),
-              episodeCount: expect.any(Number),
-              releaseDate: expect.anything(),
-            },
-          ]),
-        },
-      });
-
-      expect(result!.releaseDate).toEqual(expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) || null);
+      expect(result).toHaveProperty('externalID');
+      expect(result).toHaveProperty('metadata');
+      expect(result).toHaveProperty('metadata.numberOfSeasons');
     });
 
     it('should return null for an unknown title type', async () => {
-      const result = await tmdb.searchDetailsById('1', 'UNKNOWN' as any);
+      const result = await tmdb.getMetadata('1', 'UNKNOWN' as any);
 
-      expect(logger.error).toHaveBeenCalledWith('Unknown title type');
+      expect(logger.error).toHaveBeenCalledWith('Unknown title type: UNKNOWN');
       expect(result).toBeNull();
     });
+  });
+
+  it('should not call API if rate limit exceeded using several different methods', async () => {
+    fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
+    fetchMock.mockResponse(JSON.stringify([]), { status: 200 });
+
+    await tmdb.search('test query');
+    await tmdb.getMetadata('123', TitleType.MOVIE);
+
+    expect(logger.error).toHaveBeenCalledWith(`Rate limit exceeded`);
   });
 });

@@ -8,25 +8,23 @@
 
 import { Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { delayByMs } from '@ntx/common/utils/delay.utils';
 import {
   DEFAULT_EXTERNAL_TITLE_SEARCH_MAX_RESULTS,
   ExternalProviders,
 } from '@ntx/external-providers/external-providers.constants';
 import {
   ExternalTitle,
-  ExternalTitleMetadataRequest,
   ExternalTitleMetadataResult,
   ExternalTitleSearchResultItem,
 } from '@ntx/external-providers/external-providers.types';
-import { APIRateLimiter } from '@ntx/external-providers/implementations/api-rate-limiter.abstract';
+import { APIRateLimiter, ApplyCallRateLimit } from '@ntx/external-providers/implementations/api-rate-limiter.abstract';
 import {
   ExternalProviderConfig,
   ExternalTitleSearchOptions,
   IExternalTitleProvider,
 } from '@ntx/external-providers/interfaces/external-title-provider.interface';
 import { IFuseOptions } from 'fuse.js';
-import { TitleDetailedSearchResult } from '../../interfaces/TitleDetailedSearchResult.interface';
-import { ITitleSearchPlugin } from '../interfaces/ITitleSearchPlugin.interface';
 import { TMDBMovieGateway } from './interfaces/TMDB-movie-gateway.interface';
 import { TMDBTitleSelector } from './interfaces/TMDB-title-selector.interface';
 import { TMDBTVShowGateway } from './interfaces/TMDB-tv-show-gateway.interface';
@@ -48,12 +46,10 @@ export interface TMDBConfig {
   rateLimitMs: number;
 }
 
-export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, IExternalTitleProvider {
+export class TMDBService extends APIRateLimiter implements IExternalTitleProvider {
   private readonly config: TMDBConfig & ExternalProviderConfig;
 
   private readonly logger: Logger;
-
-  readonly pluginUUID: string = ExternalProviders.TMDB.toString();
 
   private readonly tmdbMovieGateway: TMDBMovieGateway;
   private readonly tmdbTVShowGateway: TMDBTVShowGateway;
@@ -84,36 +80,44 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, I
   public getProviderID = (): string => ExternalProviders.TMDB.toString();
 
   public async exists(title: ExternalTitle): Promise<boolean> {
-    const metadata = await this.getMetadata(title).catch((_error) => null);
+    const metadata = await this.getMetadata(title.externalID, title.type).catch((_error) => null);
 
     return metadata != null;
   }
 
-  // public async search(
-  //   query: string,
-  //   options?: ExternalTitleSearchOptions,
-  // ): Promise<ExternalTitleSearchResultCandidate[]> {
-  //   throw new Error('Method not implemented.');
-  // }
-
+  @ApplyCallRateLimit({ returnValueOnRateLimit: null })
   public async getMetadata<T extends TitleType>(
-    request: ExternalTitleMetadataRequest<T>,
-  ): Promise<ExternalTitleMetadataResult<T>> {
+    externalID: string,
+    type: T,
+  ): Promise<ExternalTitleMetadataResult<T> | null> {
+    if (this.isValidTitleType(type) === false) {
+      this.logger.error(`Unknown title type: ${type}`);
+
+      return null;
+    }
+
     const typeToSearchStrategyMap = {
       [TitleType.MOVIE]: (ID: string) => this.tmdbMovieGateway.getDetailsByID(ID),
       [TitleType.SERIES]: (ID: string) => this.tmdbTVShowGateway.getDetailsByID(ID),
     };
 
-    throw new Error('Method not implemented.');
-  }
-
-  public async search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]> {
-    if (this.canCall() === false) {
-      this.logger.warn(`Rate limit exceeded`);
-
-      return [];
+    const titleDetails = await typeToSearchStrategyMap[type](externalID);
+    if (titleDetails == null) {
+      return null;
     }
 
+    const metadata = TMDBTitleMapper.TMDBTitleDetails2ExternalTitleMetadata(titleDetails);
+
+    return {
+      providerID: this.getProviderID(),
+      externalID: externalID,
+      type: type,
+      metadata: metadata,
+    } as ExternalTitleMetadataResult<T>;
+  }
+
+  @ApplyCallRateLimit({ returnValueOnRateLimit: [] })
+  public async search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]> {
     if (query == '' || query == null) {
       this.logger.error('Query is empty or null');
 
@@ -124,10 +128,11 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, I
 
     if (!types || types.length === 0) {
       types = Object.values(TitleType);
+    } else {
     }
 
     types.forEach((type) => {
-      if (!Object.values(TitleType).includes(type)) {
+      if (this.isValidTitleType(type) === false) {
         this.logger.error(`Unknown title type: ${type}`);
 
         return [];
@@ -143,14 +148,13 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, I
       [TitleType.SERIES]: (args: { query: string }) => this.tmdbTVShowGateway.search(args),
     };
 
-    this.updateLastCallTime();
-
     let tmdbTitles: TMDBTitle[] = [];
 
     for (const type of types) {
       const apiData = await typeToSearchStrategyMap[type]({ query });
       if (apiData != null) {
         tmdbTitles = tmdbTitles.concat(...(apiData.map((result) => result.results) || []));
+        await delayByMs(this.config.rateLimitMs);
       }
     }
 
@@ -159,76 +163,7 @@ export class TMDBService extends APIRateLimiter implements ITitleSearchPlugin, I
     return results.map((title) => TMDBTitleMapper.TMDBTitle2ExternalTitleSearchResultItem(title));
   }
 
-  public async searchDetailsById(id: string, type: TitleType): Promise<TitleDetailedSearchResult | null> {
-    if (this.canCall() === false) {
-      this.logger.warn(`Rate limit exceeded (${this.getProviderID()})`);
-
-      return null;
-    }
-
-    if (id == '' || id == null) {
-      this.logger.error('ID is empty or null');
-
-      return null;
-    }
-
-    this.updateLastCallTime();
-
-    let titleDetails: TitleDetailedSearchResult | null = null;
-
-    switch (type) {
-      case TitleType.MOVIE:
-        const tmdbMovieDetails = await this.tmdbMovieGateway.getDetailsByID(id);
-        if (tmdbMovieDetails == null) {
-          return null;
-        }
-
-        titleDetails = {
-          id: tmdbMovieDetails.id.toString(),
-          title: tmdbMovieDetails.title,
-          originalTitle: tmdbMovieDetails.original_title,
-          type: TitleType.MOVIE,
-          releaseDate: tmdbMovieDetails.release_date,
-          sourceUUID: this.getProviderID(),
-          details: {
-            runtime: tmdbMovieDetails.runtime,
-          },
-        };
-
-        break;
-      case TitleType.SERIES:
-        const tmdbTVShowDetails = await this.tmdbTVShowGateway.getDetailsByID(id);
-        if (tmdbTVShowDetails == null) {
-          return null;
-        }
-
-        titleDetails = {
-          id: tmdbTVShowDetails.id.toString(),
-          title: tmdbTVShowDetails.name,
-          originalTitle: tmdbTVShowDetails.original_name,
-          type: TitleType.SERIES,
-          releaseDate: tmdbTVShowDetails.first_air_date,
-          sourceUUID: this.getProviderID(),
-          details: {
-            numberOfSeasons: tmdbTVShowDetails.number_of_seasons,
-            numberOfEpisodes: tmdbTVShowDetails.number_of_episodes,
-            seasons: tmdbTVShowDetails.seasons.map((season) => ({
-              id: season.id.toString(),
-              seasonNumber: season.season_number,
-              releaseDate: season.air_date,
-              episodeCount: season.episode_count,
-              name: season.name,
-            })) as any,
-          },
-        };
-
-        break;
-      default:
-        this.logger.error('Unknown title type');
-
-        break;
-    }
-
-    return titleDetails;
-  }
+  private isValidTitleType = (type: TitleType): boolean => {
+    return Object.values(TitleType).includes(type);
+  };
 }
