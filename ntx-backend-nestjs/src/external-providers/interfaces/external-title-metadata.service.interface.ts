@@ -1,5 +1,5 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { ExternalTitleMetadataRequest, ExternalTitleMetadataResult } from './external-providers.types';
+import { ExternalTitleMetadataRequest, ExternalTitleMetadataResult } from '../external-providers.types';
 
 export interface IExternalTitleMetadataService {
   getTitleMetadata<T extends TitleType>(

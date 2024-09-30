@@ -32,13 +32,6 @@ export interface ExternalTitleSearchResultItem {
   weight: number;
 }
 
-export interface ExternalTitleSearchResultCandidate {
-  providerID: string;
-  externalID: string;
-  type: TitleType;
-  metadata: ExternalTitleMetadata;
-}
-
 export interface ExternalTitleMetadataRequest<T extends TitleType = TitleType> {
   externalID: string;
   providerID: string;

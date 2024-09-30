@@ -13,9 +13,9 @@ import {
   ExternalTitleSearchRequest,
   ExternalTitleSearchResult,
 } from './external-providers.types';
-import { IExternalTitleMetadataService } from './external-title-metadata.service.interface';
-import { IExternalTitleSearchService } from './external-title-search.service.interface';
 import { IExternalTitleMetadataRetriever } from './interfaces/external-title-metadata-retriever.interface';
+import { IExternalTitleMetadataService } from './interfaces/external-title-metadata.service.interface';
+import { IExternalTitleSearchService } from './interfaces/external-title-search.service.interface';
 import { IExternalTitleSearcher } from './interfaces/external-title-searcher.interface';
 import { IExternalTitleSelector } from './interfaces/external-title-selector.interface';
 
