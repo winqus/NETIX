@@ -60,6 +60,8 @@ describe('External Title Service (e2e)', () => {
       expect(searchResult).toBeDefined();
       expect(searchResult.size).toBeGreaterThan(0);
       expect(searchResult.results[0].metadata.name).toBe(expectedTitleName);
+      expect(searchResult.results[0].metadata.summary).toBeDefined();
+      expect(searchResult.results[0].metadata.releaseDate).toBeDefined();
     });
   });
 
@@ -81,6 +83,7 @@ describe('External Title Service (e2e)', () => {
 
       expect(metadataResult).not.toBeNull();
       expect(metadataResult!.metadata.name).toBe(expectedTitleName);
+      expect(metadataResult!.metadata.summary).toBeDefined();
     });
   });
 });

@@ -11,6 +11,7 @@ export interface ExternalTitle<T extends TitleType = TitleType> {
 export interface ExternalTitleMetadata {
   name: string;
   originalName: string;
+  summary: string;
   releaseDate: string;
 }
 
