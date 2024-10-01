@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LibraryService } from '@ntx-app/shared/services/library.service';
+import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
 import { debounceTime, firstValueFrom, Subject } from 'rxjs';
 
 @Component({
