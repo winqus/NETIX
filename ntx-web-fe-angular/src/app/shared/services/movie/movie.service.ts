@@ -1,26 +1,51 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { delay, map, Observable, of } from 'rxjs';
-import { getUploadMovieUrl } from '@ntx-shared/config/api-endpoints';
-import { IUploadService as IMovieService } from './IMovie.interface';
+import { catchError, delay, map, Observable, of, throwError } from 'rxjs';
+import { getMovieUrl } from '@ntx-shared/config/api-endpoints';
+import { IMovieService } from './IMovie.service.interface';
 import { MediaItem } from '@ntx-shared/models/mediaItem';
 import { MediaItemMapper } from '@ntx-shared/mappers/mediaItemMapper';
 import movieTestData from './movieTestData';
 import { API_CONFIG } from '@ntx-shared/config/api-endpoints';
 import WatchableVideoDTO from '@ntx-shared/models/watchableVideo.dto';
 import { WatchableVideoDTOMapper } from '@ntx-shared/mappers/WatchableVideoDTOMapper';
+import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MovieService implements IMovieService {
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
-  uploadMovieMetadata(formData: FormData): Observable<any> {
-    const url = getUploadMovieUrl();
+  uploadMovieMetadata(formData: FormData): Observable<MovieDTO> {
+    const url = getMovieUrl();
     const httpOptions = {};
 
-    return this.http.post(url, formData, httpOptions);
+    return this.http.post(url, formData, httpOptions).pipe(
+      map((response: any) => {
+        return MovieDTOMapper.anyToMovieDTO(response);
+      }),
+      catchError((error) => {
+        console.error('Error fetching movie metadata:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getMovieMetadata(id: string): Observable<MovieDTO> {
+    const url = getMovieUrl(id);
+    const httpOptions = {};
+
+    return this.http.get(url, httpOptions).pipe(
+      map((response: any) => {
+        return MovieDTOMapper.anyToMovieDTO(response);
+      }),
+      catchError((error) => {
+        console.error('Error fetching movie metadata:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   getMovies(page = 1, limit = 20): Observable<MediaItem[]> {

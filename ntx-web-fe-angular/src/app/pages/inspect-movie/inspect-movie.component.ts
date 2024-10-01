@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@ntx/environments/environment.development';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { UploadService } from '@ntx-shared/services/upload/upload.service';
+import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
@@ -22,7 +22,7 @@ export class InspectMovieComponent implements OnInit {
   isFromCreation: boolean = false;
 
   constructor(
-    private uploadService: UploadService,
+    private movieService: MovieService,
     private posterService: PosterService,
     private route: ActivatedRoute
   ) {}
@@ -32,7 +32,7 @@ export class InspectMovieComponent implements OnInit {
     const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
 
-    this.uploadService.getMovieMetadata(movieId).subscribe({
+    this.movieService.getMovieMetadata(movieId).subscribe({
       next: (response) => {
         if (environment.development) console.log('Upload successful:', response);
         this.movie = response;
