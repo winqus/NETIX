@@ -4,6 +4,7 @@ import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import fetchMock from 'jest-fetch-mock';
 import { tmdbResponseByUrl as resp } from '../../../../test/examples/TMDB-search-title-response.examples';
 import { TMDBService, TMDBSetup } from './TMDB.service';
+import { TMDBWithAPIV3AndFuseJsServiceFactory } from './TMDB.service.factory';
 
 describe('TMDBService', () => {
   let tmdb: TMDBService;
@@ -14,7 +15,8 @@ describe('TMDBService', () => {
   });
 
   beforeEach(async () => {
-    tmdb = new TMDBService({ apiKey: 'testApiKey', rateLimitMs: 1000 }, logger);
+    const setup: TMDBSetup = { apiKey: 'testApiKey', rateLimitMs: 1000 };
+    tmdb = TMDBWithAPIV3AndFuseJsServiceFactory(setup, logger);
   });
 
   it('should be defined', () => {
@@ -23,17 +25,14 @@ describe('TMDBService', () => {
 
   describe('setup', () => {
     it('should initialize with valid setup', () => {
-      const setup: TMDBSetup = { apiKey: 'testApiKey', rateLimitMs: 1000 };
-
-      const tmdb = new TMDBService(setup, logger);
-
       expect(tmdb).toBeInstanceOf(TMDBService);
     });
 
     it('should throw error if API key is not provided', () => {
       const setup: TMDBSetup = { apiKey: '', rateLimitMs: 1000 };
 
-      expect(() => new TMDBService(setup)).toThrow();
+      expect(() => TMDBWithAPIV3AndFuseJsServiceFactory(setup, logger)).toThrow();
+      // expect(() => new TMDBService(setup)).toThrow();
     });
   });
 

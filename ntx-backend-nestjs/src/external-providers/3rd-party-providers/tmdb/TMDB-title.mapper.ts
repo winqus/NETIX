@@ -10,6 +10,15 @@ import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
 import { TMDBTitle, TMDBTitleDetails, WeightedTMDBTitle } from './interfaces/TMDBTitle';
 import { TMDBTVShow } from './interfaces/TMDBTVShow';
 import { TMDBTVShowDetails } from './interfaces/TMDBTVShowDetails';
+import { TMDB_IMAGE_API_BASE_URL, TMDB_IMAGE_ORIGINAL_OPTION, TMDB_IMAGE_SMALL_OPTION } from './TMDB.constants';
+
+export function TMDBImagePathToOriginalImageURL(path: string) {
+  return `${TMDB_IMAGE_API_BASE_URL}/${TMDB_IMAGE_ORIGINAL_OPTION}${path}`;
+}
+
+export function TMDBImagePathToSmallImageURL(path: string) {
+  return `${TMDB_IMAGE_API_BASE_URL}/${TMDB_IMAGE_SMALL_OPTION}${path}`;
+}
 
 export class TMDBTitleMapper {
   public static TMDBTitle2ExternalTitleSearchResultItem(
@@ -25,6 +34,8 @@ export class TMDBTitleMapper {
       externalID: title.id.toString(),
       type: type,
       weight: 'weight' in title ? title.weight : 0.0,
+      posterURL: TMDBImagePathToSmallImageURL(title.poster_path),
+      backdropURL: TMDBImagePathToSmallImageURL(title.backdrop_path),
     };
 
     switch (type) {

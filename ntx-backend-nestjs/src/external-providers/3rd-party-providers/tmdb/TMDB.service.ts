@@ -29,10 +29,7 @@ import { TMDBMovieGateway } from './interfaces/TMDB-movie-gateway.interface';
 import { TMDBTitleSelector } from './interfaces/TMDB-title-selector.interface';
 import { TMDBTVShowGateway } from './interfaces/TMDB-tv-show-gateway.interface';
 import { TMDBTitle } from './interfaces/TMDBTitle';
-import { TMDBMovieGatewayAPIv3 } from './TMDB-movie-gateway-api-v3.class';
-import { TMDBTitleSelectorFuseJS } from './TMDB-title-selector-fusejs.class';
-import { TMDBTitleMapper } from './TMDB-title.mapper';
-import { TMDBTVShowGatewayAPIv3 } from './TMDB-tv-show-gateway-api-v3.class';
+import { TMDBImagePathToOriginalImageURL, TMDBTitleMapper } from './TMDB-title.mapper';
 import { defaultTMDBFactory } from './TMDB.factory';
 
 export type TMDBSetup = {
@@ -49,11 +46,10 @@ export interface TMDBConfig {
 export class TMDBService extends APIRateLimiter implements IExternalTitleProvider {
   private readonly config: TMDBConfig & ExternalProviderConfig;
 
-  private readonly logger: Logger;
-
   private readonly tmdbMovieGateway: TMDBMovieGateway;
   private readonly tmdbTVShowGateway: TMDBTVShowGateway;
   private readonly tmdbTitleSelector: TMDBTitleSelector;
+  private readonly logger: Logger;
 
   fuseOptions: IFuseOptions<any> = {
     findAllMatches: true,
@@ -66,15 +62,22 @@ export class TMDBService extends APIRateLimiter implements IExternalTitleProvide
     ignoreFieldNorm: false, // Can improve matching, or not...
   };
 
-  constructor(setup: TMDBSetup, logger?: Logger) {
+  constructor(
+    setup: TMDBSetup,
+    movieGateway: TMDBMovieGateway,
+    tvShowGateway: TMDBTVShowGateway,
+    titleSelector: TMDBTitleSelector,
+    logger?: Logger,
+  ) {
     super();
     this.config = defaultTMDBFactory(setup);
     this.initializeRateLimiter(this.config.rateLimitMs);
 
+    this.tmdbMovieGateway = movieGateway;
+    this.tmdbTVShowGateway = tvShowGateway;
+    this.tmdbTitleSelector = titleSelector;
+
     this.logger = logger || new Logger(TMDBService.name);
-    this.tmdbMovieGateway = new TMDBMovieGatewayAPIv3(this.config, this.logger);
-    this.tmdbTVShowGateway = new TMDBTVShowGatewayAPIv3(this.config, this.logger);
-    this.tmdbTitleSelector = new TMDBTitleSelectorFuseJS();
   }
 
   public getProviderID = (): string => ExternalProviders.TMDB.toString();
@@ -121,6 +124,8 @@ export class TMDBService extends APIRateLimiter implements IExternalTitleProvide
       externalID: externalID,
       type: type,
       metadata: metadata,
+      posterURL: TMDBImagePathToOriginalImageURL(titleDetails.poster_path),
+      backdropURL: TMDBImagePathToOriginalImageURL(titleDetails.backdrop_path),
     } as ExternalTitleMetadataResult<T>;
   }
 

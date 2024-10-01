@@ -11,6 +11,7 @@ import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-
 import fetchMock from 'jest-fetch-mock';
 import * as path from 'path';
 import { TMDBService, TMDBSetup } from './TMDB.service';
+import { TMDBWithAPIV3AndFuseJsServiceFactory } from './TMDB.service.factory';
 
 describe('TMDBService with TMDB API calls for titles', () => {
   const FORWARD_FETCH_IF_NOT_CACHED = false;
@@ -110,7 +111,7 @@ describe('TMDBService with TMDB API calls for titles', () => {
 
     const setup: TMDBSetup = { apiKey: tmdb_api_key, rateLimitMs: 5 };
 
-    tmdb = new TMDBService(setup, logger);
+    tmdb = TMDBWithAPIV3AndFuseJsServiceFactory(setup, logger);
   });
 
   const titlePositionInResults = (title: string, results: ExternalTitleSearchResultItem[]): number => {

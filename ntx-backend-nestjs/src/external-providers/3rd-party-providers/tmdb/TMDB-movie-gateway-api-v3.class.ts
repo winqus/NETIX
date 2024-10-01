@@ -4,10 +4,10 @@ import { TMDBMovieGateway, TMDBMovieSearchOptions } from './interfaces/TMDB-movi
 import { TMDBMovie } from './interfaces/TMDBMovie';
 import { TMDBMovieDetails } from './interfaces/TMDBMovieDetails';
 import { TMDBSearchResult } from './interfaces/TMDBSearchResult';
+import { TMDB_API_V3_BASE_URL } from './TMDB.constants';
 import { TMDBConfig } from './TMDB.service';
 
-const maxResultPagesToSearchThrough = 5;
-const TMDB_API_V3_BASE_URL = 'https://api.themoviedb.org/3';
+const MAX_RESULT_PAGES_TO_SEARCH_THROUGH = 5;
 const TMDB_API_SEARCH_MOVIE_ROUTE = `${TMDB_API_V3_BASE_URL}/search/movie`;
 const TMDB_API_MOVIE_DETAILS_ROUTE = `${TMDB_API_V3_BASE_URL}/movie`;
 
@@ -42,7 +42,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
     let currentPage = 1;
     let totalPages = 1;
 
-    while (currentPage <= totalPages && currentPage <= maxResultPagesToSearchThrough) {
+    while (currentPage <= totalPages && currentPage <= MAX_RESULT_PAGES_TO_SEARCH_THROUGH) {
       const params = new URLSearchParams();
       params.append('query', encodeURIComponent(query));
       params.append('include_adult', include_adult);

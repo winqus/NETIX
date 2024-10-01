@@ -4,10 +4,10 @@ import { TMDBTVShowGateway, TMDBTVShowSearchOptions } from './interfaces/TMDB-tv
 import { TMDBSearchResult } from './interfaces/TMDBSearchResult';
 import { TMDBTVShow } from './interfaces/TMDBTVShow';
 import { TMDBTVShowDetails } from './interfaces/TMDBTVShowDetails';
+import { TMDB_API_V3_BASE_URL } from './TMDB.constants';
 import { TMDBConfig } from './TMDB.service';
 
-const maxResultPagesToSearchThrough = 5;
-const TMDB_API_V3_BASE_URL = 'https://api.themoviedb.org/3';
+const MAX_RESULT_PAGES_TO_SEARCH_THROUGH = 5;
 const TMDB_API_SEARCH_TV_SHOW_ROUTE = `${TMDB_API_V3_BASE_URL}/search/tv`;
 const TMDB_API_TV_SHOW_DETAILS_ROUTE = `${TMDB_API_V3_BASE_URL}/tv`;
 
@@ -42,7 +42,7 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
     let currentPage = 1;
     let totalPages = 1;
 
-    while (currentPage <= totalPages && currentPage <= maxResultPagesToSearchThrough) {
+    while (currentPage <= totalPages && currentPage <= MAX_RESULT_PAGES_TO_SEARCH_THROUGH) {
       const params = new URLSearchParams();
       params.append('query', encodeURIComponent(query));
       params.append('include_adult', include_adult);

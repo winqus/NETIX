@@ -4,6 +4,8 @@ export interface ExternalTitle<T extends TitleType = TitleType> {
   externalID: string;
   providerID: string;
   type: T;
+  posterURL?: string;
+  backdropURL?: string;
 }
 
 export interface ExternalTitleMetadata {
@@ -30,6 +32,8 @@ export interface ExternalTitleSearchResultItem {
   type: TitleType;
   metadata: ExternalTitleMetadata;
   weight: number;
+  posterURL?: string;
+  backdropURL?: string;
 }
 
 export interface ExternalTitleMetadataRequest<T extends TitleType = TitleType> {
@@ -43,6 +47,8 @@ export interface ExternalTitleMetadataResult<T extends TitleType = TitleType> {
   providerID: string;
   type: T;
   metadata: TitleTypeMetadataMap[T];
+  posterURL?: string;
+  backdropURL?: string;
 }
 
 type TitleTypeMetadataMap = {
