@@ -45,6 +45,7 @@ export class TMDBTitleMapper {
         (result as ExternalTitleSearchResultItem).metadata = {
           name: title.title,
           originalName: title.original_title,
+          summary: title.overview,
           releaseDate: title.release_date,
         };
 
@@ -55,6 +56,7 @@ export class TMDBTitleMapper {
         (result as ExternalTitleSearchResultItem).metadata = {
           name: title.name,
           originalName: title.original_name,
+          summary: title.overview,
           releaseDate: title.first_air_date,
         };
         break;
@@ -79,6 +81,7 @@ export class TMDBTitleMapper {
 
         const metadata: ExternalMovieMetadata = {
           name: movieDetails.title,
+          summary: movieDetails.overview,
           originalName: movieDetails.original_title,
           releaseDate: movieDetails.release_date,
           runtime: movieDetails.runtime,
@@ -92,6 +95,7 @@ export class TMDBTitleMapper {
         const metadata: ExternalSeriesMetadata = {
           name: tvShowDetails.name,
           originalName: tvShowDetails.original_name,
+          summary: tvShowDetails.overview,
           releaseDate: tvShowDetails.first_air_date,
           numberOfSeasons: tvShowDetails.number_of_seasons,
           numberOfEpisodes: tvShowDetails.number_of_episodes,
