@@ -1,5 +1,5 @@
-import { ExternalTitleSearchRequest, ExternalTitleSearchResultCandidate } from '../external-providers.types';
+import { ExternalTitleSearchRequest, ExternalTitleSearchResultItem } from '../external-providers.types';
 
 export interface IExternalTitleSearcher {
-  searchTitleByName(request: ExternalTitleSearchRequest): Promise<ExternalTitleSearchResultCandidate[]>;
+  searchTitleByName(request: ExternalTitleSearchRequest): Promise<ExternalTitleSearchResultItem[]>;
 }

@@ -1,9 +1,11 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 
-export interface ExternalTitle {
+export interface ExternalTitle<T extends TitleType = TitleType> {
   externalID: string;
   providerID: string;
-  type: TitleType;
+  type: T;
+  posterURL?: string;
+  backdropURL?: string;
 }
 
 export interface ExternalTitleMetadata {
@@ -30,13 +32,8 @@ export interface ExternalTitleSearchResultItem {
   type: TitleType;
   metadata: ExternalTitleMetadata;
   weight: number;
-}
-
-export interface ExternalTitleSearchResultCandidate {
-  providerID: string;
-  externalID: string;
-  type: TitleType;
-  metadata: ExternalTitleMetadata;
+  posterURL?: string;
+  backdropURL?: string;
 }
 
 export interface ExternalTitleMetadataRequest<T extends TitleType = TitleType> {
@@ -50,6 +47,8 @@ export interface ExternalTitleMetadataResult<T extends TitleType = TitleType> {
   providerID: string;
   type: T;
   metadata: TitleTypeMetadataMap[T];
+  posterURL?: string;
+  backdropURL?: string;
 }
 
 type TitleTypeMetadataMap = {
@@ -64,13 +63,11 @@ export interface ExternalMovieMetadata extends ExternalTitleMetadata {
 export interface ExternalSeriesMetadata extends ExternalTitleMetadata {
   numberOfSeasons?: number;
   numberOfEpisodes?: number;
-  seasons: [
-    {
-      id: string;
-      name: string;
-      seasonNumber: number;
-      episodeCount: number;
-      releaseDate: string | null;
-    },
-  ];
+  seasons: {
+    id: string;
+    name: string;
+    seasonNumber: number;
+    episodeCount: number;
+    releaseDate: string | null;
+  }[];
 }

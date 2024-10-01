@@ -6,7 +6,15 @@ describe('ExternalProvidersModule', () => {
   describe('forRoot', () => {
     it('creates', async () => {
       const module: TestingModule = await Test.createTestingModule({
-        imports: [ExternalProvidersModule.forRoot()],
+        imports: [
+          ExternalProvidersModule.forRoot({
+            TMDB: {
+              enable: false,
+              apiKey: 'test',
+              rateLimitMs: 1,
+            },
+          }),
+        ],
       }).compile();
 
       const externalTitleService = module.get(ExternalTitleService);

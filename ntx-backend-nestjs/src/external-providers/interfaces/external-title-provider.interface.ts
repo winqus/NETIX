@@ -1,5 +1,9 @@
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { ExternalTitleSearchResultCandidate } from '../external-providers.types';
+import { ExternalTitle, ExternalTitleMetadataResult, ExternalTitleSearchResultItem } from '../external-providers.types';
+
+export interface ExternalProviderConfig {
+  enabled: boolean;
+}
 
 export interface ExternalTitleSearchOptions {
   types?: TitleType[];
@@ -8,5 +12,12 @@ export interface ExternalTitleSearchOptions {
 
 export interface IExternalTitleProvider {
   getProviderID(): string;
-  findByQuery(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultCandidate[]>;
+
+  isEnabled(): boolean;
+
+  exists(title: ExternalTitle): Promise<boolean>;
+
+  search(query: string, options?: ExternalTitleSearchOptions): Promise<ExternalTitleSearchResultItem[]>;
+
+  getMetadata<T extends TitleType>(externalID: string, type: T): Promise<ExternalTitleMetadataResult<T> | null>;
 }
