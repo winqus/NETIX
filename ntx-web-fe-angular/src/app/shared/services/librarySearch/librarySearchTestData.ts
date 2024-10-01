@@ -1,4 +1,4 @@
-const searchResponseFixture = {
+export const searchResponseFixture = {
   size: 0,
   searchResults: [
     {

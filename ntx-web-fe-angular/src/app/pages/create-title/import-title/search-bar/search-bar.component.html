@@ -15,7 +15,7 @@
       <ul>
         @for (result of results; track result) {
           <li (click)="selectMovie(result)">
-            {{ result.name }}
+            {{ result.metadata.name }}
           </li>
         }
       </ul>
