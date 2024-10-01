@@ -1,0 +1,24 @@
+<div>
+  <label for="searchBar" class="form-control w-full">
+    <div class="label py-0">
+      <span class="label-text font-bold">Title</span>
+    </div>
+    <input
+      id="searchBar"
+      type="text"
+      class="input input-bordered input-sm w-full p-2 rounded-md"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchTermChange()"
+      placeholder="Search for a movie title..."
+    />
+    @if (searchTerm) {
+      <ul>
+        @for (result of results; track result) {
+          <li (click)="selectMovie(result)">
+            {{ result.name }}
+          </li>
+        }
+      </ul>
+    }
+  </label>
+</div>
