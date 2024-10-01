@@ -46,6 +46,7 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (!this.fileUploadId) {
       this.fileUploadId = `file-upload-${generateRandomId()}`;
+      console.log(this.fileUploadId);
     }
   }
 

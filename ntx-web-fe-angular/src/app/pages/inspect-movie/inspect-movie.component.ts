@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
 import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
-import { UploadService } from '@ntx-shared/services/upload/upload.service';
+import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
@@ -28,7 +28,7 @@ export class InspectMovieComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
-    private uploadService: UploadService,
+    private movieService: MovieService,
     private posterService: PosterService,
     private route: ActivatedRoute
   ) {}
@@ -38,7 +38,7 @@ export class InspectMovieComponent implements OnInit {
     const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
 
-    this.uploadService.getMovieMetadata(movieId).subscribe({
+    this.movieService.getMovieMetadata(movieId).subscribe({
       next: (response) => {
         if (environment.development) console.log('Upload successful:', response);
         this.movie = response;
@@ -82,7 +82,7 @@ export class InspectMovieComponent implements OnInit {
         runtimeMinutes: this.movieTitleEditForm.get('runtimeMinutes')?.value,
       };
 
-      this.uploadService.updateMovieMetadata(this.movie?.id, movieData).subscribe({
+      this.movieService.updateMovieMetadata(this.movie?.id, movieData).subscribe({
         next: (response) => {
           if (environment.development) console.log('Update successful:', response);
           this.editModal.nativeElement.close();

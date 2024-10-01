@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UploadTitleComponent } from './upload-title.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { UploadService } from '@ntx-shared/services/upload/upload.service';
+import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 
 describe('UploadContentComponent', () => {
   let component: UploadTitleComponent;
@@ -9,10 +9,10 @@ describe('UploadContentComponent', () => {
   let mockUploadService: any;
 
   beforeEach(async () => {
-    mockUploadService = jasmine.createSpyObj('UploadService', ['uploadMovieMetadata']);
+    mockUploadService = jasmine.createSpyObj('MovieService', ['uploadMovieMetadata']);
     await TestBed.configureTestingModule({
       imports: [UploadTitleComponent, ReactiveFormsModule],
-      providers: [{ provide: UploadService, useValue: mockUploadService }],
+      providers: [{ provide: MovieService, useValue: mockUploadService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UploadTitleComponent);

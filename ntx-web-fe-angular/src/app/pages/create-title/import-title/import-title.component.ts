@@ -1,12 +1,12 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { ImageUploadComponent } from './components/image-upload/image-upload.component';
-import { FieldRestrictions, MediaConstants } from '@ntx/app/shared/config/constants';
+import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
+import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { environment } from '@ntx/environments/environment';
 import { Router } from '@angular/router';
-import { SearchBarComponent } from '@ntx-pages/create-title/import-title/components/search-bar/search-bar.component';
+import { SearchBarComponent } from '@ntx/app/pages/create-title/import-title/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-import-title',
@@ -15,9 +15,6 @@ import { SearchBarComponent } from '@ntx-pages/create-title/import-title/compone
   templateUrl: './import-title.component.html',
 })
 export class ImportTitleComponent implements OnInit {
-  @ViewChild('croppModal') cropModalElement!: ElementRef<HTMLDialogElement>;
-  @ViewChild(ImageUploadComponent) imageFileComponent!: ImageUploadComponent;
-
   imageFile: File | null = null;
   imageAccept: string = '';
   imageMaxSize: number = 0;
@@ -45,7 +42,6 @@ export class ImportTitleComponent implements OnInit {
 
   async ngOnInit(): Promise<any> {
     this.imageAccept = MediaConstants.image.formats.join(',');
-    this.imageMaxSize = MediaConstants.image.maxSize;
   }
 
   get title() {
