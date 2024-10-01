@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
 import { debounceTime, firstValueFrom, Subject } from 'rxjs';
+import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
 
 @Component({
   selector: 'app-search-bar',
@@ -13,7 +14,7 @@ import { debounceTime, firstValueFrom, Subject } from 'rxjs';
 })
 export class SearchBarComponent implements OnInit {
   private searchSubject = new Subject<string>(); // For the search input
-  @Input() results: any[] = [];
+  @Input() results: ExternalTitleSearchResultItem[] = [];
   @Output() movieSelected = new EventEmitter<string>();
   searchTerm: string = '';
 
@@ -34,7 +35,9 @@ export class SearchBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.searchSubject.pipe(debounceTime(500)).subscribe(async (tempSearchTerm: string) => {
-      this.results = await firstValueFrom(this.libraryService.search(tempSearchTerm));
+      const result = await firstValueFrom(this.libraryService.search(tempSearchTerm));
+
+      this.results = result.searchResults[1].results;
       console.log(tempSearchTerm);
     });
   }

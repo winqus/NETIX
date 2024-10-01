@@ -10,7 +10,7 @@
             <input type="radio" name="my_tabs_2" role="tab" class="tab tabs-xs" aria-label="Movie" checked="checked" />
             <div role="tabpanel" class="tab-content grid rounded-lg bg-base-100 border-[#101010] px-1">
               <!-- Searchbar field-->
-              <app-search-bar [results]="titleNames" (movieSelected)="onTitleSelected($event)"></app-search-bar>
+              <app-search-bar [results]="searchResults" (movieSelected)="onTitleSelected($event)"></app-search-bar>
               <!-- Title Field -->
               <label for="title" class="form-control w-full">
                 <div class="label py-0">
@@ -39,22 +39,22 @@
                 </div>
               </label>
 
-              <!--              &lt;!&ndash; Date Field &ndash;&gt;-->
-              <!--              <label for="originallyReleasedAt" class="form-control w-full">-->
-              <!--                <div class="label py-0">-->
-              <!--                  <span class="label-text font-bold">Original release</span>-->
-              <!--                </div>-->
-              <!--                <input-->
-              <!--                  formControlName="originallyReleasedAt"-->
-              <!--                  id="originallyReleasedAt"-->
-              <!--                  class="input input-bordered input-sm w-full p-2 rounded-md"-->
-              <!--                  [class]="{ 'input-error': isInvalid('originallyReleasedAt') }"-->
-              <!--                  type="date"-->
-              <!--                />-->
-              <!--                <div class="label py-0 mb-2">-->
-              <!--                  <span class="label-text-alt text-error">{{ getErrorMessage('originallyReleasedAt') }}</span>-->
-              <!--                </div>-->
-              <!--              </label>-->
+              <!-- Date Field -->
+              <label for="originallyReleasedAt" class="form-control w-full">
+                <div class="label py-0">
+                  <span class="label-text font-bold">Original release</span>
+                </div>
+                <input
+                  formControlName="originallyReleasedAt"
+                  id="originallyReleasedAt"
+                  class="input input-bordered input-sm w-full p-2 rounded-md"
+                  [class]="{ 'input-error': isInvalid('originallyReleasedAt') }"
+                  type="date"
+                />
+                <div class="label py-0 mb-2">
+                  <span class="label-text-alt text-error">{{ getErrorMessage('originallyReleasedAt') }}</span>
+                </div>
+              </label>
 
               <!--              &lt;!&ndash; Duration Field &ndash;&gt;-->
               <!--              <label for="runtimeMinutes" class="form-control w-full">-->

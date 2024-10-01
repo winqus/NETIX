@@ -7,6 +7,7 @@ import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { environment } from '@ntx/environments/environment';
 import { Router } from '@angular/router';
 import { SearchBarComponent } from '@ntx/app/pages/create-title/import-title/search-bar/search-bar.component';
+import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
 
 @Component({
   selector: 'app-import-title',
@@ -20,7 +21,7 @@ export class ImportTitleComponent implements OnInit {
   imageMaxSize: number = 0;
   errorMessage: string = '';
 
-  titleNames: string[] = [];
+  searchResults: ExternalTitleSearchResultItem[] = [];
 
   titleCreationForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
@@ -138,7 +139,8 @@ export class ImportTitleComponent implements OnInit {
   }
 
   updateFields(title: any) {
-    this.titleCreationForm.patchValue({ title: title.name });
-    this.titleCreationForm.patchValue({ summary: title.summary || title.name + ' summary blablabla' });
+    this.titleCreationForm.patchValue({ title: title.metadata.name });
+    this.titleCreationForm.patchValue({ summary: title.metadata.summary || title.name + ' summary blablabla' });
+    this.titleCreationForm.patchValue({ originallyReleasedAt: title.metadata.releaseDate });
   }
 }
