@@ -35,4 +35,4 @@ export const SWAGGER_DESCRIPTION =
   '<a href="/swagger/json">/swagger/json</a> or ' +
   '<a href="/swagger/yaml">/swagger/yaml</a> ' +
   'to get the OpenAPI document in JSON or YAML format.';
-export const SWAGGER_TAGS = ['movies', 'posters', 'default'];
+export const SWAGGER_TAGS = ['movies', 'images', 'default'];
