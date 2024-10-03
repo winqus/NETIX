@@ -7,6 +7,7 @@ import {
   Logger,
   Param,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -24,11 +25,12 @@ import {
   MOVIES_CONTROLLER_VERSION,
   MOVIES_NO_FILE_PROVIDED_ERROR,
   MOVIES_NO_ID_PROVIDED_ERROR,
+  MOVIES_NOT_FOUND_ERROR,
   MOVIES_POSTER_STORAGE_ARGS as MOVIES_POSTER_FILE_STORAGE_ARGS,
   MOVIES_SWAGGER_TAG,
 } from './movies.constants';
 import { MoviesService } from './movies.service';
-import { ApiDocsForGetMovie, ApiDocsForPostMovie } from './swagger/api-docs.decorators';
+import { ApiDocsForGetMovie, ApiDocsForPostMovie, ApiDocsForPutUpdatePoster } from './swagger/api-docs.decorators';
 
 @ApiTags(MOVIES_SWAGGER_TAG)
 @Controller({
@@ -77,6 +79,35 @@ export class MoviesController {
       const movie = await this.moviesSrv.findOne(id);
 
       return movie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Put(':id/poster')
+  @ApiDocsForPutUpdatePoster()
+  @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
+  public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      if (file == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      const updatedMovie = await this.moviesSrv.updatePosterForOne(id, fileInStorageFromRaw(file));
+
+      if (updatedMovie == null) {
+        throw new BadRequestException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      this.logger.log(`Updated poster for movie ${id}`);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
