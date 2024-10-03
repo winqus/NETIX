@@ -2,8 +2,10 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
-import { debounceTime, firstValueFrom, Subject } from 'rxjs';
 import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
+import { Subject } from 'rxjs/internal/Subject';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { debounceTime } from 'rxjs/internal/operators/debounceTime';
 
 @Component({
   selector: 'app-search-bar',
@@ -13,7 +15,7 @@ import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.
   imports: [FormsModule, CommonModule],
 })
 export class SearchBarComponent implements OnInit {
-  private searchSubject = new Subject<string>(); // For the search input
+  private searchSubject = new Subject<string>();
   @Input() results: ExternalTitleSearchResultItem[] = [];
   @Output() movieSelected = new EventEmitter<string>();
   searchTerm: string = '';

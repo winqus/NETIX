@@ -14,6 +14,7 @@ export const SERVER = {
   endpoints: {
     movies: '/v1/movies',
     poster: '/v1/poster',
+    imageProxy: '/v1/images-proxy',
   },
 };
 
@@ -31,4 +32,8 @@ export function getPoster(_id: string, _size?: string) {
   } else {
     return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
   }
+}
+
+export function getImageProxy(_url: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.imageProxy}?url=${_url}`;
 }

@@ -1,8 +1,8 @@
-import { from, Observable } from 'rxjs';
 import { IPostersService } from './IPosters.service.interface';
 import { HttpClient } from '@angular/common/http';
-import { getPoster } from '../../config/api-endpoints';
+import { getImageProxy, getPoster } from '../../config/api-endpoints';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root',
@@ -16,9 +16,9 @@ export class PosterService implements IPostersService {
     return this.http.get(url, { responseType: 'blob' });
   }
 
-  downloadImage(url: string): Observable<Blob> {
-    console.log(url);
+  downloadImage(imgUrl: string): Observable<Blob> {
+    const url = getImageProxy(imgUrl);
 
-    return this.http.get(url.replace('https://image.tmdb.org', '/tmdb-image'), { responseType: 'blob' });
+    return this.http.get(url, { responseType: 'blob' });
   }
 }

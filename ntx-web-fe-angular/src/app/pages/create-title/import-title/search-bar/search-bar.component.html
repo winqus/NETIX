@@ -13,7 +13,7 @@
         <img [src]="result.posterURL" alt="{{ result.metadata.name }} poster" class="movie-poster-thumbnail" />
         <div class="movie-info">
           <span class="movie-title">{{ result.metadata.name }}</span>
-          <span class="movie-details">{{ result.type }} - {{ result.metadata.releaseDate }} - {{ result.providerID }}</span>
+          <span class="movie-details">{{ result.type }} · {{ result.metadata.releaseDate }} · {{ result.providerID }} </span>
         </div>
       </li>
     </ul>

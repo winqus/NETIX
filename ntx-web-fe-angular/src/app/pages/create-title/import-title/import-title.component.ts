@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ImageService } from '@ntx-shared/services/image.service';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
