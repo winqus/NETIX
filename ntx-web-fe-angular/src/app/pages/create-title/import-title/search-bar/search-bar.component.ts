@@ -31,6 +31,8 @@ export class SearchBarComponent implements OnInit {
 
   selectMovie(result: any) {
     this.movieSelected.emit(result);
+    this.results = [];
+    this.movieSelected.emit(result);
   }
 
   ngOnInit(): void {

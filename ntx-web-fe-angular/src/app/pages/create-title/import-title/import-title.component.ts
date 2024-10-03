@@ -22,6 +22,7 @@ export class ImportTitleComponent implements OnInit {
   errorMessage: string = '';
 
   searchResults: ExternalTitleSearchResultItem[] = [];
+  selectedPosterURL: string | null = null; // Store the selected poster URL
 
   titleCreationForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
@@ -132,15 +133,15 @@ export class ImportTitleComponent implements OnInit {
     return !!(control && control.invalid && control.touched);
   }
 
-  onTitleSelected(title: any) {
-    this.updateFields(title);
-    //enable import button
+  onMovieSelected(movie: any) {
+    this.updateFields(movie);
     this.isFormValid();
+    this.selectedPosterURL = movie.posterURL;
   }
 
-  updateFields(title: any) {
-    this.titleCreationForm.patchValue({ title: title.metadata.name });
-    this.titleCreationForm.patchValue({ summary: title.metadata.summary || title.name + ' summary blablabla' });
-    this.titleCreationForm.patchValue({ originallyReleasedAt: title.metadata.releaseDate });
+  updateFields(movie: any) {
+    this.titleCreationForm.patchValue({ title: movie.metadata.name });
+    this.titleCreationForm.patchValue({ summary: movie.metadata.summary || movie.name + ' summary blablabla' });
+    this.titleCreationForm.patchValue({ originallyReleasedAt: movie.metadata.releaseDate });
   }
 }

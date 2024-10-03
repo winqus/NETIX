@@ -25,6 +25,7 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   @ViewChild('input') inputElement!: ElementRef<HTMLInputElement>;
   @ViewChild('image') imageElement!: ElementRef<HTMLImageElement>;
   @ViewChild('croppModal') croppModal!: ElementRef<HTMLDialogElement>;
+  @Input() posterImage: string | null = null;
 
   fileUploadId: string = '';
   isDraggingOver: boolean = false;
@@ -52,6 +53,10 @@ export class ImageUploadComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.props = { ...this.defaultProps, ...this.props };
+
+    if (this.posterImage) {
+      this.imageUrl = this.posterImage;
+    }
   }
 
   onFileChanged(event: any) {
