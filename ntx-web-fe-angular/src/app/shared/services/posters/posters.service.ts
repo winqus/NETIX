@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { IPostersService } from './IPosters.service.interface';
 import { HttpClient } from '@angular/common/http';
 import { getPoster } from '../../config/api-endpoints';
@@ -14,5 +14,11 @@ export class PosterService implements IPostersService {
     const url = getPoster(id, size);
 
     return this.http.get(url, { responseType: 'blob' });
+  }
+
+  downloadImage(url: string): Observable<Blob> {
+    console.log(url);
+
+    return this.http.get(url.replace('https://image.tmdb.org', '/tmdb-image'), { responseType: 'blob' });
   }
 }

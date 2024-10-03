@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ImageService } from '@ntx-shared/services/image.service';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { environment } from '@ntx/environments/environment';
-import { Router } from '@angular/router';
-import { SearchBarComponent } from '@ntx/app/pages/create-title/import-title/search-bar/search-bar.component';
+import { SearchBarComponent } from '@ntx-pages/create-title/import-title/search-bar/search-bar.component';
 import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
 
 @Component({
@@ -18,11 +18,10 @@ import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.
 export class ImportTitleComponent implements OnInit {
   imageFile: File | null = null;
   imageAccept: string = '';
-  imageMaxSize: number = 0;
   errorMessage: string = '';
 
   searchResults: ExternalTitleSearchResultItem[] = [];
-  selectedPosterURL: string | null = null; // Store the selected poster URL
+  selectedResultPosterURL: string | null = null;
 
   titleCreationForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
@@ -37,7 +36,6 @@ export class ImportTitleComponent implements OnInit {
   });
 
   constructor(
-    private imageService: ImageService,
     private uploadMovie: MovieService,
     private router: Router
   ) {}
@@ -77,22 +75,20 @@ export class ImportTitleComponent implements OnInit {
 
       this.uploadMovie.uploadMovieMetadata(formData).subscribe({
         next: (response) => {
-          if (environment.development) console.log('Upload successful:', response);
+          if (environment.development) console.log('Import successful:', response);
           const movieId = response.id;
-          this.router.navigate(['/movie', movieId]);
+          this.router.navigate(['/inspect/movie', movieId]);
         },
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;
-          if (environment.development) console.error('Error uploading metadata:', errorResponse);
+          if (environment.development) console.error('Error importing metadata:', errorResponse);
         },
       });
     }
   }
 
   async receiveImageFile(file: File | null) {
-    if (file !== null) {
-      this.imageFile = await this.imageService.compressImage(file);
-    }
+    this.imageFile = file;
   }
 
   getErrorMessage(controlName: string): string {
@@ -136,7 +132,7 @@ export class ImportTitleComponent implements OnInit {
   onMovieSelected(movie: any) {
     this.updateFields(movie);
     this.isFormValid();
-    this.selectedPosterURL = movie.posterURL;
+    this.selectedResultPosterURL = movie.posterURL;
   }
 
   updateFields(movie: any) {
