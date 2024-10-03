@@ -1,16 +1,26 @@
 <form [formGroup]="titleCreationForm" (submit)="onSubmit()">
   <div class="h-full w-full justify-center items-center">
     <div class="h-full flex flex-col rounded-lg">
+      <!-- Searchbar field-->
+      <div class="h-full flex flex-col pb-2">
+        <app-search-bar [results]="searchResults" (movieSelected)="onMovieSelected($event)"> </app-search-bar>
+      </div>
       <div class="h-full flex flex-row pb-2">
+        <!-- Image field-->
         <div class="flex flex-col h-full mr-6">
-          <app-image-upload class="h-[300px] w-[200px]" title="Thumbnail Select" [props]="{ accept: imageAccept, readonly: false }" (filePassed)="receiveImageFile($event)"></app-image-upload>
+          <app-image-upload
+            class="h-[300px] w-[200px]"
+            title="Thumbnail Select"
+            [props]="{ accept: imageAccept, readonly: false }"
+            [posterImage]="selectedPosterURL"
+            (filePassed)="receiveImageFile($event)"
+          >
+          </app-image-upload>
         </div>
         <div class="flex flex-col flex-auto h-full">
           <div role="tablist" class="tabs tabs-lifted">
             <input type="radio" name="my_tabs_2" role="tab" class="tab tabs-xs" aria-label="Movie" checked="checked" />
             <div role="tabpanel" class="tab-content grid rounded-lg bg-base-100 border-[#101010] px-1">
-              <!-- Searchbar field-->
-              <app-search-bar [results]="searchResults" (movieSelected)="onTitleSelected($event)"></app-search-bar>
               <!-- Title Field -->
               <label for="title" class="form-control w-full">
                 <div class="label py-0">
@@ -22,6 +32,43 @@
                 </div>
               </label>
 
+              <!-- Flex container for release date and runtime fields -->
+              <div class="flex flex-row gap-4">
+                <!-- Date Field -->
+                <label for="originallyReleasedAt" class="form-control w-full">
+                  <div class="label py-0">
+                    <span class="label-text font-bold">Original release</span>
+                  </div>
+                  <input
+                    formControlName="originallyReleasedAt"
+                    id="originallyReleasedAt"
+                    class="input input-bordered input-sm w-full p-2 rounded-md"
+                    [class]="{ 'input-error': isInvalid('originallyReleasedAt') }"
+                    type="date"
+                  />
+                  <div class="label py-0 mb-2">
+                    <span class="label-text-alt text-error">{{ getErrorMessage('originallyReleasedAt') }}</span>
+                  </div>
+                </label>
+
+                <!-- Runtime Field -->
+                <label for="runtimeMinutes" class="form-control w-full">
+                  <div class="label py-0">
+                    <span class="label-text font-bold">Runtime in minutes</span>
+                  </div>
+                  <input
+                    formControlName="runtimeMinutes"
+                    id="runtimeMinutes"
+                    class="input input-bordered input-sm w-full p-2 rounded-md"
+                    [class]="{ 'input-error': isInvalid('runtimeMinutes') }"
+                    type="text"
+                    placeholder="Runtime"
+                  />
+                  <div class="label py-0 mb-2">
+                    <span class="label-text-alt text-error">{{ getErrorMessage('runtimeMinutes') }}</span>
+                  </div>
+                </label>
+              </div>
               <!-- Summary Field -->
               <label for="summary" class="form-control h-full">
                 <div class="label py-0">
@@ -33,46 +80,12 @@
                   class="textarea textarea-bordered textarea-xs w-full font-mono text-sm p-2 mb-2 rounded-md resize-none read-only:bg-neutral-900 flex-1"
                   [class]="{ 'textarea-error': isInvalid('summary') }"
                   placeholder="Summary..."
+                  style="height: 300px"
                 ></textarea>
                 <div class="label py-0 mb-2">
                   <span class="label-text-alt text-error">{{ getErrorMessage('summary') }}</span>
                 </div>
               </label>
-
-              <!-- Date Field -->
-              <label for="originallyReleasedAt" class="form-control w-full">
-                <div class="label py-0">
-                  <span class="label-text font-bold">Original release</span>
-                </div>
-                <input
-                  formControlName="originallyReleasedAt"
-                  id="originallyReleasedAt"
-                  class="input input-bordered input-sm w-full p-2 rounded-md"
-                  [class]="{ 'input-error': isInvalid('originallyReleasedAt') }"
-                  type="date"
-                />
-                <div class="label py-0 mb-2">
-                  <span class="label-text-alt text-error">{{ getErrorMessage('originallyReleasedAt') }}</span>
-                </div>
-              </label>
-
-              <!--              &lt;!&ndash; Duration Field &ndash;&gt;-->
-              <!--              <label for="runtimeMinutes" class="form-control w-full">-->
-              <!--                <div class="label py-0">-->
-              <!--                  <span class="label-text font-bold">Runtime in minutes</span>-->
-              <!--                </div>-->
-              <!--                <input-->
-              <!--                  formControlName="runtimeMinutes"-->
-              <!--                  id="runtimeMinutes"-->
-              <!--                  class="input input-bordered input-sm w-full p-2 rounded-md"-->
-              <!--                  [class]="{ 'input-error': isInvalid('runtimeMinutes') }"-->
-              <!--                  type="text"-->
-              <!--                  placeholder="Runtime"-->
-              <!--                />-->
-              <!--                <div class="label py-0 mb-2">-->
-              <!--                  <span class="label-text-alt text-error">{{ getErrorMessage('runtimeMinutes') }}</span>-->
-              <!--                </div>-->
-              <!--              </label>-->
             </div>
           </div>
         </div>

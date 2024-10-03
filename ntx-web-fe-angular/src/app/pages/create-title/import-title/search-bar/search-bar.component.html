@@ -1,8 +1,5 @@
-<div>
+<div class="search-container">
   <label for="searchBar" class="form-control w-full">
-    <div class="label py-0">
-      <span class="label-text font-bold">Title</span>
-    </div>
     <input
       id="searchBar"
       type="text"
@@ -11,14 +8,14 @@
       (ngModelChange)="onSearchTermChange()"
       placeholder="Search for a movie title..."
     />
-    @if (searchTerm) {
-      <ul>
-        @for (result of results; track result) {
-          <li (click)="selectMovie(result)">
-            {{ result.metadata.name }}
-          </li>
-        }
-      </ul>
-    }
+    <ul *ngIf="searchTerm" class="results-dropdown">
+      <li *ngFor="let result of results" class="result-item" (click)="selectMovie(result)">
+        <img [src]="result.posterURL" alt="{{ result.metadata.name }} poster" class="movie-poster-thumbnail" />
+        <div class="movie-info">
+          <span class="movie-title">{{ result.metadata.name }}</span>
+          <span class="movie-details">{{ result.type }} - {{ result.metadata.releaseDate }} - {{ result.providerID }}</span>
+        </div>
+      </li>
+    </ul>
   </label>
 </div>

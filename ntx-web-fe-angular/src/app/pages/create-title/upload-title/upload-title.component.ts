@@ -66,7 +66,7 @@ export class UploadTitleComponent implements OnInit {
     }
   }
 
-  async recieveImageFile(file: File | null) {
+  async receiveImageFile(file: File | null) {
     this.imageFile = file;
   }
 

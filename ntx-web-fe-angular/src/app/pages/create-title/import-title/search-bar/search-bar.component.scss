@@ -1,0 +1,53 @@
+.search-container {
+  position: relative; // Positioning the dropdown relative to the search container
+  width: 100%;
+}
+
+.results-dropdown {
+  position: absolute;
+  background-color: #000; // Black background
+  border: 1px solid #333;
+  width: 100%; // Ensure the dropdown matches the search bar width
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 0;
+  left: 0; // Aligns the dropdown with the search bar
+  top: 100%; // Ensures the dropdown appears below the search bar
+  margin-top: 4px; // Creates some space between the search bar and the dropdown
+  box-sizing: border-box; // Ensures no overflow due to padding/borders
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+  background-color: #1a1a1a;
+  color: #fff;
+  border-bottom: 1px solid #333;
+}
+
+.result-item:hover {
+  background-color: #333;
+}
+
+.movie-poster-thumbnail {
+  width: 40px;
+  height: 60px;
+  margin-right: 8px;
+}
+
+.movie-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.movie-title {
+  font-weight: bold;
+}
+
+.movie-details {
+  color: #ccc;
+}
