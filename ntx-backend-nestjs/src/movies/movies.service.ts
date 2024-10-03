@@ -1,14 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
-import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
-import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { PosterService } from '@ntx/images/poster.service';
-import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { Movie } from './entities/movie.entity';
+import { MoviesMapper } from './movies.mapper';
 import { MoviesRepository } from './movies.repository';
 
 @Injectable()
@@ -20,7 +17,7 @@ export class MoviesService {
     private readonly posterSrv: PosterService,
   ) {}
 
-  public async createMovie(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
+  public async createOneWithPoster(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
     try {
       if (posterFile == null) {
         throw new BadRequestException('posterFile can not be null or empty');
@@ -29,11 +26,11 @@ export class MoviesService {
       try {
         await validateOrReject(dto);
       } catch (error) {
-        this.logger.error('Invalid CreateMovieManuallyDTO');
+        this.logger.error('Invalid CreateMovieDTO');
         throw new BadRequestException(error);
       }
 
-      const movieHash = this.createMovieHash(dto);
+      const movieHash = Movie.createHash(dto);
 
       const alreadyExists = await this.moviesRepo.existsByHash(movieHash);
       if (alreadyExists) {
@@ -43,34 +40,17 @@ export class MoviesService {
 
       const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
 
-      const newMovie = await createValidatedObject(Movie, {
-        uuid: generateUUIDv4(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      const newMovie = await Movie.create({
         posterID: posterID,
         name: dto.name,
-        type: TitleType.MOVIE,
         originallyReleasedAt: dto.originallyReleasedAt,
         summary: dto.summary,
         runtimeMinutes: dto.runtimeMinutes,
-        hash: movieHash,
       });
 
       await this.moviesRepo.create(newMovie);
 
-      const newMovieDTO = createValidatedObject(MovieDTO, {
-        id: newMovie.uuid,
-        createdAt: newMovie.createdAt,
-        updatedAt: newMovie.updatedAt,
-        name: newMovie.name,
-        summary: newMovie.summary,
-        originallyReleasedAt: newMovie.originallyReleasedAt,
-        runtimeMinutes: newMovie.runtimeMinutes,
-        posterID: newMovie.posterID,
-        videoID: newMovie.videoID,
-      });
-
-      return newMovieDTO;
+      return MoviesMapper.Movie2MovieDTO(newMovie);
     } catch (error) {
       this.logger.error(`Failed to create movie ${dto.name}: ${error.message}`);
       throw error;
@@ -89,30 +69,10 @@ export class MoviesService {
         throw new BadRequestException('requested movie does not exist');
       }
 
-      const movieDTO = createValidatedObject(MovieDTO, {
-        id: movie.uuid,
-        createdAt: movie.createdAt,
-        updatedAt: movie.updatedAt,
-        name: movie.name,
-        summary: movie.summary,
-        originallyReleasedAt: movie.originallyReleasedAt,
-        runtimeMinutes: movie.runtimeMinutes,
-        posterID: movie.posterID,
-        videoID: movie.videoID,
-      });
-
-      return movieDTO;
+      return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
       this.logger.error(`Failed to find movie with this ${id}: ${error.message}`);
       throw error;
     }
-  }
-
-  private createMovieHash({
-    name,
-    originallyReleasedAt,
-    runtimeMinutes,
-  }: Pick<Movie, 'name' | 'originallyReleasedAt' | 'runtimeMinutes'>): string {
-    return generateHash(name, originallyReleasedAt.toDateString(), runtimeMinutes.toString());
   }
 }

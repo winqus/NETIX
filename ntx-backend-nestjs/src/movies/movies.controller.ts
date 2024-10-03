@@ -52,7 +52,7 @@ export class MoviesController {
 
       await validateOrReject(dto);
 
-      const newMovie = await this.moviesSrv.createMovie(dto, fileInStorageFromRaw(file));
+      const newMovie = await this.moviesSrv.createOneWithPoster(dto, fileInStorageFromRaw(file));
 
       this.logger.log(`Created new movie ${newMovie.id} with poster ${newMovie.posterID}`);
 
