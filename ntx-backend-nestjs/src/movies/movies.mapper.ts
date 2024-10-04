@@ -5,7 +5,7 @@ import { Movie } from './entities/movie.entity';
 export class MoviesMapper {
   public static async any2Movie(any: any): Promise<Movie> {
     const movie = createValidatedObject(Movie, {
-      uuid: any.id,
+      uuid: any.uuid,
       createdAt: any.createdAt,
       updatedAt: any.updatedAt,
       name: any.name,

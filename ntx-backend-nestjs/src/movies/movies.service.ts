@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { PosterService } from '@ntx/images/poster.service';
 import { validateOrReject } from 'class-validator';
@@ -6,6 +6,7 @@ import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
 import { Movie } from './entities/movie.entity';
+import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_NO_ID_PROVIDED_ERROR, MOVIES_NOT_FOUND_ERROR } from './movies.constants';
 import { MoviesMapper } from './movies.mapper';
 import { MoviesRepository } from './movies.repository';
 
@@ -42,7 +43,7 @@ export class MoviesService {
         runtimeMinutes: dto.runtimeMinutes,
       });
 
-      await this.moviesRepo.create(newMovie);
+      await this.moviesRepo.createOne(newMovie);
 
       return MoviesMapper.Movie2MovieDTO(newMovie);
     } catch (error) {
@@ -54,7 +55,7 @@ export class MoviesService {
   public async createOneWithPoster(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
     try {
       if (posterFile == null) {
-        throw new BadRequestException('posterFile can not be null or empty');
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
       }
 
       try {
@@ -64,11 +65,10 @@ export class MoviesService {
         throw new BadRequestException(error);
       }
 
-      const movieHash = Movie.createHash(dto);
-
+      const movieHash = Movie.createHash({ name: dto.name, originallyReleasedAt: dto.originallyReleasedAt });
       const alreadyExists = await this.moviesRepo.existsByHash(movieHash);
       if (alreadyExists) {
-        this.logger.error(`Movie with hash ${movieHash} already exists.`);
+        this.logger.error(`Movie ${dto.name} with hash ${movieHash} already exists.`);
         throw new ConflictException(`Movie with these contents already exists`);
       }
 
@@ -82,7 +82,7 @@ export class MoviesService {
         runtimeMinutes: dto.runtimeMinutes,
       });
 
-      await this.moviesRepo.create(newMovie);
+      await this.moviesRepo.createOne(newMovie);
 
       return MoviesMapper.Movie2MovieDTO(newMovie);
     } catch (error) {
@@ -94,7 +94,7 @@ export class MoviesService {
   public async updateOne(id: string, dto: UpdateMovieDTO): Promise<MovieDTO> {
     try {
       if (id == null) {
-        throw new BadRequestException('id can not be null');
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
       try {
@@ -113,7 +113,7 @@ export class MoviesService {
 
       const updatedMovie = await this.moviesRepo.updateOneByUUID(id, movieUpdate);
       if (updatedMovie == null) {
-        throw new BadRequestException('requested movie does not exist');
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
       return MoviesMapper.Movie2MovieDTO(updatedMovie);
@@ -126,16 +126,16 @@ export class MoviesService {
   public async updatePosterForOne(id: string, posterFile: FileInStorage): Promise<MovieDTO> {
     try {
       if (id == null) {
-        throw new BadRequestException('id can not be null');
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
       if (posterFile == null) {
-        throw new BadRequestException('posterFile can not be null or empty');
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
       }
 
-      const movie = await this.moviesRepo.findByUUID(id);
+      const movie = await this.moviesRepo.findOneByUUID(id);
       if (movie == null) {
-        throw new BadRequestException('requested movie does not exist');
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
       const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
@@ -153,13 +153,13 @@ export class MoviesService {
   public async findOne(id: string): Promise<MovieDTO> {
     try {
       if (id == null) {
-        throw new BadRequestException('id can not be null');
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
-      const movie = await this.moviesRepo.findByUUID(id);
+      const movie = await this.moviesRepo.findOneByUUID(id);
 
       if (movie == null) {
-        throw new BadRequestException('requested movie does not exist');
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
       return MoviesMapper.Movie2MovieDTO(movie);

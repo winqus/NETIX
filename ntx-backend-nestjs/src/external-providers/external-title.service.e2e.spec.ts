@@ -15,8 +15,6 @@ describe('External Title Service (e2e)', () => {
   let tmdbFetchMocker: TMDBFetchMocker;
 
   beforeAll(async () => {
-    fetchMock.dontMock();
-
     const testConfigurationFactory: ConfigFactory = () => ({});
 
     Object.assign(process.env, testConfigurationFactory());
@@ -33,6 +31,7 @@ describe('External Title Service (e2e)', () => {
       ],
     }).compile();
 
+    // fetchMock.dontMock();
     tmdbFetchMocker = new TMDBFetchMocker();
     tmdbFetchMocker.initialize();
     tmdbFetchMocker.mockResponses();

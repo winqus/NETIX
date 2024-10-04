@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsString, Length, Max, Min } from 'class-validator';
+import { IsDate, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
 import {
   MOVIES_NAME_LENGTH_MAX,
   MOVIES_NAME_LENGTH_MIN,
@@ -11,17 +11,21 @@ import {
 export class UpdateMovieDTO {
   @IsString()
   @Length(MOVIES_NAME_LENGTH_MIN, MOVIES_NAME_LENGTH_MAX)
+  @IsOptional()
   name: string;
 
   @IsString()
   @Length(MOVIES_SUMMARY_LENGTH_MIN, MOVIES_SUMMARY_LENGTH_MAX)
+  @IsOptional()
   summary: string;
 
   @IsDate()
+  @IsOptional()
   originallyReleasedAt: Date;
 
   @IsInt()
   @Min(MOVIES_RUNTIME_MINS_MIN)
   @Max(MOVIES_RUNTIME_MINS_MAX)
+  @IsOptional()
   runtimeMinutes: number;
 }

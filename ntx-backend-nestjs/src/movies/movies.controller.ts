@@ -5,7 +5,9 @@ import {
   Get,
   HttpException,
   Logger,
+  NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
   UploadedFile,
@@ -20,9 +22,11 @@ import { FileToStorageContainerInterceptor } from '@ntx/file-storage/interceptor
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
+import { UpdateMovieDTO } from './dto/update-movie.dto';
 import {
   MOVIES_CONTROLLER_BASE_PATH,
   MOVIES_CONTROLLER_VERSION,
+  MOVIES_EMPTY_DTO_ERROR,
   MOVIES_NO_FILE_PROVIDED_ERROR,
   MOVIES_NO_ID_PROVIDED_ERROR,
   MOVIES_NOT_FOUND_ERROR,
@@ -30,7 +34,12 @@ import {
   MOVIES_SWAGGER_TAG,
 } from './movies.constants';
 import { MoviesService } from './movies.service';
-import { ApiDocsForGetMovie, ApiDocsForPostMovie, ApiDocsForPutUpdatePoster } from './swagger/api-docs.decorators';
+import {
+  ApiDocsForGetMovie,
+  ApiDocsForPatchMovie,
+  ApiDocsForPostMovie,
+  ApiDocsForPutUpdatePoster,
+} from './swagger/api-docs.decorators';
 
 @ApiTags(MOVIES_SWAGGER_TAG)
 @Controller({
@@ -72,7 +81,7 @@ export class MoviesController {
   @ApiDocsForGetMovie()
   public async get(@Param('id') id: string): Promise<MovieDTO> {
     try {
-      if (id == null) {
+      if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
@@ -93,7 +102,7 @@ export class MoviesController {
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
   public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     try {
-      if (id == null) {
+      if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
@@ -103,11 +112,41 @@ export class MoviesController {
 
       const updatedMovie = await this.moviesSrv.updatePosterForOne(id, fileInStorageFromRaw(file));
 
-      if (updatedMovie == null) {
-        throw new BadRequestException(MOVIES_NOT_FOUND_ERROR);
+      this.logger.log(`Updated poster for movie ${id}`);
+
+      return updatedMovie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Patch(':id')
+  @ApiDocsForPatchMovie()
+  public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO) {
+    try {
+      if (!id) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
-      this.logger.log(`Updated poster for movie ${id}`);
+      if (!dto || Object.keys(dto).length === 0) {
+        throw new BadRequestException(MOVIES_EMPTY_DTO_ERROR);
+      }
+
+      await validateOrReject(dto);
+
+      const updatedMovie = await this.moviesSrv.updateOne(id, dto);
+
+      if (updatedMovie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      this.logger.log(`Updated movie ${id}`);
+
+      return updatedMovie;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
