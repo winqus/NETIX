@@ -1,14 +1,13 @@
-import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
-import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
-import { generateHash } from '@ntx/common/utils/generate-hash.utils';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { PosterService } from '@ntx/images/poster.service';
-import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
+import { UpdateMovieDTO } from './dto/update-movie.dto';
 import { Movie } from './entities/movie.entity';
+import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_NO_ID_PROVIDED_ERROR, MOVIES_NOT_FOUND_ERROR } from './movies.constants';
+import { MoviesMapper } from './movies.mapper';
 import { MoviesRepository } from './movies.repository';
 
 @Injectable()
@@ -20,20 +19,16 @@ export class MoviesService {
     private readonly posterSrv: PosterService,
   ) {}
 
-  public async createMovie(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
+  public async createOne(dto: CreateMovieDTO): Promise<MovieDTO> {
     try {
-      if (posterFile == null) {
-        throw new BadRequestException('posterFile can not be null or empty');
-      }
-
       try {
         await validateOrReject(dto);
       } catch (error) {
-        this.logger.error('Invalid CreateMovieManuallyDTO');
+        this.logger.error('Invalid CreateMovieDTO');
         throw new BadRequestException(error);
       }
 
-      const movieHash = this.createMovieHash(dto);
+      const movieHash = Movie.createHash(dto);
 
       const alreadyExists = await this.moviesRepo.existsByHash(movieHash);
       if (alreadyExists) {
@@ -41,38 +36,116 @@ export class MoviesService {
         throw new ConflictException(`Movie with these contents already exists`);
       }
 
-      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
-
-      const newMovie = await createValidatedObject(Movie, {
-        uuid: generateUUIDv4(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        posterID: posterID,
+      const newMovie = await Movie.create({
         name: dto.name,
-        type: TitleType.MOVIE,
         originallyReleasedAt: dto.originallyReleasedAt,
         summary: dto.summary,
         runtimeMinutes: dto.runtimeMinutes,
-        hash: movieHash,
       });
 
-      await this.moviesRepo.create(newMovie);
+      await this.moviesRepo.createOne(newMovie);
 
-      const newMovieDTO = createValidatedObject(MovieDTO, {
-        id: newMovie.uuid,
-        createdAt: newMovie.createdAt,
-        updatedAt: newMovie.updatedAt,
-        name: newMovie.name,
-        summary: newMovie.summary,
-        originallyReleasedAt: newMovie.originallyReleasedAt,
-        runtimeMinutes: newMovie.runtimeMinutes,
-        posterID: newMovie.posterID,
-        videoID: newMovie.videoID,
-      });
-
-      return newMovieDTO;
+      return MoviesMapper.Movie2MovieDTO(newMovie);
     } catch (error) {
       this.logger.error(`Failed to create movie ${dto.name}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async createOneWithPoster(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO> {
+    try {
+      if (posterFile == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      try {
+        await validateOrReject(dto);
+      } catch (error) {
+        this.logger.error('Invalid CreateMovieDTO');
+        throw new BadRequestException(error);
+      }
+
+      const movieHash = Movie.createHash({ name: dto.name, originallyReleasedAt: dto.originallyReleasedAt });
+      const alreadyExists = await this.moviesRepo.existsByHash(movieHash);
+      if (alreadyExists) {
+        this.logger.error(`Movie ${dto.name} with hash ${movieHash} already exists.`);
+        throw new ConflictException(`Movie with these contents already exists`);
+      }
+
+      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
+
+      const newMovie = await Movie.create({
+        posterID: posterID,
+        name: dto.name,
+        originallyReleasedAt: dto.originallyReleasedAt,
+        summary: dto.summary,
+        runtimeMinutes: dto.runtimeMinutes,
+      });
+
+      await this.moviesRepo.createOne(newMovie);
+
+      return MoviesMapper.Movie2MovieDTO(newMovie);
+    } catch (error) {
+      this.logger.error(`Failed to create movie ${dto.name}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async updateOne(id: string, dto: UpdateMovieDTO): Promise<MovieDTO> {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      try {
+        await validateOrReject(dto);
+      } catch (error) {
+        this.logger.error('Invalid UpdateMovieDTO');
+        throw new BadRequestException(error);
+      }
+
+      const movieUpdate: Partial<Movie> = {
+        name: dto.name,
+        originallyReleasedAt: dto.originallyReleasedAt,
+        runtimeMinutes: dto.runtimeMinutes,
+        summary: dto.summary,
+      };
+
+      const updatedMovie = await this.moviesRepo.updateOneByUUID(id, movieUpdate);
+      if (updatedMovie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      return MoviesMapper.Movie2MovieDTO(updatedMovie);
+    } catch (error) {
+      this.logger.error(`Failed to update movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async updatePosterForOne(id: string, posterFile: FileInStorage): Promise<MovieDTO> {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      if (posterFile == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      const movie = await this.moviesRepo.findOneByUUID(id);
+      if (movie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
+
+      movie.posterID = posterID;
+      await this.moviesRepo.updateOneByUUID(id, movie);
+
+      return MoviesMapper.Movie2MovieDTO(movie);
+    } catch (error) {
+      this.logger.error(`Failed to replace poster for movie with this ${id}: ${error.message}`);
       throw error;
     }
   }
@@ -80,39 +153,19 @@ export class MoviesService {
   public async findOne(id: string): Promise<MovieDTO> {
     try {
       if (id == null) {
-        throw new BadRequestException('id can not be null');
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
-      const movie = await this.moviesRepo.findByUUID(id);
+      const movie = await this.moviesRepo.findOneByUUID(id);
 
       if (movie == null) {
-        throw new BadRequestException('requested movie does not exist');
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      const movieDTO = createValidatedObject(MovieDTO, {
-        id: movie.uuid,
-        createdAt: movie.createdAt,
-        updatedAt: movie.updatedAt,
-        name: movie.name,
-        summary: movie.summary,
-        originallyReleasedAt: movie.originallyReleasedAt,
-        runtimeMinutes: movie.runtimeMinutes,
-        posterID: movie.posterID,
-        videoID: movie.videoID,
-      });
-
-      return movieDTO;
+      return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
       this.logger.error(`Failed to find movie with this ${id}: ${error.message}`);
       throw error;
     }
-  }
-
-  private createMovieHash({
-    name,
-    originallyReleasedAt,
-    runtimeMinutes,
-  }: Pick<Movie, 'name' | 'originallyReleasedAt' | 'runtimeMinutes'>): string {
-    return generateHash(name, originallyReleasedAt.toDateString(), runtimeMinutes.toString());
   }
 }
