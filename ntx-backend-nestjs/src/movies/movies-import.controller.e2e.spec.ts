@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
+import { ConsoleLogger as _ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigFactory, ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { tempLocalStorageOptionsFactory } from '@ntx-test/utils/temp-local-storage-options.factory';
@@ -55,14 +54,14 @@ describe('Movies API (e2e)', () => {
       ],
     }).compile();
 
-    // fetchMock.dontMock();
+    // fetchMock.dontMock(); // For when using real fetch is necessary
     tmdbFetchMocker = new TMDBFetchMocker();
     tmdbFetchMocker.initialize();
     tmdbFetchMocker.mockResponses();
 
     app = moduleFixture.createNestApplication();
     app.useLogger(false);
-    // app.useLogger(new ConsoleLogger()); // For debugging tests
+    // app.useLogger(new _ConsoleLogger()); // For debugging tests
     app.enableVersioning({ type: VersioningType.URI, defaultVersion: DEFAULT_CONTROLLER_VERSION });
     app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
 

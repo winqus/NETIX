@@ -31,7 +31,7 @@ describe('External Title Service (e2e)', () => {
       ],
     }).compile();
 
-    // fetchMock.dontMock();
+    // fetchMock.dontMock(); // For when using real fetch is necessary
     tmdbFetchMocker = new TMDBFetchMocker();
     tmdbFetchMocker.initialize();
     tmdbFetchMocker.mockResponses();
