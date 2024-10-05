@@ -210,12 +210,4 @@ export class MoviesService {
       throw error;
     }
   }
-
-  private createMovieHash({
-    name,
-    originallyReleasedAt,
-    runtimeMinutes,
-  }: Pick<Movie, 'name' | 'originallyReleasedAt' | 'runtimeMinutes'>): string {
-    return generateHash(name, originallyReleasedAt.toDateString(), runtimeMinutes.toString());
-  }
 }
