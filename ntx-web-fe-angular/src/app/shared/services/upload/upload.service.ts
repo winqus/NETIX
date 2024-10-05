@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { IUploadService } from './IUpload.service.interface';
-import { MovieData, MovieDTO } from '@ntx-shared/models/movie.dto';
+import { UpdateMovieDTO, MovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
 
 @Injectable({
@@ -27,7 +27,7 @@ export class UploadService implements IUploadService {
     );
   }
 
-  updateMovieMetadata(id: string, movieData: MovieData): Observable<MovieDTO> {
+  updateMovieMetadata(id: string, movieData: UpdateMovieDTO): Observable<MovieDTO> {
     const url = getMovieUrl(id);
     const httpOptions = {
       headers: {

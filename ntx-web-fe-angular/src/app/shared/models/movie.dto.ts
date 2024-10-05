@@ -10,7 +10,7 @@ export interface MovieDTO {
   videoID?: string;
 }
 
-export interface MovieData {
+export interface UpdateMovieDTO {
   name: string;
   summary: string;
   originallyReleasedAt: Date;

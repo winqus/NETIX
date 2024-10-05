@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
-import { MovieDTO, MovieData } from '@ntx-shared/models/movie.dto';
+import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { UploadService } from '@ntx-shared/services/upload/upload.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
@@ -75,7 +75,7 @@ export class InspectMovieComponent implements OnInit {
     if (this.movie == null) return;
 
     if (this.movieTitleEditForm.valid) {
-      const movieData: MovieData = {
+      const movieData: UpdateMovieDTO = {
         name: this.movieTitleEditForm.get('title')?.value,
         summary: this.movieTitleEditForm.get('summary')?.value,
         originallyReleasedAt: this.movieTitleEditForm.get('originallyReleasedAt')?.value,
