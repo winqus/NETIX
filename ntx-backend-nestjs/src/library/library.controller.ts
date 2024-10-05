@@ -36,7 +36,7 @@ export class LibraryController {
     }
 
     const providersList: Providers[] = [];
-    for (const provider in providers.split(',')) {
+    for (const provider of providers.split(',')) {
       if (Object.keys(Providers).includes(provider)) {
         providersList.push(provider as Providers);
       } else {
