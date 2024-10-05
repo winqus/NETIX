@@ -3,17 +3,17 @@ import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
 export abstract class EntityRepository<T> {
   constructor(protected readonly entityModel: Model<T & Document>) {}
 
-  public async exists(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+  protected async exists(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
     const entity = await this.entityModel.findOne(entityFilterQuery).exec();
 
     return entity != null;
   }
 
-  public async findByUUID(uuid: string): Promise<T | null> {
+  protected async findByUUID(uuid: string): Promise<T | null> {
     return this.entityModel.findOne({ uuid }, { _id: 0, __v: 0 }).exec();
   }
 
-  public async findOne(entityFilterQuery: FilterQuery<T>, projection?: Record<string, unknown>): Promise<T | null> {
+  protected async findOne(entityFilterQuery: FilterQuery<T>, projection?: Record<string, unknown>): Promise<T | null> {
     return this.entityModel
       .findOne(entityFilterQuery, {
         _id: 0,
@@ -23,11 +23,11 @@ export abstract class EntityRepository<T> {
       .exec();
   }
 
-  public async find(entityFilterQuery: FilterQuery<T>): Promise<T[] | null> {
+  protected async find(entityFilterQuery: FilterQuery<T>): Promise<T[] | null> {
     return this.entityModel.find(entityFilterQuery);
   }
 
-  public async create(createEntityData: unknown): Promise<T> {
+  protected async create(createEntityData: unknown): Promise<T> {
     const entity = new this.entityModel(createEntityData);
 
     const savedEntity = (await entity.save()).toObject({
@@ -42,7 +42,7 @@ export abstract class EntityRepository<T> {
     return savedEntity;
   }
 
-  public async findOneAndUpdate(
+  protected async findOneAndUpdate(
     entityFilterQuery: FilterQuery<T>,
     updateEntityData: UpdateQuery<unknown>,
   ): Promise<T | null> {
@@ -51,13 +51,13 @@ export abstract class EntityRepository<T> {
     });
   }
 
-  public async deleteOne(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+  protected async deleteOne(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
     const deleteResult = await this.entityModel.deleteOne(entityFilterQuery);
 
     return deleteResult.deletedCount === 1;
   }
 
-  public async deleteMany(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+  protected async deleteMany(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
     const deleteResult = await this.entityModel.deleteMany(entityFilterQuery);
 
     return deleteResult.deletedCount >= 1;

@@ -4,10 +4,15 @@ import { CreateMovieDTO } from './dto/create-movie.dto';
 
 export const MOVIES_CONTROLLER_BASE_PATH = 'movies';
 export const MOVIES_CONTROLLER_VERSION = '1';
+export const MOVIES_IMPORT_CONTROLLER_BASE_PATH = 'movies-import';
+export const MOVIES_IMPORT_CONTROLLER_VERSION = '1';
 export const MOVIES_POSTER_TEMP_STORAGE_CONTAINER = 'raw-uploads';
 export const MOVIES_POSTER_INPUT_MIME_TYPES = ['image/webp', 'application/octet-stream'];
 export const MOVIES_POSTER_MAX_SIZE_IN_BYTES = 102_400; // 100 KB
 export const MOVIES_POSTER_FILE_FIELD_NAME = 'poster';
+export const MOVIES_POSTER_DEFAULT_ID = 'MT-default-poster';
+export const MOVIES_ID_PREFIX = 'MT-';
+export const MOVIES_ID_LENGTH = 15;
 
 export const MOVIES_POSTER_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
   container: MOVIES_POSTER_TEMP_STORAGE_CONTAINER,
@@ -28,8 +33,10 @@ export const MOVIES_MODEL_TOKEN = 'MOVIES_MODEL';
 export const MOVIES_SCHEMA_NAME = 'Movie';
 
 /* Errors */
+export const MOVIES_EMPTY_DTO_ERROR = 'Empty DTO provided';
 export const MOVIES_NO_FILE_PROVIDED_ERROR = 'No file provided';
 export const MOVIES_NO_ID_PROVIDED_ERROR = 'No id provided';
+export const MOVIES_NOT_FOUND_ERROR = 'Movie not found';
 
 /* Swagger */
 export const MOVIES_SWAGGER_TAG = 'movies';

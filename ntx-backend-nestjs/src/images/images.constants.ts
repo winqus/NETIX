@@ -2,6 +2,7 @@ import { PosterSize } from './images.types';
 
 export const POSTER_CONTROLLER_BASE_PATH = 'poster';
 export const POSTER_CONTROLLER_VERSION = '1';
+export const IMAGES_PROXY_CONTROLLER_BASE_PATH = 'images-proxy';
 
 export const POSTER_MIME_TYPE = 'image/webp';
 export const POSTER_EXTENTION = 'webp';
@@ -22,4 +23,4 @@ export const IMAGES_POSTER_SIZES: Record<PosterSize, { width: number; height: nu
 export const POSTER_NO_ID_PROVIDED_ERROR = 'No id provided';
 
 /* Swagger */
-export const POSTER_SWAGGER_TAG = 'posters';
+export const IMAGES_SWAGGER_TAG = 'images';
