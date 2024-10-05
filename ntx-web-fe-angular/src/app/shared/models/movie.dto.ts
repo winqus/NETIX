@@ -9,3 +9,10 @@ export interface MovieDTO {
   posterID: string;
   videoID?: string;
 }
+
+export interface MovieData {
+  name: string;
+  summary: string;
+  originallyReleasedAt: Date;
+  runtimeMinutes: number;
+}
