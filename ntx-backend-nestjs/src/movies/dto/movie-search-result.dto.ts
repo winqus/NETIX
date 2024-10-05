@@ -6,7 +6,7 @@ export interface MovieSearchResultDTO {
   results: MovieSearchResultItem[];
 }
 
-interface MovieSearchResultItem {
+export interface MovieSearchResultItem {
   type: TitleType.MOVIE;
   metadata: MovieResultMetadata;
   weight: number;
