@@ -61,4 +61,35 @@ export class LibraryController {
 
     return this.libraryService.searchByName(query, providersList, [TitleType.MOVIE], limit);
   }
+
+  @Get('external-movies/:id/metadata')
+  @ApiQuery({ name: 'providerID', required: true, type: String, example: 'TMDB' })
+  @ApiQuery({ name: 'type', required: true, enum: TitleType, example: TitleType.MOVIE })
+  public async getExternalTitleMetadata(
+    @Param('id') id: string,
+    @Query('providerID') providerID: string,
+    @Query('type') type: TitleType,
+  ) {
+    this.logger.log(`Fetching metadata for external ID: ${id}, provider: ${providerID}, type: ${type}`);
+
+    if (!id?.trim()) {
+      throw new BadRequestException('ID parameter is required');
+    }
+
+    if (!providerID?.trim()) {
+      throw new BadRequestException('Provider ID parameter is required');
+    }
+
+    if (!Object.values(TitleType).includes(type)) {
+      throw new BadRequestException('Invalid title type');
+    }
+
+    const metadataRequest = {
+      externalID: id.trim(),
+      providerID: providerID.trim(),
+      type,
+    };
+
+    return this.externalTitleService.getTitleMetadata(metadataRequest);
+  }
 }
