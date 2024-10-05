@@ -1,12 +1,27 @@
-import { ExternalSearchResultDTO } from './external-search-result.dto';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { ExternalTitleSearchResultItem } from '@ntx/external-providers/external-providers.types';
+import { MovieResultMetadata } from '@ntx/movies/dto/movie-search-result.dto';
 
 export interface SearchResultDTO {
   size: number;
-  results: [
+  searchResults: [
     {
-      id: string;
+      id: 'ntx';
       size: number;
-      searchResults: ExternalSearchResultDTO[];
+      results: SearchResultItem[];
+    },
+    {
+      id: 'ntx-discovery';
+      size: number;
+      results: ExternalTitleSearchResultItem[];
     },
   ];
+}
+
+export interface SearchResultItem {
+  type: TitleType.MOVIE;
+  metadata: MovieResultMetadata;
+  weight: number;
+  posterURL?: string;
+  backdropURL?: string;
 }

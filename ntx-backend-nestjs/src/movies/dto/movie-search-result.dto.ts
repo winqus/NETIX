@@ -1,7 +1,19 @@
-import { MovieResultShortMetadata } from './movie-result-short-metadata.dto';
+import { TitleResultMetadata } from '@ntx/common/interfaces/title-result-metadata.interface';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 
 export interface MovieSearchResultDTO {
-  providerID: 'ntx';
-  resultWeight: 1.0;
-  shortMovieMetadata: MovieResultShortMetadata;
+  size: number;
+  results: MovieSearchResultItem[];
+}
+
+interface MovieSearchResultItem {
+  type: TitleType.MOVIE;
+  metadata: MovieResultMetadata;
+  weight: number;
+  posterURL?: string;
+  backdropURL?: string;
+}
+
+export interface MovieResultMetadata extends TitleResultMetadata {
+  runtimeMinutes: number;
 }
