@@ -118,23 +118,29 @@ export class MoviesService {
       const movies = await this.moviesRepo.findAllByName(name);
 
       if (!movies.length) {
-        throw new BadRequestException('No movies found with the given name');
+        this.logger.warn(`No movies found with the given name "${name}"`);
+
+        return [];
       }
 
-      const movieSearchResults = movies.map((movie) => {
-        return {
-          providerID: 'ntx' as const, // Literal type 'ntx'
-          resultWeight: 1 as const, // Literal type 1
-          shortMovieMetadata: {
-            title: movie.name,
-            type: movie.type,
+      const movieSearchResults: MovieSearchResultDTO = {
+        size: movies.length,
+        results: movies.map((movie) => ({
+          type: TitleType.MOVIE,
+          metadata: {
+            name: movie.name,
+            originalName: movie.name,
+            summary: movie.summary,
             releaseDate: movie.originallyReleasedAt.toISOString(),
-            posterID: movie.posterID || '', // Handle optional posterID
+            runtimeMinutes: movie.runtimeMinutes,
           },
-        };
-      });
+          weight: 1,
+          posterURL: movie.posterID ? `/poster/${movie.posterID}` : undefined,
+          backdropURL: undefined,
+        })),
+      };
 
-      return movieSearchResults;
+      return [movieSearchResults];
     } catch (error) {
       this.logger.error(`Failed to find movies by name "${name}": ${error.message}`);
       throw error;
