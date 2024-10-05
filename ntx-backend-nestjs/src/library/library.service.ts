@@ -1,42 +1,73 @@
-import { Injectable, Logger } from '@nestjs/common';
+// library.service.ts
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { MovieSearchResultDTO } from '../movies/dto/movie-search-result.dto';
+import { ExternalTitleService } from '@ntx/external-providers/external-title.service';
+import { MovieSearchResultDTO, MovieSearchResultItem } from '../movies/dto/movie-search-result.dto';
 import { MoviesService } from '../movies/movies.service';
-import { ExternalProviders } from './library.constants';
+import { Providers } from './library.constants';
 
 @Injectable()
-export class ExternalTitleSearchService {
+export class LibraryService {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly moviesService: MoviesService) {}
+  constructor(
+    @Inject() private readonly moviesService: MoviesService,
+    @Inject() private readonly extTitlesService: ExternalTitleService,
+  ) {}
 
-  /**
-   * Triggers search by movie name when provider is ntx.
-   * @param query - The search query (e.g., "shrek")
-   * @param provider - The provider to search from (e.g., 'ntx')
-   * @returns MovieSearchResultDTO[] - The result DTO array for the movie search
-   */
   public async searchByName(
     query: string,
-    provider: (typeof ExternalProviders)[keyof typeof ExternalProviders],
-  ): Promise<MovieSearchResultDTO[]> {
-    this.logger.log(`Searching movie by name: ${query} for provider: ${provider}`);
+    providers: Providers[],
+    types: TitleType[],
+    limit: number,
+  ): Promise<MovieSearchResultDTO> {
+    this.logger.log(`Searching movie by name: ${query} for provider: ${providers}`);
+    const resultDto: MovieSearchResultDTO = { size: 0, results: [] };
 
-    if (provider === ExternalProviders.NTX) {
-      return await this.moviesService.findAllByName(query);
-    } else {
-      const movieSearchResult: MovieSearchResultDTO = {
-        providerID: 'ntx',
-        resultWeight: 1,
-        shortMovieMetadata: {
-          title: 'Shrek',
-          type: TitleType.MOVIE,
-          releaseDate: '2001-05-18',
-          posterID: 'some-poster-id',
-        },
-      };
-
-      return [movieSearchResult];
+    if (providers.includes(Providers.NTX)) {
+      const moviesResults = await this.moviesService.findAllByName(query);
+      moviesResults.forEach((movieResult) => {
+        resultDto.results.push(...movieResult.results);
+        resultDto.size += movieResult.size;
+      });
     }
+
+    if (providers.includes(Providers.NTX_DISCOVERY)) {
+      const extResults = await this.extTitlesService.search({
+        query: query,
+        types: types,
+        maxResults: limit,
+      });
+
+      const movieResults = extResults.results
+        .filter((result) => result.type === TitleType.MOVIE)
+        .map((result) => {
+          const movieResultItem: MovieSearchResultItem = {
+            type: TitleType.MOVIE,
+            metadata: {
+              name: result.metadata.name,
+              originalName: result.metadata.originalName,
+              summary: result.metadata.summary,
+              releaseDate: result.metadata.releaseDate,
+              runtimeMinutes: result.metadata.runtimeMinutes ?? 0,
+            },
+            weight: result.weight,
+            posterURL: result.posterURL,
+            backdropURL: result.backdropURL,
+          };
+
+          return movieResultItem;
+        });
+
+      resultDto.results.push(...movieResults);
+      resultDto.size += movieResults.length;
+    }
+
+    resultDto.results.sort((a, b) => b.weight - a.weight);
+
+    resultDto.results = resultDto.results.slice(0, limit);
+    resultDto.size = resultDto.results.length;
+
+    return resultDto;
   }
 }
