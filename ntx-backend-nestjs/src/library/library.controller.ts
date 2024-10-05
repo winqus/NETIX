@@ -10,9 +10,6 @@ import {
 } from './library.constants';
 import { LibraryService } from './library.service';
 
-// @ApiTags('Library')
-// @Controller('api/v1/library')
-
 @ApiTags(LIBRARY_SWAGGER_TAG)
 @Controller({
   path: LIBRARY_CONTROLLER_BASE_PATH,
