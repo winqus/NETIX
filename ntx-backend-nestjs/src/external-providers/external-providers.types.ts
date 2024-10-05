@@ -9,6 +9,7 @@ export interface ExternalTitle<T extends TitleType = TitleType> {
 }
 
 export interface ExternalTitleMetadata {
+  runtimeMinutes: number;
   name: string;
   originalName: string;
   summary: string;
