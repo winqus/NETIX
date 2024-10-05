@@ -2,7 +2,6 @@ import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { ExternalTitleService } from '@ntx/external-providers/external-title.service';
-import { MovieSearchResultDTO } from '../movies/dto/movie-search-result.dto';
 import { MoviesService } from '../movies/movies.service';
 import { Providers } from './library.constants';
 import { LibraryController } from './library.controller';
@@ -104,7 +103,7 @@ describe('LibraryController', () => {
   });
 
   it('should call searchByName when provider is NTX', async () => {
-    const result = await controller.search('MOVIE', 'NTX', 10, 'shrek');
+    const result = await controller.search('shrek', 'MOVIE', 'NTX', 10);
 
     expect(libraryService.searchByName).toHaveBeenCalledWith('shrek', [Providers.NTX], [TitleType.MOVIE], 10);
     expect(result).toEqual({
@@ -125,7 +124,7 @@ describe('LibraryController', () => {
   });
 
   it('should call searchByName with NTX_DISCOVERY provider', async () => {
-    const result = await controller.search('MOVIE', 'NTX_DISCOVERY', 10, 'shrek');
+    const result = await controller.search('shrek', 'MOVIE', 'NTX_DISCOVERY', 10);
 
     expect(libraryService.searchByName).toHaveBeenCalledWith('shrek', [Providers.NTX_DISCOVERY], [TitleType.MOVIE], 10);
     expect(result).toEqual({
@@ -148,17 +147,17 @@ describe('LibraryController', () => {
   });
 
   it('should throw BadRequestException when query is missing', async () => {
-    await expect(controller.search('MOVIE', 'NTX', 10, '')).rejects.toThrowError(BadRequestException);
+    await expect(controller.search('MOVIE', 'NTX', '', 10)).rejects.toThrowError(BadRequestException);
   });
 
   it('should throw BadRequestException for invalid provider', async () => {
-    await expect(controller.search('MOVIE', 'unsupported-provider', 10, 'shrek')).rejects.toThrowError(
+    await expect(controller.search('MOVIE', 'unsupported-provider', 'shrek', 10)).rejects.toThrowError(
       BadRequestException,
     );
   });
 
   it('should throw BadRequestException when limit is invalid', async () => {
-    await expect(controller.search('MOVIE', 'NTX', 101, 'shrek')).rejects.toThrowError(BadRequestException);
-    await expect(controller.search('MOVIE', 'NTX', 0, 'shrek')).rejects.toThrowError(BadRequestException);
+    await expect(controller.search('MOVIE', 'NTX', 'shrek', 101)).rejects.toThrowError(BadRequestException);
+    await expect(controller.search('MOVIE', 'NTX', 'shrek', 0)).rejects.toThrowError(BadRequestException);
   });
 });

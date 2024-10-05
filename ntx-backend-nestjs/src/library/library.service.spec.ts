@@ -4,6 +4,7 @@ import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { ExternalTitleService } from '@ntx/external-providers/external-title.service';
 import { MovieSearchResultDTO } from '../movies/dto/movie-search-result.dto';
 import { MoviesService } from '../movies/movies.service';
+import { SearchResultDTO } from './dto/search-result-dto';
 import { Providers } from './library.constants';
 import { LibraryService } from './library.service';
 
@@ -70,8 +71,8 @@ describe('LibraryService', () => {
     const result = await service.searchByName(query, providers, types, limit);
 
     expect(moviesService.findAllByName).toHaveBeenCalledWith(query);
-    expect(result.size).toEqual(movieSearchResult.size);
-    expect(result.results).toEqual(movieSearchResult.results);
+    expect(result.size).toEqual(1);
+    expect(result.searchResults[0].results).toEqual(movieSearchResult.results);
   });
 
   it('should call ExternalTitleService when provider includes NTX_DISCOVERY', async () => {
@@ -110,8 +111,8 @@ describe('LibraryService', () => {
       types,
       maxResults: limit,
     });
-    expect(result.results.length).toBeGreaterThan(0);
-    expect(result.results[0].metadata.name).toEqual('Shrek');
+    expect(result.searchResults[1].results.length).toBeGreaterThan(0);
+    expect(result.searchResults[1].results[0].metadata.name).toEqual('Shrek');
   });
 
   it('should limit the results to the provided limit', async () => {
@@ -157,7 +158,7 @@ describe('LibraryService', () => {
     const result = await service.searchByName(query, providers, types, limit);
 
     expect(result.size).toEqual(limit);
-    expect(result.results.length).toEqual(limit);
+    expect(result.searchResults[0].results.length).toEqual(limit);
   });
 
   it('should log search query and providers', async () => {
@@ -181,7 +182,13 @@ describe('LibraryService', () => {
     const types = [TitleType.MOVIE];
     const limit = 10;
 
-    const expectedResult = { results: [], size: 0 };
+    const expectedResult: SearchResultDTO = {
+      size: 0,
+      searchResults: [
+        { id: 'ntx', size: 0, results: [] },
+        { id: 'ntx-discovery', size: 0, results: [] },
+      ],
+    };
 
     const result = await service.searchByName(query, invalidProvider, types, limit);
 
