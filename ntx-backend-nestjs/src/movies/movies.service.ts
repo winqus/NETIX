@@ -1,8 +1,12 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { FileInStorage } from '@ntx/file-storage/types';
+import { PosterSize } from '@ntx/images/images.types';
 import { PosterService } from '@ntx/images/poster.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
+import { MovieSearchResultDTO } from './dto/movie-search-result.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
 import { Movie } from './entities/movie.entity';
@@ -165,6 +169,44 @@ export class MoviesService {
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
       this.logger.error(`Failed to find movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async findAllByName(name: string): Promise<MovieSearchResultDTO[]> {
+    try {
+      if (!name) {
+        throw new BadRequestException('name can not be null or empty');
+      }
+
+      const movies = await this.moviesRepo.findAllByName(name);
+
+      if (!movies.length) {
+        this.logger.warn(`No movies found with the given name "${name}"`);
+
+        return [];
+      }
+
+      const movieSearchResults: MovieSearchResultDTO = {
+        size: movies.length,
+        results: movies.map((movie) => ({
+          type: TitleType.MOVIE,
+          metadata: {
+            name: movie.name,
+            originalName: movie.name,
+            summary: movie.summary,
+            releaseDate: movie.originallyReleasedAt.toISOString(),
+            runtimeMinutes: movie.runtimeMinutes,
+          },
+          weight: 1,
+          posterURL: movie.posterID ? `/api/v1/poster/${movie.posterID}?size=${PosterSize.XS}` : undefined,
+          backdropURL: undefined,
+        })),
+      };
+
+      return [movieSearchResults];
+    } catch (error) {
+      this.logger.error(`Failed to find movies by name "${name}": ${error.message}`);
       throw error;
     }
   }

@@ -12,6 +12,18 @@ export class MoviesRepository extends EntityRepository<Movie> {
     super(model);
   }
 
+  public async findAllByName(name: string): Promise<Movie[]> {
+    const query: FilterQuery<MovieDocument> = {
+      name: { $regex: new RegExp(name, 'i') },
+    };
+
+    const movieDocuments = await this.model.find(query).exec();
+
+    const movies: Movie[] = movieDocuments.map(this.mapMovieDocumentToMovie);
+
+    return movies;
+  }
+
   public async createOne(movie: Movie): Promise<Movie> {
     const created = await super.create(movie);
 
@@ -42,5 +54,21 @@ export class MoviesRepository extends EntityRepository<Movie> {
     const updated = await super.findOneAndUpdate(query, update);
 
     return updated == null ? null : MoviesMapper.any2Movie(updated);
+  }
+
+  private mapMovieDocumentToMovie(document: MovieDocument): Movie {
+    return {
+      uuid: document.uuid,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+      posterID: document.posterID,
+      name: document.name,
+      type: document.type,
+      hash: document.hash,
+      originallyReleasedAt: document.originallyReleasedAt,
+      summary: document.summary,
+      runtimeMinutes: document.runtimeMinutes,
+      videoID: document.videoID,
+    };
   }
 }

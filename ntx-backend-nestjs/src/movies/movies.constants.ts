@@ -40,13 +40,3 @@ export const MOVIES_NOT_FOUND_ERROR = 'Movie not found';
 
 /* Swagger */
 export const MOVIES_SWAGGER_TAG = 'movies';
-export const MOVIES_CREATE_SWAGGER_API_BODY_OPTIONS: ApiBodyOptions = {
-  schema: {
-    type: 'object',
-    allOf: [
-      { $ref: getSchemaPath(CreateMovieDTO) },
-      { properties: { poster: { type: 'string', format: 'binary' } }, required: ['poster'] },
-    ],
-  },
-  description: 'Body combines properties of CreateMovieDTO and a <i>poster</i> file in multipart/form-data format.',
-};
