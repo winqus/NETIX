@@ -1,5 +1,6 @@
-export const CONTROLLER_BASE_PATH = 'api/v1/library';
-export const CONTROLLER_VERSION = '1';
+export const LIBRARY_CONTROLLER_BASE_PATH = 'library';
+export const LIBRARY_CONTROLLER_VERSION = '1';
+export const LIBRARY_SWAGGER_TAG = 'library';
 
 export enum Providers {
   NTX = 'NTX',

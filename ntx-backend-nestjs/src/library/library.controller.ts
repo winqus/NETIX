@@ -2,11 +2,22 @@ import { BadRequestException, Controller, Get, Logger, Query } from '@nestjs/com
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { MovieSearchResultDTO } from '../movies/dto/movie-search-result.dto';
-import { Providers } from './library.constants';
+import {
+  LIBRARY_CONTROLLER_BASE_PATH,
+  LIBRARY_CONTROLLER_VERSION,
+  LIBRARY_SWAGGER_TAG,
+  Providers,
+} from './library.constants';
 import { LibraryService } from './library.service';
 
-@ApiTags('Library')
-@Controller('api/v1/library')
+// @ApiTags('Library')
+// @Controller('api/v1/library')
+
+@ApiTags(LIBRARY_SWAGGER_TAG)
+@Controller({
+  path: LIBRARY_CONTROLLER_BASE_PATH,
+  version: LIBRARY_CONTROLLER_VERSION,
+})
 export class LibraryController {
   private readonly logger = new Logger(this.constructor.name);
 
