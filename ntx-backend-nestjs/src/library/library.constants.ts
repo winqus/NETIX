@@ -7,4 +7,4 @@ export enum Providers {
   NTX_DISCOVERY = 'NTX_DISCOVERY',
 }
 
-export const DEFAULT_SEARCH_LIMIT = 10;
+export const LIBRARY_DEFAULT_SEARCH_LIMIT = 10;
