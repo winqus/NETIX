@@ -3,17 +3,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { MovieSearchResultDTO } from '../movies/dto/movie-search-result.dto';
 import { MoviesService } from '../movies/movies.service';
-import { ExternalProviders } from './library.constants';
-import { ExternalTitleSearchService } from './library.service'; // Adjust the path accordingly
+import { Providers } from './library.constants';
+import { LibraryService } from './library.service'; // Adjust the path accordingly
 
 describe('ExternalTitleSearchService', () => {
-  let service: ExternalTitleSearchService;
+  let service: LibraryService;
   let moviesService: MoviesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ExternalTitleSearchService,
+        LibraryService,
         {
           provide: MoviesService,
           useValue: {
@@ -23,7 +23,7 @@ describe('ExternalTitleSearchService', () => {
       ],
     }).compile();
 
-    service = module.get<ExternalTitleSearchService>(ExternalTitleSearchService);
+    service = module.get<LibraryService>(LibraryService);
     moviesService = module.get<MoviesService>(MoviesService);
   });
 
@@ -33,7 +33,7 @@ describe('ExternalTitleSearchService', () => {
 
   it('should call findAllByName when provider is NTX', async () => {
     const query = 'shrek';
-    const provider = ExternalProviders.NTX;
+    const provider = Providers.NTX;
     const movieSearchResult: MovieSearchResultDTO[] = [
       {
         providerID: 'ntx',
@@ -79,7 +79,7 @@ describe('ExternalTitleSearchService', () => {
 
   it('should log search query and provider', async () => {
     const query = 'shrek';
-    const provider = ExternalProviders.NTX;
+    const provider = Providers.NTX;
 
     const loggerSpy = jest.spyOn(Logger.prototype, 'log');
 
