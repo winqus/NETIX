@@ -3,6 +3,7 @@ import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
 import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { FileInStorage } from '@ntx/file-storage/types';
+import { PosterSize } from '@ntx/images/images.types';
 import { PosterService } from '@ntx/images/poster.service';
 import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { validateOrReject } from 'class-validator';
@@ -135,7 +136,7 @@ export class MoviesService {
             runtimeMinutes: movie.runtimeMinutes,
           },
           weight: 1,
-          posterURL: movie.posterID ? `/poster/${movie.posterID}` : undefined,
+          posterURL: movie.posterID ? `/api/v1/poster/${movie.posterID}?size=${PosterSize.XS}` : undefined,
           backdropURL: undefined,
         })),
       };
