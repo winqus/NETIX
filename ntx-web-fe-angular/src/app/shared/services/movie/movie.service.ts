@@ -10,7 +10,7 @@ import { API_CONFIG } from '@ntx-shared/config/api-endpoints';
 import WatchableVideoDTO from '@ntx-shared/models/watchableVideo.dto';
 import { WatchableVideoDTOMapper } from '@ntx-shared/mappers/WatchableVideoDTOMapper';
 import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
-import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +39,26 @@ export class MovieService implements IMovieService {
 
     return this.http.get(url, httpOptions).pipe(
       map((response: any) => {
+        return MovieDTOMapper.anyToMovieDTO(response);
+      }),
+      catchError((error) => {
+        console.error('Error fetching movie metadata:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateMovieMetadata(id: string, movieData: UpdateMovieDTO): Observable<MovieDTO> {
+    const url = getMovieUrl(id);
+    const httpOptions = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    return this.http.patch(url, movieData, httpOptions).pipe(
+      map((response: any) => {
+        console.log(response);
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
