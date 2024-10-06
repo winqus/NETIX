@@ -1,5 +1,10 @@
 import { TitleType } from './titleType.enum';
 
+export interface ExternalTitleDTO {
+  externalID: string;
+  providerID: string;
+}
+
 export interface ExternalMovieDTO {
   externalID: string;
   providerID: string;

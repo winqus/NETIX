@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs/internal/Subject';
@@ -28,15 +28,12 @@ export class SearchBarComponent implements OnInit {
 
   onSearchTermChange() {
     this.searchSubject.next(this.searchTerm);
-    // this.movieTitles = this.libraryService.getMovieTitles(this.searchTerm);
-    this.cdr.detectChanges();
   }
 
   selectMovie(result: any) {
     this.movieSelected.emit(result);
     console.log(result);
     this.results = null;
-    // this.movieSelected.emit(result);
   }
 
   ngOnInit(): void {

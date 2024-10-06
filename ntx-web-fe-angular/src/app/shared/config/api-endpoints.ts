@@ -1,4 +1,3 @@
-import { ur } from '@faker-js/faker/.';
 import { environment } from '@ntx/environments/environment';
 
 export const API_CONFIG = {
@@ -13,7 +12,10 @@ export const API_CONFIG = {
 export const SERVER = {
   baseUrl: environment.api.serverUrl + '/api',
   endpoints: {
-    movies: '/v1/movies',
+    movies: {
+      movies: '/v1/movies',
+      moviesImport: '/v1/movies-import',
+    },
     poster: '/v1/poster',
     imageProxy: '/v1/images-proxy',
     library: {
@@ -25,10 +27,14 @@ export const SERVER = {
 
 export function getMovieUrl(_id?: string): string {
   if (_id) {
-    return `${SERVER.baseUrl}${SERVER.endpoints.movies}/${_id}`;
+    return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}`;
   } else {
-    return `${SERVER.baseUrl}${SERVER.endpoints.movies}`;
+    return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}`;
   }
+}
+
+export function getMovieImporteUrl(): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.moviesImport}`;
 }
 
 export function getPoster(_id: string, _size?: string) {
@@ -37,6 +43,10 @@ export function getPoster(_id: string, _size?: string) {
   } else {
     return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
   }
+}
+
+export function replacePoster(_id: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/poster`;
 }
 
 export function getImageProxy(_url: string) {
