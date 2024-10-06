@@ -1,5 +1,9 @@
 import { TitleType } from '@ntx-shared/models/titleType.enum';
 
+export enum Provider {
+  NTX_DISCOVERY = 'NTX_DISCOVERY',
+}
+
 export interface LibrarySearchResultDTO {
   size: number;
   searchResults: [

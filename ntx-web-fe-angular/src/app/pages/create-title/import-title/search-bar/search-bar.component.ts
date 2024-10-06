@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
-import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
 import { Subject } from 'rxjs/internal/Subject';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { debounceTime } from 'rxjs/internal/operators/debounceTime';
+import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
+import { ExternalTitleSearchResultItem, Provider } from '@ntx-shared/models/librarySearch.dto';
+import { TitleType } from '@ntx-shared/models/titleType.enum';
 
 @Component({
   selector: 'app-search-bar',
@@ -16,8 +17,8 @@ import { debounceTime } from 'rxjs/internal/operators/debounceTime';
 })
 export class SearchBarComponent implements OnInit {
   private searchSubject = new Subject<string>();
-  @Input() results: ExternalTitleSearchResultItem[] = [];
-  @Output() movieSelected = new EventEmitter<string>();
+  results: ExternalTitleSearchResultItem[] | null = null;
+  @Output() movieSelected = new EventEmitter<ExternalTitleSearchResultItem>();
   searchTerm: string = '';
 
   constructor(
@@ -28,18 +29,21 @@ export class SearchBarComponent implements OnInit {
   onSearchTermChange() {
     this.searchSubject.next(this.searchTerm);
     // this.movieTitles = this.libraryService.getMovieTitles(this.searchTerm);
-    // this.cdr.detectChanges();
+    this.cdr.detectChanges();
   }
 
   selectMovie(result: any) {
     this.movieSelected.emit(result);
-    this.results = [];
-    this.movieSelected.emit(result);
+    console.log(result);
+    this.results = null;
+    // this.movieSelected.emit(result);
   }
 
   ngOnInit(): void {
     this.searchSubject.pipe(debounceTime(500)).subscribe(async (tempSearchTerm: string) => {
-      const result = await firstValueFrom(this.libraryService.search(tempSearchTerm));
+      if (tempSearchTerm == null || '') return;
+
+      const result = await firstValueFrom(this.libraryService.search(tempSearchTerm, TitleType.MOVIE, Provider.NTX_DISCOVERY));
 
       this.results = result.searchResults[1].results;
       console.log(tempSearchTerm);

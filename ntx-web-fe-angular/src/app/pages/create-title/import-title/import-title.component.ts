@@ -4,9 +4,11 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { ExternalMovieService } from '@ntx-shared/services/externalMovie/externalMovie.service';
 import { environment } from '@ntx/environments/environment';
 import { SearchBarComponent } from '@ntx-pages/create-title/import-title/search-bar/search-bar.component';
 import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
+import { ExternalMovieDTO } from '@ntx-shared/models/externalMovie.dto';
 
 @Component({
   selector: 'app-import-title',
@@ -19,7 +21,6 @@ export class ImportTitleComponent implements OnInit {
   imageAccept: string = '';
   errorMessage: string = '';
 
-  searchResults: ExternalTitleSearchResultItem[] = [];
   selectedResultPosterURL: string | null = null;
 
   titleCreationForm = new FormGroup({
@@ -36,6 +37,7 @@ export class ImportTitleComponent implements OnInit {
 
   constructor(
     private uploadMovie: MovieService,
+    private externalMovie: ExternalMovieService,
     private router: Router
   ) {}
 
@@ -128,15 +130,30 @@ export class ImportTitleComponent implements OnInit {
     return !!(control && control.invalid && control.touched);
   }
 
-  onMovieSelected(movie: any) {
-    this.updateFields(movie);
-    this.isFormValid();
-    this.selectedResultPosterURL = movie.posterURL;
+  onMovieSelected(movie: ExternalTitleSearchResultItem) {
+    if (movie == null) return;
+    console.log(movie);
+
+    this.externalMovie.getExternalMovieMetadata(movie.externalID, movie.providerID).subscribe({
+      next: (response) => {
+        if (environment.development) console.log('External movie load successful:', response);
+
+        this.updateFields(response);
+        this.isFormValid();
+
+        if (movie.posterURL != null) this.selectedResultPosterURL = movie.posterURL;
+      },
+      error: (errorResponse) => {
+        this.errorMessage = errorResponse.error.message;
+        if (environment.development) console.error('Error loading external movie metadata:', errorResponse);
+      },
+    });
   }
 
-  updateFields(movie: any) {
+  updateFields(movie: ExternalMovieDTO) {
     this.titleCreationForm.patchValue({ title: movie.metadata.name });
-    this.titleCreationForm.patchValue({ summary: movie.metadata.summary || movie.name + ' summary blablabla' });
+    this.titleCreationForm.patchValue({ summary: movie.metadata.summary });
     this.titleCreationForm.patchValue({ originallyReleasedAt: movie.metadata.releaseDate });
+    this.titleCreationForm.patchValue({ runtimeMinutes: movie.metadata.runtime.toString() });
   }
 }
