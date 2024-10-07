@@ -1,35 +1,53 @@
 name: Frontend CI
 
 on:
+  push:
+    branches:
+      - 'develop'
+    paths: 
+      - 'ntx-web-fe-angular/**'
   pull_request:
     paths:
       - 'ntx-web-fe-angular/**'
 
 jobs:
   frontend:
-    name: Frontend Build and Test
-    runs-on: ubuntu-latest
+    name: Angular FE APP Build and Test
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    concurrency:
+      group: frontend-ci-${{ github.ref }}
+      cancel-in-progress: true
+
+    strategy:
+      matrix:
+        node-version: [20.x]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Cache node modules
+        id: cache-node-modules
+        uses: actions/cache@v4
         with:
-          node-version: '20'
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ntx-web-fe-angular/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/ntx-web-fe-angular/package-lock.json') }}
+          path: ./ntx-web-fe-angular/node_modules
+          key: ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-web-fe-angular/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      - name: Install dependencies
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/ntx-web-fe-angular/package-lock.json'
+
+      - name: Install dependencies (if node_modules cache not found)
+        if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
         working-directory: ntx-web-fe-angular
-        run: npm install
+        run: npm ci
 
       - name: Run lint
         working-directory: ntx-web-fe-angular
