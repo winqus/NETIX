@@ -1,8 +1,9 @@
-import { BadRequestException, Controller, Get, Logger, Param, Query } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Controller, Get, Logger, NotFoundException, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
-import { ExternalTitleService } from '../external-providers/external-title.service'; // Import the external title service
+import { ExternalTitleMetadataResult } from '@ntx/external-providers/external-providers.types';
+import { ExternalTitleService } from '../external-providers/external-title.service';
 import { SearchResultDTO } from './dto/search-result-dto';
 import {
   LIBRARY_CONTROLLER_BASE_PATH,
@@ -12,6 +13,7 @@ import {
   Providers,
 } from './library.constants';
 import { LibraryService } from './library.service';
+import { ApiDocsForGetExternalTitleMetadata, ApiDocsForSearch } from './swagger/api-docs.decorators';
 
 @ApiTags(LIBRARY_SWAGGER_TAG)
 @Controller({
@@ -27,10 +29,7 @@ export class LibraryController {
   ) {}
 
   @Get('search')
-  @ApiQuery({ name: 'types', required: true, type: String })
-  @ApiQuery({ name: 'providers', required: true, type: String })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'query', required: true, type: String, example: 'shrek' })
+  @ApiDocsForSearch()
   public async search(
     @Query('query') query: string,
     @Query('types') types: string,
@@ -64,8 +63,11 @@ export class LibraryController {
   }
 
   @Get('external-movies/:id/metadata')
-  @ApiQuery({ name: 'providerID', required: true, type: String, example: 'TMDB' })
-  public async getExternalTitleMetadata(@Param('id') id: string, @Query('providerID') providerID: string) {
+  @ApiDocsForGetExternalTitleMetadata()
+  public async getExternalTitleMetadata(
+    @Param('id') id: string,
+    @Query('providerID') providerID: string,
+  ): Promise<ExternalTitleMetadataResult<TitleType>> {
     this.logger.log(`Fetching metadata for external ID: ${id}, provider: ${providerID}, type: MOVIE`);
 
     if (!id?.trim()) {
@@ -91,6 +93,12 @@ export class LibraryController {
       type: TitleType.MOVIE,
     };
 
-    return this.externalTitleService.getTitleMetadata(metadataRequest);
+    const result = await this.externalTitleService.getTitleMetadata(metadataRequest);
+
+    if (!result) {
+      throw new NotFoundException('Metadata not found');
+    }
+
+    return result;
   }
 }
