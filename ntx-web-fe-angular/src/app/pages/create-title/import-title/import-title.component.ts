@@ -11,8 +11,8 @@ import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.
 import { ExternalMovieDTO } from '@ntx-shared/models/externalMovie.dto';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { formatDate } from '@ntx-shared/services/utils/utils';
-import { UpdateMovieDTO } from '@ntx/app/shared/models/movie.dto';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 
 @Component({
   selector: 'app-import-title',
@@ -51,7 +51,7 @@ export class ImportTitleComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return this.externalTitleCreationForm.valid && (this.imageFile !== null || this.selectedResultPosterURL !== null);
+    return this.externalTitleCreationForm.valid && this.imageFile !== null;
   }
 
   onSubmit() {
@@ -72,26 +72,6 @@ export class ImportTitleComponent implements OnInit {
           if (environment.development) console.log('External movie upload successful:', response);
           movieId = response.id;
         }),
-        // Step 2: Download image if poster URL is available, or skip
-        switchMap(() => {
-          if (this.selectedResultPosterURL && this.imageFile == null) {
-            return this.posterService.downloadImage(this.selectedResultPosterURL).pipe(
-              tap((blob) => {
-                this.imageFile = new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
-                  type: MediaConstants.image.exportMimeType,
-                  lastModified: Date.now(),
-                });
-              }),
-              catchError((errorResponse) => {
-                this.errorMessage = errorResponse.error.message;
-                if (environment.development) console.error('Error downloading imported poster:', errorResponse);
-                return of(null); // Continue even if the download fails
-              })
-            );
-          }
-
-          return of(null); // No poster URL to download
-        }),
         // Step 3: Replace movie poster if an image file is present
         switchMap(() => {
           if (this.imageFile) {
@@ -105,11 +85,11 @@ export class ImportTitleComponent implements OnInit {
               catchError((errorResponse) => {
                 this.errorMessage = errorResponse.error.message;
                 if (environment.development) console.error('Error uploading external movie poster:', errorResponse);
-                return of(null); // Continue even if the upload fails
+                return of(null);
               })
             );
           } else {
-            return of(null); // No image file to upload
+            return of(null);
           }
         }),
         // Step 4: Update movie metadata if form has been edited
@@ -147,76 +127,6 @@ export class ImportTitleComponent implements OnInit {
           if (environment.development) console.error('Error in submission process:', errorResponse);
         },
       });
-    // this.externalMovie
-    //   .uploadExternalMovieMetadata({
-    //     externalID: this.selectedMovie?.externalID,
-    //     externalProviderID: this.selectedMovie?.providerID,
-    //   })
-    //   .subscribe({
-    //     next: (response) => {
-    //       if (environment.development) console.log('External movie upload successful:', response);
-    //       movieId = response.id;
-
-    //       if (this.selectedResultPosterURL) {
-    //         console.log(this.selectedResultPosterURL);
-    //         this.posterService.downloadImage(this.selectedResultPosterURL).subscribe({
-    //           next: (blob: Blob) => {
-    //             if (environment.development) console.log('External movie poster download successful:', blob);
-
-    //             this.imageFile = new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
-    //               type: MediaConstants.image.exportMimeType,
-    //               lastModified: Date.now(),
-    //             });
-    //             console.log(this.imageFile);
-    //           },
-    //           error: (errorResponse) => {
-    //             if (environment.development) console.error('Error downloading imported poster:', errorResponse);
-    //           },
-    //         });
-    //       }
-
-    //       const posterFormData = new FormData();
-    //       posterFormData.append('poster', this.imageFile as Blob);
-    //       console.log(posterFormData);
-    //       this.externalMovie.replaceExternalMoviePoster(movieId, posterFormData).subscribe({
-    //         next: (posterUpdateResponse) => {
-    //           if (environment.development) console.log('External movie poster upload successful:', posterUpdateResponse);
-    //         },
-    //         error: (errorResponse) => {
-    //           this.errorMessage = errorResponse.error.message;
-    //           if (environment.development) console.error('Error uploading external movie poster:', errorResponse);
-    //         },
-    //       });
-
-    //       if (this.isEdited() && this.externalTitleCreationForm.valid) {
-    //         console.log(this.externalTitleCreationForm);
-    //         const movieData: UpdateMovieDTO = {
-    //           name: this.externalTitleCreationForm.get('title')?.value ?? '',
-    //           summary: this.externalTitleCreationForm.get('summary')?.value ?? '',
-    //           originallyReleasedAt: new Date(this.externalTitleCreationForm.get('originallyReleasedAt')?.value ?? ''),
-    //           runtimeMinutes: parseInt(this.externalTitleCreationForm.get('runtimeMinutes')?.value ?? ''),
-    //         };
-
-    //         console.log(movieData);
-
-    //         this.movieService.updateMovieMetadata(movieId, movieData).subscribe({
-    //           next: (response) => {
-    //             if (environment.development) console.log('Update successful:', response);
-    //           },
-    //           error: (errorResponse) => {
-    //             this.errorMessage = errorResponse.error.message;
-    //             if (environment.development) console.error('Error updating metadata:', errorResponse);
-    //           },
-    //         });
-    //       }
-
-    //       this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
-    //     },
-    //     error: (errorResponse) => {
-    //       this.errorMessage = errorResponse.error.message;
-    //       if (environment.development) console.error('Error uploading external movie:', errorResponse);
-    //     },
-    //   });
   }
 
   async receiveImageFile(file: File | null) {
@@ -273,7 +183,22 @@ export class ImportTitleComponent implements OnInit {
         this.isFormValid();
 
         this.errorMessage = '';
-        if (movie.posterURL != null) this.selectedResultPosterURL = movie.posterURL;
+        if (movie.posterURL != null) {
+          this.selectedResultPosterURL = movie.posterURL;
+
+          this.posterService.downloadImage(this.selectedResultPosterURL).subscribe({
+            next: (blob) => {
+              this.imageFile = new File([blob], movie.metadata.name + '.' + MediaConstants.image.exportFileExtension, {
+                type: MediaConstants.image.exportMimeType,
+                lastModified: Date.now(),
+              });
+            },
+            error: (errorResponse) => {
+              this.errorMessage = errorResponse.error.message;
+              if (environment.development) console.error('Error loading external movie metadata:', errorResponse);
+            },
+          });
+        }
       },
       error: (errorResponse) => {
         this.errorMessage = errorResponse.error.message;
