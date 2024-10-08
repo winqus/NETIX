@@ -126,7 +126,6 @@ export class ImageUploadComponent implements OnInit, OnChanges {
     if (this.props.posterUrl != null) {
       this.posterServ.downloadImage(this.props.posterUrl).subscribe({
         next: (blob: Blob) => {
-          // this.posterUrl = URL.createObjectURL(blob);
           this.setFile(
             new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
               type: MediaConstants.image.exportMimeType,

@@ -45,6 +45,7 @@ export class InspectMovieComponent implements OnInit {
 
         this.populateEditForm(this.movie.name, this.movie.summary, this.movie.originallyReleasedAt, this.movie.runtimeMinutes);
 
+        console.log(this.movie!.posterID);
         if (this.isFromCreation) {
           timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
         } else {

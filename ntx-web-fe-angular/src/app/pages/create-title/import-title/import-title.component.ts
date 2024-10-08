@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { catchError, of, switchMap, tap } from 'rxjs';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
@@ -60,48 +61,60 @@ export class ImportTitleComponent implements OnInit {
 
     let movieId = '';
 
+    // Step 1: Upload external movie metadata
     this.externalMovie
       .uploadExternalMovieMetadata({
-        externalID: this.selectedMovie?.externalID,
-        externalProviderID: this.selectedMovie?.providerID,
+        externalID: this.selectedMovie.externalID,
+        externalProviderID: this.selectedMovie.providerID,
       })
-      .subscribe({
-        next: (response) => {
+      .pipe(
+        tap((response) => {
           if (environment.development) console.log('External movie upload successful:', response);
           movieId = response.id;
-
-          if (this.selectedResultPosterURL) {
-            console.log(this.selectedResultPosterURL);
-            this.posterService.downloadImage(this.selectedResultPosterURL).subscribe({
-              next: (blob: Blob) => {
-                if (environment.development) console.log('External movie poster download successful:', response);
-
+        }),
+        // Step 2: Download image if poster URL is available, or skip
+        switchMap(() => {
+          if (this.selectedResultPosterURL && this.imageFile == null) {
+            return this.posterService.downloadImage(this.selectedResultPosterURL).pipe(
+              tap((blob) => {
                 this.imageFile = new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
                   type: MediaConstants.image.exportMimeType,
                   lastModified: Date.now(),
                 });
-              },
-              error: (errorResponse) => {
+              }),
+              catchError((errorResponse) => {
+                this.errorMessage = errorResponse.error.message;
                 if (environment.development) console.error('Error downloading imported poster:', errorResponse);
-              },
-            });
+                return of(null); // Continue even if the download fails
+              })
+            );
           }
 
-          const posterFormData = new FormData();
-          posterFormData.append('poster', this.imageFile as Blob);
+          return of(null); // No poster URL to download
+        }),
+        // Step 3: Replace movie poster if an image file is present
+        switchMap(() => {
+          if (this.imageFile) {
+            const posterFormData = new FormData();
+            posterFormData.append('poster', this.imageFile as Blob);
 
-          this.externalMovie.replaceExternalMoviePoster(movieId, posterFormData).subscribe({
-            next: (response) => {
-              if (environment.development) console.log('External movie poster upload successful:', response);
-            },
-            error: (errorResponse) => {
-              this.errorMessage = errorResponse.error.message;
-              if (environment.development) console.error('Error uploading external movie poster:', errorResponse);
-            },
-          });
-
+            return this.externalMovie.replaceExternalMoviePoster(movieId, posterFormData).pipe(
+              tap((posterUpdateResponse) => {
+                if (environment.development) console.log('External movie poster upload successful:', posterUpdateResponse);
+              }),
+              catchError((errorResponse) => {
+                this.errorMessage = errorResponse.error.message;
+                if (environment.development) console.error('Error uploading external movie poster:', errorResponse);
+                return of(null); // Continue even if the upload fails
+              })
+            );
+          } else {
+            return of(null); // No image file to upload
+          }
+        }),
+        // Step 4: Update movie metadata if form has been edited
+        switchMap(() => {
           if (this.isEdited() && this.externalTitleCreationForm.valid) {
-            console.log(this.externalTitleCreationForm);
             const movieData: UpdateMovieDTO = {
               name: this.externalTitleCreationForm.get('title')?.value ?? '',
               summary: this.externalTitleCreationForm.get('summary')?.value ?? '',
@@ -109,26 +122,101 @@ export class ImportTitleComponent implements OnInit {
               runtimeMinutes: parseInt(this.externalTitleCreationForm.get('runtimeMinutes')?.value ?? ''),
             };
 
-            console.log(movieData);
-
-            this.movieService.updateMovieMetadata(movieId, movieData).subscribe({
-              next: (response) => {
-                if (environment.development) console.log('Update successful:', response);
-              },
-              error: (errorResponse) => {
+            return this.movieService.updateMovieMetadata(movieId, movieData).pipe(
+              tap((updateResponse) => {
+                if (environment.development) console.log('Update successful:', updateResponse);
+              }),
+              catchError((errorResponse) => {
                 this.errorMessage = errorResponse.error.message;
                 if (environment.development) console.error('Error updating metadata:', errorResponse);
-              },
-            });
+                return of(null); // Continue even if the update fails
+              })
+            );
+          } else {
+            return of(null); // No metadata update needed
           }
-
+        })
+      )
+      .subscribe({
+        next: () => {
+          // Step 5: Navigate to the movie details page after all steps are complete
           this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
         },
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;
-          if (environment.development) console.error('Error uploading external movie:', errorResponse);
+          if (environment.development) console.error('Error in submission process:', errorResponse);
         },
       });
+    // this.externalMovie
+    //   .uploadExternalMovieMetadata({
+    //     externalID: this.selectedMovie?.externalID,
+    //     externalProviderID: this.selectedMovie?.providerID,
+    //   })
+    //   .subscribe({
+    //     next: (response) => {
+    //       if (environment.development) console.log('External movie upload successful:', response);
+    //       movieId = response.id;
+
+    //       if (this.selectedResultPosterURL) {
+    //         console.log(this.selectedResultPosterURL);
+    //         this.posterService.downloadImage(this.selectedResultPosterURL).subscribe({
+    //           next: (blob: Blob) => {
+    //             if (environment.development) console.log('External movie poster download successful:', blob);
+
+    //             this.imageFile = new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
+    //               type: MediaConstants.image.exportMimeType,
+    //               lastModified: Date.now(),
+    //             });
+    //             console.log(this.imageFile);
+    //           },
+    //           error: (errorResponse) => {
+    //             if (environment.development) console.error('Error downloading imported poster:', errorResponse);
+    //           },
+    //         });
+    //       }
+
+    //       const posterFormData = new FormData();
+    //       posterFormData.append('poster', this.imageFile as Blob);
+    //       console.log(posterFormData);
+    //       this.externalMovie.replaceExternalMoviePoster(movieId, posterFormData).subscribe({
+    //         next: (posterUpdateResponse) => {
+    //           if (environment.development) console.log('External movie poster upload successful:', posterUpdateResponse);
+    //         },
+    //         error: (errorResponse) => {
+    //           this.errorMessage = errorResponse.error.message;
+    //           if (environment.development) console.error('Error uploading external movie poster:', errorResponse);
+    //         },
+    //       });
+
+    //       if (this.isEdited() && this.externalTitleCreationForm.valid) {
+    //         console.log(this.externalTitleCreationForm);
+    //         const movieData: UpdateMovieDTO = {
+    //           name: this.externalTitleCreationForm.get('title')?.value ?? '',
+    //           summary: this.externalTitleCreationForm.get('summary')?.value ?? '',
+    //           originallyReleasedAt: new Date(this.externalTitleCreationForm.get('originallyReleasedAt')?.value ?? ''),
+    //           runtimeMinutes: parseInt(this.externalTitleCreationForm.get('runtimeMinutes')?.value ?? ''),
+    //         };
+
+    //         console.log(movieData);
+
+    //         this.movieService.updateMovieMetadata(movieId, movieData).subscribe({
+    //           next: (response) => {
+    //             if (environment.development) console.log('Update successful:', response);
+    //           },
+    //           error: (errorResponse) => {
+    //             this.errorMessage = errorResponse.error.message;
+    //             if (environment.development) console.error('Error updating metadata:', errorResponse);
+    //           },
+    //         });
+    //       }
+
+    //       this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
+    //     },
+    //     error: (errorResponse) => {
+    //       this.errorMessage = errorResponse.error.message;
+    //       if (environment.development) console.error('Error uploading external movie:', errorResponse);
+    //     },
+    //   });
   }
 
   async receiveImageFile(file: File | null) {
