@@ -6,6 +6,7 @@ import { TitleType } from '@ntx-shared/models/titleType.enum';
 import { ILibraryService } from './ILibrary.service.interface';
 import { getLibrarySearch } from '@ntx-shared/config/api-endpoints';
 import { LibrarySearchResultDTOMapper } from '@ntx/app/shared/mappers/LibrarySearchResultDTO.mapper';
+import { environment } from '@ntx/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ export class LibraryService implements ILibraryService {
   constructor(private readonly http: HttpClient) {}
 
   public search(query: string, type: TitleType, providers: string, limit?: number): Observable<LibrarySearchResultDTO> {
-    //console.log(`LibraryService is searching for: <${query}>`);
+    if (environment.development) console.log(`LibraryService is searching for: <${query}>`);
 
     const url = getLibrarySearch(query, type, providers, limit);
     const httpOptions = {};

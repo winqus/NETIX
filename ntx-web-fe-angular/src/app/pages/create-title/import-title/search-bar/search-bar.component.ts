@@ -40,18 +40,10 @@ export class SearchBarComponent implements OnInit {
   }
 
   searchTermFilter(searchTerm: string) {
-    if (!searchTerm || searchTerm.trim() === '') {
-      return false;
-    }
-
-    console.log(`Search term is ok: <${searchTerm}>`); // Logs the search term
-
-    return true;
+    return !(!searchTerm || searchTerm.trim() === '');
   }
 
   onSearchTermChange() {
-    console.log(`[onSearchTermChange] Search term: <${this.searchTerm}>`); // Logs the search term
-
     // Emit the search term to the subject
     this.searchSubject.next(this.searchTerm);
   }
@@ -61,8 +53,6 @@ export class SearchBarComponent implements OnInit {
   }
 
   private handleSearch(tempSearchTerm: string): void {
-    console.log(tempSearchTerm);
-
     if (!tempSearchTerm) {
       this.clearResults();
       return;
@@ -81,8 +71,6 @@ export class SearchBarComponent implements OnInit {
       next: (result) => this.handleSearchResult(result),
       error: () => this.handleSearchError(),
     });
-
-    console.log(tempSearchTerm);
     this.cdr.detectChanges();
   }
 
@@ -92,7 +80,6 @@ export class SearchBarComponent implements OnInit {
       this.results = null;
     } else {
       this.results = result.searchResults[1].results;
-      console.log(this.results);
       this.errorMessage = null;
     }
   }
