@@ -9,8 +9,10 @@
       placeholder="Search for a movie title..."
       autocomplete="off"
     />
-    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   </label>
+  @if (errorMessage) {
+    <div class="absolute bg-black border border-gray-800 w-full max-h-72 overflow-y-auto z-50 mt-1">{{ errorMessage }}</div>
+  }
 
   @if (results !== null) {
     <ul class="absolute bg-black border border-gray-800 w-full max-h-72 overflow-y-auto z-50 mt-1">

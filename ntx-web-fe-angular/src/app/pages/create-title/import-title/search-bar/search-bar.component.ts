@@ -1,9 +1,8 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs/internal/Subject';
-import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
-import { debounceTime } from 'rxjs/internal/operators/debounceTime';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
 import { ExternalTitleSearchResultItem, Provider } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
@@ -28,16 +27,9 @@ export class SearchBarComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  onSearchTermChange() {
-    if (this.searchTerm == null || this.searchTerm == '') return;
-
-    this.searchSubject.next(this.searchTerm);
-  }
-
   selectMovie(result: any) {
     this.movieSelected.emit(result);
-    console.log(result);
-    this.results = null;
+    this.results = null; // Clear results after selection
   }
 
   handleKeyDown(event: KeyboardEvent, result: any) {
@@ -47,26 +39,66 @@ export class SearchBarComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.searchSubject.pipe(debounceTime(500)).subscribe(async (tempSearchTerm: string) => {
-      if (tempSearchTerm == null || '') return;
+  searchTermFilter(searchTerm: string) {
+    if (!searchTerm || searchTerm.trim() === '') {
+      return false;
+    }
 
-      try {
-        const result = await firstValueFrom(this.libraryService.search(tempSearchTerm, TitleType.MOVIE, Provider.NTX_DISCOVERY));
-        if (result.size < 1) {
-          this.errorMessage = 'No movies found for the given search query.';
-          this.results = null;
-        } else {
-          this.results = result.searchResults[1].results;
-          console.log(this.results);
-          this.errorMessage = null;
-        }
-      } catch (error) {
-        this.errorMessage = 'An error occurred while fetching the search results.';
-        this.results = null;
-      }
-      console.log(tempSearchTerm);
-      this.cdr.detectChanges();
+    console.log(`Search term is ok: <${searchTerm}>`); // Logs the search term
+
+    return true;
+  }
+
+  onSearchTermChange() {
+    console.log(`[onSearchTermChange] Search term: <${this.searchTerm}>`); // Logs the search term
+
+    // Emit the search term to the subject
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  ngOnInit(): void {
+    this.searchSubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe((tempSearchTerm) => this.handleSearch(tempSearchTerm));
+  }
+
+  private handleSearch(tempSearchTerm: string): void {
+    console.log(tempSearchTerm);
+
+    if (!tempSearchTerm) {
+      this.clearResults();
+      return;
+    }
+
+    this.performSearch(tempSearchTerm);
+  }
+
+  private clearResults(): void {
+    this.errorMessage = null;
+    this.results = null;
+  }
+
+  private performSearch(tempSearchTerm: string): void {
+    this.libraryService.search(tempSearchTerm, TitleType.MOVIE, Provider.NTX_DISCOVERY).subscribe({
+      next: (result) => this.handleSearchResult(result),
+      error: () => this.handleSearchError(),
     });
+
+    console.log(tempSearchTerm);
+    this.cdr.detectChanges();
+  }
+
+  private handleSearchResult(result: any): void {
+    if (result.size < 1) {
+      this.errorMessage = 'No movies found for the given search query.';
+      this.results = null;
+    } else {
+      this.results = result.searchResults[1].results;
+      console.log(this.results);
+      this.errorMessage = null;
+    }
+  }
+
+  private handleSearchError(): void {
+    this.errorMessage = 'An error occurred while fetching the search results.';
+    this.results = null;
   }
 }
