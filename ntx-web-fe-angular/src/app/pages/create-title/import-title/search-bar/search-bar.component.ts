@@ -21,6 +21,7 @@ export class SearchBarComponent implements OnInit {
   errorMessage: string | null = null;
   @Output() movieSelected = new EventEmitter<ExternalTitleSearchResultItem>();
   searchTerm: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private libraryService: LibraryService,
@@ -64,9 +65,11 @@ export class SearchBarComponent implements OnInit {
   private clearResults(): void {
     this.errorMessage = null;
     this.results = null;
+    this.isLoading = false;
   }
 
   private performSearch(tempSearchTerm: string): void {
+    this.isLoading = true;
     this.libraryService.search(tempSearchTerm, TitleType.MOVIE, Provider.NTX_DISCOVERY).subscribe({
       next: (result) => this.handleSearchResult(result),
       error: () => this.handleSearchError(),
@@ -82,10 +85,12 @@ export class SearchBarComponent implements OnInit {
       this.results = result.searchResults[1].results;
       this.errorMessage = null;
     }
+    this.isLoading = false;
   }
 
   private handleSearchError(): void {
     this.errorMessage = 'An error occurred while fetching the search results.';
     this.results = null;
+    this.isLoading = false;
   }
 }

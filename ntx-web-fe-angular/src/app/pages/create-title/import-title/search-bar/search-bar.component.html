@@ -1,15 +1,13 @@
 <div class="search-container relative">
-  <label for="searchBar" class="form-control w-full">
-    <input
-      id="searchBar"
-      type="text"
-      class="input input-bordered input-sm w-full p-2 rounded-md"
-      [(ngModel)]="searchTerm"
-      (ngModelChange)="onSearchTermChange()"
-      placeholder="Search for a movie title..."
-      autocomplete="off"
-    />
+  <label for="searchBar" class="input input-bordered flex flex-row input-sm rounded-md align-middle">
+    @if (isLoading) {
+      <app-svg-icons name="throbber"></app-svg-icons>
+    } @else {
+      <div class="ml-4"></div>
+    }
+    <input id="searchBar" type="text" class="w-full p-2" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()" placeholder="Search for a movie title..." autocomplete="off" />
   </label>
+
   @if (errorMessage) {
     <div class="absolute bg-black border border-gray-800 w-full max-h-72 overflow-y-auto z-50 mt-1">{{ errorMessage }}</div>
   }
