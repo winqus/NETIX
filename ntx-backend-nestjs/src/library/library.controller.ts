@@ -1,6 +1,7 @@
 import { BadRequestException, Controller, Get, Logger, Param, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
+import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
 import { ExternalTitleService } from '../external-providers/external-title.service'; // Import the external title service
 import { SearchResultDTO } from './dto/search-result-dto';
 import {
@@ -73,6 +74,15 @@ export class LibraryController {
 
     if (!providerID?.trim()) {
       throw new BadRequestException('Provider ID parameter is required');
+    }
+
+    const providersList: ExternalProviders[] = [];
+    for (const provider of providerID.split(',')) {
+      if (Object.keys(ExternalProviders).includes(provider)) {
+        providersList.push(provider as ExternalProviders);
+      } else {
+        throw new BadRequestException(`Invalid provider: ${provider}`);
+      }
     }
 
     const metadataRequest = {
