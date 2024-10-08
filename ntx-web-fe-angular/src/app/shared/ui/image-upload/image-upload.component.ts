@@ -5,11 +5,13 @@ import { MediaConstants } from '@ntx-shared/config/constants';
 import { ImageService } from '@ntx-shared/services/image.service';
 import { ImageCropperComponent } from '@ntx-shared/ui/image-upload/image-cropper/image-cropper.component';
 import { environment } from '@ntx/environments/environment.development';
+import { PosterService } from '@ntx-shared/services/posters/posters.service';
 
 export interface InputProps {
   title?: string;
   accept?: string;
   readonly?: boolean;
+  posterUrl?: string | null;
 }
 
 @Component({
@@ -25,7 +27,6 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   @ViewChild('input') inputElement!: ElementRef<HTMLInputElement>;
   @ViewChild('image') imageElement!: ElementRef<HTMLImageElement>;
   @ViewChild('croppModal') croppModal!: ElementRef<HTMLDialogElement>;
-  @Input() posterImage: string | null = null;
 
   fileUploadId: string = '';
   isDraggingOver: boolean = false;
@@ -34,6 +35,7 @@ export class ImageUploadComponent implements OnInit, OnChanges {
     title: 'Upload File',
     accept: '',
     readonly: false,
+    posterUrl: null,
   };
 
   originalImage: File | null = null;
@@ -42,7 +44,10 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   originalImgUrl: string | null = null;
   imageUrl: string | null = null;
 
-  constructor(private imageServ: ImageService) {}
+  constructor(
+    private imageServ: ImageService,
+    private posterServ: PosterService
+  ) {}
 
   ngOnInit() {
     if (!this.fileUploadId) {
@@ -54,8 +59,8 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   ngOnChanges(): void {
     this.props = { ...this.defaultProps, ...this.props };
 
-    if (this.posterImage) {
-      this.imageUrl = this.posterImage;
+    if (this.props.posterUrl != null) {
+      this.imageUrl = this.props.posterUrl;
     }
   }
 
@@ -111,6 +116,28 @@ export class ImageUploadComponent implements OnInit, OnChanges {
         this.imageProcessing();
       }
     }, 100);
+  }
+
+  openCroppModal() {
+    if (this.croppModal?.nativeElement) {
+      this.croppModal.nativeElement.showModal();
+    }
+
+    if (this.props.posterUrl != null) {
+      this.posterServ.downloadImage(this.props.posterUrl).subscribe({
+        next: (blob: Blob) => {
+          this.setFile(
+            new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
+              type: MediaConstants.image.exportMimeType,
+              lastModified: Date.now(),
+            })
+          );
+        },
+        error: (errorResponse) => {
+          if (environment.development) console.error('Error downloading imported poster:', errorResponse);
+        },
+      });
+    }
   }
 
   private async setCroppedImage(blob: Blob) {

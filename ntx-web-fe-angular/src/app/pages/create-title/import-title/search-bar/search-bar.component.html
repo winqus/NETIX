@@ -7,15 +7,20 @@
       [(ngModel)]="searchTerm"
       (ngModelChange)="onSearchTermChange()"
       placeholder="Search for a movie title..."
+      autocomplete="off"
     />
-    <ul *ngIf="searchTerm" class="results-dropdown">
-      <li *ngFor="let result of results" class="result-item" (click)="selectMovie(result)">
-        <img [src]="result.posterURL" alt="{{ result.metadata.name }} poster" class="movie-poster-thumbnail" />
-        <div class="movie-info">
-          <span class="movie-title">{{ result.metadata.name }}</span>
-          <span class="movie-details">{{ result.type }} - {{ result.metadata.releaseDate }} - {{ result.providerID }}</span>
-        </div>
-      </li>
-    </ul>
+    @if (results !== null) {
+      <ul class="results-dropdown">
+        @for (result of results; track result.externalID) {
+          <li class="result-item" (click)="selectMovie(result)">
+            <img [src]="result.posterURL" alt="{{ result.metadata.name }} poster" class="movie-poster-thumbnail" />
+            <div class="movie-info">
+              <span class="movie-title">{{ result.metadata.name }}</span>
+              <span class="movie-details">{{ result.type }} · {{ result.metadata.releaseDate }} · {{ result.providerID }} </span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
   </label>
 </div>

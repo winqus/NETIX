@@ -1,19 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { ExternalTitleSearchResultItem, LibrarySearchResultDTO } from '@ntx-shared/models/librarySearch.dto';
-import { searchResponseFixture } from '@ntx-shared/services/librarySearch/librarySearchTestData';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, Observable, throwError } from 'rxjs';
+import { LibrarySearchResultDTO } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
+import { ILibraryService } from './ILibrary.service.interface';
+import { getLibrarySearch } from '@ntx-shared/config/api-endpoints';
+import { LibrarySearchResultDTOMapper } from '@ntx/app/shared/mappers/LibrarySearchResultDTO.mapper';
 
 @Injectable({
   providedIn: 'root',
 })
-export class LibraryService {
-  constructor() {}
+export class LibraryService implements ILibraryService {
+  constructor(private readonly http: HttpClient) {}
 
-  public search(query: string, type: TitleType = TitleType.MOVIE, providers: string[] = []): Observable<LibrarySearchResultDTO> {
-    // const filteredResults =
-    //   searchResponseFixture.searchResults.find((result: { id: string }) => result.id === 'ntx-discovery')?.results.map((item) => ({ ...item, type: TitleType[item.type as keyof typeof TitleType] })) ||
-    //   [];
-    return of(searchResponseFixture as LibrarySearchResultDTO);
+  public search(query: string, type: TitleType, providers: string, limit?: number): Observable<LibrarySearchResultDTO> {
+    const url = getLibrarySearch(query, type, providers, limit);
+    const httpOptions = {};
+
+    return this.http.get(url, httpOptions).pipe(
+      map((response: any) => {
+        return LibrarySearchResultDTOMapper.anyToLibrarySearchResultDTO(response);
+      }),
+      catchError((error) => {
+        console.error('Error fetching search query:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }
