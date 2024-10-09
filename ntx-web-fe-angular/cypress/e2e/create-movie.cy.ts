@@ -12,7 +12,7 @@ describe('create movie', () => {
     cy.url().should('include', '/createTitle');
     cy.get('[aria-label="Create"]').click();
     cy.contains('Title');
-    cy.get('.btn').contains('CREATE').should('be.disabled');
+    cy.get('button').contains('CREATE').should('be.disabled');
   });
 
   it('should allow creating with valid fields', () => {
@@ -26,7 +26,7 @@ describe('create movie', () => {
 
     cy.get('.mr-6 > > .relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
 
-    cy.get('.btn').contains('CREATE');
+    cy.get('button').contains('CREATE');
   });
 
   it('should create a movie', () => {
@@ -40,7 +40,7 @@ describe('create movie', () => {
 
     cy.get('.mr-6 > > .relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
 
-    cy.get('.btn').contains('CREATE').click();
+    cy.get('button').contains('CREATE').click();
     cy.wait('@BE_CreateMovie').its('response.statusCode').should('eq', 201);
 
     cy.url().should('include', '/inspect/movie');
@@ -52,6 +52,6 @@ describe('create movie', () => {
 
     cy.get('#title').type(makeLongRandomMovieName(), { delay: 3 });
     cy.get('#summary').type(makeRandomMovieSummary(), { delay: 3 });
-    cy.get('[for="title"] > .mb-2 > .label-text-alt').should('be.visible').and('contain.text', 'Maximum length is 200');
+    cy.get('[for="title"]').contains('Maximum length is 200');
   });
 });

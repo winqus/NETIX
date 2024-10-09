@@ -3,6 +3,11 @@ import convertRouteToPath from 'cypress/support/convertRoute';
 import { makeLongRandomMovieName, makeRandomMovieSummary } from 'cypress/support/randomDataFactory';
 
 describe('create movie', () => {
+  const SEARCH_RESULTS_ELEMENT = 'ul';
+  const SEARCH_RESULTS_ITEM_ELEMENT = 'li';
+
+  const caseInsensitiveMatch = (text: string) => new RegExp(text, 'i');
+
   beforeEach(() => {
     cy.intercept(convertRouteToPath(getMovieImporteUrl())).as('BE_ImportMovie');
   });
@@ -12,53 +17,53 @@ describe('create movie', () => {
     cy.url().should('include', '/createTitle');
     cy.get('[aria-label="Import"]').click();
     cy.contains('Title');
-    cy.get('.btn').contains('Import').should('be.disabled');
+    cy.get('button').contains('Import').should('be.disabled');
   });
 
   it('should display external movie search results when a movie title is entered', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
+    const movieName = 'Shrek';
 
-    const MOVIE_TITLE = 'Shrek';
-    cy.get('#searchBar').type(MOVIE_TITLE);
-
-    cy.get('.absolute').should('exist');
-    cy.get('.absolute > :nth-child(1) > .flex-col > .font-bold').contains(MOVIE_TITLE);
-    cy.get(':nth-child(1) > .flex-col > .text-gray-400').should('exist');
+    cy.get('#searchBar').type(movieName);
+    cy.get(SEARCH_RESULTS_ELEMENT)
+      .should('be.visible')
+      .within(() => {
+        cy.get(SEARCH_RESULTS_ITEM_ELEMENT).should('have.length.greaterThan', 0);
+        cy.get(SEARCH_RESULTS_ITEM_ELEMENT).first().get('img').should('be.visible');
+        cy.get(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(movieName);
+        cy.get(SEARCH_RESULTS_ITEM_ELEMENT).first().contains('MOVIE');
+      });
   });
 
   it('should display an error message for a non-existent movie search', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
+    const searchQuery = 'Sh@#$';
 
-    const title = 'Sh@#$';
-    cy.get('#searchBar').type(title);
-    cy.get('.input > app-svg-icons > div > span').should('exist');
-    cy.get('.absolute').should('exist').contains('No movies found for the given search query.');
-    cy.get('.input > app-svg-icons > div > svg').should('exist');
+    cy.get('#searchBar').type(searchQuery);
+    cy.get('.input > [name="throbber"]').should('be.visible');
+    cy.contains('No movies found for the given search query.');
+    cy.get('.input > [name="search"]').should('be.visible');
   });
 
   it('should successfully import a selected movie', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
+    const movieName = 'shrek';
 
-    const MOVIE_TITLE = 'shrek';
-    cy.get('#searchBar').type(MOVIE_TITLE);
+    cy.get('#searchBar').type(movieName);
+    cy.get(SEARCH_RESULTS_ELEMENT).should('be.visible').get(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(caseInsensitiveMatch(movieName)).click();
+    cy.get('img#myImage').should('be.visible');
 
-    cy.get('.absolute').should('exist');
-    cy.get('.absolute > :nth-child(1)').click();
-
-    cy.wait(1000);
-
-    cy.get('.gap-5 > .flex-col.h-full > > .relative > .w-full img').should('be.visible');
-
-    cy.get('.btn').contains('Import').should('be.enabled').click();
+    cy.get('button').contains('Import').should('be.enabled').click();
 
     cy.wait('@BE_ImportMovie').then((interception) => {
       const statusCode = interception.response?.statusCode;
 
       if (statusCode !== 201) {
-        cy.get('.text-xs').contains('Movie with these contents already exists').should('be.visible');
+        /* For test repeatability, need to handle the case where the movie already exists */
+        cy.contains('Movie with these contents already exists').should('be.visible');
       } else {
         cy.wrap(statusCode).should('eq', 201);
         cy.url().should('include', '/inspect/movie');
@@ -70,30 +75,27 @@ describe('create movie', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
-    const MOVIE_TITLE = 'shrek';
-    cy.get('#searchBar').type(MOVIE_TITLE);
+    const movieName = 'shrek';
+    cy.get('#searchBar').type(movieName);
 
-    cy.get('.absolute').should('exist');
-    cy.get('.absolute > :nth-child(1)').click();
+    cy.get(SEARCH_RESULTS_ELEMENT).should('be.visible').find(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(caseInsensitiveMatch(movieName)).click();
 
-    cy.get('.flex-grow > [for="title"] > #title').type(makeLongRandomMovieName(), { delay: 3 });
-    cy.get('.flex-grow > .form-control.h-full > #summary').type(makeRandomMovieSummary(), { delay: 3 });
-    cy.get('[for="title"] > .mb-2 > .label-text-alt').should('be.visible').and('contain.text', 'Maximum length is 200');
+    cy.get('app-import-title').find('input#title').type(makeLongRandomMovieName(), { delay: 2 });
+    cy.get('app-import-title').find('textarea#summary').type(makeRandomMovieSummary(), { delay: 2 });
+    cy.get('[for="title"]').contains('Maximum length is 200');
 
-    cy.get('.btn').contains('Import').should('be.disabled');
+    cy.get('button').contains('Import').should('be.disabled');
   });
 
   it('should display an error message when the search request fails', () => {
     cy.intercept('GET', '/api/v1/library/search*', { statusCode: 500 });
-
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
-    const MOVIE_TITLE = 'shrek';
-    cy.get('#searchBar').type(MOVIE_TITLE);
+    const movieName = 'shrek';
+    cy.get('#searchBar').type(movieName);
 
-    cy.get('.absolute').should('exist');
-    cy.get('.absolute').should('exist').contains('An error occurred while fetching the search results.');
+    cy.contains('An error occurred while fetching the search results.');
   });
 
   it('should display an error message when fetching movie metadata fails', () => {
@@ -105,15 +107,14 @@ describe('create movie', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
-    const MOVIE_TITLE = 'shrek';
-    cy.get('#searchBar').type(MOVIE_TITLE);
+    const movieName = 'shrek';
+    cy.get('#searchBar').type(movieName);
 
-    cy.get('.absolute').should('exist');
-    cy.get('.absolute > :nth-child(1)').click();
+    cy.get(SEARCH_RESULTS_ELEMENT).should('be.visible').find(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(caseInsensitiveMatch(movieName)).click();
 
     cy.wait('@fetchMovieError');
 
-    cy.get('.text-xs').contains('Failed to fetch movie from external data source.');
-    cy.get('.btn').contains('Import').should('be.disabled');
+    cy.contains('Failed to fetch movie from external data source.');
+    cy.get('button').contains('Import').should('be.disabled');
   });
 });
