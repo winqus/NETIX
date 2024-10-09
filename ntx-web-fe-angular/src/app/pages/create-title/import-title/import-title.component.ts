@@ -182,7 +182,7 @@ export class ImportTitleComponent implements OnInit {
         this.updateFields(this.selectedMovie);
         this.isFormValid();
 
-        this.errorMessage = '';
+        // this.errorMessage = '';
         if (movie.posterURL != null) {
           this.selectedResultPosterURL = movie.posterURL;
 
