@@ -10,34 +10,37 @@ describe('create movie', () => {
   it('should navigate to create title page', () => {
     cy.visit('/createTitle');
     cy.url().should('include', '/createTitle');
+    cy.get('[aria-label="Create"]').click();
     cy.contains('Title');
-    cy.get('.btn').contains('CREATE').should('be.disabled');
+    cy.get('button').contains('CREATE').should('be.disabled');
   });
 
   it('should allow creating with valid fields', () => {
     cy.visit('/createTitle');
+    cy.get('[aria-label="Create"]').click();
 
     cy.get('#title').type(makeRandomMovieName(), { delay: 3 });
     cy.get('#summary').type(makeRandomMovieSummary(), { delay: 3 });
     cy.get('#originallyReleasedAt').type(makeRandomMovieReleaseDate(), { delay: 3 });
     cy.get('#runtimeMinutes').type(makeRandomMovieRuntime().toString(), { delay: 3 });
 
-    cy.get('.relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
+    cy.get('.mr-6 > > .relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
 
-    cy.get('.btn').contains('CREATE');
+    cy.get('button').contains('CREATE');
   });
 
   it('should create a movie', () => {
     cy.visit('/createTitle');
+    cy.get('[aria-label="Create"]').click();
 
     cy.get('#title').type(makeRandomMovieName(), { delay: 3 });
     cy.get('#summary').type(makeRandomMovieSummary(), { delay: 3 });
     cy.get('#originallyReleasedAt').type(makeRandomMovieReleaseDate(), { delay: 3 });
     cy.get('#runtimeMinutes').type(makeRandomMovieRuntime().toString(), { delay: 3 });
 
-    cy.get('.relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
+    cy.get('.mr-6 > > .relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
 
-    cy.get('.btn').contains('CREATE').click();
+    cy.get('button').contains('CREATE').click();
     cy.wait('@BE_CreateMovie').its('response.statusCode').should('eq', 201);
 
     cy.url().should('include', '/inspect/movie');
@@ -45,9 +48,10 @@ describe('create movie', () => {
 
   it('should throw error label', () => {
     cy.visit('/createTitle');
+    cy.get('[aria-label="Create"]').click();
 
     cy.get('#title').type(makeLongRandomMovieName(), { delay: 3 });
     cy.get('#summary').type(makeRandomMovieSummary(), { delay: 3 });
-    cy.get('[for="title"] > .mb-2 > .label-text-alt').should('be.visible').and('contain.text', 'Maximum length is 200');
+    cy.get('[for="title"]').contains('Maximum length is 200');
   });
 });

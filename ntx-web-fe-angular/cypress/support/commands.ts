@@ -51,13 +51,14 @@ Cypress.Commands.add('createMovieWithPoster', (args: any): Cypress.Chainable<Mov
   cy.intercept('POST', convertRouteToPath(getMovieUrl())).as(CREATE_MOVIE_REQUEST_TOKEN);
 
   cy.visit('/createTitle');
+  cy.get('[aria-label="Create"]').click();
 
   cy.get('#title').type(name || makeRandomMovieName(), { delay: 0 });
   cy.get('#summary').type(summary || makeRandomMovieSummary(), { delay: 0 });
   cy.get('#originallyReleasedAt').type(releaseDate || makeRandomMovieReleaseDate(), { delay: 0 });
   cy.get('#runtimeMinutes').type(runtime || makeRandomMovieRuntime().toString(), { delay: 0 });
 
-  cy.get('.relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
+  cy.get('.mr-6 > > .relative > .w-full').selectFile('cypress/files/1_sm_284x190.webp');
 
   cy.get('.btn').contains('CREATE').click();
   return cy.wait('@' + CREATE_MOVIE_REQUEST_TOKEN).then((interception) => {

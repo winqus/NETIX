@@ -50,11 +50,11 @@ export function replacePoster(_id: string) {
 }
 
 export function getImageProxy(_url: string) {
-  return `${SERVER.baseUrl}${SERVER.endpoints.imageProxy}?url=${_url}`;
+  return `${SERVER.baseUrl}${SERVER.endpoints.imageProxy}?url=${encodeURIComponent(_url)}`;
 }
 
 export function getLibrarySearch(_query: string, _types: string, _providers: string, _limit?: number) {
-  let url = `${SERVER.baseUrl}${SERVER.endpoints.library.search}?query=${_query}&types=${_types}&providers=${_providers}`;
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.library.search}?query=${encodeURIComponent(_query)}&types=${_types}&providers=${_providers}`;
   if (_limit !== undefined) url += `&limit=${_limit}`;
 
   return url;

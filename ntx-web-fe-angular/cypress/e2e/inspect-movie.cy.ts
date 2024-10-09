@@ -38,11 +38,11 @@ describe('inspect movie', () => {
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
 
       // Assert movie details present
-      cy.contains('MOVIE').should('exist');
-      cy.contains(movie.name).should('exist');
+      cy.contains('MOVIE').should('be.visible');
+      cy.contains(movie.name).should('be.visible');
 
       // Assert poster present
-      cy.get('.relative > .h-full').should('be.visible');
+      cy.get('img').should('be.visible');
     });
   });
 
@@ -54,8 +54,8 @@ describe('inspect movie', () => {
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
-      cy.contains('Unpublished').should('exist');
-      cy.contains('Missing video').should('exist');
+      cy.contains('Unpublished').should('be.visible');
+      cy.contains('Missing video').should('be.visible');
     });
   });
 
@@ -69,9 +69,9 @@ describe('inspect movie', () => {
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
 
-      cy.get('.dropdown > .btn').click();
+      cy.get('[name="three_dots_vertical"]').click();
       cy.get('.dropdown-content').should('be.visible');
-      cy.contains('Edit metadata').should('exist');
+      cy.contains('Edit metadata').should('be.visible');
     });
   });
 
@@ -85,7 +85,7 @@ describe('inspect movie', () => {
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
 
-      cy.get('.dropdown > .btn').click();
+      cy.get('[name="three_dots_vertical"]').click();
       cy.get('.dropdown-content').should('be.visible');
       cy.contains('Edit metadata').click();
       cy.get('.modal-box').should('be.visible');
@@ -100,11 +100,11 @@ describe('inspect movie', () => {
       cy.get('#originallyReleasedAt').clear().type(newMovieRelease, { delay: 3 });
       cy.get('#runtimeMinutes').clear().type(newMovieRuntime.toString(), { delay: 3 });
 
-      cy.get('.btn').contains('SAVE').click();
+      cy.get('button').contains('SAVE').click();
 
-      cy.get('.text-4xl').and('contain.text', newMovieName);
-      cy.get('.flex-grow > .text-xl').and('contain.text', newMovieSummary);
-      cy.get('.flex-col > .flex > .text-xl').and('contain.text', new Date(newMovieRelease).getFullYear());
+      cy.contains(newMovieName);
+      cy.contains(newMovieSummary);
+      cy.contains(new Date(newMovieRelease).getFullYear());
     });
   });
 });
