@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InspectMovieComponent } from './inspect-movie.component';
-import { UploadService } from '@ntx-shared/services/upload/upload.service';
+import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
@@ -10,7 +10,7 @@ import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 describe('InspectMovieComponent', () => {
   let component: InspectMovieComponent;
   let fixture: ComponentFixture<InspectMovieComponent>;
-  let mockUploadService: any;
+  let mockMovieService: any;
   let mockPosterService: any;
   let mockActivatedRoute: any;
 
@@ -26,7 +26,7 @@ describe('InspectMovieComponent', () => {
   };
 
   beforeEach(async () => {
-    mockUploadService = {
+    mockMovieService = {
       getMovieMetadata: jasmine.createSpy('getMovieMetadata').and.returnValue(of(mockMovie)),
     };
 
@@ -45,7 +45,7 @@ describe('InspectMovieComponent', () => {
     await TestBed.configureTestingModule({
       imports: [InspectMovieComponent],
       providers: [
-        { provide: UploadService, useValue: mockUploadService },
+        { provide: MovieService, useValue: mockMovieService },
         { provide: PosterService, useValue: mockPosterService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
@@ -61,7 +61,7 @@ describe('InspectMovieComponent', () => {
   });
 
   it('should fetch movie metadata on init', () => {
-    expect(mockUploadService.getMovieMetadata).toHaveBeenCalledWith('1');
+    expect(mockMovieService.getMovieMetadata).toHaveBeenCalledWith('1');
     expect(component.movie).toEqual(mockMovie);
   });
 

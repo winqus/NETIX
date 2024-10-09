@@ -1,8 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
-import { UploadService } from '@ntx-shared/services/upload/upload.service';
+import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { environment } from '@ntx/environments/environment';
 import { Router } from '@angular/router';
 
@@ -13,9 +13,6 @@ import { Router } from '@angular/router';
   templateUrl: './upload-title.component.html',
 })
 export class UploadTitleComponent implements OnInit {
-  @ViewChild('croppModal') cropModalElement!: ElementRef<HTMLDialogElement>;
-  @ViewChild(ImageUploadComponent) imageFileComponent!: ImageUploadComponent;
-
   imageFile: File | null = null;
 
   imageAccept: string = '';
@@ -34,7 +31,7 @@ export class UploadTitleComponent implements OnInit {
   });
 
   constructor(
-    private upload: UploadService,
+    private uploadMovie: MovieService,
     private router: Router
   ) {}
 
@@ -55,7 +52,7 @@ export class UploadTitleComponent implements OnInit {
       formData.append('runtimeMinutes', this.movieTitleCreationForm.get('runtimeMinutes')?.value as string);
       formData.append('poster', this.imageFile as Blob);
 
-      this.upload.uploadMovieMetadata(formData).subscribe({
+      this.uploadMovie.uploadMovieMetadata(formData).subscribe({
         next: (response) => {
           if (environment.development) console.log('Upload successful:', response);
           const movieId = response.id;
@@ -69,7 +66,7 @@ export class UploadTitleComponent implements OnInit {
     }
   }
 
-  async recieveImageFile(file: File | null) {
+  async receiveImageFile(file: File | null) {
     this.imageFile = file;
   }
 

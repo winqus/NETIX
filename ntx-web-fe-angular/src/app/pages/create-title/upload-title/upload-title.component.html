@@ -3,7 +3,7 @@
     <div class="h-full flex flex-col rounded-lg">
       <div class="h-full flex flex-row pb-2">
         <div class="flex flex-col h-full mr-6">
-          <app-image-upload class="h-[300px] w-[200px]" title="Thumbnail Select" [props]="{ accept: imageAccept, readonly: false }" (filePassed)="recieveImageFile($event)"></app-image-upload>
+          <app-image-upload class="h-[300px] w-[200px]" title="Thumbnail Select" [props]="{ accept: imageAccept, readonly: false }" (filePassed)="receiveImageFile($event)"></app-image-upload>
         </div>
         <div class="flex flex-col flex-auto h-full">
           <div role="tablist" class="tabs tabs-lifted">

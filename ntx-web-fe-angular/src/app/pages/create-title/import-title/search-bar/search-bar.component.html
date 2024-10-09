@@ -1,0 +1,39 @@
+<div class="search-container relative">
+  <label for="searchBar" class="input input-bordered flex flex-row input-sm rounded-md">
+    @if (isLoading) {
+      <app-svg-icons name="throbber"></app-svg-icons>
+    } @else {
+      <app-svg-icons class="content-center w-4" name="search" size="15"></app-svg-icons>
+    }
+    <input id="searchBar" type="text" class="w-full p-2" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()" placeholder="Search for a movie title..." autocomplete="off" />
+  </label>
+
+  @if (errorMessage) {
+    <div class="absolute bg-black border border-gray-800 w-full max-h-72 overflow-y-auto z-50 mt-1">{{ errorMessage }}</div>
+  }
+
+  @if (results !== null) {
+    <ul class="absolute bg-black border border-gray-800 w-full max-h-72 overflow-y-auto z-50 mt-1">
+      @for (result of results; track result.externalID) {
+        <li
+          tabindex="0"
+          class="flex items-center p-2 cursor-pointer bg-gray-900 text-white border-b border-gray-800 hover:bg-gray-800"
+          (click)="selectMovie(result)"
+          (keydown)="handleKeyDown($event, result)"
+        >
+          <div class="w-10 aspect-[2/3] mr-2 bg-white flex align-middle justify-center items-center">
+            @if (result.posterURL && !result.posterURL.endsWith('null')) {
+              <img [src]="result.posterURL" alt="Poster Image" class="" />
+            } @else {
+              <app-svg-icons name="file_image" size="20" color="black"></app-svg-icons>
+            }
+          </div>
+          <div class="flex flex-col text-sm">
+            <span class="font-bold">{{ result.metadata.name }}</span>
+            <span class="text-gray-400">{{ result.type }} · {{ result.metadata.releaseDate }} · {{ result.providerID }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>

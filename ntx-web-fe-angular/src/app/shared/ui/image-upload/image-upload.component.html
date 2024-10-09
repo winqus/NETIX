@@ -7,13 +7,13 @@
     [class.bg-neutral-900]="props.readonly"
     [class.bg-neutral-400]="isDraggingOver"
   >
-    <input #input type="file" [size]="" [accept]="props.accept" hidden [id]="fileUploadId" [disabled]="props.readonly" (change)="onFileChanged($event)" />
+    <input #input id="fileUploadId" type="file" [size]="" [accept]="props.accept" hidden [id]="fileUploadId" [disabled]="props.readonly" (change)="onFileChanged($event)" />
     @if (imageUrl) {
       <img #image class="w-full h-full rounded-lg m-auto" [src]="imageUrl" id="myImage" alt="Preview" />
       <button class="btn-xs btn-circle absolute top-0 left-0 bg-black flex items-center justify-center m-1" (click)="clearFile($event)">
         <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
       </button>
-      <button class="btn-xs btn-circle absolute bottom-0 right-0 bg-black flex items-center justify-center m-1" type="button" onclick="croppModal.showModal()">
+      <button class="btn-xs btn-circle absolute bottom-0 right-0 bg-black flex items-center justify-center m-1" type="button" (click)="openCroppModal()">
         <app-svg-icons name="crop" size="15" color="white"></app-svg-icons>
       </button>
     } @else {

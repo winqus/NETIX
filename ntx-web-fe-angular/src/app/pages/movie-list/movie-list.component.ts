@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MovieCardComponent } from '@ntx-pages/movie-card/movie-card.component';
 import { MovieCardSkeletonComponent } from '@ntx-pages/movie-card-skeleton/movie-card-skeleton.component';
 import { MediaItem } from '@ntx-shared/models/mediaItem';
-import { MovieService } from '@ntx-shared/services/movie.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 
 @Component({
   selector: 'app-example',
