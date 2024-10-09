@@ -1,5 +1,7 @@
+import { TitleType } from '@ntx-shared/models/titleType.enum';
+
 export const searchResponseFixture = {
-  size: 0,
+  size: 10,
   searchResults: [
     {
       id: 'ntx',
@@ -13,7 +15,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '808',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 1,
           posterURL: 'https://image.tmdb.org/t/p/w200/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/sRvXNDItGlWCqtO3j6wks52FmbD.jpg',
@@ -28,7 +30,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '809',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/2yYP0PQjG8zVqturh1BAqu2Tixl.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/iaNoLnnpQb5SNxGc4bkQmdCvEdG.jpg',
@@ -43,7 +45,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '10192',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/6HrfPZtKcGmX2tUWW3cnciZTaSD.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/xZ2we4gdiwQmg6D1w9qHlAm5yIf.jpg',
@@ -58,7 +60,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '810',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/n4SexGGQzI26E269tfpa80MZaGV.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/qSNz1G1Ts8fFw6v4Vae4aMAjcY7.jpg',
@@ -73,7 +75,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '421892',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/8XwmMjwiQ91Rm0eU4AcxyFA3XUZ.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/lV0GbGz293cKfwbDcBHS4kGRtSC.jpg',
@@ -87,7 +89,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '13394',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/zeqUbXA0JPSlyAHdRTgxoYgK24n.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/vO1VJevJIKIXGfveYHsLPn8iHUn.jpg',
@@ -102,7 +104,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '381696',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/wRvMRdLa8zQ85drGAWEsZTuKJO.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/zWDZckQzoHEE4oipgVNWXIFpXCH.jpg',
@@ -117,7 +119,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '128914',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/wH4zCbgNJxjnQAzJj48zitzsu3A.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/kk1Yk0mcIOXJ9yC6rQvkbRCKemo.jpg',
@@ -132,7 +134,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '26840',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/lJg4alrYfp7CDNVID4iGefT9CIn.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/tcHdogyWBZktk2JtO3oIqdJ24bW.jpg',
@@ -146,7 +148,7 @@ export const searchResponseFixture = {
         {
           providerID: 'TMDB',
           externalID: '252634',
-          type: 'MOVIE',
+          type: TitleType.MOVIE,
           weight: 0.999,
           posterURL: 'https://image.tmdb.org/t/p/w200/j1Ew14NWmwTYqGYNNS7YTWIJXae.jpg',
           backdropURL: 'https://image.tmdb.org/t/p/w200/rzRthZa34uJUmnmvnepxxBSaRw0.jpg',

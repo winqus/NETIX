@@ -71,7 +71,9 @@ export class SearchBarComponent implements OnInit {
   private performSearch(tempSearchTerm: string): void {
     this.isLoading = true;
     this.libraryService.search(tempSearchTerm, TitleType.MOVIE, Provider.NTX_DISCOVERY).subscribe({
-      next: (result) => this.handleSearchResult(result),
+      next: (result) => {
+        this.handleSearchResult(result);
+      },
       error: () => this.handleSearchError(),
     });
     this.cdr.detectChanges();

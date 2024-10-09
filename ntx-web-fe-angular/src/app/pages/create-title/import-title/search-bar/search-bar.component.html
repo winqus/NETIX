@@ -1,9 +1,9 @@
 <div class="search-container relative">
-  <label for="searchBar" class="input input-bordered flex flex-row input-sm rounded-md align-middle">
+  <label for="searchBar" class="input input-bordered flex flex-row input-sm rounded-md">
     @if (isLoading) {
       <app-svg-icons name="throbber"></app-svg-icons>
     } @else {
-      <div class="ml-4"></div>
+      <app-svg-icons class="content-center w-4" name="search" size="15"></app-svg-icons>
     }
     <input id="searchBar" type="text" class="w-full p-2" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()" placeholder="Search for a movie title..." autocomplete="off" />
   </label>
