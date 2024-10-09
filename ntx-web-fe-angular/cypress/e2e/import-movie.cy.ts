@@ -7,7 +7,7 @@ describe('create movie', () => {
     cy.intercept(convertRouteToPath(getMovieImporteUrl())).as('BE_ImportMovie');
   });
 
-  it('should navigate to inport title page', () => {
+  it('should load the import title page with the disabled Import button', () => {
     cy.visit('/createTitle');
     cy.url().should('include', '/createTitle');
     cy.get('[aria-label="Import"]').click();
@@ -15,7 +15,7 @@ describe('create movie', () => {
     cy.get('.btn').contains('Import').should('be.disabled');
   });
 
-  it('should allow search for external movies', () => {
+  it('should display external movie search results when a movie title is entered', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
@@ -27,7 +27,7 @@ describe('create movie', () => {
     cy.get(':nth-child(1) > .flex-col > .text-gray-400').should('exist');
   });
 
-  it('should show error when searching for a non-existent movie', () => {
+  it('should display an error message for a non-existent movie search', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
@@ -38,7 +38,7 @@ describe('create movie', () => {
     cy.get('.input > app-svg-icons > div > svg').should('exist');
   });
 
-  it('should allow import a selected movie', () => {
+  it('should successfully import a selected movie', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
@@ -66,7 +66,7 @@ describe('create movie', () => {
     });
   });
 
-  it('should throw error label', () => {
+  it('should display a validation error for exceeding maximum movie name length', () => {
     cy.visit('/createTitle');
     cy.get('[aria-label="Import"]').click();
 
@@ -83,7 +83,7 @@ describe('create movie', () => {
     cy.get('.btn').contains('Import').should('be.disabled');
   });
 
-  it('should throw search error', () => {
+  it('should display an error message when the search request fails', () => {
     cy.intercept('GET', '/api/v1/library/search*', { statusCode: 500 });
 
     cy.visit('/createTitle');
@@ -96,7 +96,7 @@ describe('create movie', () => {
     cy.get('.absolute').should('exist').contains('An error occurred while fetching the search results.');
   });
 
-  it('should throw error on fetching a movie', () => {
+  it('should display an error message when fetching movie metadata fails', () => {
     cy.intercept('GET', '/api/v1/library/external-movies/808/metadata*', {
       statusCode: 400,
       body: { message: 'Failed to fetch movie from external data source.' },
