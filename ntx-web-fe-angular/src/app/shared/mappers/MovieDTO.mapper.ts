@@ -1,6 +1,10 @@
 import { MovieDTO } from '../models/movie.dto';
 
 export class MovieDTOMapper {
+  static anyToMovieDTOArray(items: any[]): MovieDTO[] {
+    return items.map((item) => this.anyToMovieDTO(item));
+  }
+
   static anyToMovieDTO(item: any): MovieDTO {
     return {
       id: item.id,

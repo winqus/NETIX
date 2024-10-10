@@ -70,7 +70,8 @@ export class MovieService implements IMovieService {
 
     return this.http.get(url, httpOptions).pipe(
       map((response: any) => {
-        return response.map(MovieDTOMapper.anyToMovieDTO(response));
+        console.log(response);
+        return MovieDTOMapper.anyToMovieDTOArray(response);
       }),
       catchError((error) => {
         console.error('Error fetching movie metadata:', error);
