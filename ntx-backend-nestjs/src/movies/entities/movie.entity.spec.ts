@@ -27,6 +27,7 @@ describe('Movie', () => {
       expect(movie.runtimeMinutes).toBe(props.runtimeMinutes);
       expect(movie.videoID).toBeUndefined();
       expect(movie.hash).toBeDefined();
+      expect(movie.isPublished).toBe(false);
     });
 
     it('should generate uuid if not provided', async () => {

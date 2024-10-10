@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Logger,
@@ -35,9 +36,11 @@ import {
 } from './movies.constants';
 import { MoviesService } from './movies.service';
 import {
+  ApiDocsForDeleteMoviePublished,
   ApiDocsForGetMovie,
   ApiDocsForPatchMovie,
   ApiDocsForPostMovie,
+  ApiDocsForPutMoviePublished,
   ApiDocsForPutUpdatePoster,
 } from './swagger/api-docs.decorators';
 
@@ -145,6 +148,42 @@ export class MoviesController {
       }
 
       this.logger.log(`Updated movie ${id}`);
+
+      return updatedMovie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Put(':id/published')
+  @ApiDocsForPutMoviePublished()
+  public async publish(@Param('id') id: string): Promise<MovieDTO> {
+    try {
+      const updatedMovie = await this.moviesSrv.publishOne(id);
+
+      this.logger.log(`Published movie ${id}`);
+
+      return updatedMovie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Delete(':id/published')
+  @ApiDocsForDeleteMoviePublished()
+  public async unpublish(@Param('id') id: string): Promise<MovieDTO> {
+    try {
+      const updatedMovie = await this.moviesSrv.unpublishOne(id);
+
+      this.logger.log(`Unpublished movie ${id}`);
 
       return updatedMovie;
     } catch (error) {

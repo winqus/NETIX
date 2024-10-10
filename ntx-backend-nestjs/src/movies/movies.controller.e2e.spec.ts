@@ -233,4 +233,38 @@ describe('Movies API (e2e)', () => {
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
   });
+
+  describe('PUT /api/v1/movies/:id/published', () => {
+    it('should successfully set the movie to be published', async () => {
+      const existingMovie = await createRandomValidMovie();
+
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/${existingMovie.id}/published`);
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.isPublished).toBe(true);
+    });
+
+    it('should return 404 when movie does not exist', async () => {
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`);
+
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('DELETE /api/v1/movies/:id/published', () => {
+    it('should successfully set the movie to be unpublished', async () => {
+      const existingMovie = await createRandomValidMovie();
+
+      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/${existingMovie.id}/published`);
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.isPublished).toBe(false);
+    });
+
+    it('should return 404 when movie does not exist', async () => {
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`);
+
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
 });

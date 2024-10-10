@@ -5,4 +5,5 @@ export interface Title extends Entity {
   name: string;
   type: string;
   hash: string;
+  isPublished: boolean;
 }

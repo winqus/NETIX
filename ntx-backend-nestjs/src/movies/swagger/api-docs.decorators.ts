@@ -82,3 +82,30 @@ export function ApiDocsForImportMovie() {
     ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
   );
 }
+
+export function ApiDocsForPutMoviePublished() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Set a movie as published' }),
+    ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiResponse({ status: HttpStatus.OK, description: 'Changed movie state to published', type: MovieDTO }),
+    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid id' }),
+    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Requested movie does not exist' }),
+    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}
+
+export function ApiDocsForDeleteMoviePublished() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Set a movie as unpublished' }),
+    ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Changed movie state to unpublished',
+      type: MovieDTO,
+      example: { '...': '...', isPublished: false, '....': '...' },
+    }),
+    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid id' }),
+    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Requested movie does not exist' }),
+    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}
