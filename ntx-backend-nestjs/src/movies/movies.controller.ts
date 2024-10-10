@@ -36,9 +36,11 @@ import {
 } from './movies.constants';
 import { MoviesService } from './movies.service';
 import {
+  ApiDocsForDeleteMoviePublished,
   ApiDocsForGetMovie,
   ApiDocsForPatchMovie,
   ApiDocsForPostMovie,
+  ApiDocsForPutMoviePublished,
   ApiDocsForPutUpdatePoster,
 } from './swagger/api-docs.decorators';
 
@@ -158,6 +160,7 @@ export class MoviesController {
   }
 
   @Put(':id/published')
+  @ApiDocsForPutMoviePublished()
   public async publish(@Param('id') id: string): Promise<MovieDTO> {
     try {
       const updatedMovie = await this.moviesSrv.publishOne(id);
@@ -175,6 +178,7 @@ export class MoviesController {
   }
 
   @Delete(':id/published')
+  @ApiDocsForDeleteMoviePublished()
   public async unpublish(@Param('id') id: string): Promise<MovieDTO> {
     try {
       const updatedMovie = await this.moviesSrv.unpublishOne(id);
