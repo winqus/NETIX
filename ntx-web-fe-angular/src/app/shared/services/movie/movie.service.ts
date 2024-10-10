@@ -79,10 +79,4 @@ export class MovieService implements IMovieService {
       })
     );
   }
-
-  __getTestMovies(): Observable<MovieDTO[]> {
-    const raw: any[] = testMovieFixture;
-
-    return of(raw);
-  }
 }
