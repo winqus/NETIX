@@ -22,6 +22,10 @@ export class MoviesMapper {
     return movie;
   }
 
+  public static async any2Movies(any: any[]): Promise<Movie[]> {
+    return Promise.all(any.map((a) => MoviesMapper.any2Movie(a)));
+  }
+
   public static async Movie2MovieDTO(movie: Movie): Promise<MovieDTO> {
     const movieDTO = createValidatedObject(MovieDTO, {
       id: movie.uuid,
@@ -37,5 +41,9 @@ export class MoviesMapper {
     });
 
     return movieDTO;
+  }
+
+  public static async Movies2MovieDTOs(movies: Movie[]): Promise<MovieDTO[]> {
+    return Promise.all(movies.map((m) => MoviesMapper.Movie2MovieDTO(m)));
   }
 }

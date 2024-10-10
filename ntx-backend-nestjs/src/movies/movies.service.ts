@@ -173,6 +173,17 @@ export class MoviesService {
     }
   }
 
+  public async findAll(): Promise<MovieDTO[]> {
+    try {
+      const movies = await this.moviesRepo.findAllSortedByReleaseDate();
+
+      return MoviesMapper.Movies2MovieDTOs(movies);
+    } catch (error) {
+      this.logger.error(`Failed to find movies sorted by release date: ${error.message}`);
+      throw error;
+    }
+  }
+
   public async findAllByName(name: string): Promise<MovieSearchResultDTO[]> {
     try {
       if (!name) {

@@ -33,6 +33,23 @@ export function ApiDocsForPostMovie() {
   );
 }
 
+export function ApiDocsForGetMovie() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Get movie by ID' }),
+    ApiResponse({ status: HttpStatus.OK, description: 'Found movie', type: MovieDTO }),
+    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad or not existing ID' }),
+    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}
+
+export function ApiDocsForGetMovies() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Get all movies sorted by release date in descending order' }),
+    ApiResponse({ status: HttpStatus.OK, description: 'Retrieved movies list', type: [MovieDTO] }),
+    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}
+
 export function ApiDocsForPutUpdatePoster() {
   return applyDecorators(
     ApiOperation({ summary: 'Replace poster for a movie' }),
@@ -51,15 +68,6 @@ export function ApiDocsForPutUpdatePoster() {
       status: HttpStatus.BAD_REQUEST,
       description: 'When file or id not provided',
     }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
-  );
-}
-
-export function ApiDocsForGetMovie() {
-  return applyDecorators(
-    ApiOperation({ summary: 'Get movie by ID' }),
-    ApiResponse({ status: HttpStatus.OK, description: 'Found movie', type: MovieDTO }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad or not existing ID' }),
     ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
   );
 }
