@@ -38,6 +38,7 @@ import { MoviesService } from './movies.service';
 import {
   ApiDocsForDeleteMoviePublished,
   ApiDocsForGetMovie,
+  ApiDocsForGetMovies,
   ApiDocsForPatchMovie,
   ApiDocsForPostMovie,
   ApiDocsForPutMoviePublished,
@@ -91,6 +92,22 @@ export class MoviesController {
       const movie = await this.moviesSrv.findOne(id);
 
       return movie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Get()
+  @ApiDocsForGetMovies()
+  public async getAll(): Promise<MovieDTO[]> {
+    try {
+      const movies = await this.moviesSrv.findAll();
+
+      return movies;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

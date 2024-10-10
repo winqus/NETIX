@@ -1,6 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
-import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { PosterSize } from '@ntx/images/images.types';
 import { PosterService } from '@ntx/images/poster.service';
@@ -169,6 +168,17 @@ export class MoviesService {
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
       this.logger.error(`Failed to find movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async findAll(): Promise<MovieDTO[]> {
+    try {
+      const movies = await this.moviesRepo.findAllSortedByReleaseDate();
+
+      return MoviesMapper.Movies2MovieDTOs(movies);
+    } catch (error) {
+      this.logger.error(`Failed to find movies sorted by release date: ${error.message}`);
       throw error;
     }
   }

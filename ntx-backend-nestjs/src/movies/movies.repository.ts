@@ -13,24 +13,34 @@ export class MoviesRepository extends EntityRepository<Movie> {
     super(model);
   }
 
-  public async findAllByName(name: string): Promise<Movie[]> {
-    const query: FilterQuery<MovieDocument> = {
-      name: { $regex: makeCaseInsensitiveRegex(name) },
-    };
+  public async findOneByUUID(uuid: string): Promise<Movie | null> {
+    const query: FilterQuery<MovieDocument> = { uuid };
+    const found = await super.findOne(query);
 
+    return found == null ? null : MoviesMapper.any2Movie(found);
+  }
+
+  public async findAllByName(name: string): Promise<Movie[]> {
+    const query: FilterQuery<MovieDocument> = { name: { $regex: makeCaseInsensitiveRegex(name) } };
     const movieDocuments = await this.model.find(query).exec();
 
     if (movieDocuments.length > 0) {
-      return Promise.all(movieDocuments.map((m) => MoviesMapper.any2Movie(m)));
+      return MoviesMapper.any2Movies(movieDocuments);
     }
 
     return [];
   }
 
-  public async createOne(movie: Movie): Promise<Movie> {
-    const created = await super.create(movie);
+  public async findAllSortedByReleaseDate(isAscending?: boolean): Promise<Movie[]> {
+    const query: FilterQuery<MovieDocument> = {};
+    const sortOrder = isAscending ? 1 : -1;
+    const movieDocuments = await this.model.find(query).sort({ originallyReleasedAt: sortOrder }).exec();
 
-    return MoviesMapper.any2Movie(created);
+    if (movieDocuments.length > 0) {
+      return MoviesMapper.any2Movies(movieDocuments);
+    }
+
+    return [];
   }
 
   public async existsByUUID(uuid: string): Promise<boolean> {
@@ -45,11 +55,10 @@ export class MoviesRepository extends EntityRepository<Movie> {
     return super.exists(query);
   }
 
-  public async findOneByUUID(uuid: string): Promise<Movie | null> {
-    const query: FilterQuery<MovieDocument> = { uuid };
-    const found = await super.findOne(query);
+  public async createOne(movie: Movie): Promise<Movie> {
+    const created = await super.create(movie);
 
-    return found == null ? null : MoviesMapper.any2Movie(found);
+    return MoviesMapper.any2Movie(created);
   }
 
   public async updateOneByUUID(uuid: string, update: Partial<Movie>): Promise<Movie | null> {

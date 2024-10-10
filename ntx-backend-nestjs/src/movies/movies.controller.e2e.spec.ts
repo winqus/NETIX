@@ -95,6 +95,39 @@ describe('Movies API (e2e)', () => {
     return createdMovie;
   }
 
+  describe('GET /api/v1/movies/:id', () => {
+    it('should return 200 when movie exists', async () => {
+      const existingMovie = await createRandomValidMovie();
+
+      const response = await request(app.getHttpServer()).get(`/api/v1/movies/${existingMovie.id}`);
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.name).toEqual(existingMovie.name);
+    });
+
+    it('should return 404 when movie does not exist', async () => {
+      const response = await request(app.getHttpServer()).get(`/api/v1/movies/123456789012345`);
+
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('GET /api/v1/movies', () => {
+    it('should return a list of movies', async () => {
+      const existingMovies = await Promise.all([createRandomValidMovie(), createRandomValidMovie()]);
+
+      const response = await request(app.getHttpServer()).get('/api/v1/movies');
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.length).toBeGreaterThanOrEqual(2);
+      expect(response.body.map((m: any) => m.id)).toContain(existingMovies[0].id);
+      expect(response.body.map((m: any) => m.id)).toContain(existingMovies[1].id);
+      expect(Date.parse(response.body[0].originallyReleasedAt)).toBeGreaterThanOrEqual(
+        Date.parse(response.body[1].originallyReleasedAt),
+      );
+    });
+  });
+
   describe('POST /api/v1/movies', () => {
     it('should successfully create a movie with valid input', async () => {
       const createMovieDto = createRandomValidCreateMovieDTO();
@@ -162,23 +195,6 @@ describe('Movies API (e2e)', () => {
       expect(firstResponse.body).toHaveProperty('id');
       expect(secondResponse.status).toBe(HttpStatus.CONFLICT);
       expect(secondResponse.body.message).toMatch('already exists');
-    });
-  });
-
-  describe('GET /api/v1/movies/:id', () => {
-    it('should return 200 when movie exists', async () => {
-      const existingMovie = await createRandomValidMovie();
-
-      const response = await request(app.getHttpServer()).get(`/api/v1/movies/${existingMovie.id}`);
-
-      expect(response.status).toBe(HttpStatus.OK);
-      expect(response.body.name).toEqual(existingMovie.name);
-    });
-
-    it('should return 404 when movie does not exist', async () => {
-      const response = await request(app.getHttpServer()).get(`/api/v1/movies/123456789012345`);
-
-      expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
   });
 
