@@ -1,7 +1,6 @@
 import { Component, HostListener, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { MediaItem } from '@ntx-shared/models/mediaItem';
-import { VideoState } from '@ntx-shared/models/watchableVideo.dto';
+import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 
 @Component({
   selector: 'app-movie-card',
@@ -10,7 +9,7 @@ import { VideoState } from '@ntx-shared/models/watchableVideo.dto';
   templateUrl: './movie-card.component.html',
 })
 export class MovieCardComponent {
-  @Input() movie!: MediaItem;
+  @Input() movie!: MovieDTO;
   isMobile: boolean = false;
 
   constructor(private router: Router) {
@@ -27,16 +26,16 @@ export class MovieCardComponent {
   }
 
   get publishedDate(): string {
-    if (!this.movie || !this.movie.releaseDate) return '0000';
-    const date = this.movie.releaseDate;
+    if (!this.movie || !this.movie.originallyReleasedAt) return '0000';
+    const date = this.movie.originallyReleasedAt;
 
     const year = date.getFullYear();
     return `${year}`;
   }
 
   get formattedDuration(): string {
-    if (!this.movie || !this.movie.duration) return '00:00:00';
-    const duration = this.movie.duration;
+    if (!this.movie || !this.movie.runtimeMinutes) return '00:00:00';
+    const duration = this.movie.runtimeMinutes;
     const hours = Math.floor(duration / 3600)
       .toString()
       .padStart(2, '0');
@@ -48,7 +47,7 @@ export class MovieCardComponent {
   }
 
   isReady(): boolean {
-    return this.movie.state == VideoState.READY ? true : false;
+    return false;
   }
 
   watch() {
@@ -56,6 +55,6 @@ export class MovieCardComponent {
   }
 
   movieState(): string {
-    return this.movie.state.toLocaleUpperCase().replaceAll('_', ' ');
+    return '';
   }
 }

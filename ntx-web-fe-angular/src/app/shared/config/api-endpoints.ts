@@ -26,11 +26,10 @@ export const SERVER = {
 };
 
 export function getMovieUrl(_id?: string): string {
-  if (_id) {
-    return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}`;
-  } else {
-    return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}`;
-  }
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}`;
+  if (_id) url += `/${_id}`;
+
+  return url;
 }
 
 export function getMovieImporteUrl(): string {

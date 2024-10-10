@@ -6,8 +6,8 @@ import Player from 'video.js/dist/types/player';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '@ntx-shared/services/layout.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
-import { MediaItem } from '@ntx-shared/models/mediaItem';
 import { formatTime } from '@ntx-shared/services/utils/utils';
+import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 
 @Component({
   selector: 'app-video-media-viewer',
@@ -24,7 +24,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   player!: Player;
 
-  mediaData?: MediaItem;
+  mediaData?: MovieDTO;
   streamID: string | null = null;
 
   private options = {
@@ -83,8 +83,8 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     this.streamID = params!.get('uuid');
 
     if (this.streamID) {
-      this.mediaData = history.state.data as MediaItem;
-      this.videoTitle = this.mediaData?.title || 'No title available';
+      this.mediaData = history.state.data as MovieDTO;
+      this.videoTitle = this.mediaData?.name || 'No title available';
 
       console.log('streamID', this.streamID);
 
