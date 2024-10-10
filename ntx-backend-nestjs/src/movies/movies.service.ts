@@ -210,4 +210,35 @@ export class MoviesService {
       throw error;
     }
   }
+
+  public async publishOne(id: string): Promise<MovieDTO> {
+    return this.togglePublishedForOne(id, true);
+  }
+
+  public async unpublishOne(id: string): Promise<MovieDTO> {
+    return this.togglePublishedForOne(id, false);
+  }
+
+  private async togglePublishedForOne(id: string, isPublished: boolean): Promise<MovieDTO> {
+    try {
+      id = id.trim();
+
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      const movie = await this.moviesRepo.findOneByUUID(id);
+      if (movie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      movie.isPublished = isPublished;
+      const updatedMovie = await this.moviesRepo.updateOneByUUID(id, movie);
+
+      return MoviesMapper.Movie2MovieDTO(updatedMovie!);
+    } catch (error) {
+      this.logger.error(`Failed to publish movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
 }

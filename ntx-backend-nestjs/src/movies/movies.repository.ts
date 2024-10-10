@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { makeCaseInsensitiveRegex } from '@ntx/common/utils/regex.utils';
 import { EntityRepository } from '@ntx/database/entity.repository';
 import { FilterQuery, Model } from 'mongoose';
 import { Movie } from './entities/movie.entity';
@@ -14,14 +15,16 @@ export class MoviesRepository extends EntityRepository<Movie> {
 
   public async findAllByName(name: string): Promise<Movie[]> {
     const query: FilterQuery<MovieDocument> = {
-      name: { $regex: new RegExp(name, 'i') },
+      name: { $regex: makeCaseInsensitiveRegex(name) },
     };
 
     const movieDocuments = await this.model.find(query).exec();
 
-    const movies: Movie[] = movieDocuments.map(this.mapMovieDocumentToMovie);
+    if (movieDocuments.length > 0) {
+      return Promise.all(movieDocuments.map((m) => MoviesMapper.any2Movie(m)));
+    }
 
-    return movies;
+    return [];
   }
 
   public async createOne(movie: Movie): Promise<Movie> {
@@ -54,21 +57,5 @@ export class MoviesRepository extends EntityRepository<Movie> {
     const updated = await super.findOneAndUpdate(query, update);
 
     return updated == null ? null : MoviesMapper.any2Movie(updated);
-  }
-
-  private mapMovieDocumentToMovie(document: MovieDocument): Movie {
-    return {
-      uuid: document.uuid,
-      createdAt: document.createdAt,
-      updatedAt: document.updatedAt,
-      posterID: document.posterID,
-      name: document.name,
-      type: document.type,
-      hash: document.hash,
-      originallyReleasedAt: document.originallyReleasedAt,
-      summary: document.summary,
-      runtimeMinutes: document.runtimeMinutes,
-      videoID: document.videoID,
-    };
   }
 }

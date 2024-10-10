@@ -3,7 +3,7 @@ import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
 import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { generateUniqueID } from '@ntx/common/utils/ID.utils';
-import { IsDate, IsInt, IsOptional, IsPositive, IsString, Length, Matches, Max, Min } from 'class-validator';
+import { IsBoolean, IsDate, IsInt, IsOptional, IsPositive, IsString, Length, Matches, Max, Min } from 'class-validator';
 import { MOVIES_ID_LENGTH, MOVIES_ID_PREFIX, MOVIES_POSTER_DEFAULT_ID } from '../movies.constants';
 
 export interface MovieProps {
@@ -14,6 +14,7 @@ export interface MovieProps {
   name: string;
   originallyReleasedAt: Date;
   summary: string;
+  isPublished?: boolean;
   runtimeMinutes: number;
   videoID?: string;
 }
@@ -41,6 +42,9 @@ export class Movie implements Title {
   @IsString()
   hash: string;
 
+  @IsBoolean()
+  isPublished: boolean;
+
   @IsDate()
   originallyReleasedAt: Date;
 
@@ -66,11 +70,12 @@ export class Movie implements Title {
       posterID: props.posterID || MOVIES_POSTER_DEFAULT_ID,
       name: props.name,
       type: TitleType.MOVIE,
+      hash: this.createHash(props),
+      isPublished: props.isPublished || false,
       originallyReleasedAt: props.originallyReleasedAt,
       summary: props.summary,
       runtimeMinutes: props.runtimeMinutes,
       videoID: props.videoID,
-      hash: this.createHash(props),
     });
 
     return movie;

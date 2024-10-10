@@ -10,12 +10,13 @@ export class MoviesMapper {
       updatedAt: any.updatedAt,
       name: any.name,
       summary: any.summary,
+      type: any.type,
       originallyReleasedAt: any.originallyReleasedAt,
+      hash: any.hash,
+      isPublished: any.isPublished,
       runtimeMinutes: any.runtimeMinutes,
       posterID: any.posterID,
       videoID: any.videoID,
-      hash: any.hash,
-      type: any.type,
     });
 
     return movie;
@@ -29,6 +30,7 @@ export class MoviesMapper {
       name: movie.name,
       summary: movie.summary,
       originallyReleasedAt: movie.originallyReleasedAt,
+      isPublished: movie.isPublished,
       runtimeMinutes: movie.runtimeMinutes,
       posterID: movie.posterID,
       videoID: movie.videoID,

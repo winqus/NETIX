@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
+import { IsBoolean, IsDate, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
 import {
   MOVIES_NAME_LENGTH_MAX,
   MOVIES_NAME_LENGTH_MIN,
@@ -28,6 +28,9 @@ export class MovieDTO {
 
   @IsDate()
   originallyReleasedAt: Date;
+
+  @IsBoolean()
+  isPublished: boolean;
 
   @IsInt()
   @Min(MOVIES_RUNTIME_MINS_MIN)
