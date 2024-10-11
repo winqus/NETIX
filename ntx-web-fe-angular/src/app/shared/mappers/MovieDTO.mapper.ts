@@ -12,6 +12,7 @@ export class MovieDTOMapper {
       runtimeMinutes: item.runtimeMinutes,
       posterID: item.posterID,
       videoID: item.videoID || null,
+      isPublished: item.isPublished || false,
     };
   }
 }
