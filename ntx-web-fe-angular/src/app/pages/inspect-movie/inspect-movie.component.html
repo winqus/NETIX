@@ -15,7 +15,9 @@
             <div class="flex flex-row items-center justify-start gap-8">
               <div class="text-4xl">{{ this.movie?.name || 'Unknown' }}</div>
               <div class="text-xl text-gray-500">{{ this.movie?.originallyReleasedAt?.getFullYear() || 'Unknown Year' }}</div>
-              <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
+              @if (!this.movie?.isPublished) {
+                <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
+              }
             </div>
             <div class="text-1xl text-gray-500">
               <div>Created at {{ this.movie?.createdAt || 'Unknown' }}</div>
@@ -59,7 +61,7 @@
         </form>
       </div>
 
-      <form [formGroup]="movieTitleEditForm" class="w-full h-full" (submit)="onSubmit()">
+      <form [formGroup]="movieTitleEditForm!" class="w-full h-full" (submit)="onSubmit()">
         <!-- Title Field -->
         <label for="title" class="form-control w-full">
           <div class="label py-0">

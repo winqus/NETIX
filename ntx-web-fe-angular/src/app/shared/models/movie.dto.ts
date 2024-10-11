@@ -8,6 +8,7 @@ export interface MovieDTO {
   runtimeMinutes: number;
   posterID: string;
   videoID?: string;
+  isPublished: boolean;
 }
 
 export interface UpdateMovieDTO {

@@ -23,6 +23,7 @@ describe('InspectMovieComponent', () => {
     originallyReleasedAt: new Date(),
     runtimeMinutes: 120,
     posterID: 'poster123',
+    isPublished: true,
   };
 
   beforeEach(async () => {
