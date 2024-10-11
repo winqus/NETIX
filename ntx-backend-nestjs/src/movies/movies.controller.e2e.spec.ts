@@ -12,6 +12,7 @@ import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
+import { MovieDTO } from './dto/movie.dto';
 import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
 import { MoviesModule } from './movies.module';
 
@@ -77,7 +78,7 @@ describe('Movies API (e2e)', () => {
     tmdbFetchMocker.dontMockResponses();
   });
 
-  async function createRandomValidMovie() {
+  async function createRandomValidMovie(): Promise<MovieDTO> {
     const createMovieDto = createRandomValidCreateMovieDTO();
     const testImagePath = validTestImagePath;
 
@@ -229,6 +230,7 @@ describe('Movies API (e2e)', () => {
         .patch(`/api/v1/movies/${existingMovie.id}`)
         .send({ name: newName });
 
+      expect(existingMovie.updatedAt).not.toEqual(response.body.updatedAt);
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.name).toEqual(newName);
     });
