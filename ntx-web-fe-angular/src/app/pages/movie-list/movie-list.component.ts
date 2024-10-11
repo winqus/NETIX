@@ -22,13 +22,14 @@ export class MovieListComponent implements OnInit {
   ngOnInit() {
     this.movieService.getMovies().subscribe({
       next: (response) => {
-        console.log(response);
+        if (environment.development) console.log('Get movies:', response);
         this.movies = response;
         this.movies.sort((a, b) => new Date(b.originallyReleasedAt).getTime() - new Date(a.originallyReleasedAt).getTime());
         this.isLoadingMovies = false;
       },
       error: (errorResponse) => {
-        if (environment.development) console.error('Error uploading metadata:', errorResponse);
+        if (environment.development) console.error('Error getting movies:', errorResponse);
+        this.isLoadingMovies = false;
       },
     });
   }
