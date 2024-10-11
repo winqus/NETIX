@@ -3,8 +3,18 @@ import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
 import { generateHash } from '@ntx/common/utils/generate-hash.utils';
 import { generateUniqueID } from '@ntx/common/utils/ID.utils';
-import { IsBoolean, IsDate, IsInt, IsOptional, IsPositive, IsString, Length, Matches, Max, Min } from 'class-validator';
-import { MOVIES_ID_LENGTH, MOVIES_ID_PREFIX, MOVIES_POSTER_DEFAULT_ID } from '../movies.constants';
+import { IsBoolean, IsDate, IsInt, IsOptional, IsString, Length, Matches, Max, Min } from 'class-validator';
+import {
+  MOVIES_ID_LENGTH,
+  MOVIES_ID_PREFIX,
+  MOVIES_NAME_LENGTH_MAX,
+  MOVIES_NAME_LENGTH_MIN,
+  MOVIES_POSTER_DEFAULT_ID,
+  MOVIES_RUNTIME_MINS_MAX,
+  MOVIES_RUNTIME_MINS_MIN,
+  MOVIES_SUMMARY_LENGTH_MAX,
+  MOVIES_SUMMARY_LENGTH_MIN,
+} from '../movies.constants';
 
 export interface MovieProps {
   uuid?: string;
@@ -33,7 +43,7 @@ export class Movie implements Title {
   posterID: string;
 
   @IsString()
-  @Length(1, 200)
+  @Length(MOVIES_NAME_LENGTH_MIN, MOVIES_NAME_LENGTH_MAX)
   name: string;
 
   @Matches(TitleType.MOVIE)
@@ -49,13 +59,12 @@ export class Movie implements Title {
   originallyReleasedAt: Date;
 
   @IsString()
-  @Length(1, 1000)
+  @Length(MOVIES_SUMMARY_LENGTH_MIN, MOVIES_SUMMARY_LENGTH_MAX)
   summary: string;
 
   @IsInt()
-  @IsPositive()
-  @Min(1)
-  @Max(12_000)
+  @Min(MOVIES_RUNTIME_MINS_MIN)
+  @Max(MOVIES_RUNTIME_MINS_MAX)
   runtimeMinutes: number;
 
   @IsString()
