@@ -1,6 +1,4 @@
-import { ApiBodyOptions, getSchemaPath } from '@nestjs/swagger';
 import { FileToStorageContainerInterceptorArgs } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
-import { CreateMovieDTO } from './dto/create-movie.dto';
 
 export const MOVIES_CONTROLLER_BASE_PATH = 'movies';
 export const MOVIES_CONTROLLER_VERSION = '1';
@@ -24,9 +22,9 @@ export const MOVIES_POSTER_STORAGE_ARGS: FileToStorageContainerInterceptorArgs =
 export const MOVIES_NAME_LENGTH_MIN = 1;
 export const MOVIES_NAME_LENGTH_MAX = 200;
 export const MOVIES_SUMMARY_LENGTH_MIN = 1;
-export const MOVIES_SUMMARY_LENGTH_MAX = 1000;
-export const MOVIES_RUNTIME_MINS_MIN = 1;
-export const MOVIES_RUNTIME_MINS_MAX = 12000;
+export const MOVIES_SUMMARY_LENGTH_MAX = 1_000;
+export const MOVIES_RUNTIME_MINS_MIN = 0;
+export const MOVIES_RUNTIME_MINS_MAX = 12_000;
 
 /* Mongoose */
 export const MOVIES_MODEL_TOKEN = 'MOVIES_MODEL';

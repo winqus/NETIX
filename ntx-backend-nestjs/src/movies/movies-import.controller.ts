@@ -50,7 +50,7 @@ export class MoviesImportController {
       createMovieDTO.name = externalTitleMetadata.metadata.name;
       createMovieDTO.originallyReleasedAt = new Date(externalTitleMetadata.metadata.releaseDate);
       createMovieDTO.summary = externalTitleMetadata.metadata.summary;
-      createMovieDTO.runtimeMinutes = externalTitleMetadata?.metadata.runtime;
+      createMovieDTO.runtimeMinutes = externalTitleMetadata.metadata.runtime;
 
       const newMovie = await this.moviesSrv.createOne(createMovieDTO);
 
