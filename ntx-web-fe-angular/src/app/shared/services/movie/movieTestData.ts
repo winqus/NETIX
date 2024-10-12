@@ -10,6 +10,7 @@ export const testMovieFixture: MovieDTO[] = [
     originallyReleasedAt: new Date('2010-11-07'),
     runtimeMinutes: 10140,
     posterID: 'https://fastly.picsum.photos/id/986/700/900.jpg?hmac=Z6XTg0SLdISSLjJxY7L15daSPBlIl0is-pHMS2sGDCo',
+    isPublished: true,
   },
   {
     id: '2',
@@ -20,6 +21,7 @@ export const testMovieFixture: MovieDTO[] = [
     originallyReleasedAt: new Date('2014-11-07'),
     runtimeMinutes: 10140,
     posterID: 'https://fastly.picsum.photos/id/410/700/900.jpg?hmac=7bkyN8_CkLEpktiIL8SQj9YV2-Bgv-u3AIkBsMhDQSM',
+    isPublished: true,
   },
   {
     id: '3',
@@ -30,6 +32,7 @@ export const testMovieFixture: MovieDTO[] = [
     originallyReleasedAt: new Date('1999-11-07'),
     runtimeMinutes: 9140,
     posterID: 'https://fastly.picsum.photos/id/729/700/900.jpg?hmac=dkrDGdKLxPWTVcfUtk9oBeviL3snwldFOMo9QG5f1EU',
+    isPublished: true,
   },
   {
     id: '4',
@@ -40,6 +43,7 @@ export const testMovieFixture: MovieDTO[] = [
     originallyReleasedAt: new Date('1994-11-07'),
     runtimeMinutes: 10000,
     posterID: 'https://fastly.picsum.photos/id/172/700/900.jpg?hmac=j92ReRNGl367wrJYLhaSHNa61DFyORGCaSqWWSUooqw',
+    isPublished: true,
   },
   {
     id: '5',
@@ -50,6 +54,7 @@ export const testMovieFixture: MovieDTO[] = [
     originallyReleasedAt: new Date('2017-11-07'),
     runtimeMinutes: 9890,
     posterID: 'https://fastly.picsum.photos/id/344/700/900.jpg?hmac=XwfWpOhCSDOwm7KOpSCD8s7dZCJMTInlxl2k48xQNow',
+    isPublished: true,
   },
   {
     id: '6',
@@ -60,5 +65,6 @@ export const testMovieFixture: MovieDTO[] = [
     originallyReleasedAt: new Date('2017-11-07'),
     runtimeMinutes: 9890,
     posterID: 'https://fastly.picsum.photos/id/690/700/800.jpg?hmac=11qu0nO1sNp6VYfM9qhziv8t9It_5KC2zFe5rwMBY4I',
+    isPublished: true,
   },
 ];

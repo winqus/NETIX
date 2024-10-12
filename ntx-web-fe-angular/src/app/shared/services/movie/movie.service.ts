@@ -4,8 +4,7 @@ import { getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { IMovieService } from './IMovie.service.interface';
 import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
 import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
-import { catchError, delay, map, Observable, of, throwError } from 'rxjs';
-import { testMovieFixture } from './movieTestData';
+import { catchError, map, Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',

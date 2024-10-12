@@ -11,7 +11,6 @@ describe('MovieCardComponent with MovieDTO', () => {
   let fixture: ComponentFixture<MovieCardComponent>;
   let mockRouter: jasmine.SpyObj<Router>;
 
-  // Mock movie object using MovieDTO interface
   const mockMovie: MovieDTO = {
     id: '1',
     createdAt: new Date('2020-01-01'),
@@ -21,7 +20,8 @@ describe('MovieCardComponent with MovieDTO', () => {
     originallyReleasedAt: new Date('2020-01-09'),
     runtimeMinutes: 120,
     posterID: 'poster123',
-    videoID: 'video123', // optional field
+    videoID: 'video123',
+    isPublished: true,
   };
 
   beforeEach(async () => {
@@ -99,7 +99,7 @@ describe('MovieCardComponent with MovieDTO', () => {
     expect(component.navigateToMovie).toHaveBeenCalled();
 
     component.onKeydown(spaceEvent);
-    expect(component.navigateToMovie).toHaveBeenCalledTimes(2); // Called twice now
+    expect(component.navigateToMovie).toHaveBeenCalledTimes(2);
   });
 
   it('should not trigger navigation for keys other than Enter or Space', () => {
