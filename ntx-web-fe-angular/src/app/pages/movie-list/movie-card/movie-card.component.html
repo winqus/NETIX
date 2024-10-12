@@ -1,0 +1,25 @@
+<div class="text-white" tabindex="-1">
+  @if (!posterLoaded) {
+    <div class="object-cover h-full aspect-[2/3] mr-2 bg-white flex align-middle justify-center items-center">
+      <app-svg-icons name="file_image" size="60" color="black"></app-svg-icons>
+    </div>
+  } @else {
+    <img
+      [src]="posterSource()"
+      [alt]="this.movie?.name"
+      class="object-cover h-full w-full rounded-md aspect-[2/3] shadow-xl dark:shadow-gray-950 skeleton"
+      role="button"
+      tabindex="0"
+      (click)="navigateToMovie()"
+      (keydown)="onKeydown($event)"
+      (error)="onPosterError()"
+      style="cursor: pointer"
+    />
+  }
+  <div class="w-full" tabindex="-1">
+    <h2 class="card-title">{{ this.movie?.name }}</h2>
+    <div class="flex justify-between">
+      <h3>{{ publishedDate }}</h3>
+    </div>
+  </div>
+</div>

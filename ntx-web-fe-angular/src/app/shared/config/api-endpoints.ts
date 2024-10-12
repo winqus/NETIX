@@ -26,11 +26,10 @@ export const SERVER = {
 };
 
 export function getMovieUrl(_id?: string): string {
-  if (_id) {
-    return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}`;
-  } else {
-    return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}`;
-  }
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}`;
+  if (_id) url += `/${_id}`;
+
+  return url;
 }
 
 export function getMovieImporteUrl(): string {
@@ -38,11 +37,9 @@ export function getMovieImporteUrl(): string {
 }
 
 export function getPoster(_id: string, _size?: string) {
-  if (_size) {
-    return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}?size=${_size}`;
-  } else {
-    return `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
-  }
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
+  if (_size) url += `?size=${_size}`;
+  return url;
 }
 
 export function replacePoster(_id: string) {

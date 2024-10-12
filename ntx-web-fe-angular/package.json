@@ -12,7 +12,8 @@
     "test-ci": "npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "backend:start": "cd ../ntx-backend-nestjs && npm start"
   },
   "private": true,
   "dependencies": {
