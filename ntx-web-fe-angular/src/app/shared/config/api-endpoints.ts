@@ -32,13 +32,18 @@ export function getMovieUrl(_id?: string): string {
   return url;
 }
 
-export function getMovieImporteUrl(): string {
+export function getMoviePublishedUrl(_id: string): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/published`;
+}
+
+export function getMovieImportUrl(): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.movies.moviesImport}`;
 }
 
 export function getPoster(_id: string, _size?: string) {
   let url = `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
   if (_size) url += `?size=${_size}`;
+
   return url;
 }
 

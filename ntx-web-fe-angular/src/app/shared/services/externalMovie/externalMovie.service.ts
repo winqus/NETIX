@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { getExternalMovie, getMovieImporteUrl, replacePoster } from '@ntx-shared/config/api-endpoints';
+import { getExternalMovie, getMovieImportUrl, replacePoster } from '@ntx-shared/config/api-endpoints';
 import { IExternalMovieService } from './IExternalMovie.service.interface';
 import { ExternalMovieDTO } from '@ntx-shared/models/externalMovie.dto';
 import { ExternalMovieDTOMapper } from '@ntx-shared/mappers/ExternalMovieDTO.mapper';
@@ -14,7 +14,7 @@ import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
 export class ExternalMovieService implements IExternalMovieService {
   constructor(private readonly http: HttpClient) {}
   uploadExternalMovieMetadata(title: any): Observable<MovieDTO> {
-    const url = getMovieImporteUrl();
+    const url = getMovieImportUrl();
     const httpOptions = {};
 
     return this.http.post(url, title, httpOptions).pipe(

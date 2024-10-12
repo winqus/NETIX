@@ -11,7 +11,7 @@ export const FieldRestrictions = {
     min: 0,
     max: 12000,
     pattern: /^[0-9]+$/,
-    patternRrror: 'Runtime has to be integer',
+    patternError: 'Runtime has to be integer',
   },
 };
 
