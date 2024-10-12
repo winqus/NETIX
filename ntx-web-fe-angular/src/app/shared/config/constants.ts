@@ -8,7 +8,7 @@ export const FieldRestrictions = {
     maxLength: 1000,
   },
   runtimeMinutes: {
-    min: 1,
+    min: 0,
     max: 12000,
     pattern: /^[0-9]+$/,
     patternRrror: 'Runtime has to be integer',
