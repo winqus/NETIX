@@ -50,7 +50,7 @@ describe('LibraryController', () => {
     };
 
     const mockLibraryService = {
-      searchByName: jest.fn().mockImplementation((query, providers, types, limit) => {
+      searchByName: jest.fn().mockImplementation((_query, providers, _types, _limit) => {
         if (providers.includes(Providers.NTX)) {
           return Promise.resolve({
             size: 1,
