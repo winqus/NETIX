@@ -112,7 +112,7 @@ export class InspectMovieComponent implements OnInit {
         },
       });
     } else {
-      this.movieService.unPublishMovie(this.movie?.id).subscribe({
+      this.movieService.unpublishMovie(this.movie?.id).subscribe({
         next: (response) => {
           if (environment.development) console.log('Unpublishing successful:', response);
           this.movie = response;

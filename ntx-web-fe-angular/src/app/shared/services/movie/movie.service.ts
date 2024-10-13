@@ -96,7 +96,7 @@ export class MovieService implements IMovieService {
     );
   }
 
-  unPublishMovie(id: string): Observable<MovieDTO> {
+  unpublishMovie(id: string): Observable<MovieDTO> {
     const url = getMoviePublishedUrl(id);
 
     const httpOptions = {};
