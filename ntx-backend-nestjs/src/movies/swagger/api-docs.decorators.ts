@@ -62,6 +62,7 @@ export function ApiDocsForPutUpdatePoster() {
       },
       description: 'Body is a <i>poster</i> file in multipart/form-data format.',
     }),
+    ApiResponse({ status: HttpStatus.OK, description: 'Updated movie poster with given file', type: MovieDTO }),
     ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Requested movie does not exist' }),
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
