@@ -4,7 +4,7 @@ import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 
 describe('InspectMovieComponent', () => {
