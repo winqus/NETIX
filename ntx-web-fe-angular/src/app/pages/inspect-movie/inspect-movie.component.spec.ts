@@ -31,7 +31,7 @@ describe('InspectMovieComponent', () => {
       getMovieMetadata: jasmine.createSpy('getMovieMetadata').and.returnValue(of(mockMovie)),
       updateMovieMetadata: jasmine.createSpy('updateMovieMetadata').and.returnValue(of(mockMovie)),
       publishMovie: jasmine.createSpy('publishMovie').and.returnValue(of({ ...mockMovie, isPublished: true })),
-      unPublishMovie: jasmine.createSpy('unPublishMovie').and.returnValue(of({ ...mockMovie, isPublished: false })),
+      unpublishMovie: jasmine.createSpy('unpublishMovie').and.returnValue(of({ ...mockMovie, isPublished: false })),
     };
 
     mockPosterService = {
@@ -108,7 +108,7 @@ describe('InspectMovieComponent', () => {
       spyOn(console, 'error');
       component.movie = { ...mockMovie, isPublished: true };
 
-      mockMovieService.unPublishMovie.and.returnValue(throwError(() => new Error('Error unpublishing movie')));
+      mockMovieService.unpublishMovie.and.returnValue(throwError(() => new Error('Error unpublishing movie')));
 
       component.onToggleMoviePublish();
 
