@@ -126,7 +126,7 @@ describe('inspect movie', () => {
       cy.get('.modal-box').should('be.visible');
       cy.contains('Confirm').click();
 
-      cy.get('.flex > .badge').contains('Unpublished').should('not.exist');
+      cy.get('.badge').contains('Unpublished').should('not.exist');
     });
   });
 
@@ -152,7 +152,7 @@ describe('inspect movie', () => {
       cy.contains('Publish').click();
       cy.contains('Confirm').click();
 
-      cy.get('.flex > .badge').contains('Unpublished').should('be.visible');
+      cy.get('.badge').contains('Unpublished').should('be.visible');
     });
   });
 });
