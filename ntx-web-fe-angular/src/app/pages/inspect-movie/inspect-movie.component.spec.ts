@@ -88,7 +88,7 @@ describe('InspectMovieComponent', () => {
       component.movie = { ...mockMovie, isPublished: true };
       component.onToggleMoviePublish();
 
-      expect(mockMovieService.unPublishMovie).toHaveBeenCalledWith('1');
+      expect(mockMovieService.unpublishMovie).toHaveBeenCalledWith('1');
       expect(component.movie?.isPublished).toBeFalse();
     });
 
@@ -112,7 +112,7 @@ describe('InspectMovieComponent', () => {
 
       component.onToggleMoviePublish();
 
-      expect(mockMovieService.unPublishMovie).toHaveBeenCalledWith('1');
+      expect(mockMovieService.unpublishMovie).toHaveBeenCalledWith('1');
       expect(console.error).toHaveBeenCalledWith('Error unpublishing movie:', jasmine.any(Error));
     });
   });
