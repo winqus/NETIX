@@ -20,6 +20,7 @@ import { formatDate } from '@ntx/app/shared/services/utils/utils';
 })
 export class InspectMovieComponent implements OnInit {
   @ViewChild('editModal') editModal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('publishPopup') publishPopup!: ElementRef<HTMLDialogElement>;
 
   movie: MovieDTO | undefined;
   posterUrl: string | null = null;
@@ -71,7 +72,7 @@ export class InspectMovieComponent implements OnInit {
     });
   }
 
-  onSubmit() {
+  onSubmitNewMetadata() {
     if (this.movieTitleEditForm == null) return;
     if (this.movie == null) return;
 
@@ -95,6 +96,50 @@ export class InspectMovieComponent implements OnInit {
         },
       });
     }
+  }
+
+  onToggleMoviePublish() {
+    if (this.movie == null) return;
+
+    if (!this.movie?.isPublished) {
+      this.movieService.publishMovie(this.movie?.id).subscribe({
+        next: (response) => {
+          if (environment.development) console.log('Publishing successful:', response);
+          this.movie = response;
+        },
+        error: (errorResponse) => {
+          if (environment.development) console.error('Error publishing movie:', errorResponse);
+        },
+      });
+    } else {
+      this.movieService.unpublishMovie(this.movie?.id).subscribe({
+        next: (response) => {
+          if (environment.development) console.log('Unpublishing successful:', response);
+          this.movie = response;
+        },
+        error: (errorResponse) => {
+          if (environment.development) console.error('Error unpublishing movie:', errorResponse);
+        },
+      });
+    }
+
+    this.publishPopup.nativeElement.close();
+  }
+
+  getPublishPopupTitle(): string {
+    if (this.movie == null) return '';
+
+    if (this.movie.isPublished) return 'Unpublish ' + this.movie?.name + '?';
+
+    return 'Publish ' + this.movie?.name + '?';
+  }
+
+  getPublishPopupText(): string {
+    if (this.movie == null) return '';
+
+    if (this.movie.isPublished) return 'Are you sure you want to unpublish?';
+
+    return 'Are you sure you want to publish?';
   }
 
   getErrorMessage(controlName: string): string {
@@ -126,7 +171,7 @@ export class InspectMovieComponent implements OnInit {
   private getPatternErrorMessage(controlName: string): string {
     switch (controlName) {
       case 'runtimeMinutes':
-        return FieldRestrictions.runtimeMinutes.patternRrror;
+        return FieldRestrictions.runtimeMinutes.patternError;
       default:
         return 'Invalid format';
     }

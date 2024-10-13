@@ -32,8 +32,9 @@
           <div class="justify-end">
             <div class="dropdown dropdown-left">
               <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
-              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1">
-                <button class="btn btn-sm btn-outline" type="button" onclick="editModal.showModal()">Edit metadata</button>
+              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
+                <button class="btn btn-sm btn-outline border-none" type="button" onclick="editModal.showModal()">Edit metadata</button>
+                <button class="btn btn-sm btn-outline border-none" type="button" onclick="publishPopup.showModal()">Publish</button>
               </ul>
             </div>
           </div>
@@ -61,7 +62,7 @@
         </form>
       </div>
 
-      <form [formGroup]="movieTitleEditForm!" class="w-full h-full" (submit)="onSubmit()">
+      <form [formGroup]="movieTitleEditForm!" class="w-full h-full" (submit)="onSubmitNewMetadata()">
         <!-- Title Field -->
         <label for="title" class="form-control w-full">
           <div class="label py-0">
@@ -142,3 +143,21 @@
     </div>
   </dialog>
 }
+
+<dialog #publishPopup id="publishPopup" class="modal modal-middle">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold">{{ getPublishPopupTitle() }}</h3>
+      <form method="dialog">
+        <button class="btn-sm btn-circle bg-black flex items-center justify-center">
+          <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
+        </button>
+      </form>
+    </div>
+    <div class="mb-3">{{ getPublishPopupText() }}</div>
+    <div class="flex flex-row justify-end gap-2">
+      <button class="btn btn-square btn-outline w-fit px-4" type="button" (click)="publishPopup.close()">Cancel</button>
+      <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="button" (click)="onToggleMoviePublish()">Confirm</button>
+    </div>
+  </div>
+</dialog>

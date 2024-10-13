@@ -160,7 +160,7 @@ export class ImportTitleComponent implements OnInit {
   private getPatternErrorMessage(controlName: string): string {
     switch (controlName) {
       case 'runtimeMinutes':
-        return FieldRestrictions.runtimeMinutes.patternRrror;
+        return FieldRestrictions.runtimeMinutes.patternError;
       default:
         return 'Invalid format';
     }

@@ -1,4 +1,4 @@
-import { getMovieImporteUrl } from '@ntx/app/shared/config/api-endpoints';
+import { getMovieImportUrl } from '@ntx/app/shared/config/api-endpoints';
 import convertRouteToPath from 'cypress/support/convertRoute';
 import { makeLongRandomMovieName, makeRandomMovieSummary } from 'cypress/support/randomDataFactory';
 import { makeCaseInsensitiveRegex } from 'cypress/support/regex';
@@ -8,7 +8,7 @@ describe('create movie', () => {
   const SEARCH_RESULTS_ITEM_ELEMENT = 'li';
 
   beforeEach(() => {
-    cy.intercept(convertRouteToPath(getMovieImporteUrl())).as('BE_ImportMovie');
+    cy.intercept(convertRouteToPath(getMovieImportUrl())).as('BE_ImportMovie');
   });
 
   it('should load the import title page with the disabled Import button', () => {
