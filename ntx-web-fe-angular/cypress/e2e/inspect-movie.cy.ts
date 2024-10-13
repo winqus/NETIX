@@ -118,7 +118,7 @@ describe('inspect movie', () => {
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
 
-      cy.get('.flex > .badge').contains('Unpublished').should('be.visible');
+      cy.get('.badge').contains('Unpublished').should('be.visible');
 
       cy.get('[name="three_dots_vertical"]').click();
       cy.get('.dropdown-content').should('be.visible');
@@ -146,7 +146,7 @@ describe('inspect movie', () => {
       cy.get('.modal-box').should('be.visible');
       cy.contains('Confirm').click();
 
-      cy.get('.flex > .badge').contains('Unpublished').should('not.exist');
+      cy.get('.badge').contains('Unpublished').should('not.exist');
 
       cy.get('[name="three_dots_vertical"]').click();
       cy.contains('Publish').click();
