@@ -72,7 +72,7 @@ export class InspectMovieComponent implements OnInit {
     });
   }
 
-  onSubmit() {
+  onSubmitNewMetadata() {
     if (this.movieTitleEditForm == null) return;
     if (this.movie == null) return;
 
@@ -124,6 +124,22 @@ export class InspectMovieComponent implements OnInit {
     }
 
     this.publishPopup.nativeElement.close();
+  }
+
+  getPublishPopupTitle(): string {
+    if (this.movie == null) return '';
+
+    if (this.movie.isPublished) return 'Unpublish ' + this.movie?.name + '?';
+
+    return 'Publish ' + this.movie?.name + '?';
+  }
+
+  getPublishPopupText(): string {
+    if (this.movie == null) return '';
+
+    if (this.movie.isPublished) return 'Are you sure you want to unpublish?';
+
+    return 'Are you sure you want to publish?';
   }
 
   getErrorMessage(controlName: string): string {

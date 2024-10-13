@@ -107,4 +107,52 @@ describe('inspect movie', () => {
       cy.contains(new Date(newMovieRelease).getFullYear());
     });
   });
+
+  it('should display published movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+      cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
+
+      cy.get('.flex > .badge').contains('Unpublished').should('be.visible');
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Publish').click();
+      cy.get('.modal-box').should('be.visible');
+      cy.contains('Confirm').click();
+
+      cy.get('.flex > .badge').contains('Unpublished').should('not.exist');
+    });
+  });
+
+  it('should display unpublished movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+      cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Publish').click();
+      cy.get('.modal-box').should('be.visible');
+      cy.contains('Confirm').click();
+
+      cy.get('.flex > .badge').contains('Unpublished').should('not.exist');
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.contains('Publish').click();
+      cy.contains('Confirm').click();
+
+      cy.get('.flex > .badge').contains('Unpublished').should('be.visible');
+    });
+  });
 });

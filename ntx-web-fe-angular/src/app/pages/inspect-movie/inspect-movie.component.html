@@ -62,7 +62,7 @@
         </form>
       </div>
 
-      <form [formGroup]="movieTitleEditForm!" class="w-full h-full" (submit)="onSubmit()">
+      <form [formGroup]="movieTitleEditForm!" class="w-full h-full" (submit)="onSubmitNewMetadata()">
         <!-- Title Field -->
         <label for="title" class="form-control w-full">
           <div class="label py-0">
@@ -147,19 +147,17 @@
 <dialog #publishPopup id="publishPopup" class="modal modal-middle">
   <div class="modal-box">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-bold">Publish {{ this.movie?.name }}?</h3>
+      <h3 class="text-lg font-bold">{{ getPublishPopupTitle() }}</h3>
       <form method="dialog">
         <button class="btn-sm btn-circle bg-black flex items-center justify-center">
           <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
         </button>
       </form>
     </div>
-    <form class="w-full h-full" (submit)="onToggleMoviePublish()">
-      <div class="mb-3">Are you sure you want to publish?</div>
-      <div class="flex flex-row justify-end gap-2">
-        <button class="btn btn-square btn-outline w-fit px-4" type="button" (click)="publishPopup.close()">Cancel</button>
-        <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="submit">Confirm</button>
-      </div>
-    </form>
+    <div class="mb-3">{{ getPublishPopupText() }}</div>
+    <div class="flex flex-row justify-end gap-2">
+      <button class="btn btn-square btn-outline w-fit px-4" type="button" (click)="publishPopup.close()">Cancel</button>
+      <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="button" (click)="onToggleMoviePublish()">Confirm</button>
+    </div>
   </div>
 </dialog>
