@@ -22,6 +22,7 @@ export class LibrarySearchResultDTOMapper {
 
   static anyToSearchResultItem(item: any): SearchResultItem {
     return {
+      id: item.id,
       type: item.type as TitleType.MOVIE,
       metadata: this.anyToMovieResultMetadata(item.metadata),
       weight: item.weight,

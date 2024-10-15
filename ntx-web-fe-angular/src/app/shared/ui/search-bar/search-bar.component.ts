@@ -1,12 +1,14 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
-import { ExternalTitleSearchResultItem, Provider } from '@ntx-shared/models/librarySearch.dto';
+import { ExternalTitleSearchResultItem, Provider, SearchResultItem } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SearchResultDTO } from '../../models/searchBar.dto';
+import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
 
 @Component({
   selector: 'app-search-bar',
@@ -17,9 +19,10 @@ import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component'
 })
 export class SearchBarComponent implements OnInit {
   private searchSubject = new Subject<string>();
-  results: ExternalTitleSearchResultItem[] | null = null;
+  @Input({ required: true }) providers: string = '';
+  results: SearchResultDTO[] | null = null;
   errorMessage: string | null = null;
-  @Output() movieSelected = new EventEmitter<ExternalTitleSearchResultItem>();
+  @Output() movieSelected = new EventEmitter<SearchResultDTO>();
   searchTerm: string = '';
   isLoading: boolean = false;
 
@@ -30,7 +33,7 @@ export class SearchBarComponent implements OnInit {
 
   selectMovie(result: any) {
     this.movieSelected.emit(result);
-    this.results = null; // Clear results after selection
+    this.results = null;
   }
 
   handleKeyDown(event: KeyboardEvent, result: any) {
@@ -40,12 +43,25 @@ export class SearchBarComponent implements OnInit {
     }
   }
 
+  getAdditionalInfo(searchResultitem: SearchResultDTO): string {
+    let info = searchResultitem.type + ' · ' + searchResultitem.year;
+
+    if (searchResultitem.provider != null) {
+      info += ' · ' + searchResultitem.provider;
+    }
+
+    return info;
+  }
+
+  getName(searchResultitem: SearchResultDTO): string {
+    return searchResultitem.name;
+  }
+
   searchTermFilter(searchTerm: string) {
     return !(!searchTerm || searchTerm.trim() === '');
   }
 
   onSearchTermChange() {
-    // Emit the search term to the subject
     this.searchSubject.next(this.searchTerm);
   }
 
@@ -70,7 +86,7 @@ export class SearchBarComponent implements OnInit {
 
   private performSearch(tempSearchTerm: string): void {
     this.isLoading = true;
-    this.libraryService.search(tempSearchTerm, TitleType.MOVIE, Provider.NTX_DISCOVERY).subscribe({
+    this.libraryService.search(tempSearchTerm, TitleType.MOVIE, this.providers).subscribe({
       next: (result) => {
         this.handleSearchResult(result);
       },
@@ -80,14 +96,23 @@ export class SearchBarComponent implements OnInit {
   }
 
   private handleSearchResult(result: any): void {
+    this.isLoading = false;
     if (result.size < 1) {
       this.errorMessage = 'No movies found for the given search query.';
       this.results = null;
-    } else {
-      this.results = result.searchResults[1].results;
-      this.errorMessage = null;
+      return;
     }
-    this.isLoading = false;
+
+    let tempResult = null;
+    if (this.providers == Provider.NTX) {
+      tempResult = result.searchResults[0].results;
+    } else {
+      tempResult = result.searchResults[1].results;
+    }
+
+    this.results = SearchResultDTOMapper.anyToSearchResultDTOArray(tempResult);
+
+    this.errorMessage = null;
   }
 
   private handleSearchError(): void {
