@@ -51,6 +51,7 @@ describe('LibraryService', () => {
       size: 1,
       results: [
         {
+          id: 'MT-pwnAdlIThNtEtK8',
           type: TitleType.MOVIE,
           metadata: {
             name: 'Shrek',
@@ -125,6 +126,7 @@ describe('LibraryService', () => {
       size: 2,
       results: [
         {
+          id: 'MT-pwnAdlIThNtEtK8',
           type: TitleType.MOVIE,
           metadata: {
             name: 'Shrek',
@@ -138,6 +140,7 @@ describe('LibraryService', () => {
           backdropURL: 'backdrop-url',
         },
         {
+          id: 'MT-pwnAdlIThNtEtK8',
           type: TitleType.MOVIE,
           metadata: {
             name: 'Shrek 2',

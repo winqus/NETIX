@@ -201,6 +201,7 @@ export class MoviesService {
       const movieSearchResults: MovieSearchResultDTO = {
         size: movies.length,
         results: movies.map((movie) => ({
+          id: movie.uuid,
           type: TitleType.MOVIE,
           metadata: {
             name: movie.name,
