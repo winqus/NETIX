@@ -97,6 +97,7 @@ export class SearchBarComponent implements OnInit {
 
   private handleSearchResult(result: any): void {
     this.isLoading = false;
+
     if (result.size < 1) {
       this.errorMessage = 'No movies found for the given search query.';
       this.results = null;

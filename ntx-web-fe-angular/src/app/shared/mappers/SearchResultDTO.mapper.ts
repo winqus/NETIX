@@ -7,7 +7,7 @@ export class SearchResultDTOMapper {
   }
 
   static anyToSearchResultDTO(item: any): SearchResultDTO {
-    if (item.id != null) {
+    if (item.id == null) {
       return this.mapExternalSearchResultToDTO(item as ExternalTitleSearchResultItem);
     } else {
       return this.mapInternalSearchResultToDTO(item as SearchResultItem);

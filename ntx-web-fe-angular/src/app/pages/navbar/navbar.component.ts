@@ -36,10 +36,9 @@ export class NavbarComponent {
   }
   onMovieSelected(movie: SearchResultDTO) {
     if (movie == null) return;
+    console.log(movie);
 
     if (movie.id == null) return;
-
-    console.log(movie);
 
     this.router.navigate(['/inspect/movies', movie.id]);
   }
