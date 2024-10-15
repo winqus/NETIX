@@ -187,7 +187,7 @@ export class MoviesService {
     try {
       name = name.trim();
       if (!name) {
-        throw new BadRequestException('Query can not be null, empty or only whitespaces');
+        throw new BadRequestException('name can not be null or empty');
       }
 
       const movies = await this.moviesRepo.findAllByName(name);
