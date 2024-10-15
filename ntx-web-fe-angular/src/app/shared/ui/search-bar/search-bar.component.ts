@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
-import { ExternalTitleSearchResultItem, Provider, SearchResultItem } from '@ntx-shared/models/librarySearch.dto';
+import { Provider } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { SearchResultDTO } from '../../models/searchResult.dto';

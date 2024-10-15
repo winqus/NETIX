@@ -7,7 +7,7 @@ import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants'
 import { ExternalMovieService } from '@ntx-shared/services/externalMovie/externalMovie.service';
 import { environment } from '@ntx/environments/environment';
 import { SearchBarComponent } from '@ntx-shared/ui/search-bar/search-bar.component';
-import { ExternalTitleSearchResultItem, Provider } from '@ntx-shared/models/librarySearch.dto';
+import { Provider } from '@ntx-shared/models/librarySearch.dto';
 import { ExternalMovieDTO } from '@ntx-shared/models/externalMovie.dto';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { formatDate } from '@ntx-shared/services/utils/utils';

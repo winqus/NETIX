@@ -4,11 +4,10 @@ import { makeRandomMovieName } from 'cypress/support/randomDataFactory';
 import { yearOnlyRegex } from 'cypress/support/regex';
 
 describe('view movies list', () => {
-  const movieName = makeRandomMovieName();
   const SEARCH_RESULTS_ELEMENT = 'ul';
   const SEARCH_RESULTS_ITEM_ELEMENT = 'li';
   before(() => {
-    cy.createMovieWithPoster(movieName);
+    cy.createMovieWithPoster();
     cy.createMovieWithPoster();
   });
 
@@ -35,6 +34,10 @@ describe('view movies list', () => {
   });
 
   it('should searched movie navigate to a movie inspect page', () => {
+    const movieName = makeRandomMovieName();
+
+    cy.createMovieWithPoster({ name: movieName });
+
     cy.visit('/');
 
     cy.get('#searchBar').type(movieName);

@@ -35,10 +35,7 @@ export class NavbarComponent {
     return Provider.NTX.toString();
   }
   onMovieSelected(movie: SearchResultDTO) {
-    if (movie == null) return;
-    console.log(movie);
-
-    if (movie.id == null) return;
+    if (movie == null || movie.id == null) return;
 
     this.router.navigate(['/inspect/movies', movie.id]);
   }
