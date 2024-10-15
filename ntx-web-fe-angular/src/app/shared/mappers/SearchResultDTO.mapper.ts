@@ -1,5 +1,5 @@
 import { ExternalTitleSearchResultItem, SearchResultItem } from '../models/librarySearch.dto';
-import { SearchResultDTO } from '../models/searchBar.dto';
+import { SearchResultDTO } from '../models/searchResult.dto';
 
 export class SearchResultDTOMapper {
   static anyToSearchResultDTOArray(items: any[]): SearchResultDTO[] {

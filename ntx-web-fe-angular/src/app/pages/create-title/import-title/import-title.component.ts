@@ -13,7 +13,7 @@ import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { formatDate } from '@ntx-shared/services/utils/utils';
 import { UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
-import { SearchResultDTO } from '@ntx/app/shared/models/searchBar.dto';
+import { SearchResultDTO } from '@ntx/app/shared/models/searchResult.dto';
 
 @Component({
   selector: 'app-import-title',

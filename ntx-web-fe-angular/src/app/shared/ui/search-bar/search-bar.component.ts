@@ -7,7 +7,7 @@ import { LibraryService } from '@ntx-shared/services/librarySearch/library.servi
 import { ExternalTitleSearchResultItem, Provider, SearchResultItem } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
-import { SearchResultDTO } from '../../models/searchBar.dto';
+import { SearchResultDTO } from '../../models/searchResult.dto';
 import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
 
 @Component({

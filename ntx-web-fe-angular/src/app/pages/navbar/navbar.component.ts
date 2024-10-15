@@ -5,7 +5,7 @@ import { SvgIconsComponent } from '../../../app/shared/ui/svg-icons/svg-icons.co
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from '@ntx-shared/ui/search-bar/search-bar.component';
 import { Provider } from '@ntx/app/shared/models/librarySearch.dto';
-import { SearchResultDTO } from '@ntx/app/shared/models/searchBar.dto';
+import { SearchResultDTO } from '@ntx/app/shared/models/searchResult.dto';
 interface NavbarProps {
   title: string;
 }
