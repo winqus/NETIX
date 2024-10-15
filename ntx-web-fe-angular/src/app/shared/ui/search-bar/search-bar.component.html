@@ -14,7 +14,7 @@
 
   @if (results !== null) {
     <ul class="absolute bg-black border border-gray-800 w-full max-h-72 overflow-y-auto z-50 mt-1">
-      @for (result of results; track result.externalID) {
+      @for (result of results; track result) {
         <li
           tabindex="0"
           class="flex items-center p-2 cursor-pointer bg-gray-900 text-white border-b border-gray-800 hover:bg-gray-800"
@@ -29,8 +29,10 @@
             }
           </div>
           <div class="flex flex-col text-sm">
-            <span class="font-bold">{{ result.metadata.name }}</span>
-            <span class="text-gray-400">{{ result.type }} · {{ result.metadata.releaseDate }} · {{ result.providerID }}</span>
+            <span class="font-bold">{{ getName(result) }}</span>
+            <span class="text-gray-400">
+              {{ getAdditionalInfo(result) }}
+            </span>
           </div>
         </li>
       }

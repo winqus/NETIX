@@ -6,13 +6,14 @@ import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.c
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
 import { ExternalMovieService } from '@ntx-shared/services/externalMovie/externalMovie.service';
 import { environment } from '@ntx/environments/environment';
-import { SearchBarComponent } from '@ntx-pages/create-title/import-title/search-bar/search-bar.component';
-import { ExternalTitleSearchResultItem } from '@ntx-shared/models/librarySearch.dto';
+import { SearchBarComponent } from '@ntx-shared/ui/search-bar/search-bar.component';
+import { Provider } from '@ntx-shared/models/librarySearch.dto';
 import { ExternalMovieDTO } from '@ntx-shared/models/externalMovie.dto';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { formatDate } from '@ntx-shared/services/utils/utils';
 import { UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { SearchResultDTO } from '@ntx/app/shared/models/searchResult.dto';
 
 @Component({
   selector: 'app-import-title',
@@ -171,10 +172,16 @@ export class ImportTitleComponent implements OnInit {
     return !!(control && control.invalid && control.touched);
   }
 
-  onMovieSelected(movie: ExternalTitleSearchResultItem) {
-    if (movie == null) return;
+  getProviders() {
+    return Provider.NTX_DISCOVERY.toString();
+  }
 
-    this.externalMovie.getExternalMovieMetadata(movie.externalID, movie.providerID).subscribe({
+  onMovieSelected(resultMovie: SearchResultDTO) {
+    if (resultMovie == null || resultMovie.item === null) return;
+
+    const externalMovieItem = resultMovie.item;
+
+    this.externalMovie.getExternalMovieMetadata(externalMovieItem.externalID, externalMovieItem.providerID).subscribe({
       next: (response) => {
         if (environment.development) console.log('External movie load successful:', response);
         this.selectedMovie = response;
@@ -183,12 +190,14 @@ export class ImportTitleComponent implements OnInit {
         this.isFormValid();
 
         this.errorMessage = '';
-        if (movie.posterURL != null) {
-          this.selectedResultPosterURL = movie.posterURL;
+        if (externalMovieItem.posterURL != null) {
+          this.selectedResultPosterURL = externalMovieItem.posterURL;
+
+          if (this.selectedResultPosterURL === null) return;
 
           this.posterService.downloadImage(this.selectedResultPosterURL).subscribe({
             next: (blob) => {
-              this.imageFile = new File([blob], movie.metadata.name + '.' + MediaConstants.image.exportFileExtension, {
+              this.imageFile = new File([blob], externalMovieItem.metadata.name + '.' + MediaConstants.image.exportFileExtension, {
                 type: MediaConstants.image.exportMimeType,
                 lastModified: Date.now(),
               });

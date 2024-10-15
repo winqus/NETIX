@@ -16,7 +16,6 @@ export class LibraryService implements ILibraryService {
 
   public search(query: string, type: TitleType, providers: string, limit?: number): Observable<LibrarySearchResultDTO> {
     if (environment.development) console.log(`LibraryService is searching for: <${query}>`);
-
     const url = getLibrarySearch(query, type, providers, limit);
     const httpOptions = {};
 

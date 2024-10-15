@@ -7,6 +7,7 @@ import { TitleType } from '@ntx/app/shared/models/titleType.enum';
 import { Provider } from '@ntx/app/shared/models/librarySearch.dto';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
+import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
 
 describe('SearchBarComponent', () => {
   let component: SearchBarComponent;
@@ -39,6 +40,7 @@ describe('SearchBarComponent', () => {
   }));
 
   it('should call library service when a valid search term is provided', fakeAsync(() => {
+    component.providers = Provider.NTX_DISCOVERY;
     mockLibraryService.search.and.returnValue(of(searchResponseFixture));
 
     component.searchTerm = 'Shrek';
@@ -51,6 +53,8 @@ describe('SearchBarComponent', () => {
   it('should set results when search returns data', fakeAsync(() => {
     mockLibraryService.search.and.returnValue(of(searchResponseFixture));
 
+    component.providers = Provider.NTX_DISCOVERY;
+
     component.searchTerm = 'Shrek';
     component.onSearchTermChange();
     tick(500);
@@ -58,7 +62,7 @@ describe('SearchBarComponent', () => {
 
     expect(mockLibraryService.search).toHaveBeenCalledWith('Shrek', TitleType.MOVIE, Provider.NTX_DISCOVERY);
 
-    expect(component.results).toEqual(searchResponseFixture.searchResults[1].results);
+    expect(component.results).toEqual(SearchResultDTOMapper.anyToSearchResultDTOArray(searchResponseFixture.searchResults[1].results));
     expect(component.errorMessage).toBeNull();
     expect(component.isLoading).toBeFalse();
   }));
@@ -92,7 +96,7 @@ describe('SearchBarComponent', () => {
 
   it('should emit the selected movie', () => {
     spyOn(component.movieSelected, 'emit');
-    const movie = searchResponseFixture.searchResults[1].results[0];
+    const movie = SearchResultDTOMapper.anyToSearchResultDTO(searchResponseFixture.searchResults[1].results[0]);
 
     component.selectMovie(movie);
 

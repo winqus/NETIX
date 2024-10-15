@@ -2,6 +2,7 @@ import { TitleType } from '@ntx-shared/models/titleType.enum';
 
 export enum Provider {
   NTX_DISCOVERY = 'NTX_DISCOVERY',
+  NTX = 'NTX',
 }
 
 export interface LibrarySearchResultDTO {
@@ -21,6 +22,7 @@ export interface LibrarySearchResultDTO {
 }
 
 export interface SearchResultItem {
+  id: string;
   type: TitleType.MOVIE;
   metadata: MovieResultMetadata;
   weight: number;
