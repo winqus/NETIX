@@ -185,6 +185,7 @@ export class MoviesService {
 
   public async findAllByName(name: string): Promise<MovieSearchResultDTO[]> {
     try {
+      name = name.trim();
       if (!name) {
         throw new BadRequestException('name can not be null or empty');
       }

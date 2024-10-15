@@ -40,6 +40,7 @@ export class LibraryController {
       `Received search request with types: ${types}, providers: ${providers}, query: ${query}, limit: ${limit}`,
     );
 
+    query = query.trim();
     if (!query) {
       throw new BadRequestException('Query parameter is required');
     }
