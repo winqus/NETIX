@@ -7,6 +7,7 @@ export interface MovieSearchResultDTO {
 }
 
 export interface MovieSearchResultItem {
+  id: string;
   type: TitleType.MOVIE;
   metadata: MovieResultMetadata;
   weight: number;
