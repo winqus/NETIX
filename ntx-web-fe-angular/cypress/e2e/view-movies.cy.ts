@@ -27,14 +27,14 @@ describe('view movies list', () => {
     });
   });
 
-  it('should searched movie navigate to a movie inspect page', () => {
+  it('should navigate to movie inspect page', () => {
     cy.visit('/');
     cy.wait('@BE_GetMovies');
     cy.get('app-movie-card').first().click();
     cy.url().should('include', '/inspect/movies/MT-');
   });
 
-  it('should navigate to movie inspect page', () => {
+  it('should searched movie navigate to a movie inspect page', () => {
     cy.visit('/');
 
     cy.get('#searchBar').type(movieName);
