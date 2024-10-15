@@ -1,0 +1,46 @@
+name: Create bugfix issue
+description: Describe a bug or a problem that needs fixing.
+title: "Fix _some_bug_or_problem_summary_"
+labels: ["bug"]
+projects: ["winqus/5"]
+assignees: []
+body:
+  - type: textarea
+    id: describe-the-bug
+    attributes:
+      label: "Describe the bug"
+      description: "A clear and concise description of what the bug is."
+      placeholder: "Please describe the bug here."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: "To Reproduce"
+      description: "Steps to reproduce the behavior:"
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: "[Optional] Expected behavior"
+      description: "A clear and concise description of what you expected to happen."
+      placeholder: "Please describe what you expected to happen."
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "[Optional] Screenshots"
+      description: "If applicable, add screenshots to help explain your problem."
+      placeholder: "Add links to screenshots here, if applicable."
+    validations:
+      required: false
