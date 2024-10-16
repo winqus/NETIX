@@ -26,6 +26,17 @@ export const MOVIES_SUMMARY_LENGTH_MAX = 1_000;
 export const MOVIES_RUNTIME_MINS_MIN = 0;
 export const MOVIES_RUNTIME_MINS_MAX = 12_000;
 
+/* Cache */
+export enum MOVIES_CACHE_KEY {
+  GET_ALL = 'movies-get-all',
+}
+
+export const MOVIES_CACHE_OPTS = {
+  [MOVIES_CACHE_KEY.GET_ALL]: {
+    ttl: 10_000 /* miliseconds */,
+  },
+};
+
 /* Mongoose */
 export const MOVIES_MODEL_TOKEN = 'MOVIES_MODEL';
 export const MOVIES_SCHEMA_NAME = 'Movie';

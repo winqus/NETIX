@@ -1,4 +1,5 @@
-import { Body, Controller, HttpException, Logger, NotFoundException, Post, UsePipes } from '@nestjs/common';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Body, Controller, HttpException, Inject, Logger, NotFoundException, Post, UsePipes } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
@@ -9,6 +10,7 @@ import { CreateMovieDTO } from './dto/create-movie.dto';
 import { ImportMovieDTO } from './dto/import-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import {
+  MOVIES_CACHE_KEY,
   MOVIES_IMPORT_CONTROLLER_BASE_PATH,
   MOVIES_IMPORT_CONTROLLER_VERSION,
   MOVIES_SWAGGER_TAG,
@@ -26,6 +28,7 @@ export class MoviesImportController {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
     private readonly externalTitles: ExternalTitleService,
   ) {}
@@ -56,6 +59,8 @@ export class MoviesImportController {
 
       this.logger.log(`Created new movie ${newMovie.id} with poster ${newMovie.posterID}`);
 
+      this.clearMoviesCache();
+
       return newMovie;
     } catch (error) {
       if (error instanceof HttpException) {
@@ -64,5 +69,9 @@ export class MoviesImportController {
         throw new CustomHttpInternalErrorException(error);
       }
     }
+  }
+
+  private async clearMoviesCache() {
+    this.cache.del(MOVIES_CACHE_KEY.GET_ALL);
   }
 }

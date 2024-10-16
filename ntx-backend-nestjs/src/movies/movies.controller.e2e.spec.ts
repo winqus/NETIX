@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { ConsoleLogger as _ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigFactory, ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -45,6 +46,7 @@ describe('Movies API (e2e)', () => {
           ignoreEnvFile: true,
         }),
         DatabaseModule,
+        CacheModule.register({ isGlobal: true }),
         ExternalProvidersModule.forRoot({
           TMDB: {
             enable: true,
