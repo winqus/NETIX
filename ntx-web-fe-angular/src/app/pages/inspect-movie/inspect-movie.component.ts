@@ -126,7 +126,7 @@ export class InspectMovieComponent implements OnInit {
     this.publishPopup.nativeElement.close();
   }
 
-  getPublished(): string {
+  getPublishedButtonLabel(): string {
     if (this.movie?.isPublished) return 'Unpublish';
 
     return 'Publish';
