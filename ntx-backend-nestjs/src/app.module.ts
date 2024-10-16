@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core/constants';
@@ -20,8 +21,8 @@ import { FileStorageModule } from './file-storage/file-storage.module';
 import { StorageType } from './file-storage/types';
 import { ImagesModule } from './images/images.module';
 import { JobQueueModule } from './job-queue/job-queue.module';
-import { MoviesModule } from './movies/movies.module';
 import { LibraryModule } from './library/library.module';
+import { MoviesModule } from './movies/movies.module';
 
 function getStorageBaseDirPath() {
   if (process.env.USE_TEMPORARY_FILE_STORAGE === 'true') {
@@ -53,6 +54,7 @@ function getStorageBaseDirPath() {
         limit: DEFAULT_THROTTLE_LIMIT,
       },
     ]),
+    CacheModule.register({ isGlobal: true }),
     ExternalProvidersModule.forRoot({
       TMDB: {
         enable: true,

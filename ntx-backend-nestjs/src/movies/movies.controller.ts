@@ -1,3 +1,4 @@
+import { Cache, CACHE_MANAGER, CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   Body,
@@ -5,6 +6,7 @@ import {
   Delete,
   Get,
   HttpException,
+  Inject,
   Logger,
   NotFoundException,
   Param,
@@ -25,6 +27,8 @@ import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
 import {
+  MOVIES_CACHE_KEY,
+  MOVIES_CACHE_OPTS,
   MOVIES_CONTROLLER_BASE_PATH,
   MOVIES_CONTROLLER_VERSION,
   MOVIES_EMPTY_DTO_ERROR,
@@ -54,7 +58,10 @@ import {
 export class MoviesController {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly moviesSrv: MoviesService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
+    private readonly moviesSrv: MoviesService,
+  ) {}
 
   @Post()
   @ApiDocsForPostMovie()
@@ -70,6 +77,8 @@ export class MoviesController {
       const newMovie = await this.moviesSrv.createOneWithPoster(dto, fileInStorageFromRaw(file));
 
       this.logger.log(`Created new movie ${newMovie.id} with poster ${newMovie.posterID}`);
+
+      this.clearMoviesCache();
 
       return newMovie;
     } catch (error) {
@@ -102,10 +111,15 @@ export class MoviesController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey(MOVIES_CACHE_KEY.GET_ALL)
+  @CacheTTL(MOVIES_CACHE_OPTS[MOVIES_CACHE_KEY.GET_ALL].ttl)
   @ApiDocsForGetMovies()
   public async getAll(): Promise<MovieDTO[]> {
     try {
       const movies = await this.moviesSrv.findAll();
+
+      this.logger.log(`Fetched all movies`);
 
       return movies;
     } catch (error) {
@@ -133,6 +147,8 @@ export class MoviesController {
       const updatedMovie = await this.moviesSrv.updatePosterForOne(id, fileInStorageFromRaw(file));
 
       this.logger.log(`Updated poster for movie ${id}`);
+
+      this.clearMoviesCache();
 
       return updatedMovie;
     } catch (error) {
@@ -166,6 +182,8 @@ export class MoviesController {
 
       this.logger.log(`Updated movie ${id}`);
 
+      this.clearMoviesCache();
+
       return updatedMovie;
     } catch (error) {
       if (error instanceof HttpException) {
@@ -183,6 +201,8 @@ export class MoviesController {
       const updatedMovie = await this.moviesSrv.publishOne(id);
 
       this.logger.log(`Published movie ${id}`);
+
+      this.clearMoviesCache();
 
       return updatedMovie;
     } catch (error) {
@@ -202,6 +222,8 @@ export class MoviesController {
 
       this.logger.log(`Unpublished movie ${id}`);
 
+      this.clearMoviesCache();
+
       return updatedMovie;
     } catch (error) {
       if (error instanceof HttpException) {
@@ -210,5 +232,9 @@ export class MoviesController {
         throw new CustomHttpInternalErrorException(error);
       }
     }
+  }
+
+  private async clearMoviesCache() {
+    this.cache.del(MOVIES_CACHE_KEY.GET_ALL);
   }
 }
