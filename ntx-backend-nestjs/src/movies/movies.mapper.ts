@@ -16,6 +16,7 @@ export class MoviesMapper {
       isPublished: any.isPublished,
       runtimeMinutes: any.runtimeMinutes,
       posterID: any.posterID,
+      backdropID: any.backdropID,
       videoID: any.videoID,
     });
 
@@ -37,6 +38,7 @@ export class MoviesMapper {
       isPublished: movie.isPublished,
       runtimeMinutes: movie.runtimeMinutes,
       posterID: movie.posterID,
+      backdropID: movie.backdropID,
       videoID: movie.videoID,
     });
 
