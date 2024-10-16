@@ -137,7 +137,7 @@ export class FileStorageLocal implements FileStorage {
 
   private throwErrorIfFileDoesNotExist(filePath: string) {
     if (fse.existsSync(filePath) === false) {
-      throw new Error('File does not exist');
+      throw new Error('ENOENT: File does not exist');
     }
   }
 }

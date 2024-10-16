@@ -53,7 +53,7 @@ export class PosterService {
 
         return posterStream;
       } catch (error) {
-        if (error.message === 'File does not exist') {
+        if (error.message === 'ENOENT: File does not exist') {
           this.logger.warn(`Did not find poster ${fileName}`);
           throw new NotFoundException('Poster not found');
         } else {

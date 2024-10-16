@@ -32,7 +32,7 @@ export class FileStorageService implements FileStorage {
    *
    * @param args - The arguments required to locate and download the file: `{ container: string; fileName: string; }`
    * @returns A promise that resolves to a `Buffer` containing the file data.
-   * @throws Error - Throws an error with the message `'File does not exist'` if the file is not found.
+   * @throws Error - Throws an error with the message `'ENOENT: File does not exist'` if the file is not found.
    */
   public async downloadFile(args: FileStorageDownloadFileArgs): Promise<Buffer> {
     return this.fileStorageStrategy.downloadFile(args);
@@ -43,7 +43,7 @@ export class FileStorageService implements FileStorage {
    *
    * @param args - The arguments required to locate and stream the file: `{ container: string; fileName: string; }`
    * @returns A promise that resolves to a `Readable` stream of the file data.
-   * @throws Error - Throws an error with the message `'File does not exist'` if the file is not found.
+   * @throws Error - Throws an error with the message `'ENOENT: File does not exist'` if the file is not found.
    */
   public async downloadStream(args: FileStorageDownloadStreamArgs): Promise<Readable> {
     return this.fileStorageStrategy.downloadStream(args);
