@@ -33,6 +33,35 @@ describe('view movies list', () => {
     cy.url().should('include', '/inspect/movies/MT-');
   });
 
+  it('should display unpublished badge', () => {
+    cy.visit('/');
+    cy.wait('@BE_GetMovies');
+    cy.get('app-movie-card').first().find('.badge').contains('Unpublished').should('be.visible');
+  });
+
+  it('should display published card', () => {
+    const movieName = makeRandomMovieName();
+
+    cy.createMovieWithPoster({ name: movieName });
+
+    cy.visit('/');
+    cy.wait('@BE_GetMovies');
+
+    cy.get('app-movie-card').find('.card-title').contains(movieName).click();
+
+    cy.get('[name="three_dots_vertical"]').click();
+    cy.get('.dropdown-content').should('be.visible');
+    cy.contains('Publish').click();
+    cy.get('.modal-box').should('be.visible');
+    cy.contains('Confirm').click();
+
+    cy.get('.badge').contains('Unpublished').should('not.exist');
+
+    cy.visit('/');
+    cy.wait('@BE_GetMovies');
+    cy.get('app-movie-card').find('.card-title').contains(movieName).parents('app-movie-card').find('.badge').should('not.exist');
+  });
+
   it('should searched movie navigate to a movie inspect page', () => {
     const movieName = makeRandomMovieName();
 

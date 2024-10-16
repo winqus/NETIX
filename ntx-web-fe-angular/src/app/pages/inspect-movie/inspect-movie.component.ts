@@ -126,6 +126,12 @@ export class InspectMovieComponent implements OnInit {
     this.publishPopup.nativeElement.close();
   }
 
+  getPublishedButtonLabel(): string {
+    if (this.movie?.isPublished) return 'Unpublish';
+
+    return 'Publish';
+  }
+
   getPublishPopupTitle(): string {
     if (this.movie == null) return '';
 
