@@ -39,7 +39,7 @@ describe('view movies list', () => {
     cy.get('app-movie-card').first().find('.badge').contains('unpublished').should('be.visible');
   });
 
-  it.only('should display published card', () => {
+  it('should display published card', () => {
     const movieName = makeRandomMovieName();
 
     cy.createMovieWithPoster({ name: movieName });

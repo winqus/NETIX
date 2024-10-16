@@ -29,7 +29,7 @@ export class MovieCardComponent {
   isPublished() {
     if (this.movie == null) return false;
 
-    return this.movie?.isPublished;
+    return this.movie.isPublished;
   }
 
   onPosterError(): void {
