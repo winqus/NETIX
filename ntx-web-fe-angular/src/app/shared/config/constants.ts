@@ -21,8 +21,8 @@ export const MediaConstants = {
     formats: ['.png', '.jpg', '.jpeg', '.webp'],
     exportFileExtension: 'webp',
     exportMimeType: 'image/webp',
-    maxSizeMb: 0.1,
-    maxSizeBytes: 100 * 1024,
+    maxSizeMb: 1.0,
+    maxSizeBytes: 1_024_000,
     maxHeight: 1920,
   },
   video: {
