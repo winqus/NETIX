@@ -27,6 +27,7 @@ import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
 import {
+  MOVIES_BACKDROP_STORAGE_ARGS as MOVIES_BACKDROP_FILE_STORAGE_ARGS,
   MOVIES_CACHE_KEY,
   MOVIES_CACHE_OPTS,
   MOVIES_CONTROLLER_BASE_PATH,
@@ -46,6 +47,7 @@ import {
   ApiDocsForPatchMovie,
   ApiDocsForPostMovie,
   ApiDocsForPutMoviePublished,
+  ApiDocsForPutUpdateBackdrop,
   ApiDocsForPutUpdatePoster,
 } from './swagger/api-docs.decorators';
 
@@ -149,6 +151,33 @@ export class MoviesController {
       this.logger.log(`Updated poster for movie ${id}`);
 
       this.clearMoviesCache();
+
+      return updatedMovie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Put(':id/backdrop')
+  @ApiDocsForPutUpdateBackdrop()
+  @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_BACKDROP_FILE_STORAGE_ARGS))
+  public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    try {
+      if (!id) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      if (file == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      const updatedMovie = await this.moviesSrv.updateBackdropForOne(id, fileInStorageFromRaw(file));
+
+      this.logger.log(`Updated backdrop for movie ${id}`);
 
       return updatedMovie;
     } catch (error) {
