@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import { ImagesProxyController } from './images-proxy.controller';
-import { IMAGES_CREATE_POSTER_QUEUE } from './images.constants';
+import { CREATE_POSTER_QUEUE } from './images.constants';
 import { PostersController } from './poster.contollers';
 import { PosterService } from './poster.service';
 import { CreatePosterWorker } from './queues/create-poster.worker';
@@ -18,7 +18,7 @@ import { CreatePosterWorker } from './queues/create-poster.worker';
       maxRedirects: 5,
     }),
     FileStorageModule,
-    JobQueueModule.register(IMAGES_CREATE_POSTER_QUEUE),
+    JobQueueModule.register(CREATE_POSTER_QUEUE),
   ],
 })
 export class ImagesModule {}

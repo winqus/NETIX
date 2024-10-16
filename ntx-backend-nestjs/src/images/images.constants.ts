@@ -1,18 +1,23 @@
 import { PosterSize } from './images.types';
 
-export const POSTER_CONTROLLER_BASE_PATH = 'poster';
-export const POSTER_CONTROLLER_VERSION = '1';
+/* Images Proxy */
 export const IMAGES_PROXY_CONTROLLER_BASE_PATH = 'images-proxy';
 
+/* Posters */
+export const POSTER_CONTROLLER_BASE_PATH = 'poster';
+export const POSTER_CONTROLLER_VERSION = '1';
 export const POSTER_MIME_TYPE = 'image/webp';
 export const POSTER_EXTENTION = 'webp';
+export const POSTER_ID_PREFIX = 'P_';
+export const POSTER_ID_LENGTH = 15;
+export const POSTER_FILE_CONTAINER = 'posters';
+export const POSTER_CACHE_CONTROL_HEADER_VAL = 'public, max-age=604800';
 
-export const IMAGES_POSTER_CONTAINER = 'posters';
-export const IMAGES_CREATE_POSTER_JOBNAME = 'create-poster-job';
-export const IMAGES_CREATE_POSTER_QUEUE = 'images-create-poster-queue';
-export const IMAGES_POSTER_QUEUE_CONCURRENCY = 3;
+export const CREATE_POSTER_JOBNAME = 'create-poster-job';
+export const CREATE_POSTER_QUEUE = 'images-create-poster-queue';
+export const CREATE_POSTER_QUEUE_CONCURRENCY = 3;
 
-export const IMAGES_POSTER_SIZES: Record<PosterSize, { width: number; height: number }> = {
+export const POSTER_SIZES: Record<PosterSize, { width: number; height: number }> = {
   [PosterSize.XS]: { width: 60, height: 90 },
   [PosterSize.S]: { width: 120, height: 180 },
   [PosterSize.M]: { width: 240, height: 360 },

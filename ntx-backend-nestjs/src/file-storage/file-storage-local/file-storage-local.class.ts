@@ -120,6 +120,8 @@ export class FileStorageLocal implements FileStorage {
 
     const filePath = this.transformToLocalFilePath({ container, fileName });
 
+    this.throwErrorIfFileDoesNotExist(filePath);
+
     return fse.readFile(filePath);
   }
 
@@ -128,6 +130,14 @@ export class FileStorageLocal implements FileStorage {
 
     const filePath = this.transformToLocalFilePath({ container, fileName });
 
+    this.throwErrorIfFileDoesNotExist(filePath);
+
     return fse.createReadStream(filePath);
+  }
+
+  private throwErrorIfFileDoesNotExist(filePath: string) {
+    if (fse.existsSync(filePath) === false) {
+      throw new Error('ENOENT: File does not exist');
+    }
   }
 }

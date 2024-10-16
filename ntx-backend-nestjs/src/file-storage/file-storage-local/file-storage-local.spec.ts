@@ -146,11 +146,9 @@ describe('FileStorageLocal', () => {
       await createRandomTempFile(fileStorageSrv, container, 'some-random-contents2');
       const nonExistingFileName = `some-non-existing-file-${Date.now()}`;
 
-      const readableStream = await fileStorageSrv.downloadStream({ container, fileName: nonExistingFileName });
+      const promise = fileStorageSrv.downloadStream({ container, fileName: nonExistingFileName });
 
-      readableStream.on('error', (error) => {
-        expect(error.message).toMatch(/ENOENT/);
-      });
+      expect(promise).rejects.toThrow(/ENOENT/);
     });
   });
 });
