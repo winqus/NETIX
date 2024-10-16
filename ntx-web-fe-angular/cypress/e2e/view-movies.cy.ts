@@ -33,10 +33,10 @@ describe('view movies list', () => {
     cy.url().should('include', '/inspect/movies/MT-');
   });
 
-  it('should display unpublsihed badge', () => {
+  it('should display unpublished badge', () => {
     cy.visit('/');
     cy.wait('@BE_GetMovies');
-    cy.get('app-movie-card').first().find('.badge').contains('unpublished').should('be.visible');
+    cy.get('app-movie-card').first().find('.badge').contains('Unpublished').should('be.visible');
   });
 
   it('should display published card', () => {

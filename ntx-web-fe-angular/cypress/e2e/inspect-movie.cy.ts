@@ -149,7 +149,7 @@ describe('inspect movie', () => {
       cy.get('.badge').contains('Unpublished').should('not.exist');
 
       cy.get('[name="three_dots_vertical"]').click();
-      cy.contains('Publish').click();
+      cy.contains('Unpublish').click();
       cy.contains('Confirm').click();
 
       cy.get('.badge').contains('Unpublished').should('be.visible');
