@@ -26,6 +26,12 @@ export class MovieCardComponent {
     return `${year}`;
   }
 
+  isPublished() {
+    if (this.movie == null) return false;
+
+    return this.movie?.isPublished;
+  }
+
   onPosterError(): void {
     this.posterLoaded = false;
   }

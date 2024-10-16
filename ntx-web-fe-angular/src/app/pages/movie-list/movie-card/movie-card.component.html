@@ -1,21 +1,24 @@
-<div class="text-white" tabindex="-1">
+<div class="text-white relative" tabindex="-1" (click)="navigateToMovie()" (keydown)="onKeydown($event)" style="cursor: pointer">
   @if (!posterLoaded) {
     <div class="object-cover h-full aspect-[2/3] mr-2 bg-white flex align-middle justify-center items-center">
       <app-svg-icons name="file_image" size="60" color="black"></app-svg-icons>
     </div>
   } @else {
+    <!-- <div >test</div> -->
     <img
       [src]="posterSource()"
       [alt]="this.movie?.name"
       class="object-cover h-full w-full rounded-md aspect-[2/3] shadow-xl dark:shadow-gray-950 skeleton"
       role="button"
       tabindex="0"
-      (click)="navigateToMovie()"
-      (keydown)="onKeydown($event)"
       (error)="onPosterError()"
-      style="cursor: pointer"
+      [class]="{ 'opacity-20': !isPublished() }"
     />
   }
+  @if (!isPublished()) {
+    <div class="absolute top-4 inset-x-0 mx-auto badge badge-md text-white badge-accent text-base text-center">unpublished</div>
+  }
+
   <div class="w-full" tabindex="-1">
     <h2 class="card-title">{{ this.movie?.name }}</h2>
     <div class="flex justify-between">
