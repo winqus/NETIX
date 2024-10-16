@@ -11,6 +11,7 @@ export const POSTER_EXTENTION = 'webp';
 export const POSTER_ID_PREFIX = 'P_';
 export const POSTER_ID_LENGTH = 15;
 export const POSTER_FILE_CONTAINER = 'posters';
+export const POSTER_CACHE_CONTROL_HEADER_VAL = 'public, max-age=604800';
 
 export const CREATE_POSTER_JOBNAME = 'create-poster-job';
 export const CREATE_POSTER_QUEUE = 'images-create-poster-queue';

@@ -45,14 +45,23 @@ export class PosterService {
   public async findOne(id: string, size: PosterSize): Promise<Readable> {
     try {
       const fileName = makePosterFileName(id, size, POSTER_EXTENTION);
-      const posterStream = await this.fileStorageSrv.downloadStream({
+      try {
+        const posterStream = await this.fileStorageSrv.downloadStream({
           container: POSTER_FILE_CONTAINER,
-        fileName: fileName,
-      });
+          fileName: fileName,
+        });
 
-      return posterStream;
+        return posterStream;
+      } catch (error) {
+        if (error.message === 'File does not exist') {
+          this.logger.warn(`Did not find poster ${fileName}`);
+          throw new NotFoundException('Poster not found');
+        } else {
+          this.logger.error(`Failed to find poster ${fileName}: `, error.message);
+          throw error;
+        }
+      }
     } catch (error) {
-      this.logger.error('Failed to find poster ${posterID}: ', error.message);
       throw error;
     }
   }

@@ -15,7 +15,8 @@ export function ApiDocsForGetPoster() {
       required: false,
     }),
     ApiResponse({ status: HttpStatus.OK, description: 'Found poster', type: StreamableFile }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad or not existing ID' }),
+    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Did not find requested poster' }),
+    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request' }),
     ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
   );
 }
