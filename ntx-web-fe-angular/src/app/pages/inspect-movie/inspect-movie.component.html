@@ -34,7 +34,7 @@
               <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
               <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
                 <button class="btn btn-sm btn-outline border-none" type="button" onclick="editModal.showModal()">Edit metadata</button>
-                <button class="btn btn-sm btn-outline border-none" type="button" onclick="publishPopup.showModal()">{{ isPublished() }}</button>
+                <button class="btn btn-sm btn-outline border-none" type="button" onclick="publishPopup.showModal()">{{ getPublished() }}</button>
               </ul>
             </div>
           </div>
