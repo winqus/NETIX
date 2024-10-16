@@ -1,14 +1,16 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { generateUniqueID } from '@ntx/common/utils/ID.utils';
 import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { FileInStorage } from '@ntx/file-storage/types';
-import { generateUUIDv4 } from '@ntx/utility/generateUUIDv4';
 import { Readable } from 'stream';
 import {
-  IMAGES_CREATE_POSTER_JOBNAME,
-  IMAGES_CREATE_POSTER_QUEUE,
-  IMAGES_POSTER_CONTAINER,
+  CREATE_POSTER_JOBNAME,
+  CREATE_POSTER_QUEUE,
   POSTER_EXTENTION,
+  POSTER_FILE_CONTAINER,
+  POSTER_ID_LENGTH,
+  POSTER_ID_PREFIX,
 } from './images.constants';
 import { PosterSize } from './images.types';
 import { CreatePosterQueue } from './queues/create-poster.types';
@@ -19,19 +21,19 @@ export class PosterService {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
-    @InjectQueue(IMAGES_CREATE_POSTER_QUEUE) private readonly posterQueue: CreatePosterQueue,
+    @InjectQueue(CREATE_POSTER_QUEUE) private readonly posterQueue: CreatePosterQueue,
     private readonly fileStorageSrv: FileStorageService,
   ) {}
 
   public async addCreatePosterJob(file: FileInStorage): Promise<string> {
     try {
-      const posterID = generateUUIDv4();
+      const posterID = this.generateUUID();
 
       const payload = {
         file,
         posterID,
       };
-      await this.posterQueue.add(IMAGES_CREATE_POSTER_JOBNAME, payload);
+      await this.posterQueue.add(CREATE_POSTER_JOBNAME, payload);
 
       return posterID;
     } catch (error) {
@@ -44,7 +46,7 @@ export class PosterService {
     try {
       const fileName = makePosterFileName(id, size, POSTER_EXTENTION);
       const posterStream = await this.fileStorageSrv.downloadStream({
-        container: IMAGES_POSTER_CONTAINER,
+          container: POSTER_FILE_CONTAINER,
         fileName: fileName,
       });
 
@@ -62,5 +64,9 @@ export class PosterService {
     }
 
     return Buffer.concat(chunks);
+  }
+
+  protected generateUUID(): string {
+    return generateUniqueID(POSTER_ID_PREFIX, POSTER_ID_LENGTH);
   }
 }

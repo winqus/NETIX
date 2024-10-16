@@ -4,18 +4,18 @@ import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { FileInStorage } from '@ntx/file-storage/types';
 import * as sharp from 'sharp';
 import {
-  IMAGES_CREATE_POSTER_QUEUE,
-  IMAGES_POSTER_CONTAINER,
-  IMAGES_POSTER_QUEUE_CONCURRENCY,
-  IMAGES_POSTER_SIZES,
+  CREATE_POSTER_QUEUE,
+  CREATE_POSTER_QUEUE_CONCURRENCY,
   POSTER_EXTENTION,
+  POSTER_FILE_CONTAINER,
+  POSTER_SIZES,
 } from '../images.constants';
 import { PosterSize } from '../images.types';
 import { makePosterFileName } from '../utils/images.utils';
 import { CreatePosterJob } from './create-poster.types';
 
-@Processor(IMAGES_CREATE_POSTER_QUEUE, {
-  concurrency: IMAGES_POSTER_QUEUE_CONCURRENCY,
+@Processor(CREATE_POSTER_QUEUE, {
+  concurrency: CREATE_POSTER_QUEUE_CONCURRENCY,
 })
 export class CreatePosterWorker extends WorkerHost {
   private readonly logger = new Logger(this.constructor.name);
@@ -46,7 +46,7 @@ export class CreatePosterWorker extends WorkerHost {
     const outputFiles: FileInStorage[] = [];
 
     const processingPromises = sizes.map(async (size) => {
-      const { width, height } = IMAGES_POSTER_SIZES[size];
+      const { width, height } = POSTER_SIZES[size];
 
       try {
         const resizer = sharp()
@@ -63,7 +63,7 @@ export class CreatePosterWorker extends WorkerHost {
         });
 
         const storageDestination: FileInStorage = {
-          container: IMAGES_POSTER_CONTAINER,
+          container: POSTER_FILE_CONTAINER,
           fileName: makePosterFileName(posterID, size, POSTER_EXTENTION),
         };
 
