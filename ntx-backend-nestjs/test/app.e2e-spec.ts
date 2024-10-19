@@ -9,6 +9,15 @@ describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    const testConfigurationFactory: ConfigFactory = () => ({
+      USE_MEMORY_MONGO: 'false',
+      IN_MEMORY_MONGO_PORT: 57019,
+      USE_MEMORY_REDIS: 'false',
+      USE_TEMPORARY_FILE_STORAGE: 'false',
+    });
+
+    Object.assign(process.env, testConfigurationFactory());
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
