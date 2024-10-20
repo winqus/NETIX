@@ -5,7 +5,7 @@ import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import { BackdropsController } from './backdrop.contollers';
 import { BackDropService } from './backdrop.service';
 import { ImagesProxyController } from './images-proxy.controller';
-import { CREATE_POSTER_QUEUE, IMAGES_CREATE_BACKDROP_QUEUE } from './images.constants';
+import { CREATE_BACKDROP_QUEUE, CREATE_POSTER_QUEUE } from './images.constants';
 import { PostersController } from './poster.contollers';
 import { PosterService } from './poster.service';
 import { CreateBackdropWorker } from './queues/create-backdrop.worker';
@@ -22,7 +22,7 @@ import { CreatePosterWorker } from './queues/create-poster.worker';
     }),
     FileStorageModule,
     JobQueueModule.register(CREATE_POSTER_QUEUE),
-    JobQueueModule.register(IMAGES_CREATE_BACKDROP_QUEUE),
+    JobQueueModule.register(CREATE_BACKDROP_QUEUE),
   ],
 })
 export class ImagesModule {}

@@ -16,14 +16,14 @@ export const MOVIES_BACKDROP_INPUT_MIME_TYPES = ['image/webp', 'application/octe
 export const MOVIES_ID_PREFIX = 'MT-';
 export const MOVIES_ID_LENGTH = 15;
 
-export const MOVIES_POSTER_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
+export const MOVIES_POSTER_FILE_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
   container: MOVIES_POSTER_TEMP_STORAGE_CONTAINER,
   field: MOVIES_POSTER_FILE_FIELD_NAME,
   maxSize: MOVIES_POSTER_MAX_SIZE_IN_BYTES,
   allowedMimeTypes: MOVIES_POSTER_INPUT_MIME_TYPES,
 };
 
-export const MOVIES_BACKDROP_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
+export const MOVIES_BACKDROP_FILE_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
   container: MOVIES_BACKDROP_TEMP_STORAGE_CONTAINER,
   field: MOVIES_BACKDROP_FILE_FIELD_NAME,
   maxSize: MOVIES_BACKDROP_MAX_SIZE_IN_BYTES,

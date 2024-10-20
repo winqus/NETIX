@@ -5,17 +5,17 @@ import { FileInStorage } from '@ntx/file-storage/types';
 import * as sharp from 'sharp';
 import {
   BACKDROP_EXTENTION,
-  IMAGES_BACKDROP_CONTAINER,
-  IMAGES_BACKDROP_QUEUE_CONCURRENCY,
-  IMAGES_BACKDROP_SIZES,
-  IMAGES_CREATE_BACKDROP_QUEUE,
+  BACKDROP_FILE_CONTAINER,
+  BACKDROP_QUEUE_CONCURRENCY,
+  BACKDROP_SIZES,
+  CREATE_BACKDROP_QUEUE,
 } from '../images.constants';
 import { BackdropSize } from '../images.types';
 import { makeBackdropFileName } from '../utils/images.utils';
 import { CreateBackdropJob } from './create-backdrop.types';
 
-@Processor(IMAGES_CREATE_BACKDROP_QUEUE, {
-  concurrency: IMAGES_BACKDROP_QUEUE_CONCURRENCY,
+@Processor(CREATE_BACKDROP_QUEUE, {
+  concurrency: BACKDROP_QUEUE_CONCURRENCY,
 })
 export class CreateBackdropWorker extends WorkerHost {
   private readonly logger = new Logger(this.constructor.name);
@@ -46,7 +46,7 @@ export class CreateBackdropWorker extends WorkerHost {
     const outputFiles: FileInStorage[] = [];
 
     const processingPromises = sizes.map(async (size) => {
-      const { width, height } = IMAGES_BACKDROP_SIZES[size];
+      const { width, height } = BACKDROP_SIZES[size];
 
       try {
         const resizer = sharp()
@@ -63,7 +63,7 @@ export class CreateBackdropWorker extends WorkerHost {
         });
 
         const storageDestination: FileInStorage = {
-          container: IMAGES_BACKDROP_CONTAINER,
+          container: BACKDROP_FILE_CONTAINER,
           fileName: makeBackdropFileName(backdropID, size, BACKDROP_EXTENTION),
         };
 

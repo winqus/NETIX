@@ -5,14 +5,17 @@ import {
   HttpException,
   Logger,
   Param,
+  Res,
   StreamableFile,
   UsePipes,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
+import { Response } from 'express';
 import { BackDropService } from './backdrop.service';
 import {
+  BACKDROP_CACHE_CONTROL_HEADER_VAL,
   BACKDROP_CONTROLLER_BASE_PATH,
   BACKDROP_CONTROLLER_VERSION,
   BACKDROP_EXTENTION,
@@ -37,7 +40,7 @@ export class BackdropsController {
 
   @Get(':id')
   @ApiDocsForGetBackdrop()
-  public async getFile(@Param('id') id: string): Promise<StreamableFile> {
+  public async getFile(@Param('id') id: string, @Res({ passthrough: true }) res: Response): Promise<StreamableFile> {
     try {
       if (id == null) {
         throw new BadRequestException(BACKDROP_NO_ID_PROVIDED_ERROR);
@@ -47,6 +50,8 @@ export class BackdropsController {
 
       const fileName = makeBackdropFileName(id, size, BACKDROP_EXTENTION);
       const fileStream = await this.backdropSrv.findOne(id, size);
+
+      res.setHeader('Cache-Control', BACKDROP_CACHE_CONTROL_HEADER_VAL);
 
       return new StreamableFile(fileStream, {
         type: BACKDROP_MIME_TYPE,

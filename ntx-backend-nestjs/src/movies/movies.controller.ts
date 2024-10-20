@@ -27,7 +27,7 @@ import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
 import {
-  MOVIES_BACKDROP_STORAGE_ARGS as MOVIES_BACKDROP_FILE_STORAGE_ARGS,
+  MOVIES_BACKDROP_FILE_STORAGE_ARGS,
   MOVIES_CACHE_KEY,
   MOVIES_CACHE_OPTS,
   MOVIES_CONTROLLER_BASE_PATH,
@@ -36,7 +36,7 @@ import {
   MOVIES_NO_FILE_PROVIDED_ERROR,
   MOVIES_NO_ID_PROVIDED_ERROR,
   MOVIES_NOT_FOUND_ERROR,
-  MOVIES_POSTER_STORAGE_ARGS as MOVIES_POSTER_FILE_STORAGE_ARGS,
+  MOVIES_POSTER_FILE_STORAGE_ARGS,
   MOVIES_SWAGGER_TAG,
 } from './movies.constants';
 import { MoviesService } from './movies.service';
