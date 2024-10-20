@@ -1,4 +1,14 @@
-import { BadRequestException, Controller, Get, Logger, NotFoundException, Param, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Logger,
+  NotFoundException,
+  Param,
+  ParseEnumPipe,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { ExternalProviders } from '@ntx/external-providers/external-providers.constants';
@@ -32,16 +42,15 @@ export class LibraryController {
   @ApiDocsForSearch()
   public async search(
     @Query('query') query: string,
-    @Query('types') types: string,
-    @Query('providers') providers: string,
+    @Query('types', new DefaultValuePipe(TitleType.MOVIE), new ParseEnumPipe(TitleType)) types: string,
+    @Query('providers', new DefaultValuePipe('NTX')) providers: string,
     @Query('limit') limit?: number,
   ): Promise<SearchResultDTO> {
     this.logger.log(
       `Received search request with types: ${types}, providers: ${providers}, query: ${query}, limit: ${limit}`,
     );
 
-    query = query.trim();
-    if (!query) {
+    if (!query || !query.trim()) {
       throw new BadRequestException('Query parameter is required');
     }
 
