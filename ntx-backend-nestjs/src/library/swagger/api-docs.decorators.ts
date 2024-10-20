@@ -10,13 +10,13 @@ export function ApiDocsForSearch() {
 
   return applyDecorators(
     ApiOperation({ summary: 'Search for titles' }),
-    ApiQuery({ name: 'types', required: true, type: String, description: typesDescription, example: TitleType.MOVIE }),
+    ApiQuery({ name: 'types', required: false, type: String, description: typesDescription, example: TitleType.MOVIE }),
     ApiQuery({
       name: 'providers',
-      required: true,
+      required: false,
       type: String,
       description: providersDescription,
-      example: Providers.NTX_DISCOVERY,
+      example: Providers.NTX,
     }),
     ApiQuery({ name: 'limit', required: false, type: Number }),
     ApiQuery({ name: 'query', required: true, type: String, example: 'shrek' }),
