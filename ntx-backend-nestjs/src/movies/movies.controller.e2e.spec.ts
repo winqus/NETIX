@@ -9,12 +9,17 @@ import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX } from '@ntx/app.consta
 import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
+import { BACKDROP_CACHE_CONTROL_HEADER_VAL } from '@ntx/images/images.constants';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
 import { MovieDTO } from './dto/movie.dto';
-import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
+import {
+  MOVIES_BACKDROP_FILE_FIELD_NAME,
+  MOVIES_NO_FILE_PROVIDED_ERROR,
+  MOVIES_POSTER_FILE_FIELD_NAME,
+} from './movies.constants';
 import { MoviesModule } from './movies.module';
 
 jest.setTimeout(10000);
@@ -217,6 +222,59 @@ describe('Movies API (e2e)', () => {
 
     it('should return 400 when no poster file is provided', async () => {
       const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/poster`);
+
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);
+    });
+  });
+
+  describe('GET /api/v1/backdrops/:id', () => {
+    let backdropID: string;
+
+    beforeAll(async () => {
+      const createdMovie = await createRandomValidMovie();
+
+      const testImagePath = validTestImagePath;
+      const putBackdropResponse = await request(app.getHttpServer())
+        .put(`/api/v1/movies/${createdMovie.id}/backdrop`)
+        .attach(MOVIES_BACKDROP_FILE_FIELD_NAME, testImagePath);
+
+      expect(putBackdropResponse.status).toBe(HttpStatus.OK);
+      backdropID = putBackdropResponse.body.backdropID;
+    });
+
+    it('should return the backdrop when it exists', async () => {
+      const response = await request(app.getHttpServer()).get(`/api/v1/backdrops/${backdropID}`);
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.headers['content-type']).toBe('image/webp');
+      expect(response.body).toBeDefined();
+      expect(response.headers['cache-control']).toBe(BACKDROP_CACHE_CONTROL_HEADER_VAL);
+    });
+
+    it('should return 404 when the backdrop does not exist', async () => {
+      const response = await request(app.getHttpServer()).get('/api/v1/backdrops/random-id');
+
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('PUT /api/v1/movies/:id/backdrop', () => {
+    it('should successfully update the backdrop of a movie', async () => {
+      const existingMovie = await createRandomValidMovie();
+      const testImagePath = validTestImagePath;
+
+      const response = await request(app.getHttpServer())
+        .put(`/api/v1/movies/${existingMovie.id}/backdrop`)
+        .attach(MOVIES_BACKDROP_FILE_FIELD_NAME, testImagePath);
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.backdropID).toBeDefined();
+      expect(response.body.backdropID).not.toEqual(existingMovie.backdropID);
+    });
+
+    it('should return 400 when no backdrop file is provided', async () => {
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/backdrop`);
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
       expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);

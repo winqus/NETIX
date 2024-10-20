@@ -9,14 +9,25 @@ export const MOVIES_POSTER_INPUT_MIME_TYPES = ['image/webp', 'application/octet-
 export const MOVIES_POSTER_MAX_SIZE_IN_BYTES = 1_024_000; // 1 MB
 export const MOVIES_POSTER_FILE_FIELD_NAME = 'poster';
 export const MOVIES_POSTER_DEFAULT_ID = 'MT-default-poster';
+export const MOVIES_BACKDROP_TEMP_STORAGE_CONTAINER = 'raw-uploads';
+export const MOVIES_BACKDROP_FILE_FIELD_NAME = 'backdrop';
+export const MOVIES_BACKDROP_MAX_SIZE_IN_BYTES = 1_024_000; // 1 MB
+export const MOVIES_BACKDROP_INPUT_MIME_TYPES = ['image/webp', 'application/octet-stream'];
 export const MOVIES_ID_PREFIX = 'MT-';
 export const MOVIES_ID_LENGTH = 15;
 
-export const MOVIES_POSTER_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
+export const MOVIES_POSTER_FILE_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
   container: MOVIES_POSTER_TEMP_STORAGE_CONTAINER,
   field: MOVIES_POSTER_FILE_FIELD_NAME,
   maxSize: MOVIES_POSTER_MAX_SIZE_IN_BYTES,
   allowedMimeTypes: MOVIES_POSTER_INPUT_MIME_TYPES,
+};
+
+export const MOVIES_BACKDROP_FILE_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
+  container: MOVIES_BACKDROP_TEMP_STORAGE_CONTAINER,
+  field: MOVIES_BACKDROP_FILE_FIELD_NAME,
+  maxSize: MOVIES_BACKDROP_MAX_SIZE_IN_BYTES,
+  allowedMimeTypes: MOVIES_BACKDROP_INPUT_MIME_TYPES,
 };
 
 export const MOVIES_NAME_LENGTH_MIN = 1;

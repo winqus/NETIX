@@ -7,6 +7,7 @@ export const MovieSchema = new mongoose.Schema<Movie>(
   {
     uuid: { type: String, required: true, unique: true },
     posterID: { type: String, required: true },
+    backdropID: { type: String, default: null },
     name: { type: String, required: true },
     type: { type: String, required: true },
     originallyReleasedAt: { type: Date, required: true },

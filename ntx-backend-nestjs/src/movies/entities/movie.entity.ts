@@ -21,6 +21,7 @@ export interface MovieProps {
   createdAt?: Date;
   updatedAt?: Date;
   posterID?: string;
+  backdropID?: string;
   name: string;
   originallyReleasedAt: Date;
   summary: string;
@@ -41,6 +42,10 @@ export class Movie implements Title {
 
   @IsString()
   posterID: string;
+
+  @IsString()
+  @IsOptional()
+  backdropID?: string;
 
   @IsString()
   @Length(MOVIES_NAME_LENGTH_MIN, MOVIES_NAME_LENGTH_MAX)
@@ -77,6 +82,7 @@ export class Movie implements Title {
       createdAt: props.createdAt || new Date(),
       updatedAt: props.updatedAt || new Date(),
       posterID: props.posterID || MOVIES_POSTER_DEFAULT_ID,
+      backdropID: props.backdropID || undefined,
       name: props.name,
       type: TitleType.MOVIE,
       hash: this.createHash(props),

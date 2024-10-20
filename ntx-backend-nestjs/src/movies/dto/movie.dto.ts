@@ -42,5 +42,9 @@ export class MovieDTO {
 
   @IsString()
   @IsOptional()
+  backdropID?: string;
+
+  @IsString()
+  @IsOptional()
   videoID?: string;
 }

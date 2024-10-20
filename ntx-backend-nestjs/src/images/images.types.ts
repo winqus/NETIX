@@ -4,3 +4,7 @@ export enum PosterSize {
   M = 'M',
   L = 'L',
 }
+
+export enum BackdropSize {
+  L = 'L',
+}

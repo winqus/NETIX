@@ -72,6 +72,28 @@ export function ApiDocsForPutUpdatePoster() {
   );
 }
 
+export function ApiDocsForPutUpdateBackdrop() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Replace backdrop for a movie' }),
+    ApiConsumes('multipart/form-data'),
+    ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiBody({
+      schema: {
+        type: 'object',
+        allOf: [{ properties: { backdrop: { type: 'string', format: 'binary' } }, required: ['backdrop'] }],
+      },
+      description: 'Body is a <i>backdrop</i> file in multipart/form-data format.',
+    }),
+    ApiResponse({ status: HttpStatus.OK, description: 'Updated movie backdrop with given file', type: MovieDTO }),
+    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Requested movie does not exist' }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'When file or id not provided',
+    }),
+    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}
+
 export function ApiDocsForPatchMovie() {
   return applyDecorators(
     ApiOperation({ summary: 'Update movie by ID' }),
