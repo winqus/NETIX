@@ -14,7 +14,11 @@ import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
 import { MovieDTO } from './dto/movie.dto';
-import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_POSTER_FILE_FIELD_NAME } from './movies.constants';
+import {
+  MOVIES_BACKDROP_FILE_FIELD_NAME,
+  MOVIES_NO_FILE_PROVIDED_ERROR,
+  MOVIES_POSTER_FILE_FIELD_NAME,
+} from './movies.constants';
 import { MoviesModule } from './movies.module';
 
 jest.setTimeout(10000);
@@ -217,6 +221,28 @@ describe('Movies API (e2e)', () => {
 
     it('should return 400 when no poster file is provided', async () => {
       const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/poster`);
+
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);
+    });
+  });
+
+  describe('PUT /api/v1/movies/:id/backdrop', () => {
+    it('should successfully update the backdrop of a movie', async () => {
+      const existingMovie = await createRandomValidMovie();
+      const testImagePath = validTestImagePath;
+
+      const response = await request(app.getHttpServer())
+        .put(`/api/v1/movies/${existingMovie.id}/backdrop`)
+        .attach(MOVIES_BACKDROP_FILE_FIELD_NAME, testImagePath);
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.backdropID).toBeDefined();
+      expect(response.body.backdropID).not.toEqual(existingMovie.backdropID);
+    });
+
+    it('should return 400 when no backdrop file is provided', async () => {
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/backdrop`);
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
       expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);
