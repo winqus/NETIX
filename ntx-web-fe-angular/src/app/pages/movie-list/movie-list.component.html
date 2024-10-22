@@ -1,13 +1,14 @@
-<main class="main pt-24 md:pt-16">
-  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
-    <!-- <div class="grid"> -->
+<main class="main">
+  <div class="h-screen grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
     @if (!isLoadingMovies) {
       @for (movie of movies; track movie.id) {
         <app-movie-card [movie]="movie"></app-movie-card>
       }
     } @else {
       @for (skeleton of skeletonNumber; track skeleton; let count = $count) {
-        <app-movie-card-skeleton></app-movie-card-skeleton>
+        <div class="card card-compact aspect-[3/4] group relative rounded-md shadow-xl dark:shadow-gray-950 text-white">
+          <div class="skeleton aspect-[3/4] bg-slate-950 rounded-md"></div>
+        </div>
       }
     }
   </div>

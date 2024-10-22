@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import { ENV, ENVIRONMENTS } from '../../constants';
+import { ENV, ENVIRONMENTS } from '@ntx/app.constants';
 
 export class CustomHttpInternalErrorException extends HttpException {
   constructor(error: Error) {

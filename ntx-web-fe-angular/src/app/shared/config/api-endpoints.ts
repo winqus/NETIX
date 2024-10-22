@@ -9,27 +9,59 @@ export const API_CONFIG = {
   },
 };
 
-export const METADATA_CONFIG = {
+export const SERVER = {
   baseUrl: environment.api.serverUrl + '/api',
   endpoints: {
-    searchByTitle: '/v1/search/title',
-    uploadThumbnail: '/v1/thumbnails/title',
-    uploadVideo: '/v1/videos/title',
+    movies: {
+      movies: '/v1/movies',
+      moviesImport: '/v1/movies-import',
+    },
+    poster: '/v1/poster',
+    imageProxy: '/v1/images-proxy',
+    library: {
+      search: '/v1/library/search',
+      externalMovies: '/v1/library/external-movies',
+    },
   },
 };
 
-export function getSearchByTitleUrl(title: string): string {
-  return `${METADATA_CONFIG.baseUrl}${METADATA_CONFIG.endpoints.searchByTitle}?q=${encodeURIComponent(title)}`;
+export function getMovieUrl(_id?: string): string {
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}`;
+  if (_id) url += `/${_id}`;
+
+  return url;
 }
 
-export function getSearchByIdUrl(id: string, type: string, source: string): string {
-  return `${METADATA_CONFIG.baseUrl}${METADATA_CONFIG.endpoints.searchByTitle}/${encodeURIComponent(id)}?type=${encodeURIComponent(type)}&source=${encodeURIComponent(source)}`;
+export function getMoviePublishedUrl(_id: string): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/published`;
 }
 
-export function getUploadThumbnail(id: string): string {
-  return `${METADATA_CONFIG.baseUrl}${METADATA_CONFIG.endpoints.uploadThumbnail}/${encodeURIComponent(id)}`;
+export function getMovieImportUrl(): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.moviesImport}`;
 }
 
-export function getUploadVideo(id: string): string {
-  return `${METADATA_CONFIG.baseUrl}${METADATA_CONFIG.endpoints.uploadVideo}/${encodeURIComponent(id)}`;
+export function getPoster(_id: string, _size?: string) {
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
+  if (_size) url += `?size=${_size}`;
+
+  return url;
+}
+
+export function replacePoster(_id: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/poster`;
+}
+
+export function getImageProxy(_url: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.imageProxy}?url=${encodeURIComponent(_url)}`;
+}
+
+export function getLibrarySearch(_query: string, _types: string, _providers: string, _limit?: number) {
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.library.search}?query=${encodeURIComponent(_query)}&types=${_types}&providers=${_providers}`;
+  if (_limit !== undefined) url += `&limit=${_limit}`;
+
+  return url;
+}
+
+export function getExternalMovie(_id: string, _providerId: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.library.externalMovies}/${_id}/metadata?providerID=${_providerId}`;
 }

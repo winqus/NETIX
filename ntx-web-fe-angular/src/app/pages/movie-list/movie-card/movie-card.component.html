@@ -1,0 +1,27 @@
+<div class="text-white relative" tabindex="-1" (click)="navigateToMovie()" (keydown)="onKeydown($event)" style="cursor: pointer">
+  @if (!posterLoaded) {
+    <div class="object-cover h-full aspect-[2/3] mr-2 bg-white flex align-middle justify-center items-center">
+      <app-svg-icons name="file_image" size="60" color="black"></app-svg-icons>
+    </div>
+  } @else {
+    <img
+      [src]="posterSource()"
+      [alt]="this.movie?.name"
+      class="object-cover h-full w-full rounded-md aspect-[2/3] shadow-xl dark:shadow-gray-950 skeleton"
+      role="button"
+      tabindex="0"
+      (error)="onPosterError()"
+      [class]="{ 'opacity-20': !isPublished() }"
+    />
+  }
+  @if (!isPublished()) {
+    <div class="absolute top-4 inset-x-0 mx-auto badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
+  }
+
+  <div class="w-full" tabindex="-1">
+    <h2 class="card-title">{{ this.movie?.name }}</h2>
+    <div class="flex justify-between">
+      <h3>{{ publishedDate }}</h3>
+    </div>
+  </div>
+</div>

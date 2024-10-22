@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, HttpException, Logger, NotFoundException } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
-import { ENVIRONMENTS } from '@ntx/constants';
+import { ENVIRONMENTS } from '@ntx/app.constants';
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {

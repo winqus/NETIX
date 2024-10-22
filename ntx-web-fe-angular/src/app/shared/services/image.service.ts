@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { APP_SETTINGS } from '../config/app-settings';
+import { MediaConstants } from '../config/constants';
 import Cropper from 'cropperjs';
 import imageCompression from 'browser-image-compression';
 
@@ -9,7 +9,7 @@ import imageCompression from 'browser-image-compression';
 export class ImageService {
   constructor() {}
 
-  getCropperConfig(aspectRatio: number = APP_SETTINGS.ASPECT_RATIO_TWO_THIRDS): Cropper.Options {
+  getCropperConfig(aspectRatio: number = MediaConstants.image.aspectRatio): Cropper.Options {
     return {
       aspectRatio: aspectRatio,
       viewMode: 1,
@@ -50,11 +50,12 @@ export class ImageService {
   }
 
   async compressImage(imageFile: File) {
+    if (imageFile.size < MediaConstants.image.maxSizeBytes) return imageFile;
     const options = {
-      maxSizeMB: APP_SETTINGS.MAX_IMAGE_SIZE_MB,
-      maxWidthOrHeight: APP_SETTINGS.MAX_IMAGE_HEIGHT,
+      maxSizeMB: MediaConstants.image.maxSizeMb,
+      maxWidthOrHeight: MediaConstants.image.maxHeight,
       useWebWorker: true,
     };
-    return await imageCompression(imageFile, options);
+    return imageCompression(imageFile, options);
   }
 }

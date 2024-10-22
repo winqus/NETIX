@@ -1,44 +1,51 @@
-import { ExpressAdapter } from '@bull-board/express';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { BullModule } from '@nestjs/bullmq';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core/constants';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { resolve } from 'path';
 import {
+  DEFAULT_FILE_STORAGE_BASE_DIR_PATH,
+  DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH,
   DEFAULT_THROTTLE_LIMIT,
   DEFAULT_THROTTLE_TTL,
-  QUEUE_HOST,
-  QUEUE_PASSWORD,
-  QUEUE_PORT,
-  QUEUE_UI_ROUTE,
-} from './constants';
+  ENV_FILE,
+} from './app.constants';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-import { ExternalSearchModule } from './external-search/external-search.module';
+import { ExternalProvidersModule } from './external-providers/external-providers.module';
+import { FileStorageModule } from './file-storage/file-storage.module';
+import { StorageType } from './file-storage/types';
+import { ImagesModule } from './images/images.module';
+import { JobQueueModule } from './job-queue/job-queue.module';
+import { LibraryModule } from './library/library.module';
+import { MoviesModule } from './movies/movies.module';
+
+function getStorageBaseDirPath() {
+  if (process.env.USE_TEMPORARY_FILE_STORAGE === 'true') {
+    const tempDirPath = process.env.TEMP_FILE_STORAGE_BASE_DIR_PATH || DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH;
+
+    return resolve(tempDirPath);
+  } else {
+    return resolve(DEFAULT_FILE_STORAGE_BASE_DIR_PATH);
+  }
+}
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ENV_FILE }),
     DatabaseModule,
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        connection: {
-          host: configService.get(QUEUE_HOST),
-          port: configService.get(QUEUE_PORT),
-          password: configService.get(QUEUE_PASSWORD),
-        },
-      }),
-      inject: [ConfigService],
-    }),
-    BullBoardModule.forRoot({
-      route: QUEUE_UI_ROUTE,
-      adapter: ExpressAdapter,
-    }),
+    FileStorageModule.forRoot(
+      StorageType.LocalFileSystem,
+      {
+        [StorageType.LocalFileSystem]: { setup: { storageBaseDirPath: getStorageBaseDirPath() } },
+      },
+      true,
+    ),
+    JobQueueModule.forRootAsync(),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
@@ -47,7 +54,17 @@ import { ExternalSearchModule } from './external-search/external-search.module';
         limit: DEFAULT_THROTTLE_LIMIT,
       },
     ]),
-    ExternalSearchModule,
+    CacheModule.register({ isGlobal: true }),
+    ExternalProvidersModule.forRoot({
+      TMDB: {
+        enable: true,
+        apiKey: process.env.TMDB_API_KEY || '',
+        rateLimitMs: 5,
+      },
+    }),
+    ImagesModule,
+    MoviesModule,
+    LibraryModule,
   ],
   controllers: [AppController],
   providers: [

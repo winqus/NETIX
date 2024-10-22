@@ -9,7 +9,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "test-ci": "npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox",
+    "e2e": "ng e2e",
+    "cypress:open": "cypress open",
+    "lint": "ng lint",
+    "backend:start": "cd ../ntx-backend-nestjs && npm start"
   },
   "private": true,
   "dependencies": {
@@ -39,9 +43,11 @@
     "@angular-eslint/template-parser": "17.3.0",
     "@angular/cli": "^17.1.4",
     "@angular/compiler-cli": "^17.1.0",
+    "@faker-js/faker": "^9.0.1",
     "@types/jasmine": "~5.1.0",
     "@typescript-eslint/eslint-plugin": "7.2.0",
     "@typescript-eslint/parser": "7.2.0",
+    "cypress": "^13.14.2",
     "daisyui": "^4.7.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",

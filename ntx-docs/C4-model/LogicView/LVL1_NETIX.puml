@@ -1,0 +1,22 @@
+@startuml NETIX_LVL1
+
+skinparam FrameBackgroundColor white
+
+frame "[C4 LVL1] System Context" {
+    skinparam {
+        componentBackgroundColor<<system>> #0D1F3D
+        componentFontColor<<system>> #FFFFFF
+        componentBorderColor<<system>> #FFFFFF
+    }
+
+    component [NETIX] <<system>>
+    interface NTX_WEB_UI
+    interface TMDB_API
+
+    :Viewer: --> (NTX_WEB_UI)
+    :Manager: --> (NTX_WEB_UI)
+
+    NETIX -up- NTX_WEB_UI
+    NETIX -up-( TMDB_API
+}
+@enduml

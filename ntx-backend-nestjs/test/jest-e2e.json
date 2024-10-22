@@ -10,5 +10,10 @@
     "^@ntx/(.*)$": "<rootDir>/../src/$1",
     "^@ntx-test/(.*)$": "<rootDir>/$1"
   },
-  "resolver": null
+  "collectCoverageFrom": [
+    "**/*.(t|j)s"
+  ],
+  "setupFiles": [
+    "<rootDir>/../setupJest.js"
+  ]
 }
