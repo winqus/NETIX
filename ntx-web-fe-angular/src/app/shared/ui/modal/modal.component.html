@@ -1,0 +1,21 @@
+<div [id]="id" class="modal modal-open modal-middle">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-bold">{{ title }}</h3>
+      <button class="btn-sm btn-circle bg-black flex items-center justify-center" type="button" (click)="onClose()">
+        <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
+      </button>
+    </div>
+    <div class="mb-3">{{ body }}</div>
+
+    <ng-container #dynamicContent></ng-container>
+
+    <div class="modal-action">
+      @for (button of buttons; track button) {
+        <button [class]="button.class" type="button" (click)="onButtonAction(button.action, button.shouldClose)">
+          {{ button.text }}
+        </button>
+      }
+    </div>
+  </div>
+</div>

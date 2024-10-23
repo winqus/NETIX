@@ -4,17 +4,19 @@ import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
 import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
-import { FieldRestrictions, TimeDelays } from '@ntx-shared/config/constants';
-import { formatDate } from '@ntx/app/shared/services/utils/utils';
+import { FieldRestrictions, MediaConstants, TimeDelays } from '@ntx-shared/config/constants';
+import { formatDate } from '@ntx-shared/services/utils/utils';
+import { ModalService } from '@ntx-shared/services/modal.service';
+import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule],
+  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
@@ -27,14 +29,17 @@ export class InspectMovieComponent implements OnInit {
   isFromCreation: boolean = false;
   movieTitleEditForm: FormGroup | null = null;
   errorMessage: string = '';
+  imageAccept: string | undefined;
 
   constructor(
+    private modalService: ModalService,
     private movieService: MovieService,
     private posterService: PosterService,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.imageAccept = MediaConstants.image.formats.join(',');
     const movieId = this.route.snapshot.paramMap.get('id') || '';
     const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
@@ -59,6 +64,25 @@ export class InspectMovieComponent implements OnInit {
       },
     });
   }
+
+  openPublishedPopup = () => {
+    this.modalService.openPopup('publishPopup', this.getPublishPopupTitle(), this.getPublishPopupText(), [
+      {
+        text: 'Cancel',
+        class: 'btn btn-square btn-outline w-fit px-4',
+        action: () => {},
+        shouldClose: true,
+      },
+      {
+        text: 'Confirm',
+        class: 'btn btn-square btn-primary btn-outline w-fit px-4',
+        action: () => {
+          this.onToggleMoviePublish();
+        },
+        shouldClose: true,
+      },
+    ]);
+  };
 
   loadPoster(id: string, size: string): void {
     this.posterService.getPoster(id, size).subscribe({
@@ -122,8 +146,6 @@ export class InspectMovieComponent implements OnInit {
         },
       });
     }
-
-    this.publishPopup.nativeElement.close();
   }
 
   getPublishedButtonLabel(): string {
