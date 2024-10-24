@@ -38,6 +38,7 @@ import {
   MOVIES_NOT_FOUND_ERROR,
   MOVIES_POSTER_FILE_STORAGE_ARGS,
   MOVIES_SWAGGER_TAG,
+  MOVIES_VIDEOS_FILE_STORAGE_ARGS,
 } from './movies.constants';
 import { MoviesService } from './movies.service';
 import {
@@ -136,7 +137,7 @@ export class MoviesController {
   @Put(':id/poster')
   @ApiDocsForPutUpdatePoster()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
-  public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -165,7 +166,7 @@ export class MoviesController {
   @Put(':id/backdrop')
   @ApiDocsForPutUpdateBackdrop()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_BACKDROP_FILE_STORAGE_ARGS))
-  public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -189,9 +190,42 @@ export class MoviesController {
     }
   }
 
+  @Put(':id/video')
+  // TODO: Api docs
+  @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_VIDEOS_FILE_STORAGE_ARGS))
+  public async updateVideo(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
+    try {
+      if (!id) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      if (file == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      // TODO: Implement this
+      // const updatedMovie = await this.moviesSrv.updateVideoForOne(id, fileInStorageFromRaw(file));
+      // In the movieSrv call videoSrv with method .createOneFromFile(videoName, fileInStorage)
+      // videoName - can be: get movie by id and then name + year)
+
+      // this.logger.log(`Updated video for movie ${id}`);
+
+      this.clearMoviesCache();
+
+      // return updatedMovie;
+      throw new Error('Not implemented');
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
   @Patch(':id')
   @ApiDocsForPatchMovie()
-  public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO) {
+  public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
