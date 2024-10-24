@@ -23,6 +23,7 @@ import { ImagesModule } from './images/images.module';
 import { JobQueueModule } from './job-queue/job-queue.module';
 import { LibraryModule } from './library/library.module';
 import { MoviesModule } from './movies/movies.module';
+import { VideosModule } from './videos/videos.module';
 
 function getStorageBaseDirPath() {
   if (process.env.USE_TEMPORARY_FILE_STORAGE === 'true') {
@@ -65,6 +66,7 @@ function getStorageBaseDirPath() {
     ImagesModule,
     MoviesModule,
     LibraryModule,
+    VideosModule,
   ],
   controllers: [AppController],
   providers: [
