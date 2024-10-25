@@ -175,4 +175,34 @@ describe('FileStorageLocal', () => {
       expect(promise).rejects.toThrow(/ENOENT/);
     });
   });
+
+  describe('listFiles', () => {
+    it('lists files in a container', async () => {
+      const container = 'container-with-files';
+      const expectedFileCount = 3;
+      for (let i = 0; i < expectedFileCount; i++) {
+        await createRandomTempFile(fileStorageSrv, container, `contents-${i}`);
+      }
+
+      const files = await fileStorageSrv.listFiles({ container });
+      expect(files).toHaveLength(expectedFileCount);
+    });
+
+    it('should return empty array when no files in the container', async () => {
+      const container = 'container-without-files';
+      await fse.ensureDir(resolve(tempStoragePath, container));
+
+      const files = await fileStorageSrv.listFiles({ container });
+
+      expect(files).toEqual([]);
+    });
+
+    it('should return empty array when container does not exist', async () => {
+      const container = 'non-existing-container';
+
+      const files = await fileStorageSrv.listFiles({ container });
+
+      expect(files).toEqual([]);
+    });
+  });
 });

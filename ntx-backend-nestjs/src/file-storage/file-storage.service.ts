@@ -7,6 +7,7 @@ import {
   FileStorageDownloadFileArgs,
   FileStorageDownloadStreamArgs,
   FileStorageGetFileMetadataArgs,
+  FileStorageListFilesArgs,
   FileStorageUploadSingleFileArgs,
   FileStorageUploadStreamArgs,
 } from './file-storage.interfaces';
@@ -59,5 +60,9 @@ export class FileStorageService implements FileStorage {
    */
   public async getFileMetadata(args: FileStorageGetFileMetadataArgs): Promise<unknown> {
     return this.fileStorageStrategy.getFileMetadata(args);
+  }
+
+  public async listFiles(args: FileStorageListFilesArgs): Promise<Array<FileInStorage>> {
+    return this.fileStorageStrategy.listFiles(args);
   }
 }

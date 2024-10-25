@@ -17,6 +17,7 @@ import {
   FileStorageDownloadFileArgs,
   FileStorageDownloadStreamArgs,
   FileStorageGetFileMetadataArgs,
+  FileStorageListFilesArgs,
   FileStorageUploadSingleFileArgs,
 } from '../file-storage.interfaces';
 import { FileStorageConfigFactory } from '../file-storage.types';
@@ -40,35 +41,11 @@ export class FileStorageLocal implements FileStorage {
     }
   }
 
-  private isValidContainerName(container: string): boolean {
-    return FILE_STORAGE_LOCAL_CONTAINER_NAME_REGEX.test(container);
-  }
-
-  private isValidFileName(fileName: string) {
-    return FILE_STORAGE_LOCAL_FILE_NAME_REGEX.test(fileName);
-  }
-
-  private transformToLocalFilePath({ container, fileName }: FileStorageArgs) {
-    if (this.isValidContainerName(container) === false) {
-      throw new Error(INVALID_CONTAINER_NAME);
-    }
-
-    if (this.isValidFileName(fileName) === false) {
-      throw new Error(INVALID_FILE_NAME);
-    }
-
-    const dirSegments = container.split(FILE_STORAGE_CONTAINER_DELIM);
-
-    const fullLocalFilePath = resolve(this.config.storageBaseDirPath, ...dirSegments, fileName);
-
-    return fullLocalFilePath;
-  }
-
   public async uploadSingleFile(args: FileStorageUploadSingleFileArgs): Promise<FileInStorage> {
-    const { container, fileName, content } = args;
+    const { container, fileName, content, overwriteIfExists } = args;
     const filePath = this.transformToLocalFilePath({ container, fileName });
 
-    if (fse.existsSync(filePath)) {
+    if (!overwriteIfExists && fse.existsSync(filePath)) {
       throw new Error(FILE_ALREADY_EXISTS);
     }
 
@@ -138,13 +115,66 @@ export class FileStorageLocal implements FileStorage {
     return fse.stat(filePath);
   }
 
+  public async listFiles(args: FileStorageListFilesArgs): Promise<Array<FileInStorage>> {
+    const { container } = args;
+    const dirPath = this.transformToLocalDirPath(container);
+
+    if (fse.existsSync(dirPath) === false) {
+      return [];
+    }
+
+    const files = (await fse.readdir(dirPath, { withFileTypes: true }))
+      .filter((dirent) => dirent.isFile())
+      .map((dirent) => dirent.name);
+
+    if (files.length === 0) {
+      return [];
+    }
+
+    return files.map((fileName) => ({ container, fileName }) as FileInStorage);
+  }
+
+  private isValidContainerName(container: string): boolean {
+    return FILE_STORAGE_LOCAL_CONTAINER_NAME_REGEX.test(container);
+  }
+
+  private isValidFileName(fileName: string) {
+    return FILE_STORAGE_LOCAL_FILE_NAME_REGEX.test(fileName);
+  }
+
+  private transformToLocalFilePath({ container, fileName }: FileStorageArgs) {
+    if (this.isValidFileName(fileName) === false) {
+      throw new Error(INVALID_FILE_NAME);
+    }
+
+    const fullLocalFilePath = resolve(this.transformToLocalDirPath(container), fileName);
+
+    return fullLocalFilePath;
+  }
+
+  private transformToLocalDirPath(container: string) {
+    if (this.isValidContainerName(container) === false) {
+      throw new Error(INVALID_CONTAINER_NAME);
+    }
+
+    const dirSegments = container.split(FILE_STORAGE_CONTAINER_DELIM);
+
+    const fullLocalContainerPath = resolve(this.config.storageBaseDirPath, ...dirSegments);
+
+    return fullLocalContainerPath;
+  }
+
   private throwErrorIfFileDoesNotExist(filePath: string) {
     if (fse.existsSync(filePath) === false) {
       throw new Error('ENOENT: File does not exist');
     }
   }
 
-  private isFileWrittenAtOffset(options: FileStreamOptions) {
+  private isFileWrittenAtOffset(options?: FileStreamOptions): boolean {
+    if (!options) {
+      return false;
+    }
+
     return 'start' in options && typeof options.start === 'number' && options.start >= 0;
   }
 }
