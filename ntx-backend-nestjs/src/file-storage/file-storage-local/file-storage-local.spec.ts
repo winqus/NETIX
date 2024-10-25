@@ -151,4 +151,28 @@ describe('FileStorageLocal', () => {
       expect(promise).rejects.toThrow(/ENOENT/);
     });
   });
+
+  describe('getFileMetadata', () => {
+    it('gets metadata of an existing file', async () => {
+      const container = 'container.with-metadata';
+      const expectedContents = 'some-random-contents';
+      const { fileName, filePath } = await createRandomTempFile(fileStorageSrv, container, expectedContents);
+
+      const metadata = await fileStorageSrv.getFileMetadata({ container, fileName });
+
+      expect(metadata).toMatchObject({
+        size: fse.statSync(filePath).size,
+      });
+    });
+
+    it('should throw an error when non existing fileName is provided', async () => {
+      const container = 'container-with-metadata';
+      await createRandomTempFile(fileStorageSrv, container, 'some-random-contents2');
+      const nonExistingFileName = `some-non-existing-file-${Date.now()}`;
+
+      const promise = fileStorageSrv.getFileMetadata({ container, fileName: nonExistingFileName });
+
+      expect(promise).rejects.toThrow(/ENOENT/);
+    });
+  });
 });
