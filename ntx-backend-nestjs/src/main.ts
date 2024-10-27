@@ -2,7 +2,6 @@ import { INestApplication, Logger, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Server } from '@tus/server';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
@@ -23,9 +22,6 @@ import {
 } from './app.constants';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
-import { FileStorageService } from './file-storage/file-storage.service';
-import { FileStorageDataStore } from './file-storage/tus/file-storage-data-store.tus';
-import { FileStorageFileConfigStore } from './file-storage/tus/file-storage-file-config-store.tus';
 
 async function bootstrapSwagger(app: INestApplication<any>) {
   const swaggerDocBuilder = new DocumentBuilder()
@@ -104,23 +100,6 @@ async function bootstrap() {
   app.enableCors();
   app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
   app.enableShutdownHooks();
-
-  const fileStorage = app.get(FileStorageService);
-
-  const tusServer = new Server({
-    path: '/files',
-    datastore: new FileStorageDataStore({
-      destinationContainer: 'some-large-uploads',
-      fileStorage: fileStorage,
-      configstore: new FileStorageFileConfigStore({
-        destinationContainer: 'upload-metadata',
-        fileStorage: fileStorage,
-      }),
-      expirationPeriodInMilliseconds: 0,
-    }),
-  });
-
-  app.use('/files', tusServer.handle.bind(tusServer));
 
   if (env === ENVIRONMENTS.DEVELOPMENT) {
     await bootstrapSwagger(app);

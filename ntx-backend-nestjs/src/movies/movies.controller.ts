@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   Get,
+  Head,
   HttpException,
   Inject,
   Logger,
@@ -13,6 +14,8 @@ import {
   Patch,
   Post,
   Put,
+  Req,
+  Res,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -22,6 +25,7 @@ import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInt
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
 import { FileToStorageContainerInterceptor } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
+import { TusUploadService } from '@ntx/file-storage/tus/tus-upload.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
@@ -50,6 +54,9 @@ import {
   ApiDocsForPutMoviePublished,
   ApiDocsForPutUpdateBackdrop,
   ApiDocsForPutUpdatePoster,
+  ApiDocsForTusHeadMovieVideoUpload,
+  ApiDocsForTusPatchMovieVideoUpload,
+  ApiDocsForTusPostMovieVideoUpload,
 } from './swagger/api-docs.decorators';
 
 @ApiTags(MOVIES_SWAGGER_TAG)
@@ -64,6 +71,7 @@ export class MoviesController {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
+    private readonly tusUploadSrv: TusUploadService,
   ) {}
 
   @Post()
@@ -190,30 +198,48 @@ export class MoviesController {
     }
   }
 
-  @Put(':id/video')
-  // TODO: Api docs
-  @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_VIDEOS_FILE_STORAGE_ARGS))
-  public async updateVideo(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
+  @Post(':id/video')
+  @ApiDocsForTusPostMovieVideoUpload()
+  public async handleTusPostToInitUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
+    await this.moviesSrv.findOne(id);
+
+    await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
+  }
+
+  @Head(':id/video/:uploadId')
+  @ApiDocsForTusHeadMovieVideoUpload()
+  public async handleTusHeadToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
+    await this.moviesSrv.findOne(id);
+
+    res.set({ 'cache-control': 'no-store' });
+
+    await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
+  }
+
+  @Patch(':id/video/:uploadId')
+  @ApiDocsForTusPatchMovieVideoUpload()
+  public async handleTusPatchToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
       }
 
-      if (file == null) {
-        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      const fileInStorage = await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
+      if (fileInStorage == null) {
+        /* Upload is not yet finished */
+        return;
       }
 
       // TODO: Implement this
-      // const updatedMovie = await this.moviesSrv.updateVideoForOne(id, fileInStorageFromRaw(file));
+      // const updatedMovie = await this.moviesSrv.updateVideoForOne(id, fileInStorage);
       // In the movieSrv call videoSrv with method .createOneFromFile(videoName, fileInStorage)
       // videoName - can be: get movie by id and then name + year)
 
-      // this.logger.log(`Updated video for movie ${id}`);
+      this.logger.log(
+        `video update finished for movie ${id}, file stored ${fileInStorage.fileName} in ${fileInStorage.container}`,
+      );
 
       this.clearMoviesCache();
-
-      // return updatedMovie;
-      throw new Error('Not implemented');
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

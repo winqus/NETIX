@@ -1,4 +1,5 @@
 import { FileToStorageContainerInterceptorArgs } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
+import { UploadArgs } from '@ntx/file-storage/tus/tus-upload.service';
 
 export const MOVIES_CONTROLLER_BASE_PATH = 'movies';
 export const MOVIES_CONTROLLER_VERSION = '1';
@@ -34,9 +35,8 @@ export const MOVIES_BACKDROP_FILE_STORAGE_ARGS: FileToStorageContainerIntercepto
   allowedMimeTypes: MOVIES_BACKDROP_INPUT_MIME_TYPES,
 };
 
-export const MOVIES_VIDEOS_FILE_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
+export const MOVIES_VIDEOS_FILE_STORAGE_ARGS: UploadArgs = {
   container: MOVIES_VIDEO_TEMP_STORAGE_CONTAINER,
-  field: MOVIES_VIDEO_FILE_FIELD_NAME,
   maxSize: MOVIES_VIDEO_MAX_SIZE_IN_BYTES,
   allowedMimeTypes: MOVIES_VIDEO_INPUT_MIME_TYPES,
 };
