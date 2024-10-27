@@ -26,7 +26,6 @@ export class ImageService {
         reject(new Error('Image element is not provided'));
         return;
       }
-
       const cropper = new Cropper(imageElement, {
         ...this.getCropperConfig(),
         ready() {

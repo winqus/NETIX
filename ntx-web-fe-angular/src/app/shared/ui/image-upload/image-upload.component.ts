@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { generateRandomId } from '@ntx-shared/services/utils/utils';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { MediaConstants } from '@ntx-shared/config/constants';
@@ -11,7 +11,9 @@ export interface InputProps {
   title?: string;
   accept?: string;
   readonly?: boolean;
+  originalImage?: File | null;
   posterUrl?: string | null;
+  clearImgButton?: boolean | null;
 }
 
 @Component({
@@ -21,7 +23,7 @@ export interface InputProps {
   templateUrl: './image-upload.component.html',
   styleUrl: './image-upload.component.scss',
 })
-export class ImageUploadComponent implements OnInit, OnChanges {
+export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() props: InputProps = {};
   @Output() filePassed = new EventEmitter<File | null>();
   @ViewChild('input') inputElement!: ElementRef<HTMLInputElement>;
@@ -35,7 +37,9 @@ export class ImageUploadComponent implements OnInit, OnChanges {
     title: 'Upload File',
     accept: '',
     readonly: false,
+    originalImage: null,
     posterUrl: null,
+    clearImgButton: true,
   };
 
   originalImage: File | null = null;
@@ -52,15 +56,26 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (!this.fileUploadId) {
       this.fileUploadId = `file-upload-${generateRandomId()}`;
-      console.log(this.fileUploadId);
     }
   }
 
   ngOnChanges(): void {
+    this.updateProps();
+  }
+
+  ngAfterViewInit(): void {
+    this.updateProps();
+  }
+
+  updateProps(): void {
     this.props = { ...this.defaultProps, ...this.props };
 
     if (this.props.posterUrl != null) {
       this.imageUrl = this.props.posterUrl;
+    }
+
+    if (this.props.originalImage != null) {
+      this.setFile(this.props.originalImage);
     }
   }
 

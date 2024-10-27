@@ -8,7 +8,7 @@
     </div>
     <div class="mb-3">{{ body }}</div>
 
-    <ng-container #dynamicContent></ng-container>
+    <ng-container #dynamicContent [class]="contentClass"></ng-container>
 
     <div class="modal-action">
       @for (button of buttons; track button) {

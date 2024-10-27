@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { getMoviePublishedUrl, getMovieUrl } from '@ntx-shared/config/api-endpoints';
+import { getMoviePosterUrl, getMoviePublishedUrl, getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { IMovieService } from './IMovie.service.interface';
 import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
 import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import { environment } from '@ntx/environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +22,7 @@ export class MovieService implements IMovieService {
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
-        console.error('Error uploading movie metadata:', error);
+        if (environment.development) console.error('Error uploading movie metadata:', error);
         return throwError(() => error);
       })
     );
@@ -36,7 +37,7 @@ export class MovieService implements IMovieService {
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
-        console.error('Error fetching movie metadata:', error);
+        if (environment.development) console.error('Error fetching movie metadata:', error);
         return throwError(() => error);
       })
     );
@@ -52,11 +53,10 @@ export class MovieService implements IMovieService {
 
     return this.http.patch(url, movieData, httpOptions).pipe(
       map((response: any) => {
-        console.log(response);
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
-        console.error('Error update movie metadata:', error);
+        if (environment.development) console.error('Error update movie metadata:', error);
         return throwError(() => error);
       })
     );
@@ -69,11 +69,10 @@ export class MovieService implements IMovieService {
 
     return this.http.get(url, httpOptions).pipe(
       map((response: any) => {
-        console.log(response);
         return MovieDTOMapper.anyToMovieDTOArray(response);
       }),
       catchError((error) => {
-        console.error('Error fetching movie metadata:', error);
+        if (environment.development) console.error('Error fetching movie metadata:', error);
         return throwError(() => error);
       })
     );
@@ -86,11 +85,10 @@ export class MovieService implements IMovieService {
 
     return this.http.put(url, httpOptions).pipe(
       map((response: any) => {
-        console.log(response);
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
-        console.error('Error publishing movie:', error);
+        if (environment.development) console.error('Error publishing movie:', error);
         return throwError(() => error);
       })
     );
@@ -103,11 +101,26 @@ export class MovieService implements IMovieService {
 
     return this.http.delete(url, httpOptions).pipe(
       map((response: any) => {
-        console.log(response);
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
-        console.error('Error publishing movie:', error);
+        if (environment.development) console.error('Error publishing movie:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  updatePoster(id: string, formData: FormData): Observable<MovieDTO> {
+    const url = getMoviePosterUrl(id);
+
+    const httpOptions = {};
+
+    return this.http.put(url, formData, httpOptions).pipe(
+      map((response: any) => {
+        if (environment.development) console.log(response);
+        return MovieDTOMapper.anyToMovieDTO(response);
+      }),
+      catchError((error) => {
+        if (environment.development) console.error('Error publishing movie:', error);
         return throwError(() => error);
       })
     );
