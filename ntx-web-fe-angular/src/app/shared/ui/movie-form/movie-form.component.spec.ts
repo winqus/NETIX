@@ -2,7 +2,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MovieFormComponent } from './movie-form.component';
-import { MovieDTO } from '../../models/movie.dto';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 
 describe('MovieFormComponent', () => {
   let component: MovieFormComponent;

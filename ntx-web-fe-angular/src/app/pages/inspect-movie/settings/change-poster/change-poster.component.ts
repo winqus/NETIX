@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MediaConstants } from '@ntx/app/shared/config/constants';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
-import { ModalService } from '@ntx/app/shared/services/modal.service';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
-import { ImageUploadComponent } from '@ntx/app/shared/ui/image-upload/image-upload.component';
+import { MediaConstants } from '@ntx-shared/config/constants';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { ModalService } from '@ntx-shared/services/modal.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { environment } from '@ntx/environments/environment.development';
 
 @Component({

@@ -9,7 +9,7 @@ import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component'
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { TimeDelays } from '@ntx-shared/config/constants';
-import { ImageUploadComponent } from '@ntx/app/shared/ui/image-upload/image-upload.component';
+import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';

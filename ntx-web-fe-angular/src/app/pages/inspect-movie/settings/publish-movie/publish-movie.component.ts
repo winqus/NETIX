@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
-import { ModalService } from '@ntx/app/shared/services/modal.service';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { ModalService } from '@ntx-shared/services/modal.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { environment } from '@ntx/environments/environment';
 
 @Component({

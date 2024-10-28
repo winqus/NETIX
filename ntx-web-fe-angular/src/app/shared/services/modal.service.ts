@@ -1,5 +1,5 @@
 import { ApplicationRef, ComponentRef, Injectable, Type, createComponent } from '@angular/core';
-import { ModalComponent } from '../ui/modal.component';
+import { ModalComponent } from '@ntx-shared/ui/modal.component';
 
 @Injectable({
   providedIn: 'root',

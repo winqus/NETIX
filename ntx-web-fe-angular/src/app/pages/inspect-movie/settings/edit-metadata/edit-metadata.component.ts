@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MovieDTO, UpdateMovieDTO } from '@ntx/app/shared/models/movie.dto';
-import { ModalService } from '@ntx/app/shared/services/modal.service';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
-import { ModalButton } from '@ntx/app/shared/ui/modal.component';
-import { MovieFormComponent } from '@ntx/app/shared/ui/movie-form/movie-form.component';
+import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
+import { ModalService } from '@ntx-shared/services/modal.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { ModalButton } from '@ntx-shared/ui/modal.component';
+import { MovieFormComponent } from '@ntx-shared/ui/movie-form/movie-form.component';
 import { environment } from '@ntx/environments/environment.development';
 
 @Component({
@@ -22,8 +22,8 @@ export class EditMetadataComponent {
   errorMessage: string = '';
 
   constructor(
-    private modalService: ModalService,
-    private movieService: MovieService
+    private readonly modalService: ModalService,
+    private readonly movieService: MovieService
   ) {}
 
   openPosterUpdatedModal = () => {

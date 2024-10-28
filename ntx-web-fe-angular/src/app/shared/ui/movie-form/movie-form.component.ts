@@ -1,9 +1,9 @@
-import { formatDate } from '../../services/utils/utils';
+import { formatDate } from '@ntx-shared/services/utils/utils';
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FieldRestrictions } from '../../config/constants';
-import { MovieDTO } from '../../models/movie.dto';
-import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { FieldRestrictions } from '@ntx-shared/config/constants';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -11,7 +11,6 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [SvgIconsComponent, ReactiveFormsModule],
   templateUrl: './movie-form.component.html',
-  styleUrl: './movie-form.component.scss',
 })
 export class MovieFormComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() movie: MovieDTO | undefined;

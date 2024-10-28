@@ -7,8 +7,8 @@ import { LibraryService } from '@ntx-shared/services/librarySearch/library.servi
 import { Provider } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
-import { SearchResultDTO } from '../../models/searchResult.dto';
-import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
+import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
+import { SearchResultDTOMapper } from '@ntx-shared/mappers/SearchResultDTO.mapper';
 
 @Component({
   selector: 'app-search-bar',
