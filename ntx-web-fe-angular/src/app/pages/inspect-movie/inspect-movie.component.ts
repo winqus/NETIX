@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
@@ -29,6 +29,7 @@ export class InspectMovieComponent implements OnInit {
   constructor(
     private readonly movieService: MovieService,
     private readonly posterService: PosterService,
+    private readonly router: Router,
     private readonly route: ActivatedRoute
   ) {}
 
@@ -50,6 +51,7 @@ export class InspectMovieComponent implements OnInit {
       },
       error: (errorResponse) => {
         if (environment.development) console.error('Error uploading metadata:', errorResponse);
+        this.router.navigate(['error']);
       },
     });
   }
