@@ -1,7 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { getPoster } from '@ntx/app/shared/config/api-endpoints';
-import { DateConstants } from '@ntx/app/shared/config/constants';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
 import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons/svg-icons.component';
@@ -12,27 +11,11 @@ import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons/svg-icons.compon
   imports: [SvgIconsComponent],
   templateUrl: './movie-card.component.html',
 })
-export class MovieCardComponent implements OnInit, OnDestroy {
+export class MovieCardComponent {
   @Input() movie: MovieDTO | null = null;
   posterLoaded = true;
-  recentlyUpdatedLabel: string = '';
-  private updateInterval: any;
 
-  constructor(private readonly router: Router) {}
-
-  ngOnInit(): void {
-    this.updateRecentlyUpdatedLabel();
-
-    this.updateInterval = setInterval(() => {
-      this.updateRecentlyUpdatedLabel();
-    }, 60000);
-  }
-
-  ngOnDestroy(): void {
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-    }
-  }
+  constructor(private router: Router) {}
 
   get publishedDate(): string {
     if (!this.movie || !this.movie.originallyReleasedAt) return '-';
@@ -67,36 +50,5 @@ export class MovieCardComponent implements OnInit, OnDestroy {
     if (event.key === 'Enter' || event.key === ' ') {
       this.navigateToMovie();
     }
-  }
-
-  wasMovieRecentlyUpdated(): boolean {
-    if (this.movie == null) return false;
-
-    const currentDate = new Date();
-    const sevenDaysAgo = new Date(currentDate);
-    sevenDaysAgo.setDate(currentDate.getDate() - DateConstants.daysThreshold);
-
-    return this.movie?.updatedAt >= sevenDaysAgo && this.movie?.updatedAt <= currentDate;
-  }
-
-  updateRecentlyUpdatedLabel(): void {
-    this.recentlyUpdatedLabel = this.getRecentlyUpdatedLabel();
-  }
-  getRecentlyUpdatedLabel(): string {
-    if (!this.movie?.updatedAt) return '';
-
-    const currentDate = new Date();
-    const updatedDate = new Date(this.movie.updatedAt);
-    const timeDifference = currentDate.getTime() - updatedDate.getTime();
-
-    const minutesDifference = Math.floor(timeDifference / (1000 * 60));
-    const hoursDifference = Math.floor(minutesDifference / 60);
-    const daysDifference = Math.floor(hoursDifference / 24);
-
-    if (minutesDifference < 1) return `Updated just now`;
-    if (hoursDifference < 1) return `Updated ${minutesDifference} minutes ago`;
-    if (daysDifference < 1) return `Updated ${hoursDifference} hours ago`;
-
-    return `Updated ${daysDifference} days ago`;
   }
 }
