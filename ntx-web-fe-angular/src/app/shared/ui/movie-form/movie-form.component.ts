@@ -1,68 +1,59 @@
-import { Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
-import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
-import { ModalService } from '@ntx-shared/services/modal.service';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { environment } from '@ntx/environments/environment.development';
-import { formatDate } from '@ntx-shared/services/utils/utils';
-import { FieldRestrictions } from '@ntx/app/shared/config/constants';
-import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
-import { MovieService } from '@ntx-shared/services/movie/movie.service';
-import { ChangePosterComponent } from './change-poster/change-poster.component';
-import { PublishMovieComponent } from './publish-movie/publish-movie.component';
+import { formatDate } from '../../services/utils/utils';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FieldRestrictions } from '../../config/constants';
+import { MovieDTO } from '../../models/movie.dto';
+import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-settings',
+  selector: 'app-movie-form',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent, ChangePosterComponent, PublishMovieComponent],
-  templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss',
+  imports: [SvgIconsComponent, ReactiveFormsModule],
+  templateUrl: './movie-form.component.html',
+  styleUrl: './movie-form.component.scss',
 })
-export class SettingsComponent implements OnChanges {
-  @Input({ required: true }) movie: MovieDTO | undefined;
-  @ViewChild('editModal') editModal!: ElementRef<HTMLDialogElement>;
+export class MovieFormComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  @Input() movie: MovieDTO | undefined;
+  @Input() errorMessage: string = '';
+  @Output() formGroupChange = new EventEmitter<FormGroup>();
 
   movieTitleEditForm: FormGroup | null = null;
-  errorMessage: string = '';
-  imageAccept: string | undefined;
-  newPosterImg: File | null = null;
-  tempPosterImgUrl: string = '';
 
-  constructor(
-    private modalService: ModalService,
-    private movieService: MovieService
-  ) {}
+  private formValueChangesSubscription: Subscription | null = null;
+
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  ngAfterViewInit(): void {
+    this.initForm();
+  }
 
   ngOnChanges(): void {
+    this.initForm();
+  }
+
+  ngOnDestroy(): void {
+    if (this.formValueChangesSubscription) {
+      this.formValueChangesSubscription.unsubscribe();
+    }
+  }
+
+  initForm(): void {
     if (this.movie == null) return;
 
     this.populateEditForm(this.movie.name, this.movie.summary, this.movie.originallyReleasedAt, this.movie.runtimeMinutes);
-    console.log(this.movie);
-    console.log(this.movieTitleEditForm);
-  }
 
-  onSubmitNewMetadata() {
-    if (this.movieTitleEditForm == null) return;
-    if (this.movie == null) return;
+    if (this.formValueChangesSubscription) {
+      this.formValueChangesSubscription.unsubscribe();
+    }
 
-    if (this.movieTitleEditForm.valid) {
-      const movieData: UpdateMovieDTO = {
-        name: this.movieTitleEditForm.get('title')?.value,
-        summary: this.movieTitleEditForm.get('summary')?.value,
-        originallyReleasedAt: this.movieTitleEditForm.get('originallyReleasedAt')?.value,
-        runtimeMinutes: this.movieTitleEditForm.get('runtimeMinutes')?.value,
-      };
+    if (this.movieTitleEditForm) {
+      this.formGroupChange.emit(this.movieTitleEditForm);
 
-      this.movieService.updateMovieMetadata(this.movie?.id, movieData).subscribe({
-        next: (response: MovieDTO | undefined) => {
-          if (environment.development) console.log('Update successful:', response);
-          this.editModal.nativeElement.close();
-          this.movie = response;
-        },
-        error: (errorResponse: { error: { message: string } }) => {
-          this.errorMessage = errorResponse.error.message;
-          if (environment.development) console.error('Error updating metadata:', errorResponse);
-        },
+      this.formValueChangesSubscription = this.movieTitleEditForm.valueChanges.subscribe(() => {
+        this.formGroupChange.emit(this.movieTitleEditForm!);
       });
     }
   }

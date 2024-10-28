@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { ModalService } from '@ntx/app/shared/services/modal.service';
 import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
@@ -12,6 +12,8 @@ import { environment } from '@ntx/environments/environment';
 })
 export class PublishMovieComponent {
   @Input({ required: true }) movie: MovieDTO | undefined;
+  @Output() movieChange = new EventEmitter<MovieDTO>();
+
   newPosterImg: File | null = null;
 
   constructor(
@@ -44,7 +46,8 @@ export class PublishMovieComponent {
       this.movieService.publishMovie(this.movie?.id).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Publishing successful:', response);
-          this.movie = response;
+          // this.movie = response;
+          this.movieChange.emit(response);
         },
         error: (errorResponse: any) => {
           if (environment.development) console.error('Error publishing movie:', errorResponse);
@@ -54,7 +57,8 @@ export class PublishMovieComponent {
       this.movieService.unpublishMovie(this.movie?.id).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Unpublishing successful:', response);
-          this.movie = response;
+          // this.movie = response;
+          this.movieChange.emit(response);
         },
         error: (errorResponse: any) => {
           if (environment.development) console.error('Error unpublishing movie:', errorResponse);

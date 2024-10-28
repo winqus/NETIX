@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MediaConstants } from '@ntx/app/shared/config/constants';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { ModalService } from '@ntx/app/shared/services/modal.service';
@@ -17,11 +17,12 @@ import { environment } from '@ntx/environments/environment.development';
 })
 export class ChangePosterComponent {
   @Input({ required: true }) movie: MovieDTO | undefined;
+  @Output() movieChange = new EventEmitter<MovieDTO>();
   newPosterImg: File | null = null;
 
   constructor(
-    private modalService: ModalService,
-    private movieService: MovieService
+    private readonly modalService: ModalService,
+    private readonly movieService: MovieService
   ) {}
 
   onPosterChange(event: any) {
@@ -75,8 +76,9 @@ export class ChangePosterComponent {
     formData.append('poster', this.newPosterImg as Blob);
 
     this.movieService.updatePoster(this.movie?.id, formData).subscribe({
-      next: (response: { posterID: any }) => {
+      next: (response) => {
         if (environment.development) console.log('Update poster successful:', response);
+        this.movieChange.emit(response);
       },
       error: (errorResponse: { error: { message: string } }) => {
         if (environment.development) console.error('Error updating poster:', errorResponse);

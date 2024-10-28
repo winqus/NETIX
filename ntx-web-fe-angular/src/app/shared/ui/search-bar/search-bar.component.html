@@ -1,11 +1,11 @@
 <div class="search-container relative">
-  <label for="searchBar" class="input input-bordered flex flex-row input-sm rounded-md">
+  <label [for]="id" class="input input-bordered flex flex-row input-sm rounded-md">
     @if (isLoading) {
       <app-svg-icons name="throbber"></app-svg-icons>
     } @else {
       <app-svg-icons class="content-center w-4" name="search" size="15"></app-svg-icons>
     }
-    <input id="searchBar" type="text" class="w-full p-2" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()" placeholder="Search for a movie title..." autocomplete="off" />
+    <input [id]="id" type="text" class="w-full p-2" [(ngModel)]="searchTerm" (ngModelChange)="onSearchTermChange()" placeholder="Search for a movie title..." autocomplete="off" />
   </label>
 
   @if (errorMessage) {
@@ -23,7 +23,7 @@
         >
           <div class="w-10 aspect-[2/3] mr-2 bg-white flex align-middle justify-center items-center">
             @if (result.posterURL && !result.posterURL.endsWith('null')) {
-              <img [src]="result.posterURL" alt="Poster Image" class="" />
+              <img [src]="result.posterURL" alt="Poster" class="" />
             } @else {
               <app-svg-icons name="file_image" size="20" color="black"></app-svg-icons>
             }

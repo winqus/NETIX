@@ -1,18 +1,18 @@
 import { Component, ComponentRef, EventEmitter, Input, Output, ViewChild, ViewContainerRef } from '@angular/core';
-import { SvgIconsComponent } from '../svg-icons/svg-icons.component';
+import { SvgIconsComponent } from './svg-icons/svg-icons.component';
 
-interface ModalButton {
+export interface ModalButton {
   text: string;
   class: string;
   action: () => void;
   shouldClose: boolean;
+  disabled: boolean;
 }
 
 @Component({
   selector: 'app-modal',
   standalone: true,
   imports: [SvgIconsComponent],
-  // templateUrl: './modal.component.html',
   template: `<div [id]="id" class="modal modal-open modal-middle">
     <div class="modal-box">
       <div class="flex justify-between items-center mb-4">
@@ -27,7 +27,7 @@ interface ModalButton {
 
       <div class="modal-action">
         @for (button of buttons; track button) {
-          <button [class]="button.class" type="button" (click)="onButtonAction(button.action, button.shouldClose)">
+          <button [class]="button.class" [disabled]="button.disabled" type="button" (click)="onButtonAction(button.action, button.shouldClose)">
             {{ button.text }}
           </button>
         }

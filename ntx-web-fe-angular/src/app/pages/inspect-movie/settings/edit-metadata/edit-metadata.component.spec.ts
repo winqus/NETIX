@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PublishMovieComponent } from './publish-movie.component';
+import { EditMetadataComponent } from './edit-metadata.component';
+import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { of } from 'rxjs';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 
-describe('PublishMovieComponent', () => {
-  let component: PublishMovieComponent;
-  let fixture: ComponentFixture<PublishMovieComponent>;
+describe('EditMetadataComponent', () => {
+  let component: EditMetadataComponent;
+  let fixture: ComponentFixture<EditMetadataComponent>;
   let mockMovieService: any;
 
   const mockMovie: MovieDTO = {
@@ -31,11 +31,11 @@ describe('PublishMovieComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [PublishMovieComponent],
+      imports: [EditMetadataComponent],
       providers: [{ provide: MovieService, useValue: mockMovieService }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PublishMovieComponent);
+    fixture = TestBed.createComponent(EditMetadataComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

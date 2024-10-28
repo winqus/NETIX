@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { generateRandomId } from '@ntx-shared/services/utils/utils';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { MediaConstants } from '@ntx-shared/config/constants';
@@ -49,8 +49,9 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
   imageUrl: string | null = null;
 
   constructor(
-    private imageServ: ImageService,
-    private posterServ: PosterService
+    private readonly imageServ: ImageService,
+    private readonly posterServ: PosterService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -77,6 +78,8 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.props.originalImage != null) {
       this.setFile(this.props.originalImage);
     }
+
+    this.cdr.detectChanges();
   }
 
   onFileChanged(event: any) {
@@ -185,7 +188,7 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
 
     const acceptedTypes = this.props.accept.split(',').map((type) => type.trim());
     const fileType = file.type;
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
+    const fileExtension = file.name.split('.').pop()?.toLowerCase() ?? '';
 
     return acceptedTypes.some((acceptType) => {
       if (acceptType.startsWith('.')) {

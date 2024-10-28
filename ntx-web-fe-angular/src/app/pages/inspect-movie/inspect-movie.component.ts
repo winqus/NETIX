@@ -9,12 +9,15 @@ import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component'
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { TimeDelays } from '@ntx-shared/config/constants';
-import { SettingsComponent } from './settings/settings.component';
+import { ImageUploadComponent } from '@ntx/app/shared/ui/image-upload/image-upload.component';
+import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
+import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
+import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule, SettingsComponent],
+  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent, ChangePosterComponent, PublishMovieComponent, EditMetadataComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
@@ -24,13 +27,13 @@ export class InspectMovieComponent implements OnInit {
   isFromCreation: boolean = false;
 
   constructor(
-    private movieService: MovieService,
-    private posterService: PosterService,
-    private route: ActivatedRoute
+    private readonly movieService: MovieService,
+    private readonly posterService: PosterService,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    const movieId = this.route.snapshot.paramMap.get('id') || '';
+    const movieId = this.route.snapshot.paramMap.get('id') ?? '';
     const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
 
@@ -39,19 +42,23 @@ export class InspectMovieComponent implements OnInit {
         if (environment.development) console.log('Upload successful:', response);
 
         this.movie = response;
-
-        // this.populateEditForm(this.movie.name, this.movie.summary, this.movie.originallyReleasedAt, this.movie.runtimeMinutes);
-
         if (this.isFromCreation) {
           timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
         } else {
-          this.loadPoster(this.movie!.posterID, PosterSize.L);
+          this.loadPoster(this.movie.posterID, PosterSize.L);
         }
       },
       error: (errorResponse) => {
         if (environment.development) console.error('Error uploading metadata:', errorResponse);
       },
     });
+  }
+
+  onMovieLoad(updatedMovie: MovieDTO) {
+    if (this.movie?.posterID != updatedMovie.posterID) {
+      timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(updatedMovie.posterID, PosterSize.L));
+    }
+    this.movie = updatedMovie;
   }
 
   loadPoster(id: string, size: string): void {
