@@ -34,3 +34,7 @@ export const MediaConstants = {
 export const TimeDelays = {
   posterProcessingDelay: 500,
 };
+
+export const DateConstants = {
+  daysThreshold: 7,
+};
