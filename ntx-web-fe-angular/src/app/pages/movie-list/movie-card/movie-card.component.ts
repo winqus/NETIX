@@ -16,8 +16,9 @@ export const titleUpdateBadgeThresholdDays = 7;
 export class MovieCardComponent {
   @Input() movie: MovieDTO | null = null;
   posterLoaded = true;
+  recentlyUpdatedLabel: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private readonly router: Router) {}
 
   get publishedDate(): string {
     if (!this.movie || !this.movie.originallyReleasedAt) return '-';
