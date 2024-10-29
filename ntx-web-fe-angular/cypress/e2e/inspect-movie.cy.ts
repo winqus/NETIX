@@ -1,6 +1,7 @@
-import { getMovieUrl, getPoster } from '@ntx/app/shared/config/api-endpoints';
+import { getMoviePosterUrl, getMovieUrl, getPoster } from '@ntx/app/shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
+import { HUMAN_COGNITIVE_PAUSE } from 'cypress/support/constants';
 import convertRouteToPath from 'cypress/support/convertRoute';
 import { makeRandomMovieName, makeRandomMovieReleaseDate, makeRandomMovieRuntime, makeRandomMovieSummary } from 'cypress/support/randomDataFactory';
 
@@ -153,6 +154,41 @@ describe('inspect movie', () => {
       cy.contains('Confirm').click();
 
       cy.get('.badge').contains('Unpublished').should('be.visible');
+    });
+  });
+
+  it('should change poster for movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const PUT_POSTER_REQUEST_TOKEN = 'PUT_POSTER';
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
+      cy.intercept('PUT', `${convertRouteToPath(getMoviePosterUrl(movie.id))}`).as(PUT_POSTER_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+      cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Change poster').click();
+
+      cy.get('#posterInput').selectFile('cypress/files/2_sm_284x190.webp', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + PUT_POSTER_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const newPosterID = body.posterID;
+        expect(newPosterID).to.be.a('string');
+        expect(newPosterID).to.not.eq(movie.posterID);
+
+        const GET_NEW_POSTER_TOKEN = 'GET_NEW_POSTER';
+        cy.intercept(convertRouteToPath(getPoster(newPosterID, PosterSize.L))).as(GET_NEW_POSTER_TOKEN);
+        cy.wait('@' + GET_NEW_POSTER_TOKEN).then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+      });
     });
   });
 });
