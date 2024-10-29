@@ -15,11 +15,13 @@
     />
   }
   @if (!isPublished()) {
-    <div class="absolute top-4 inset-x-0 mx-auto badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
+    <div id="publishedBadge" class="absolute top-4 inset-x-0 mx-auto badge badge-warning badge-md rounded-md font-bold gap-1 text-sm">
+      <app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished
+    </div>
   }
 
   @if (isMovieRecentlyUpdated()) {
-    <div class="absolute top-0 left-0 badge m-1 h-5 w-5">
+    <div id="recentlyUpdatedBadge" class="absolute top-0 left-0 badge m-1 h-5 w-5">
       <app-svg-icons class="tooltip tooltip-right" [attr.data-tip]="recentlyUpdatedLabel" name="clock" size="20"></app-svg-icons>
     </div>
   }
