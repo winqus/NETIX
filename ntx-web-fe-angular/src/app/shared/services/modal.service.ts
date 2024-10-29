@@ -1,5 +1,5 @@
 import { ApplicationRef, ComponentRef, Injectable, Type, createComponent } from '@angular/core';
-import { ModalComponent } from '@ntx-shared/ui/modal.component';
+import { ModalButton, ModalComponent } from '@ntx-shared/ui/modal.component';
 
 export interface ContentComponent<T> {
   component: Type<T>;
@@ -15,7 +15,21 @@ export class ModalService {
 
   constructor(private readonly appRef: ApplicationRef) {}
 
-  openModal<T>(id: string, title: string, body: string, buttons: any[], contentComponent?: ContentComponent<T>): { modalRef: ComponentRef<ModalComponent>; contentRef?: ComponentRef<T> } {
+  /**
+   * Opens a new modal with the specified configuration.
+   *
+   * @template T - The type of the content component, if specified.
+   * @param id - A unique identifier for the modal instance.
+   * @param title - The title text displayed at the top of the modal.
+   * @param body - The main text or content displayed in the modal body.
+   * @param buttons - An array of button configurations for the modal actions.
+   * @param contentComponent - An optional object containing the content component type, properties, and custom CSS class to inject into the modal.
+   *
+   * @returns An object containing:
+   * - `modalRef`: The reference to the created `ModalComponent` instance.
+   * - `contentRef`: (optional) The reference to the content component instance, if provided.
+   */
+  openModal<T>(id: string, title: string, body: string, buttons: ModalButton[], contentComponent?: ContentComponent<T>): { modalRef: ComponentRef<ModalComponent>; contentRef?: ComponentRef<T> } {
     const modalRef = createComponent(ModalComponent, {
       environmentInjector: this.appRef.injector,
     });
@@ -57,6 +71,11 @@ export class ModalService {
     return { modalRef, contentRef };
   }
 
+  /**
+   * Closes the specified modal and performs necessary cleanup.
+   *
+   * @param modalRef - The reference to the modal component to be closed.
+   */
   closeModal(modalRef: ComponentRef<ModalComponent>) {
     const index = this.modalRefs.indexOf(modalRef);
     if (index !== -1) {
