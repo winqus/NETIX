@@ -4,7 +4,7 @@ import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { ContentComponent, ModalService } from '@ntx-shared/services/modal.service';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
-import { ModalButton } from '@ntx/app/shared/ui/modal.component';
+import { ModalButton } from '@ntx-shared/ui/modal.component';
 import { environment } from '@ntx/environments/environment.development';
 
 @Component({
