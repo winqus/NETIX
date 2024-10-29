@@ -36,6 +36,10 @@ export function getMoviePublishedUrl(_id: string): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/published`;
 }
 
+export function getMoviePosterUrl(_id: string): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/poster`;
+}
+
 export function getMovieImportUrl(): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.movies.moviesImport}`;
 }

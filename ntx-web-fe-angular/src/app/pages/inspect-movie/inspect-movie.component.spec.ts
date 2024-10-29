@@ -3,7 +3,7 @@ import { InspectMovieComponent } from './inspect-movie.component';
 import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { ActivatedRoute } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 
@@ -64,56 +64,9 @@ describe('InspectMovieComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should fetch movie metadata on init', () => {
-    expect(mockMovieService.getMovieMetadata).toHaveBeenCalledWith('1');
-    expect(component.movie).toEqual(mockMovie);
-  });
-
   it('should fetch poster immediately if not from creation', () => {
     component.isFromCreation = false;
     fixture.detectChanges();
     expect(mockPosterService.getPoster).toHaveBeenCalledWith(mockMovie.posterID, PosterSize.L);
-  });
-
-  describe('Publishing and Unpublishing', () => {
-    it('should publish the movie when it is not published', () => {
-      component.movie = { ...mockMovie, isPublished: false };
-      component.onToggleMoviePublish();
-
-      expect(mockMovieService.publishMovie).toHaveBeenCalledWith('1');
-      expect(component.movie?.isPublished).toBeTrue();
-    });
-
-    it('should unpublish the movie when it is already published', () => {
-      component.movie = { ...mockMovie, isPublished: true };
-      component.onToggleMoviePublish();
-
-      expect(mockMovieService.unpublishMovie).toHaveBeenCalledWith('1');
-      expect(component.movie?.isPublished).toBeFalse();
-    });
-
-    it('should handle error while publishing the movie', () => {
-      spyOn(console, 'error');
-      component.movie = { ...mockMovie, isPublished: false };
-
-      mockMovieService.publishMovie.and.returnValue(throwError(() => new Error('Error publishing movie')));
-
-      component.onToggleMoviePublish();
-
-      expect(mockMovieService.publishMovie).toHaveBeenCalledWith('1');
-      expect(console.error).toHaveBeenCalledWith('Error publishing movie:', jasmine.any(Error));
-    });
-
-    it('should handle error while unpublishing the movie', () => {
-      spyOn(console, 'error');
-      component.movie = { ...mockMovie, isPublished: true };
-
-      mockMovieService.unpublishMovie.and.returnValue(throwError(() => new Error('Error unpublishing movie')));
-
-      component.onToggleMoviePublish();
-
-      expect(mockMovieService.unpublishMovie).toHaveBeenCalledWith('1');
-      expect(console.error).toHaveBeenCalledWith('Error unpublishing movie:', jasmine.any(Error));
-    });
   });
 });

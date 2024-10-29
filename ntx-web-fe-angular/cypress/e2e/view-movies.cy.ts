@@ -69,7 +69,7 @@ describe('view movies list', () => {
 
     cy.visit('/');
 
-    cy.get('#searchBar').type(movieName);
+    cy.get('#navbarSearchBar').type(movieName);
     cy.get(SEARCH_RESULTS_ELEMENT)
       .should('be.visible')
       .within(() => {
