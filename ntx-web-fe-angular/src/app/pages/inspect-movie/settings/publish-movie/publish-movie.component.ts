@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { ModalService } from '@ntx-shared/services/modal.service';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { ModalButton } from '@ntx/app/shared/ui/modal.component';
 import { environment } from '@ntx/environments/environment';
 
 @Component({
@@ -15,14 +16,15 @@ export class PublishMovieComponent {
   @Output() movieChange = new EventEmitter<MovieDTO>();
 
   newPosterImg: File | null = null;
+  modalButtons: ModalButton[] = [];
 
   constructor(
-    private modalService: ModalService,
-    private movieService: MovieService
+    private readonly modalService: ModalService,
+    private readonly movieService: MovieService
   ) {}
 
   openPublishedPopup = () => {
-    this.modalService.openModal('publishPopup', this.getPublishPopupTitle(), this.getPublishPopupText(), [
+    this.modalButtons = [
       {
         text: 'Cancel',
         class: 'btn btn-square btn-outline w-fit px-4',
@@ -37,7 +39,9 @@ export class PublishMovieComponent {
         },
         shouldClose: true,
       },
-    ]);
+    ];
+
+    this.modalService.openModal('publishPopup', this.getPublishPopupTitle(), this.getPublishPopupText(), this.modalButtons);
   };
   onToggleMoviePublish() {
     if (this.movie == null) return;
@@ -46,7 +50,6 @@ export class PublishMovieComponent {
       this.movieService.publishMovie(this.movie?.id).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Publishing successful:', response);
-          // this.movie = response;
           this.movieChange.emit(response);
         },
         error: (errorResponse: any) => {
@@ -57,7 +60,6 @@ export class PublishMovieComponent {
       this.movieService.unpublishMovie(this.movie?.id).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Unpublishing successful:', response);
-          // this.movie = response;
           this.movieChange.emit(response);
         },
         error: (errorResponse: any) => {

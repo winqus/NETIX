@@ -1,6 +1,12 @@
 import { ApplicationRef, ComponentRef, Injectable, Type, createComponent } from '@angular/core';
 import { ModalComponent } from '@ntx-shared/ui/modal.component';
 
+export interface ContentComponent<T> {
+  component: Type<T>;
+  inputProps?: Partial<T>;
+  customClass?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -9,15 +15,7 @@ export class ModalService {
 
   constructor(private readonly appRef: ApplicationRef) {}
 
-  openModal<T>(
-    id: string,
-    title: string,
-    body: string,
-    buttons: any[],
-    contentComponent?: Type<T>,
-    contentInputs?: Partial<T>,
-    customClass?: string
-  ): { modalRef: ComponentRef<ModalComponent>; contentRef?: ComponentRef<T> } {
+  openModal<T>(id: string, title: string, body: string, buttons: any[], contentComponent?: ContentComponent<T>): { modalRef: ComponentRef<ModalComponent>; contentRef?: ComponentRef<T> } {
     const modalRef = createComponent(ModalComponent, {
       environmentInjector: this.appRef.injector,
     });
@@ -35,14 +33,14 @@ export class ModalService {
     let contentRef: ComponentRef<T> | undefined;
 
     if (contentComponent) {
-      contentRef = modalRef.instance.viewContainerRef.createComponent(contentComponent);
+      contentRef = modalRef.instance.viewContainerRef.createComponent(contentComponent.component);
 
-      if (contentInputs) {
-        Object.assign(contentRef.instance as object, contentInputs);
+      if (contentComponent.inputProps) {
+        Object.assign(contentRef.instance as object, contentComponent.inputProps);
       }
 
-      if (customClass) {
-        contentRef.location.nativeElement.classList.add(customClass);
+      if (contentComponent.customClass) {
+        contentRef.location.nativeElement.classList.add(contentComponent.customClass);
       }
 
       contentRef.changeDetectorRef.detectChanges();

@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MediaConstants } from '@ntx-shared/config/constants';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { ModalService } from '@ntx-shared/services/modal.service';
+import { ContentComponent, ModalService } from '@ntx-shared/services/modal.service';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
+import { ModalButton } from '@ntx/app/shared/ui/modal.component';
 import { environment } from '@ntx/environments/environment.development';
 
 @Component({
@@ -19,6 +20,7 @@ export class ChangePosterComponent {
   @Input({ required: true }) movie: MovieDTO | undefined;
   @Output() movieChange = new EventEmitter<MovieDTO>();
   newPosterImg: File | null = null;
+  modalButtons: ModalButton[] = [];
 
   constructor(
     private readonly modalService: ModalService,
@@ -36,29 +38,29 @@ export class ChangePosterComponent {
   }
 
   openPosterUpdatedPopup = () => {
-    const { contentRef } = this.modalService.openModal<ImageUploadComponent>(
-      'posterUpdateConfirmPopup',
-      'Update poster',
-      '',
-      [
-        {
-          text: 'Cancel',
-          class: 'btn btn-square btn-outline w-fit px-4',
-          action: () => {},
-          shouldClose: true,
+    this.modalButtons = [
+      {
+        text: 'Cancel',
+        class: 'btn btn-square btn-outline w-fit px-4',
+        action: () => {},
+        shouldClose: true,
+      },
+      {
+        text: 'Confirm',
+        class: 'btn btn-square btn-primary btn-outline w-fit px-4',
+        action: () => {
+          this.changePoster();
         },
-        {
-          text: 'Confirm',
-          class: 'btn btn-square btn-primary btn-outline w-fit px-4',
-          action: () => {
-            this.changePoster();
-          },
-          shouldClose: true,
-        },
-      ],
-      ImageUploadComponent,
-      { props: { accept: this.getNewPosterImageAcceptType(), readonly: false, originalImage: this.newPosterImg, clearImgButton: false } }
-    );
+        shouldClose: true,
+      },
+    ];
+
+    const contentComponent: ContentComponent<ImageUploadComponent> = {
+      component: ImageUploadComponent,
+      inputProps: { props: { accept: this.getNewPosterImageAcceptType(), readonly: false, originalImage: this.newPosterImg, clearImgButton: false } },
+    };
+
+    const { contentRef } = this.modalService.openModal<ImageUploadComponent>('posterUpdateConfirmPopup', 'Update poster', '', this.modalButtons, contentComponent);
 
     if (contentRef) {
       contentRef.instance.filePassed.subscribe((croppedImage: File | null) => {

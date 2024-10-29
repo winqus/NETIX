@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
-import { ModalService } from '@ntx-shared/services/modal.service';
+import { ModalService, ContentComponent } from '@ntx-shared/services/modal.service';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ModalButton } from '@ntx-shared/ui/modal.component';
 import { MovieFormComponent } from '@ntx-shared/ui/movie-form/movie-form.component';
@@ -48,7 +48,12 @@ export class EditMetadataComponent {
       },
     ];
 
-    const { contentRef } = this.modalService.openModal<MovieFormComponent>('editModal', 'Edit', '', this.modalButtons, MovieFormComponent, { movie: this.movie, errorMessage: this.errorMessage });
+    const contentComponent: ContentComponent<MovieFormComponent> = {
+      component: MovieFormComponent,
+      inputProps: { movie: this.movie, errorMessage: this.errorMessage },
+    };
+
+    const { contentRef } = this.modalService.openModal<MovieFormComponent>('editModal', 'Edit', '', this.modalButtons, contentComponent);
 
     if (contentRef) {
       contentRef.instance.formGroupChange.subscribe((formGroup: FormGroup) => {

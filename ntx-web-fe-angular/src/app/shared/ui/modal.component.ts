@@ -6,7 +6,7 @@ export interface ModalButton {
   class: string;
   action: () => void;
   shouldClose: boolean;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 @Component({
