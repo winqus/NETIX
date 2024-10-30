@@ -92,6 +92,7 @@ export class TusUploadService {
       },
       onUploadCreate: async (_req, res, upload) => {
         this.logger.log(`Upload '${upload.id}' created`);
+        this.validateUploadMimeTypeOrThrowTusError(upload, allowedMimeTypes);
 
         return res;
       },
@@ -129,5 +130,19 @@ export class TusUploadService {
       container: upload.storage.bucket,
       fileName: upload.id,
     };
+  }
+
+  private validateUploadMimeTypeOrThrowTusError(upload: Upload, allowedMimeTypes?: string[]) {
+    if (upload?.metadata?.filetype == null) {
+      throw { status_code: 400, body: 'Upload mime type could not be determined' } as unknown as Error;
+    }
+
+    if (allowedMimeTypes == null) {
+      return;
+    }
+
+    if (!allowedMimeTypes.includes(upload.metadata.filetype)) {
+      throw { status_code: 415, body: `MIME type '${upload.metadata.filetype}' is not allowed` } as unknown as Error;
+    }
   }
 }

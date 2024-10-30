@@ -1,5 +1,6 @@
 import { FileToStorageContainerInterceptorArgs } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
 import { UploadArgs } from '@ntx/file-storage/tus/tus-upload.service';
+import { VIDEOS_FILE_ALLOWED_MIME_TYPES, VIDEOS_FILE_MAX_SIZE_IN_BYTES } from '@ntx/videos/videos.constants';
 
 export const MOVIES_CONTROLLER_BASE_PATH = 'movies';
 export const MOVIES_CONTROLLER_VERSION = '1';
@@ -16,8 +17,6 @@ export const MOVIES_BACKDROP_MAX_SIZE_IN_BYTES = 1_024_000; // 1 MB
 export const MOVIES_BACKDROP_INPUT_MIME_TYPES = ['image/webp', 'application/octet-stream'];
 export const MOVIES_VIDEO_TEMP_STORAGE_CONTAINER = 'raw-uploads';
 export const MOVIES_VIDEO_FILE_FIELD_NAME = 'video';
-export const MOVIES_VIDEO_MAX_SIZE_IN_BYTES = 10_000_000_000; // 10 GB
-export const MOVIES_VIDEO_INPUT_MIME_TYPES = ['application/octet-stream'];
 export const MOVIES_ID_PREFIX = 'MT-';
 export const MOVIES_ID_LENGTH = 15;
 
@@ -37,8 +36,8 @@ export const MOVIES_BACKDROP_FILE_STORAGE_ARGS: FileToStorageContainerIntercepto
 
 export const MOVIES_VIDEOS_FILE_STORAGE_ARGS: UploadArgs = {
   container: MOVIES_VIDEO_TEMP_STORAGE_CONTAINER,
-  maxSize: MOVIES_VIDEO_MAX_SIZE_IN_BYTES,
-  allowedMimeTypes: MOVIES_VIDEO_INPUT_MIME_TYPES,
+  maxSize: VIDEOS_FILE_MAX_SIZE_IN_BYTES,
+  allowedMimeTypes: VIDEOS_FILE_ALLOWED_MIME_TYPES,
 };
 
 export const MOVIES_NAME_LENGTH_MIN = 1;
