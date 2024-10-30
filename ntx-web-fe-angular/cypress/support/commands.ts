@@ -1,9 +1,11 @@
 /// <reference types="cypress" />
 
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import convertRouteToPath from './convertRoute';
-import { getMovieUrl } from '@ntx/app/shared/config/api-endpoints';
+import { getBackdrop, getMovieImportUrl, getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { makeRandomMovieName, makeRandomMovieSummary, makeRandomMovieReleaseDate, makeRandomMovieRuntime } from './randomDataFactory';
+import { makeCaseInsensitiveRegex } from './regex';
+import { HUMAN_COGNITIVE_PAUSE } from './constants';
 
 // ***********************************************
 // This example commands.ts shows you how to
@@ -62,6 +64,27 @@ Cypress.Commands.add('createMovieWithPoster', (args: any): Cypress.Chainable<Mov
 
   cy.get('.btn').contains('CREATE').click();
   return cy.wait('@' + CREATE_MOVIE_REQUEST_TOKEN).then((interception) => {
+    const response = interception.response!;
+    expect(response.statusCode).to.equal(201);
+    return response.body as MovieDTO;
+  });
+});
+
+Cypress.Commands.add('importMovie', (args: any): Cypress.Chainable<MovieDTO> => {
+  const { name } = args || {};
+
+  const IMPORT_MOVIE_REQUEST_TOKEN = 'import-movie-request';
+  cy.intercept('POST', convertRouteToPath(getMovieImportUrl())).as(IMPORT_MOVIE_REQUEST_TOKEN);
+
+  cy.visit('/createTitle');
+  cy.get('[aria-label="Import"]').click();
+
+  cy.get('#importSearchBar').type(name);
+  cy.get('ul').should('be.visible').get('li').first().contains(makeCaseInsensitiveRegex(name)).click();
+
+  cy.get('button').contains('Import').should('be.enabled').click().wait(HUMAN_COGNITIVE_PAUSE);
+
+  return cy.wait('@' + IMPORT_MOVIE_REQUEST_TOKEN).then((interception) => {
     const response = interception.response!;
     expect(response.statusCode).to.equal(201);
     return response.body as MovieDTO;

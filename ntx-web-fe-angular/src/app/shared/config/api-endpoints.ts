@@ -18,7 +18,7 @@ export const SERVER = {
     },
     image: {
       poster: '/v1/poster',
-      backdrop: '/v1/backdrops',
+      backdrops: '/v1/backdrops',
       imageProxy: '/v1/images-proxy',
     },
     library: {
@@ -59,7 +59,7 @@ export function getPoster(_id: string, _size?: string) {
 }
 
 export function getBackdrop(_id: string) {
-  return `${SERVER.baseUrl}${SERVER.endpoints.image.backdrop}/${_id}`;
+  return `${SERVER.baseUrl}${SERVER.endpoints.image.backdrops}/${_id}`;
 }
 
 export function replacePoster(_id: string) {

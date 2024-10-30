@@ -1,4 +1,4 @@
-import { getMoviePosterUrl, getMovieUrl, getPoster } from '@ntx/app/shared/config/api-endpoints';
+import { getBackdrop, getMovieBackdropUrl, getMovieImportUrl, getMoviePosterUrl, getMovieUrl, getPoster } from '@ntx-shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
 import { HUMAN_COGNITIVE_PAUSE } from 'cypress/support/constants';
@@ -188,6 +188,20 @@ describe('inspect movie', () => {
         cy.wait('@' + GET_NEW_POSTER_TOKEN).then((interception) => {
           expect(interception.response!.statusCode).to.eq(200);
         });
+      });
+    });
+  });
+
+  it.only('should get backdrop when importing a selected movie', () => {
+    cy.importMovie({ name: 'dune: part two' }).then((movie: MovieDTO) => {
+      const PUT_BACKDROP_REQUEST_TOKEN = 'PUT_BACKDROP';
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept('PUT', `${convertRouteToPath(getMovieBackdropUrl(movie.id))}`).as(PUT_BACKDROP_REQUEST_TOKEN);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.wait('@' + PUT_BACKDROP_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
       });
     });
   });

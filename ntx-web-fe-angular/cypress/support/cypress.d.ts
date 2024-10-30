@@ -5,5 +5,6 @@
 declare namespace Cypress {
   interface Chainable {
     createMovieWithPoster(props?: any): Chainable<MovieDTO>;
+    importMovie(props?: any): Chainable<MovieDTO>;
   }
 }
