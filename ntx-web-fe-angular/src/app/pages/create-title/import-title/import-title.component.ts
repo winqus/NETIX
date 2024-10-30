@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, of, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, from, of, switchMap, tap } from 'rxjs';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
@@ -13,12 +13,14 @@ import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { formatDate } from '@ntx-shared/services/utils/utils';
 import { UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
-import { SearchResultDTO } from '@ntx/app/shared/models/searchResult.dto';
+import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
+import { ImageService } from '@ntx-shared/services/image.service';
+import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 
 @Component({
   selector: 'app-import-title',
   standalone: true,
-  imports: [ImageUploadComponent, ReactiveFormsModule, SearchBarComponent],
+  imports: [ImageUploadComponent, ReactiveFormsModule, SearchBarComponent, SvgIconsComponent],
   templateUrl: './import-title.component.html',
 })
 export class ImportTitleComponent implements OnInit {
@@ -27,6 +29,7 @@ export class ImportTitleComponent implements OnInit {
   imageAccept: string = '';
   errorMessage: string = '';
   selectedResultPosterURL: string | null = null;
+  importingTitle: boolean = false;
 
   externalTitleCreationForm = new FormGroup({
     title: new FormControl('', [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
@@ -41,10 +44,11 @@ export class ImportTitleComponent implements OnInit {
   });
 
   constructor(
-    private movieService: MovieService,
-    private externalMovie: ExternalMovieService,
-    private posterService: PosterService,
-    private router: Router
+    private readonly movieService: MovieService,
+    private readonly externalMovie: ExternalMovieService,
+    private readonly posterService: PosterService,
+    private readonly imageService: ImageService,
+    private readonly router: Router
   ) {}
 
   async ngOnInit(): Promise<any> {
@@ -56,13 +60,11 @@ export class ImportTitleComponent implements OnInit {
   }
 
   onSubmit() {
-    if (!this.externalTitleCreationForm.valid) return;
-
-    if (this.selectedMovie == null) return;
+    if (!this.externalTitleCreationForm.valid || !this.selectedMovie) return;
 
     let movieId = '';
+    this.importingTitle = true;
 
-    // Step 1: Upload external movie metadata
     this.externalMovie
       .uploadExternalMovieMetadata({
         externalID: this.selectedMovie.externalID,
@@ -73,61 +75,94 @@ export class ImportTitleComponent implements OnInit {
           if (environment.development) console.log('External movie upload successful:', response);
           movieId = response.id;
         }),
-        // Step 3: Replace movie poster if an image file is present
-        switchMap(() => {
-          if (this.imageFile) {
-            const posterFormData = new FormData();
-            posterFormData.append('poster', this.imageFile as Blob);
+        switchMap(() => this.uploadPoster(movieId)),
+        switchMap(() => this.updateMovieMetadata(movieId)),
+        switchMap(() => this.downloadAndUploadBackdrop(movieId))
+      )
+      .subscribe({
+        next: () => this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } }),
+        error: (errorResponse) => this.handleError(errorResponse),
+      });
+  }
 
-            return this.externalMovie.replaceExternalMoviePoster(movieId, posterFormData).pipe(
-              tap((posterUpdateResponse) => {
-                if (environment.development) console.log('External movie poster upload successful:', posterUpdateResponse);
+  private uploadPoster(movieId: string) {
+    if (!this.imageFile) return of(null);
+
+    const posterFormData = new FormData();
+    posterFormData.append('poster', this.imageFile);
+
+    return this.externalMovie.replaceExternalMoviePoster(movieId, posterFormData).pipe(
+      tap((response) => {
+        if (environment.development) console.log('External movie poster upload successful:', response);
+      }),
+      catchError((errorResponse) => {
+        this.handleError(errorResponse, 'Error uploading external movie poster');
+        return of(null);
+      })
+    );
+  }
+
+  private updateMovieMetadata(movieId: string) {
+    if (!this.isEdited() || !this.externalTitleCreationForm.valid) return of(null);
+
+    const movieData: UpdateMovieDTO = {
+      name: this.externalTitleCreationForm.get('title')?.value ?? '',
+      summary: this.externalTitleCreationForm.get('summary')?.value ?? '',
+      originallyReleasedAt: new Date(this.externalTitleCreationForm.get('originallyReleasedAt')?.value ?? ''),
+      runtimeMinutes: parseInt(this.externalTitleCreationForm.get('runtimeMinutes')?.value ?? ''),
+    };
+
+    return this.movieService.updateMovieMetadata(movieId, movieData).pipe(
+      tap((response) => {
+        if (environment.development) console.log('Update successful:', response);
+      }),
+      catchError((errorResponse) => {
+        this.handleError(errorResponse, 'Error updating metadata');
+        return of(null);
+      })
+    );
+  }
+
+  private downloadAndUploadBackdrop(movieId: string) {
+    if (!this.selectedMovie?.backdropURL) return of(null);
+
+    return this.posterService.downloadImage(this.selectedMovie.backdropURL).pipe(
+      concatMap((blob) => {
+        const backdropFile = new File([blob], 'backdrop.' + MediaConstants.image.exportFileExtension, {
+          type: MediaConstants.image.exportMimeType,
+          lastModified: Date.now(),
+        });
+
+        return from(this.imageService.compressImage(backdropFile)).pipe(
+          concatMap((compressedBackdropImgFile) => {
+            const formData = new FormData();
+            formData.append('backdrop', compressedBackdropImgFile as Blob);
+
+            if (environment.development) console.log('Backdrop download and compression successful:', compressedBackdropImgFile);
+
+            return this.movieService.updateBackdrop(movieId, formData).pipe(
+              tap((response) => {
+                if (environment.development) console.log('Backdrop update successful:', response);
               }),
               catchError((errorResponse) => {
-                this.errorMessage = errorResponse.error.message;
-                if (environment.development) console.error('Error uploading external movie poster:', errorResponse);
+                this.handleError(errorResponse, 'Error uploading backdrop');
                 return of(null);
               })
             );
-          } else {
-            return of(null);
-          }
-        }),
-        // Step 4: Update movie metadata if form has been edited
-        switchMap(() => {
-          if (this.isEdited() && this.externalTitleCreationForm.valid) {
-            const movieData: UpdateMovieDTO = {
-              name: this.externalTitleCreationForm.get('title')?.value ?? '',
-              summary: this.externalTitleCreationForm.get('summary')?.value ?? '',
-              originallyReleasedAt: new Date(this.externalTitleCreationForm.get('originallyReleasedAt')?.value ?? ''),
-              runtimeMinutes: parseInt(this.externalTitleCreationForm.get('runtimeMinutes')?.value ?? ''),
-            };
+          })
+        );
+      }),
+      catchError((errorResponse) => {
+        this.handleError(errorResponse, 'Error downloading backdrop');
+        return of(null);
+      })
+    );
+  }
 
-            return this.movieService.updateMovieMetadata(movieId, movieData).pipe(
-              tap((updateResponse) => {
-                if (environment.development) console.log('Update successful:', updateResponse);
-              }),
-              catchError((errorResponse) => {
-                this.errorMessage = errorResponse.error.message;
-                if (environment.development) console.error('Error updating metadata:', errorResponse);
-                return of(null); // Continue even if the update fails
-              })
-            );
-          } else {
-            return of(null); // No metadata update needed
-          }
-        })
-      )
-      .subscribe({
-        next: () => {
-          // Step 5: Navigate to the movie details page after all steps are complete
-          this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
-        },
-        error: (errorResponse) => {
-          this.errorMessage = errorResponse.error.message;
-          if (environment.development) console.error('Error in submission process:', errorResponse);
-        },
-      });
+  private handleError(errorResponse: any, message: string = 'Error in submission process') {
+    this.importingTitle = false;
+    this.errorMessage = errorResponse.error.message;
+    if (environment.development) console.error(message, errorResponse);
   }
 
   async receiveImageFile(file: File | null) {

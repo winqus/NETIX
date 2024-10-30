@@ -8,11 +8,12 @@ import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
-import { TimeDelays } from '@ntx-shared/config/constants';
+import { MediaConstants, TimeDelays } from '@ntx-shared/config/constants';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
+import { ImageService } from '@ntx/app/shared/services/image.service';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -24,11 +25,16 @@ import { PublishMovieComponent } from './settings/publish-movie/publish-movie.co
 export class InspectMovieComponent implements OnInit {
   movie: MovieDTO | undefined;
   posterUrl: string | null = null;
+  backdropUrl: string | null = null;
+  backdropUrlColor: string = 'rgba(16, 16, 16, 1)';
+  blackColor: string = 'rgba(16, 16, 16, 1)';
+  transparentColor: string = 'rgba(16, 16, 16, 0)';
   isFromCreation: boolean = false;
 
   constructor(
     private readonly movieService: MovieService,
     private readonly posterService: PosterService,
+    private readonly imageService: ImageService,
     private readonly router: Router,
     private readonly route: ActivatedRoute
   ) {}
@@ -44,9 +50,13 @@ export class InspectMovieComponent implements OnInit {
 
         this.movie = response;
         if (this.isFromCreation) {
-          timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
+          timer(TimeDelays.posterProcessingDelay).subscribe(() => {
+            this.loadPoster(this.movie!.posterID, PosterSize.L);
+            this.loadBackdrop(this.movie!.backdropID);
+          });
         } else {
           this.loadPoster(this.movie.posterID, PosterSize.L);
+          this.loadBackdrop(this.movie.backdropID);
         }
       },
       error: (errorResponse) => {
@@ -71,6 +81,27 @@ export class InspectMovieComponent implements OnInit {
       error: (errorResponse) => {
         if (environment.development) console.error('Error loading poster:', errorResponse);
         this.posterUrl = null;
+      },
+    });
+  }
+
+  loadBackdrop(id: string): void {
+    if (id == null) return;
+
+    this.posterService.getBackdrop(id).subscribe({
+      next: async (blob: Blob) => {
+        this.backdropUrl = URL.createObjectURL(blob);
+        const backdropFile = new File([blob], 'backdrop.' + MediaConstants.image.exportFileExtension, {
+          type: MediaConstants.image.exportMimeType,
+          lastModified: Date.now(),
+        });
+        const getData = await this.imageService.getAverageColor(backdropFile);
+
+        this.backdropUrlColor = 'rgba(' + getData.r + ', ' + getData.g + ',  ' + getData.b + ', 0.5)';
+      },
+      error: (errorResponse) => {
+        if (environment.development) console.error('Error loading backdrop:', errorResponse);
+        this.backdropUrl = null;
       },
     });
   }

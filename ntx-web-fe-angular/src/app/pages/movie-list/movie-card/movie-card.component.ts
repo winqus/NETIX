@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { getPoster } from '@ntx/app/shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
@@ -13,12 +13,27 @@ export const titleUpdateBadgeThresholdDays = 7;
   imports: [SvgIconsComponent],
   templateUrl: './movie-card.component.html',
 })
-export class MovieCardComponent {
+export class MovieCardComponent implements OnInit, OnDestroy {
   @Input() movie: MovieDTO | null = null;
   posterLoaded = true;
   recentlyUpdatedLabel: string = '';
+  private updateInterval: any;
 
   constructor(private readonly router: Router) {}
+
+  ngOnInit(): void {
+    this.updateRecentlyUpdatedLabel();
+
+    this.updateInterval = setInterval(() => {
+      this.updateRecentlyUpdatedLabel();
+    }, 60000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+  }
 
   get publishedDate(): string {
     if (!this.movie || !this.movie.originallyReleasedAt) return '-';

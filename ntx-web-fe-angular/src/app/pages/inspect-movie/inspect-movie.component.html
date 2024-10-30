@@ -1,52 +1,66 @@
-<div class="h-full w-full p-10">
-  <div class="flex w-full flex-col">
-    <div class="h-[400px] flex flex-row flex-auto gap-6">
-      <div class="relative h-full aspect-[2/3] bg-white flex align-middle justify-center items-center">
-        @if (posterUrl) {
-          <img [src]="posterUrl" alt="Poster Image" class="h-full w-auto object-cover" />
-        } @else {
-          <app-svg-icons name="file_image" size="120"></app-svg-icons>
-        }
-      </div>
-      <div class="w-full flex flex-col justify-between">
-        <div class="flex flex-row flex-auto w-full">
-          <div class="flex flex-col flex-auto gap-3">
-            <div class="badge badge-md rounded-md font-bold">MOVIE</div>
-            <div class="flex flex-row items-center justify-start gap-8">
-              <div class="text-4xl">{{ this.movie?.name || 'Unknown' }}</div>
-              <div class="text-xl text-gray-500">{{ this.movie?.originallyReleasedAt?.getFullYear() || 'Unknown Year' }}</div>
-              @if (!this.movie?.isPublished) {
-                <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
-              }
-            </div>
-            <div class="text-1xl text-gray-500">
-              <div>Created at {{ this.movie?.createdAt || 'Unknown' }}</div>
-              <div>Last updated at {{ this.movie?.updatedAt || 'Unknown' }}</div>
-            </div>
-            <div class="flex-grow text-xl overflow-hidden">
-              <p class="text-xl text-balance leading-snug">
-                {{ this.movie?.summary || 'No summary available.' }}
-              </p>
-            </div>
-          </div>
-          <div class="justify-end">
-            <div class="dropdown dropdown-left">
-              <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
-              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
-                <app-edit-metadata-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
-                <app-publish-movie-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
-                <app-change-poster-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
-              </ul>
-            </div>
-          </div>
+<div class="h-full w-full relative" [style.background]="blackColor">
+  @if (backdropUrl) {
+    <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="blackColor">
+      <img [src]="backdropUrl" alt="Backdrop" class="w-full h-full object-contain" />
+    </div>
+    <div
+      class="absolute inset-0"
+      [style.background]="'linear-gradient(15deg, ' + backdropUrlColor + ' 0%, ' + transparentColor + ' 40%, ' + transparentColor + ' 70%, ' + backdropUrlColor + ' 100%)'"
+    ></div>
+  }
+
+  <div class="relative z-10 flex w-full flex-col">
+    <div class="flex w-full p-10 relative">
+      <div class="relative h-[400px] flex flex-row flex-auto gap-6 z-10">
+        <div class="relative h-full aspect-[2/3] bg-white flex align-middle justify-center items-center rounded-xl shadow-lg shadow-black">
+          @if (posterUrl) {
+            <img [src]="posterUrl" alt="Poster" class="h-full w-auto object-cover rounded-lg" />
+          } @else {
+            <app-svg-icons name="file_image" size="120"></app-svg-icons>
+          }
         </div>
-        <div class="flex flex-row items-center justify-end gap-2">
-          <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Missing video</div>
-          <button class="btn btn-sm btn-outline disabled" disabled="disabled">Add Video</button>
+        <div class="w-full flex flex-col justify-between">
+          <div class="flex flex-row flex-auto w-full">
+            <div class="flex flex-col flex-auto gap-3">
+              <div class="badge badge-md rounded-md font-bold">MOVIE</div>
+              <div class="flex flex-row items-center justify-start gap-8">
+                <div class="text-4xl">{{ this.movie?.name || 'Unknown' }}</div>
+                <div class="text-xl text-gray-500">{{ this.movie?.originallyReleasedAt?.getFullYear() || 'Unknown Year' }}</div>
+                @if (!this.movie?.isPublished) {
+                  <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
+                }
+              </div>
+              <div class="text-1xl text-gray-500">
+                <div>Created at {{ this.movie?.createdAt || 'Unknown' }}</div>
+                <div>Last updated at {{ this.movie?.updatedAt || 'Unknown' }}</div>
+              </div>
+              <div class="flex-grow w-2/3 text-xl overflow-hidden">
+                <p class="text-xl text-balance leading-snug text-white">
+                  {{ this.movie?.summary || 'No summary available.' }}
+                </p>
+              </div>
+            </div>
+            <div class="justify-end">
+              <div class="dropdown dropdown-left">
+                <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
+                  <app-edit-metadata-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  <app-publish-movie-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  <app-change-poster-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-row items-center justify-end gap-2">
+            <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Missing video</div>
+            <button class="btn btn-sm btn-outline disabled" disabled="disabled">Add Video</button>
+          </div>
         </div>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="card bg-base-300 rounded-box grid h-20 place-items-center">No video</div>
+
+    <div class="divider px-10"></div>
+    <div class="card bg-base-300 rounded-box grid h-20 place-items-center bg-transparent">No video</div>
   </div>
 </div>
