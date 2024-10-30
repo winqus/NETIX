@@ -7,6 +7,8 @@ import {
   FileStorageDeleteFileArgs,
   FileStorageDownloadFileArgs,
   FileStorageDownloadStreamArgs,
+  FileStorageGetFileMetadataArgs,
+  FileStorageListFilesArgs,
   FileStorageUploadSingleFileArgs,
   FileStorageUploadStreamArgs,
 } from './file-storage.interfaces';
@@ -32,6 +34,14 @@ export abstract class FileStorage {
   }
 
   downloadStream(args: FileStorageDownloadStreamArgs): Promise<Readable> {
+    throw new Error(METHOD_NOT_IMPLEMENTED_ERROR);
+  }
+
+  getFileMetadata(args: FileStorageGetFileMetadataArgs): Promise<unknown> {
+    throw new Error(METHOD_NOT_IMPLEMENTED_ERROR);
+  }
+
+  listFiles(args: FileStorageListFilesArgs): Promise<Array<FileInStorage>> {
     throw new Error(METHOD_NOT_IMPLEMENTED_ERROR);
   }
 }

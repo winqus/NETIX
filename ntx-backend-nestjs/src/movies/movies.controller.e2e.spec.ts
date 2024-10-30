@@ -5,14 +5,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { createRandomValidCreateMovieDTO } from '@ntx-test/movies/utils/random-valid-create-movie-dto.factory';
 import { tempLocalStorageOptionsFactory } from '@ntx-test/utils/temp-local-storage-options.factory';
 import { TMDBFetchMocker } from '@ntx-test/utils/TMDBFetchResponseMocker';
-import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX } from '@ntx/app.constants';
+import { uploadFileWithTUS } from '@ntx-test/utils/upload-file-with-tus';
+import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX, TEST_PORT } from '@ntx/app.constants';
+import { delayByMs } from '@ntx/common/utils/delay.utils';
 import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { BACKDROP_CACHE_CONTROL_HEADER_VAL } from '@ntx/images/images.constants';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import * as fse from 'fs-extra';
-import { resolve } from 'path';
+import * as path from 'path';
 import * as request from 'supertest';
 import { MovieDTO } from './dto/movie.dto';
 import {
@@ -25,7 +27,7 @@ import { MoviesModule } from './movies.module';
 jest.setTimeout(10000);
 
 const validTestImagePath = 'test/images/1_sm_284x190.webp';
-const tempStoragePath = resolve('.temp-test-data');
+const tempStoragePath = path.resolve('.temp-test-data');
 
 describe('Movies API (e2e)', () => {
   let app: INestApplication;
@@ -77,11 +79,13 @@ describe('Movies API (e2e)', () => {
     app.setGlobalPrefix(GLOBAL_ROUTE_PREFIX);
 
     await app.init();
+    await app.listen(TEST_PORT);
   });
 
   afterAll(async () => {
-    await fse.rm(tempStoragePath, { recursive: true });
+    await delayByMs(100);
     await app?.close();
+    await fse.rm(tempStoragePath, { recursive: true, force: true });
     tmdbFetchMocker.dontMockResponses();
   });
 
@@ -343,6 +347,28 @@ describe('Movies API (e2e)', () => {
       const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`);
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('TUS UPLOAD to /api/v1/movies/:id/video', () => {
+    it('should upload a video for a movie', async () => {
+      const existingMovie = await createRandomValidMovie();
+      const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
+      const testMkvVideoPath = path.resolve('test/videos/500ms-colors_3sec_1280x720_24fps_crf35.mkv');
+
+      const uploadResult = await uploadFileWithTUS(uploadEndpoint, testMkvVideoPath, 'video/x-matroska');
+
+      expect(uploadResult).toBe('uploaded');
+    });
+
+    it('should fail to upload invalid format file', async () => {
+      const existingMovie = await createRandomValidMovie();
+      const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
+      const invalidFormatFilePath = path.resolve('test/images/1_sm_284x190.webp');
+
+      const uploadPromise = uploadFileWithTUS(uploadEndpoint, invalidFormatFilePath, 'image/webp');
+
+      expect(uploadPromise).rejects.toThrow();
     });
   });
 });

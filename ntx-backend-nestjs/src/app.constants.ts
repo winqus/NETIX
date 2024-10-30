@@ -8,6 +8,7 @@ export const ENV = 'NODE_ENV';
 export const ENV_FILE = '.env';
 export const PORT = 'PORT';
 export const DEFAULT_PORT = 3055;
+export const TEST_PORT = 3056;
 
 export const GLOBAL_ROUTE_PREFIX = 'api';
 export const DEFAULT_CONTROLLER_VERSION = '1';
@@ -35,4 +36,4 @@ export const SWAGGER_DESCRIPTION =
   '<a href="/swagger/json">/swagger/json</a> or ' +
   '<a href="/swagger/yaml">/swagger/yaml</a> ' +
   'to get the OpenAPI document in JSON or YAML format.';
-export const SWAGGER_TAGS = ['movies', 'images', 'library', 'default'];
+export const SWAGGER_TAGS = ['movies', 'images', 'library', 'videos', 'default'];
