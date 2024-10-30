@@ -201,7 +201,7 @@ export class MoviesController {
   @Post(':id/video')
   @ApiDocsForTusPostMovieVideoUpload()
   public async handleTusPostToInitUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
-    // await this.moviesSrv.findOne(id);
+    await this.moviesSrv.findOne(id);
 
     await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
   }
@@ -209,7 +209,7 @@ export class MoviesController {
   @Head(':id/video/:uploadId')
   @ApiDocsForTusHeadMovieVideoUpload()
   public async handleTusHeadToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
-    // await this.moviesSrv.findOne(id);
+    await this.moviesSrv.findOne(id);
 
     res.set({ 'cache-control': 'no-store' });
 

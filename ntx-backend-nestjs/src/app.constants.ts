@@ -8,6 +8,7 @@ export const ENV = 'NODE_ENV';
 export const ENV_FILE = '.env';
 export const PORT = 'PORT';
 export const DEFAULT_PORT = 3055;
+export const TEST_PORT = 3056;
 
 export const GLOBAL_ROUTE_PREFIX = 'api';
 export const DEFAULT_CONTROLLER_VERSION = '1';
