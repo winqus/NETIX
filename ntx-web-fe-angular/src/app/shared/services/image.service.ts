@@ -94,7 +94,7 @@ export class ImageService {
         resolve({ r, g, b });
       };
 
-      img.onerror = (err) => {
+      img.onerror = () => {
         reject('Error loading image.');
       };
     });

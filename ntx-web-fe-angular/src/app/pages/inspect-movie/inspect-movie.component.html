@@ -3,12 +3,8 @@
     <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="blackColor">
       <img [src]="backdropUrl" alt="Backdrop" class="w-full h-full object-contain" />
     </div>
-    <div
-      class="absolute inset-0"
-      [style.background]="'linear-gradient(15deg, ' + backdropUrlColor + ' 0%, ' + transparentColor + ' 40%, ' + transparentColor + ' 70%, ' + backdropUrlColor + ' 100%)'"
-    ></div>
+    <div class="absolute inset-0" [style.background]="'linear-gradient(15deg, ' + backdropColor + ' 0%, ' + transparentColor + ' 40%, ' + transparentColor + ' 70%, ' + backdropColor + ' 100%)'"></div>
   }
-
   <div class="relative z-10 flex w-full flex-col">
     <div class="flex w-full p-10 relative">
       <div class="relative h-[400px] flex flex-row flex-auto gap-6 z-10">

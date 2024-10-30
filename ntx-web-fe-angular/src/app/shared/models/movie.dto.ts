@@ -7,7 +7,7 @@ export interface MovieDTO {
   originallyReleasedAt: Date;
   runtimeMinutes: number;
   posterID: string;
-  backdropID: string;
+  backdropID?: string;
   videoID?: string;
   isPublished: boolean;
 }
