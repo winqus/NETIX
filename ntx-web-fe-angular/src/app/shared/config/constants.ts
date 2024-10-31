@@ -21,8 +21,6 @@ export const MediaConstants = {
     formats: ['.png', '.jpg', '.jpeg', '.webp'],
     exportFileExtension: 'webp',
     exportMimeType: 'image/webp',
-    maxSizeMb: 1.0,
-    maxSizeBytes: 1_024_000,
     maxHeight: 1920,
   },
   video: {
@@ -33,4 +31,9 @@ export const MediaConstants = {
 
 export const TimeDelays = {
   posterProcessingDelay: 500,
+};
+
+export const CssColor = {
+  Background: 'rgba(16, 16, 16, 1)',
+  Transparent: 'rgba(16, 16, 16, 0)',
 };
