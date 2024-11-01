@@ -7,16 +7,21 @@ import {
   VIDEOS_ID_PREFIX,
   VIDEOS_NAME_LENGTH_MAX,
   VIDEOS_NAME_LENGTH_MIN,
-  VIDEOS_RUNTIME_MINS_MAX,
-  VIDEOS_RUNTIME_MINS_MIN,
 } from '../videos.constants';
+
+export enum VideoState {
+  NOT_READY = 'NOT_READY',
+  PROCESSING = 'PROCESSING',
+  READY = 'READY',
+  FAILED = 'FAILED',
+}
 
 export interface VideoProps {
   uuid?: string;
   createdAt?: Date;
   updatedAt?: Date;
   name: string;
-  runtimeMinutes: number;
+  state: VideoState;
 }
 
 export class Video implements Entity {
@@ -33,10 +38,8 @@ export class Video implements Entity {
   @Length(VIDEOS_NAME_LENGTH_MIN, VIDEOS_NAME_LENGTH_MAX)
   name: string;
 
-  @IsInt()
-  @Min(VIDEOS_RUNTIME_MINS_MIN)
-  @Max(VIDEOS_RUNTIME_MINS_MAX)
-  runtimeMinutes: number;
+  @IsString()
+  state: VideoState;
 
   public static async create(props: VideoProps): Promise<Video> {
     const movie = await createValidatedObject(Video, {
@@ -44,7 +47,7 @@ export class Video implements Entity {
       createdAt: props.createdAt || new Date(),
       updatedAt: props.updatedAt || new Date(),
       name: props.name,
-      runtimeMinutes: props.runtimeMinutes,
+      state: props.state,
     });
 
     return movie;

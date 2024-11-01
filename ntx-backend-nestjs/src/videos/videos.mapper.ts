@@ -8,7 +8,7 @@ export class VideosMapper {
       createdAt: any.createdAt,
       updatedAt: any.updatedAt,
       name: any.name,
-      runtimeMinutes: any.runtimeMinutes,
+      state: any.state,
     });
 
     return video;

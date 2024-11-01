@@ -4,6 +4,7 @@ import { FileInStorage } from '@ntx/file-storage/types';
 import { BackDropService } from '@ntx/images/backdrop.service';
 import { PosterSize } from '@ntx/images/images.types';
 import { PosterService } from '@ntx/images/poster.service';
+import { VideosService } from '@ntx/videos/videos.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieSearchResultDTO } from './dto/movie-search-result.dto';
@@ -22,6 +23,7 @@ export class MoviesService {
     private readonly moviesRepo: MoviesRepository,
     private readonly posterSrv: PosterService,
     private readonly backdropSrv: BackDropService,
+    private readonly videoSrv: VideosService,
   ) {}
 
   public async createOne(dto: CreateMovieDTO): Promise<MovieDTO> {
@@ -178,6 +180,34 @@ export class MoviesService {
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
       this.logger.error(`Failed to replace backdrop for movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async updateVideoForOne(id: string, videoFile: FileInStorage): Promise<MovieDTO> {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      if (videoFile == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      const movie = await this.moviesRepo.findOneByUUID(id);
+      if (movie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      const videoName = movie.name + movie.originallyReleasedAt.getFullYear();
+      const video = await this.videoSrv.createOneFromFile(videoName, videoFile);
+
+      movie.videoID = video.uuid;
+      await this.moviesRepo.updateOneByUUID(id, movie);
+
+      return MoviesMapper.Movie2MovieDTO(movie);
+    } catch (error) {
+      this.logger.error(`Failed to update video for the movie ${id}: ${error.message}`);
       throw error;
     }
   }
