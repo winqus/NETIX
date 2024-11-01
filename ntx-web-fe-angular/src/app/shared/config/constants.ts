@@ -36,6 +36,6 @@ export const TimeDelays = {
 };
 
 export const CssColor = {
-  Background: 'rgba(16, 16, 16, 1)',
-  Transparent: 'rgba(16, 16, 16, 0)',
+  TitleInspectBackgroundColor: 'rgba(16, 16, 16, 1)',
+  TransparentColor: 'rgba(16, 16, 16, 0)',
 };

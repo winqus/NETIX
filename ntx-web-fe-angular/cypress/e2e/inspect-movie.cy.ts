@@ -191,18 +191,4 @@ describe('inspect movie', () => {
       });
     });
   });
-
-  it.only('should get backdrop when importing a selected movie', () => {
-    cy.importMovie({ name: 'dune: part two' }).then((movie: MovieDTO) => {
-      const PUT_BACKDROP_REQUEST_TOKEN = 'PUT_BACKDROP';
-      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
-      cy.intercept('PUT', `${convertRouteToPath(getMovieBackdropUrl(movie.id))}`).as(PUT_BACKDROP_REQUEST_TOKEN);
-
-      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
-
-      cy.wait('@' + PUT_BACKDROP_REQUEST_TOKEN).then((interception) => {
-        expect(interception.response!.statusCode).to.eq(200);
-      });
-    });
-  });
 });

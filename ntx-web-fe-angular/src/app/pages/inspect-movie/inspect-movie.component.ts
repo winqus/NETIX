@@ -14,6 +14,7 @@ import { ChangePosterComponent } from './settings/change-poster/change-poster.co
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
 import { ImageService } from '@ntx-shared/services/image.service';
+import { getPoster } from '@ntx/app/shared/config/api-endpoints';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -26,9 +27,9 @@ export class InspectMovieComponent implements OnInit {
   movie: MovieDTO | undefined;
   posterUrl: string | null = null;
   backdropUrl: string | null = null;
-  backdropColor: string = CssColor.Background;
-  blackColor: string = CssColor.Background;
-  transparentColor: string = CssColor.Transparent;
+  backdropColor: string = CssColor.TitleInspectBackgroundColor;
+  pageBackgroundColor: string = CssColor.TitleInspectBackgroundColor;
+  transparentColor: string = CssColor.TransparentColor;
   isFromCreation: boolean = false;
 
   constructor(
@@ -74,15 +75,11 @@ export class InspectMovieComponent implements OnInit {
   }
 
   loadPoster(id: string, size: string): void {
-    this.posterService.getPoster(id, size).subscribe({
-      next: (blob: Blob) => {
-        this.posterUrl = URL.createObjectURL(blob);
-      },
-      error: (errorResponse) => {
-        if (environment.development) console.error('Error loading poster:', errorResponse);
-        this.posterUrl = null;
-      },
-    });
+    this.posterUrl = getPoster(id, size);
+  }
+
+  onPosterError(): void {
+    this.posterUrl = null;
   }
 
   loadBackdrop(id: string): void {

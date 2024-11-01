@@ -1,6 +1,6 @@
-<div class="h-full w-full relative" [style.background]="blackColor">
+<div class="h-full w-full relative" [style.background]="pageBackgroundColor">
   @if (backdropUrl) {
-    <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="blackColor">
+    <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="pageBackgroundColor">
       <img [src]="backdropUrl" alt="Backdrop" class="w-full h-full object-contain" />
     </div>
     <div class="absolute inset-0" [style.background]="'linear-gradient(15deg, ' + backdropColor + ' 0%, ' + transparentColor + ' 40%, ' + transparentColor + ' 70%, ' + backdropColor + ' 100%)'"></div>
@@ -10,7 +10,7 @@
       <div class="relative h-[400px] flex flex-row flex-auto gap-6 z-10">
         <div class="relative h-full aspect-[2/3] bg-white flex align-middle justify-center items-center rounded-xl shadow-lg shadow-black">
           @if (posterUrl) {
-            <img [src]="posterUrl" alt="Poster" class="h-full w-auto object-cover rounded-lg" />
+            <img [src]="posterUrl" (error)="onPosterError()" alt="Poster" class="h-full w-auto object-cover rounded-lg" />
           } @else {
             <app-svg-icons name="file_image" size="120"></app-svg-icons>
           }

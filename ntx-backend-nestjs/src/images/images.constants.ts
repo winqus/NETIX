@@ -39,7 +39,7 @@ export const CREATE_BACKDROP_JOBNAME = 'create-backdrop-job';
 export const BACKDROP_QUEUE_CONCURRENCY = 3;
 
 export const BACKDROP_SIZES: Record<BackdropSize, { width: number; height: number }> = {
-  [PosterSize.L]: { width: 360, height: 200 },
+  [BackdropSize.L]: { width: 1080, height: 600 },
 };
 
 /* Errors */

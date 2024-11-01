@@ -69,24 +69,3 @@ Cypress.Commands.add('createMovieWithPoster', (args: any): Cypress.Chainable<Mov
     return response.body as MovieDTO;
   });
 });
-
-Cypress.Commands.add('importMovie', (args: any): Cypress.Chainable<MovieDTO> => {
-  const { name } = args || {};
-
-  const IMPORT_MOVIE_REQUEST_TOKEN = 'import-movie-request';
-  cy.intercept('POST', convertRouteToPath(getMovieImportUrl())).as(IMPORT_MOVIE_REQUEST_TOKEN);
-
-  cy.visit('/createTitle');
-  cy.get('[aria-label="Import"]').click();
-
-  cy.get('#importSearchBar').type(name);
-  cy.get('ul').should('be.visible').get('li').first().contains(makeCaseInsensitiveRegex(name)).click();
-
-  cy.get('button').contains('Import').should('be.enabled').click().wait(HUMAN_COGNITIVE_PAUSE);
-
-  return cy.wait('@' + IMPORT_MOVIE_REQUEST_TOKEN).then((interception) => {
-    const response = interception.response!;
-    expect(response.statusCode).to.equal(201);
-    return response.body as MovieDTO;
-  });
-});

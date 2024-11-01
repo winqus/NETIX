@@ -52,8 +52,8 @@ export function getMovieImportUrl(): string {
 }
 
 export function getPoster(_id: string, _size?: string) {
-  let url = `${SERVER.baseUrl}${SERVER.endpoints.image.poster}/${_id}`;
-  if (_size) url += `?size=${_size}`;
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.image.poster}/${encodeURIComponent(_id)}`;
+  if (_size) url += `?size=${encodeURIComponent(_size)}`;
 
   return url;
 }

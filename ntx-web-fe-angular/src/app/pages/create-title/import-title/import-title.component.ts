@@ -225,17 +225,17 @@ export class ImportTitleComponent implements OnInit {
         this.isFormValid();
 
         this.errorMessage = '';
-        if (externalMovieItem.posterURL != null) {
-          this.selectedResultPosterURL = externalMovieItem.posterURL;
-
-          if (this.selectedResultPosterURL === null) return;
+        if (this.selectedMovie.posterURL != null) {
+          this.selectedResultPosterURL = this.selectedMovie.posterURL;
 
           this.posterService.downloadImage(this.selectedResultPosterURL).subscribe({
-            next: (blob) => {
+            next: async (blob) => {
               this.imageFile = new File([blob], externalMovieItem.metadata.name + '.' + MediaConstants.image.exportFileExtension, {
                 type: MediaConstants.image.exportMimeType,
                 lastModified: Date.now(),
               });
+
+              this.imageFile = await this.imageService.compressImage(this.imageFile);
             },
             error: (errorResponse) => {
               this.errorMessage = errorResponse.error.message;
