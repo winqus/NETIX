@@ -1,11 +1,10 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InspectMovieComponent } from './inspect-movie.component';
 import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { ActivatedRoute } from '@angular/router';
-import { of, timer } from 'rxjs';
+import { of } from 'rxjs';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { ImageService } from '@ntx/app/shared/services/image.service';
 
 describe('InspectMovieComponent', () => {
