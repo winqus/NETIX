@@ -230,10 +230,7 @@ export class MoviesController {
         return;
       }
 
-      // TODO: Implement this
-      // const updatedMovie = await this.moviesSrv.updateVideoForOne(id, fileInStorage);
-      // In the movieSrv call videoSrv with method .createOneFromFile(videoName, fileInStorage)
-      // videoName - can be: get movie by id and then name + year)
+      await this.moviesSrv.updateVideoForOne(id, fileInStorage);
 
       this.logger.log(
         `video update finished for movie ${id}, file stored ${fileInStorage.fileName} in ${fileInStorage.container}`,
