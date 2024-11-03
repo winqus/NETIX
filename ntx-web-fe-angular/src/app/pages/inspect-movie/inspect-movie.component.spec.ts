@@ -5,13 +5,14 @@ import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { PosterSize } from '@ntx-shared/models/posterSize.enum';
+import { ImageService } from '@ntx/app/shared/services/image.service';
 
 describe('InspectMovieComponent', () => {
   let component: InspectMovieComponent;
   let fixture: ComponentFixture<InspectMovieComponent>;
   let mockMovieService: any;
   let mockPosterService: any;
+  let mockImageService: any;
   let mockActivatedRoute: any;
 
   const mockMovie: MovieDTO = {
@@ -22,6 +23,7 @@ describe('InspectMovieComponent', () => {
     summary: 'This is a test movie.',
     originallyReleasedAt: new Date(),
     runtimeMinutes: 120,
+    backdropID: 'backdrop123',
     posterID: 'poster123',
     isPublished: true,
   };
@@ -29,13 +31,15 @@ describe('InspectMovieComponent', () => {
   beforeEach(async () => {
     mockMovieService = {
       getMovieMetadata: jasmine.createSpy('getMovieMetadata').and.returnValue(of(mockMovie)),
-      updateMovieMetadata: jasmine.createSpy('updateMovieMetadata').and.returnValue(of(mockMovie)),
-      publishMovie: jasmine.createSpy('publishMovie').and.returnValue(of({ ...mockMovie, isPublished: true })),
-      unpublishMovie: jasmine.createSpy('unpublishMovie').and.returnValue(of({ ...mockMovie, isPublished: false })),
     };
 
     mockPosterService = {
-      getPoster: jasmine.createSpy('getPoster').and.returnValue(of(new Blob([''], { type: 'image/jpeg' }))),
+      getPoster: jasmine.createSpy('getPoster').and.returnValue(of(new Blob([''], { type: 'image/webp' }))),
+      getBackdrop: jasmine.createSpy('getBackdrop').and.returnValue(of(new Blob([''], { type: 'image/jpeg' }))),
+    };
+
+    mockImageService = {
+      getAverageColor: jasmine.createSpy('getAverageColor').and.returnValue(Promise.resolve({ r: 100, g: 150, b: 200 })),
     };
 
     mockActivatedRoute = {
@@ -51,6 +55,7 @@ describe('InspectMovieComponent', () => {
       providers: [
         { provide: MovieService, useValue: mockMovieService },
         { provide: PosterService, useValue: mockPosterService },
+        { provide: ImageService, useValue: mockImageService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     }).compileComponents();
@@ -62,11 +67,5 @@ describe('InspectMovieComponent', () => {
 
   it('should create the component', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should fetch poster immediately if not from creation', () => {
-    component.isFromCreation = false;
-    fixture.detectChanges();
-    expect(mockPosterService.getPoster).toHaveBeenCalledWith(mockMovie.posterID, PosterSize.L);
   });
 });

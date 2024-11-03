@@ -1,6 +1,6 @@
 import { IPostersService } from './IPosters.service.interface';
 import { HttpClient } from '@angular/common/http';
-import { getImageProxy, getPoster } from '@ntx-shared/config/api-endpoints';
+import { getBackdrop, getImageProxy, getPoster } from '@ntx-shared/config/api-endpoints';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 
@@ -12,6 +12,12 @@ export class PosterService implements IPostersService {
 
   getPoster(id: string, size: string): Observable<Blob> {
     const url = getPoster(id, size);
+
+    return this.http.get(url, { responseType: 'blob' });
+  }
+
+  getBackdrop(id: string): Observable<Blob> {
+    const url = getBackdrop(id);
 
     return this.http.get(url, { responseType: 'blob' });
   }

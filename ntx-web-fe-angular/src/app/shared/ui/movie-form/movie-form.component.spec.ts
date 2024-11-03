@@ -15,6 +15,7 @@ describe('MovieFormComponent', () => {
     summary: 'This is a test movie.',
     originallyReleasedAt: new Date(),
     runtimeMinutes: 120,
+    backdropID: '',
     posterID: 'poster123',
     isPublished: true,
   };

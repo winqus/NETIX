@@ -1,9 +1,11 @@
 /// <reference types="cypress" />
 
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import convertRouteToPath from './convertRoute';
-import { getMovieUrl } from '@ntx/app/shared/config/api-endpoints';
+import { getBackdrop, getMovieImportUrl, getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { makeRandomMovieName, makeRandomMovieSummary, makeRandomMovieReleaseDate, makeRandomMovieRuntime } from './randomDataFactory';
+import { makeCaseInsensitiveRegex } from './regex';
+import { HUMAN_COGNITIVE_PAUSE } from './constants';
 
 // ***********************************************
 // This example commands.ts shows you how to

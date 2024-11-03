@@ -1,4 +1,4 @@
-import { getMoviePosterUrl, getMovieUrl, getPoster } from '@ntx/app/shared/config/api-endpoints';
+import { getBackdrop, getMovieBackdropUrl, getMovieImportUrl, getMoviePosterUrl, getMovieUrl, getPoster } from '@ntx-shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
 import { HUMAN_COGNITIVE_PAUSE } from 'cypress/support/constants';

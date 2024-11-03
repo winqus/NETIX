@@ -19,6 +19,7 @@ describe('MovieCardComponent with MovieDTO', () => {
     summary: 'This is a test movie summary.',
     originallyReleasedAt: new Date('2020-01-09'),
     runtimeMinutes: 120,
+    backdropID: '',
     posterID: 'poster123',
     videoID: 'video123',
     isPublished: true,

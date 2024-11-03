@@ -16,8 +16,11 @@ export const SERVER = {
       movies: '/v1/movies',
       moviesImport: '/v1/movies-import',
     },
-    poster: '/v1/poster',
-    imageProxy: '/v1/images-proxy',
+    image: {
+      poster: '/v1/poster',
+      backdrops: '/v1/backdrops',
+      imageProxy: '/v1/images-proxy',
+    },
     library: {
       search: '/v1/library/search',
       externalMovies: '/v1/library/external-movies',
@@ -40,15 +43,23 @@ export function getMoviePosterUrl(_id: string): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/poster`;
 }
 
+export function getMovieBackdropUrl(_id: string): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/backdrop`;
+}
+
 export function getMovieImportUrl(): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.movies.moviesImport}`;
 }
 
 export function getPoster(_id: string, _size?: string) {
-  let url = `${SERVER.baseUrl}${SERVER.endpoints.poster}/${_id}`;
-  if (_size) url += `?size=${_size}`;
+  let url = `${SERVER.baseUrl}${SERVER.endpoints.image.poster}/${encodeURIComponent(_id)}`;
+  if (_size) url += `?size=${encodeURIComponent(_size)}`;
 
   return url;
+}
+
+export function getBackdrop(_id: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.image.backdrops}/${_id}`;
 }
 
 export function replacePoster(_id: string) {
@@ -56,7 +67,7 @@ export function replacePoster(_id: string) {
 }
 
 export function getImageProxy(_url: string) {
-  return `${SERVER.baseUrl}${SERVER.endpoints.imageProxy}?url=${encodeURIComponent(_url)}`;
+  return `${SERVER.baseUrl}${SERVER.endpoints.image.imageProxy}?url=${encodeURIComponent(_url)}`;
 }
 
 export function getLibrarySearch(_query: string, _types: string, _providers: string, _limit?: number) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { getMoviePosterUrl, getMoviePublishedUrl, getMovieUrl } from '@ntx-shared/config/api-endpoints';
+import { getMovieBackdropUrl, getMoviePosterUrl, getMoviePublishedUrl, getMovieUrl } from '@ntx-shared/config/api-endpoints';
 import { IMovieService } from './IMovie.service.interface';
 import { MovieDTOMapper } from '@ntx-shared/mappers/MovieDTO.mapper';
 import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
@@ -109,6 +109,7 @@ export class MovieService implements IMovieService {
       })
     );
   }
+
   updatePoster(id: string, formData: FormData): Observable<MovieDTO> {
     const url = getMoviePosterUrl(id);
 
@@ -120,7 +121,24 @@ export class MovieService implements IMovieService {
         return MovieDTOMapper.anyToMovieDTO(response);
       }),
       catchError((error) => {
-        if (environment.development) console.error('Error publishing movie:', error);
+        if (environment.development) console.error('Error updating movie poster:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateBackdrop(id: string, formData: FormData): Observable<MovieDTO> {
+    const url = getMovieBackdropUrl(id);
+
+    const httpOptions = {};
+
+    return this.http.put(url, formData, httpOptions).pipe(
+      map((response: any) => {
+        if (environment.development) console.log(response);
+        return MovieDTOMapper.anyToMovieDTO(response);
+      }),
+      catchError((error) => {
+        if (environment.development) console.error('Error updating movie backdrop:', error);
         return throwError(() => error);
       })
     );
