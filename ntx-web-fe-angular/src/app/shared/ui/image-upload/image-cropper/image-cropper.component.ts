@@ -5,6 +5,7 @@ import { MediaConstants } from '@ntx/app/shared/config/constants';
 
 export interface InputProps {
   imageUrl?: string;
+  aspectRatio?: number;
 }
 
 @Component({
@@ -21,31 +22,41 @@ export class ImageCropperComponent implements OnInit, OnChanges {
   public angularCropper: CropperComponent = new CropperComponent();
 
   cropper: Cropper | undefined;
-  cropperOptions: Cropper.Options;
+  cropperOptions: Cropper.Options | undefined;
   imageUrl: string | null = null;
 
   defaultProps: InputProps = {
     imageUrl: '',
+    aspectRatio: undefined,
   };
 
-  constructor(public imageCropService: ImageService) {
-    this.cropperOptions = this.imageCropService.getCropperConfig();
-  }
+  constructor(public imageCropService: ImageService) {}
 
   ngOnInit() {
-    if (this.props.imageUrl) {
-      this.imageUrl = this.props.imageUrl;
-    }
+    this.updateProps();
   }
 
   ngOnChanges(): void {
+    this.updateProps();
+  }
+
+  updateProps() {
     this.props = { ...this.defaultProps, ...this.props };
+
+    if (this.props.imageUrl) {
+      this.imageUrl = this.props.imageUrl;
+    }
+
+    if (this.props.aspectRatio) {
+      this.cropperOptions = this.imageCropService.getCropperConfig(this.props.aspectRatio);
+    } else {
+      this.cropperOptions = this.imageCropService.getCropperConfig();
+    }
   }
 
   cropImg() {
     const canvasWidth = MediaConstants.image.maxHeight;
     const canvasHeight = canvasWidth * MediaConstants.image.aspectRatio;
-    const imageQuality = 0.8;
 
     if (this.angularCropper.cropper) {
       const croppedCanvas = this.angularCropper.cropper.getCroppedCanvas({
@@ -53,15 +64,11 @@ export class ImageCropperComponent implements OnInit, OnChanges {
         height: canvasHeight,
       });
 
-      croppedCanvas.toBlob(
-        async (blob: Blob | null) => {
-          if (blob) {
-            this.cropped.emit(blob);
-          }
-        },
-        MediaConstants.image.exportFileExtension,
-        imageQuality
-      );
+      croppedCanvas.toBlob(async (blob: Blob | null) => {
+        if (blob) {
+          this.cropped.emit(blob);
+        }
+      }, MediaConstants.image.exportFileExtension);
     }
   }
 }

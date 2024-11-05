@@ -191,4 +191,37 @@ describe('inspect movie', () => {
       });
     });
   });
+
+  it('should change backdrop for movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const PUT_BACKDROP_REQUEST_TOKEN = 'PUT_BACKDROP';
+      cy.intercept('PUT', `${convertRouteToPath(getMovieBackdropUrl(movie.id))}`).as(PUT_BACKDROP_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Change backdrop').click();
+
+      cy.get('#backdropInput').selectFile('cypress/files/1_backdrop_190x132.webp', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + PUT_BACKDROP_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const newBackdropID = body.backdropID;
+        expect(newBackdropID).to.be.a('string');
+        expect(newBackdropID).to.not.eq(movie.posterID);
+
+        const GET_NEW_BACKDROP_TOKEN = 'GET_NEW_BACKDROP';
+        cy.intercept(convertRouteToPath(getBackdrop(newBackdropID))).as(GET_NEW_BACKDROP_TOKEN);
+        cy.wait('@' + GET_NEW_BACKDROP_TOKEN).then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+      });
+    });
+  });
 });

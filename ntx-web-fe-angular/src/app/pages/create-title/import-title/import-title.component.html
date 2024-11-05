@@ -11,7 +11,7 @@
           <app-image-upload
             class="h-[300px] w-[200px]"
             title="Thumbnail Select"
-            [props]="{ accept: imageAccept, readonly: false, posterUrl: selectedResultPosterURL }"
+            [props]="{ accept: imageAccept, readonly: false, imageUrl: selectedResultPosterURL }"
             (filePassed)="receiveImageFile($event)"
           >
           </app-image-upload>

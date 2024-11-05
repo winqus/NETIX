@@ -36,7 +36,7 @@
       </form>
     </div>
     <div class="flex justify-center items-center">
-      <app-image-cropper class="max-h-[20%]" [props]="{ imageUrl: this.originalImgUrl! }" (cropped)="setCropedImage($event)"></app-image-cropper>
+      <app-image-cropper class="max-h-[20%]" [props]="{ imageUrl: this.originalImgUrl!, aspectRatio: props.aspectRatio }" (cropped)="setCropedImage($event)"></app-image-cropper>
     </div>
   </div>
 </dialog>
