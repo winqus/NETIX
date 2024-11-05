@@ -20,14 +20,14 @@ export class ImageService {
     };
   }
 
-  autoCropImage(imageElement: HTMLImageElement): Promise<Blob> {
+  autoCropImage(imageElement: HTMLImageElement, aspectRatio?: number): Promise<Blob> {
     return new Promise((resolve, reject) => {
       if (!imageElement) {
         reject(new Error('Image element is not provided'));
         return;
       }
       const cropper = new Cropper(imageElement, {
-        ...this.getCropperConfig(),
+        ...this.getCropperConfig(aspectRatio),
         ready() {
           try {
             const croppedCanvas = cropper.getCroppedCanvas();

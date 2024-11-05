@@ -12,7 +12,8 @@ export interface InputProps {
   accept?: string;
   readonly?: boolean;
   originalImage?: File | null;
-  posterUrl?: string | null;
+  imageUrl?: string | null;
+  aspectRatio?: number;
   clearImgButton?: boolean | null;
 }
 
@@ -38,7 +39,7 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
     accept: '',
     readonly: false,
     originalImage: null,
-    posterUrl: null,
+    imageUrl: null,
     clearImgButton: true,
   };
 
@@ -71,8 +72,8 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
   updateProps(): void {
     this.props = { ...this.defaultProps, ...this.props };
 
-    if (this.props.posterUrl != null) {
-      this.imageUrl = this.props.posterUrl;
+    if (this.props.imageUrl != null) {
+      this.imageUrl = this.props.imageUrl;
     }
 
     if (this.props.originalImage != null) {
@@ -116,7 +117,7 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
 
   private imageProcessing() {
     this.imageServ
-      .autoCropImage(this.imageElement.nativeElement)
+      .autoCropImage(this.imageElement.nativeElement, this.props.aspectRatio)
       .then((blob) => {
         this.setCroppedImage(blob);
       })
@@ -141,8 +142,8 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
       this.croppModal.nativeElement.showModal();
     }
 
-    if (this.props.posterUrl != null) {
-      this.posterServ.downloadImage(this.props.posterUrl).subscribe({
+    if (this.props.imageUrl != null) {
+      this.posterServ.downloadImage(this.props.imageUrl).subscribe({
         next: (blob: Blob) => {
           this.setFile(
             new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {

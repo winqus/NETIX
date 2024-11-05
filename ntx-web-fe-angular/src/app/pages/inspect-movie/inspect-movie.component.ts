@@ -13,13 +13,14 @@ import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.c
 import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
+import { ChangeBackdropComponent } from './settings/change-backdrop/change-backdrop.component';
 import { ImageService } from '@ntx-shared/services/image.service';
 import { getPoster } from '@ntx/app/shared/config/api-endpoints';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent, ChangePosterComponent, PublishMovieComponent, EditMetadataComponent],
+  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
@@ -71,6 +72,11 @@ export class InspectMovieComponent implements OnInit {
     if (this.movie?.posterID != updatedMovie.posterID) {
       timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(updatedMovie.posterID, PosterSize.L));
     }
+
+    if (this.movie?.backdropID != updatedMovie.backdropID) {
+      timer(TimeDelays.backdropProcessingDelay).subscribe(() => this.loadBackdrop(updatedMovie.backdropID as string));
+    }
+
     this.movie = updatedMovie;
   }
 
