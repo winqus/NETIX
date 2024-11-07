@@ -1,22 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UploadTitleComponent } from './upload-title.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
-import { PosterService } from '@ntx/app/shared/services/posters/posters.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { PosterService } from '@ntx-shared/services/posters/posters.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('UploadContentComponent', () => {
   let component: UploadTitleComponent;
   let fixture: ComponentFixture<UploadTitleComponent>;
   let mockUploadService: any;
   let mockPosterService: any;
+  let mockErrorHandlerService: any;
 
   beforeEach(async () => {
+    mockErrorHandlerService = {
+      showError: jasmine.createSpy('showError'),
+      showSuccess: jasmine.createSpy('showSuccess'),
+    };
+
     mockUploadService = jasmine.createSpyObj('MovieService', ['uploadMovieMetadata']);
     await TestBed.configureTestingModule({
       imports: [UploadTitleComponent, ReactiveFormsModule],
       providers: [
         { provide: MovieService, useValue: mockUploadService },
         { provide: PosterService, useValue: mockPosterService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
       ],
     }).compileComponents();
 

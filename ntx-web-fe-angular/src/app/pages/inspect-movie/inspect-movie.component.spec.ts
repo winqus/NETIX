@@ -1,11 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InspectMovieComponent } from './inspect-movie.component';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
-import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { ImageService } from '@ntx/app/shared/services/image.service';
+import { ImageService } from '@ntx-shared/services/image.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
+import { VideoService } from '@ntx-shared/services/videos/video.service';
+import { VideoRequirementDTO } from '@ntx/app/shared/models/video.dto';
 
 describe('InspectMovieComponent', () => {
   let component: InspectMovieComponent;
@@ -14,6 +17,9 @@ describe('InspectMovieComponent', () => {
   let mockPosterService: any;
   let mockImageService: any;
   let mockActivatedRoute: any;
+  let mockVideoService: any;
+  let mockErrorHandlerService: any;
+  let mockRouter: any;
 
   const mockMovie: MovieDTO = {
     id: '1',
@@ -27,6 +33,14 @@ describe('InspectMovieComponent', () => {
     posterID: 'poster123',
     isPublished: true,
   };
+
+  const mockVideoRequirement: VideoRequirementDTO = {
+    allowedExtentions: ['.mkv'],
+    maxFileSizeInBytes: 10485760, // 10 MB
+    supportedMimeTypes: ['video/mkv'],
+  };
+
+  const uploadProgressSubject = new BehaviorSubject<number>(0);
 
   beforeEach(async () => {
     mockMovieService = {
@@ -50,13 +64,25 @@ describe('InspectMovieComponent', () => {
       },
     };
 
+    mockVideoService = {
+      uploadVideo: jasmine.createSpy('uploadVideo'),
+      getVideoRequirements: jasmine.createSpy('getVideoRequirements').and.returnValue(of(mockVideoRequirement)), // Ensure this function is defined
+      uploadProgress$: uploadProgressSubject.asObservable(),
+    };
+
+    mockErrorHandlerService = jasmine.createSpyObj('ErrorHandlerService', ['showError', 'showSuccess']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
     await TestBed.configureTestingModule({
       imports: [InspectMovieComponent],
       providers: [
         { provide: MovieService, useValue: mockMovieService },
         { provide: PosterService, useValue: mockPosterService },
         { provide: ImageService, useValue: mockImageService },
+        { provide: VideoService, useValue: mockVideoService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Router, useValue: mockRouter },
       ],
     }).compileComponents();
 
@@ -67,5 +93,42 @@ describe('InspectMovieComponent', () => {
 
   it('should create the component', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should retrieve movie metadata on initialization and set poster and backdrop URLs', () => {
+    component.ngOnInit();
+    expect(mockMovieService.getMovieMetadata).toHaveBeenCalledWith('1');
+    expect(component.movie).toEqual(mockMovie);
+  });
+
+  it('should handle errors when loading movie metadata', () => {
+    const consoleSpy = spyOn(console, 'error');
+    mockMovieService.getMovieMetadata.and.returnValue(throwError(() => new Error('Metadata load error')));
+
+    component.ngOnInit();
+
+    expect(consoleSpy).toHaveBeenCalledWith('Error uploading metadata:', jasmine.any(Error));
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['error']);
+  });
+
+  it('should handle errors in uploadProgress$ subscription', () => {
+    const consoleSpy = spyOn(console, 'error');
+    const error = new Error('Upload error');
+
+    // Emit an error in uploadProgress$ to trigger the error handling
+    uploadProgressSubject.error(error);
+
+    expect(consoleSpy).toHaveBeenCalledWith('Error in progress subscription:', error);
+  });
+
+  it('should display a success message on successful video upload', async () => {
+    const testFile = new File([''], 'test-video.mkv', { type: 'video/mkv' });
+    mockVideoService.uploadVideo.and.returnValue(Promise.resolve());
+
+    component.onUploadVideo(testFile);
+    await fixture.whenStable();
+
+    expect(mockErrorHandlerService.showSuccess).toHaveBeenCalledWith('Video uploaded successfully');
+    expect(component.isUploadingVideo).toBe(false);
   });
 });

@@ -1,14 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChangeBackdropComponent } from './change-backdrop.component';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { of } from 'rxjs';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('ChangeBackdropComponent', () => {
   let component: ChangeBackdropComponent;
   let fixture: ComponentFixture<ChangeBackdropComponent>;
   let mockMovieService: any;
+  let mockErrorHandlerService: any;
 
   const mockMovie: MovieDTO = {
     id: '1',
@@ -24,6 +26,10 @@ describe('ChangeBackdropComponent', () => {
   };
 
   beforeEach(async () => {
+    mockErrorHandlerService = {
+      showError: jasmine.createSpy('showError'),
+      showSuccess: jasmine.createSpy('showSuccess'),
+    };
     mockMovieService = {
       getMovieMetadata: jasmine.createSpy('getMovieMetadata').and.returnValue(of(mockMovie)),
       updateMovieMetadata: jasmine.createSpy('updateMovieMetadata').and.returnValue(of(mockMovie)),
@@ -33,7 +39,10 @@ describe('ChangeBackdropComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ChangeBackdropComponent],
-      providers: [{ provide: MovieService, useValue: mockMovieService }],
+      providers: [
+        { provide: MovieService, useValue: mockMovieService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChangeBackdropComponent);
