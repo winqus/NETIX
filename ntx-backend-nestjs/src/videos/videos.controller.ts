@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { VideoDTO } from './dto/video.dto';
+import { ApiDocsForGetVideo } from './swagger/api-docs.decorators';
 import { VIDEOS_SWAGGER_TAG } from './videos.constants';
 import { VideosService } from './videos.service';
 
@@ -18,8 +19,7 @@ export class VideosController {
   constructor(private readonly videosSrv: VideosService) {}
 
   @Get(':id')
-  // TODO: api docs
-  // TODO: fix and add tests
+  @ApiDocsForGetVideo()
   public async getVideo(@Param('id') id: string): Promise<VideoDTO> {
     try {
       const videoDTO = await this.videosSrv.findOne(id);

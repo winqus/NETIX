@@ -40,7 +40,7 @@ export class VideosService {
 
   public async findOne(id: string): Promise<VideoDTO> {
     try {
-      if (id == null) {
+      if (id == null || id.trim() === '') {
         throw new BadRequestException(VIDEOS_ERROR_NO_ID_PROVIDED);
       }
 

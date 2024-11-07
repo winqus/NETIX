@@ -4,7 +4,7 @@ import { Video } from './entity/video.entity';
 
 export class VideosMapper {
   public static async any2Video(any: any): Promise<Video> {
-    const video = createValidatedObject(Video, {
+    const video = await createValidatedObject(Video, {
       uuid: any.uuid,
       createdAt: any.createdAt,
       updatedAt: any.updatedAt,
@@ -16,11 +16,11 @@ export class VideosMapper {
   }
 
   public static async any2Videos(any: any[]): Promise<Video[]> {
-    return Promise.all(any.map((a) => VideosMapper.any2Video(a)));
+    return await Promise.all(any.map((a) => VideosMapper.any2Video(a)));
   }
 
   public static async Video2VideoDTO(video: Video): Promise<VideoDTO> {
-    const videoDTO = createValidatedObject(VideoDTO, {
+    const videoDTO = await createValidatedObject(VideoDTO, {
       id: video.uuid,
       createdAt: video.createdAt,
       updatedAt: video.updatedAt,
@@ -32,6 +32,6 @@ export class VideosMapper {
   }
 
   public static async Videos2VideoDTOs(videos: Video[]): Promise<VideoDTO[]> {
-    return Promise.all(videos.map((v) => VideosMapper.Video2VideoDTO(v)));
+    return await Promise.all(videos.map((v) => VideosMapper.Video2VideoDTO(v)));
   }
 }
