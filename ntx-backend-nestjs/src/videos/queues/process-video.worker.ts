@@ -4,7 +4,6 @@ import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { import_fileTypeStream } from '@ntx/utility/importFileType';
 import { jobLogErrorAndThrowError } from '@ntx/utility/queueJobLogAndThrowError';
-import { raw } from 'express';
 import { VideoState } from '../entity/video.entity';
 import {
   PROCESS_VIDEO_QUEUE,
