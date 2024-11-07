@@ -22,5 +22,9 @@ export const VIDEOS_RUNTIME_MINS_MAX = 12_000;
 export const VIDEOS_MODEL_TOKEN = 'VIDEOS_MODEL';
 export const VIDEOS_SCHEMA_NAME = 'Video';
 
+/* Errors */
+export const VIDEOS_ERROR_NO_ID_PROVIDED = 'No video ID provided';
+export const VIDEOS_ERROR_NOT_FOUND = 'Video not found';
+
 /* Swagger */
 export const VIDEOS_SWAGGER_TAG = 'videos';

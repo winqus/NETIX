@@ -1,7 +1,7 @@
 import { Entity } from '@ntx/common/interfaces/entity.interface';
 import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
 import { generateUniqueID } from '@ntx/common/utils/ID.utils';
-import { IsDate, IsInt, IsString, Length, Max, Min } from 'class-validator';
+import { IsDate, IsString, Length } from 'class-validator';
 import {
   VIDEOS_ID_LENGTH,
   VIDEOS_ID_PREFIX,

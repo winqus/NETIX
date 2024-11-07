@@ -8,10 +8,11 @@ import { PROCESS_VIDEO_QUEUE } from './videos.constants';
 import { videosProviders } from './videos.providers';
 import { VideosRepository } from './videos.repository';
 import { VideosService } from './videos.service';
+import { VideosController } from './videos.controller';
 
 @Module({
   providers: [VideosService, VideosRepository, ...videosProviders, ProcessVideoWorker],
-  controllers: [VideoRequirementsController],
+  controllers: [VideoRequirementsController, VideosController],
   imports: [DatabaseModule, FileStorageModule, JobQueueModule.register(PROCESS_VIDEO_QUEUE)],
   exports: [VideosService],
 })

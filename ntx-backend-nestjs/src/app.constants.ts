@@ -26,7 +26,7 @@ export const DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH = './.temp-data/storage';
 /* SWAGGER OpenAPI documentation constants */
 /* Increment version when: <new max controller version>.<method added/removed>.<existing method(s) changed> */
 /* If higher order version is changed, lower order versions should be reset to 0 */
-export const SWAGGER_VERSION = '1.4.0';
+export const SWAGGER_VERSION = '1.5.0';
 export const SWAGGER_ROUTE = 'swagger';
 export const SWAGGER_JSON_ROUTE = 'swagger/json';
 export const SWAGGER_YAML_ROUTE = 'swagger/yaml';
@@ -35,5 +35,6 @@ export const SWAGGER_DESCRIPTION =
   'NETIX backend API specification. Go to ' +
   '<a href="/swagger/json">/swagger/json</a> or ' +
   '<a href="/swagger/yaml">/swagger/yaml</a> ' +
-  'to get the OpenAPI document in JSON or YAML format.';
+  'to get the OpenAPI document in JSON or YAML format. ' +
+  'Go to <a href="/api/queues">/api/queues</a> to access the BullMQ Queue UI.';
 export const SWAGGER_TAGS = ['movies', 'images', 'library', 'videos', 'default'];

@@ -199,7 +199,7 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      const videoName = movie.name + movie.originallyReleasedAt.getFullYear();
+      const videoName = `${movie.name} ${movie.originallyReleasedAt.getFullYear()}`;
       const video = await this.videoSrv.createOneFromFile(videoName, videoFile);
 
       movie.videoID = video.uuid;
