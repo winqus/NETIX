@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { makeCaseInsensitiveRegex } from '@ntx/common/utils/regex.utils';
 import { EntityRepository } from '@ntx/database/entity.repository';
 import { FilterQuery, Model } from 'mongoose';
-import { Video, VideoProps, VideoState } from './entity/video.entity';
+import { Video } from './entity/video.entity';
 import { VideoDocument } from './schemas/video.schema';
 import { VIDEOS_MODEL_TOKEN } from './videos.constants';
 import { VideosMapper } from './videos.mapper';

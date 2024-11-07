@@ -2,8 +2,16 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { FileInStorage } from '@ntx/file-storage/types';
+import { import_fileTypeStream } from '@ntx/utility/importFileType';
+import { jobLogErrorAndThrowError } from '@ntx/utility/queueJobLogAndThrowError';
+import { raw } from 'express';
 import { VideoState } from '../entity/video.entity';
-import { PROCESS_VIDEO_QUEUE, PROCESS_VIDEO_QUEUE_CONCURRENCY, VIDEO_FILE_CONTAINER } from '../videos.constants';
+import {
+  PROCESS_VIDEO_QUEUE,
+  PROCESS_VIDEO_QUEUE_CONCURRENCY,
+  VIDEO_FILE_CONTAINER,
+  VIDEOS_FILE_ALLOWED_MIME_TYPES,
+} from '../videos.constants';
 import { VideosRepository } from '../videos.repository';
 import { ProcessVideoJob } from './process-video.types';
 
@@ -36,45 +44,45 @@ export class ProcessVideoWorker extends WorkerHost {
   async handleProcessVideoJob(job: ProcessVideoJob, _token?: string): Promise<FileInStorage> {
     try {
       const { videoID, file } = job.data;
+      if (videoID == null || file == null) {
+        await jobLogErrorAndThrowError(job, `Invalid job data`);
+      }
 
       await this.videosRepository.updateOneByUUID(videoID, { state: VideoState.PROCESSING });
-
       await job.updateProgress(10);
 
-      const downloadStream = await this.fileStorageSrv.downloadStream({
+      const rawVideoReadStreamForTypeCheck = await this.fileStorageSrv.downloadStream({
         container: file.container,
         fileName: file.fileName,
       });
-
       await job.updateProgress(20);
 
-      // FIXME: fix check mime type
-      // const passThroughStream = new PassThrough();
-      // downloadStream.pipe(passThroughStream);
+      const fileTypeStream = await import_fileTypeStream();
+      const { fileType } = await fileTypeStream(rawVideoReadStreamForTypeCheck);
+      if (fileType == null) {
+        rawVideoReadStreamForTypeCheck.destroy();
+        await jobLogErrorAndThrowError(job, `Could not determine file type for video: ${videoID}`);
+      } else if (!VIDEOS_FILE_ALLOWED_MIME_TYPES.includes(fileType.mime)) {
+        rawVideoReadStreamForTypeCheck.destroy();
+        await jobLogErrorAndThrowError(job, `Invalid mime type ${fileType.mime} for video: ${videoID}`);
+      }
+      await job.updateProgress(30);
 
-      // const fileTypeStream = await import_fileTypeStream();
-      // const { fileType } = await fileTypeStream(passThroughStream);
-      // if (fileType == null) {
-      //   jobLogErrorAndThrowError(job, `Could not determine file type for video: ${videoID}`);
-      // }
-
-      // if (!VIDEOS_FILE_ALLOWED_MIME_TYPES.includes(fileType!.mime)) {
-      //   jobLogErrorAndThrowError(job, `Invalid mime type ${fileType!.mime} for video: ${videoID}`);
-      // }
-
+      const rawVideoFileReadStream = await this.fileStorageSrv.downloadStream({
+        container: file.container,
+        fileName: file.fileName,
+      });
       await job.updateProgress(40);
 
       const destinationFile: FileInStorage = {
         container: VIDEO_FILE_CONTAINER,
         fileName: videoID,
       };
-
-      const uploadStream = await this.fileStorageSrv.uploadStream(destinationFile);
-
+      const videoFileUploadStream = await this.fileStorageSrv.uploadStream(destinationFile);
       await job.updateProgress(60);
 
       await new Promise((resolve, reject) => {
-        downloadStream.pipe(uploadStream).on('done', (error) => {
+        rawVideoFileReadStream.pipe(videoFileUploadStream).on('done', (error) => {
           if (error) {
             reject(error);
           } else {
@@ -82,19 +90,25 @@ export class ProcessVideoWorker extends WorkerHost {
           }
         });
       });
-
       await job.updateProgress(80);
 
-      await this.videosRepository.updateOneByUUID(videoID, { state: VideoState.READY });
-
+      const updatedVideo = await this.videosRepository.updateOneByUUID(videoID, { state: VideoState.READY });
+      if (updatedVideo == null) {
+        await jobLogErrorAndThrowError(job, `Failed to update video state for video: ${videoID}`);
+      }
       await job.updateProgress(100);
 
-      this.logger.log(`File stored with name: ${videoID} in ${VIDEO_FILE_CONTAINER}`);
+      this.logger.log(`Video(${updatedVideo?.uuid}) proceseed and stored in '${VIDEO_FILE_CONTAINER}' container`);
 
       return destinationFile;
     } catch (error) {
       this.logger.error(`Failed to process video: ${error.message}`);
-      throw error;
+
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error(`Error processing video: ${error}`);
+      }
     }
   }
 }
