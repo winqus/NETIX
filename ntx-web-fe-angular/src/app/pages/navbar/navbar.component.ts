@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 // import { AuthService } from '@auth0/auth0-angular';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from '@ntx-shared/ui/search-bar/search-bar.component';

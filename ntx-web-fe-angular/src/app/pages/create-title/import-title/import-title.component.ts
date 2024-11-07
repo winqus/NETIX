@@ -15,7 +15,7 @@ import { UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 
 @Component({
   selector: 'app-import-title',

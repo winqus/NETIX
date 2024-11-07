@@ -1,5 +1,5 @@
 import { Component, ComponentRef, EventEmitter, Input, Output, ViewChild, ViewContainerRef } from '@angular/core';
-import { SvgIconsComponent } from './svg-icons/svg-icons.component';
+import { SvgIconsComponent } from './svg-icons.component';
 
 export interface ModalButton {
   text: string;

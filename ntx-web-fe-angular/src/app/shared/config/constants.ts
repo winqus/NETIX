@@ -34,6 +34,7 @@ export const MediaConstants = {
 export const TimeDelays = {
   posterProcessingDelay: 500,
   backdropProcessingDelay: 500,
+  videoProcessingDelay: 500,
 };
 
 export const CssColor = {

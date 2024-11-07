@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { getPoster } from '@ntx/app/shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
-import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 
 export const titleUpdateBadgeThresholdDays = 7;
 

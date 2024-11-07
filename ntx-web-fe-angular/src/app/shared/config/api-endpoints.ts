@@ -25,6 +25,9 @@ export const SERVER = {
       search: '/v1/library/search',
       externalMovies: '/v1/library/external-movies',
     },
+    video: {
+      videoRequirements: '/v1/video-requirements/file',
+    },
   },
 };
 
@@ -79,4 +82,12 @@ export function getLibrarySearch(_query: string, _types: string, _providers: str
 
 export function getExternalMovie(_id: string, _providerId: string) {
   return `${SERVER.baseUrl}${SERVER.endpoints.library.externalMovies}/${_id}/metadata?providerID=${_providerId}`;
+}
+
+export function getVideoRequirementsUrl() {
+  return `${SERVER.baseUrl}${SERVER.endpoints.video.videoRequirements}`;
+}
+
+export function getVideoUpload(_id: string) {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/video`;
 }
