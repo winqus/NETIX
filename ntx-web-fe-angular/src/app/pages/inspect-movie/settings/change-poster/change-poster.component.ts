@@ -5,6 +5,7 @@ import { ContentComponent, ModalService } from '@ntx-shared/services/modal.servi
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { ModalButton } from '@ntx-shared/ui/modal.component';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { environment } from '@ntx/environments/environment.development';
 
 @Component({
@@ -24,7 +25,8 @@ export class ChangePosterComponent {
 
   constructor(
     private readonly modalService: ModalService,
-    private readonly movieService: MovieService
+    private readonly movieService: MovieService,
+    private readonly errorHandler: ErrorHandlerService
   ) {}
 
   onPosterChange(event: any) {
@@ -80,10 +82,13 @@ export class ChangePosterComponent {
     this.movieService.updatePoster(this.movie?.id, formData).subscribe({
       next: (response) => {
         if (environment.development) console.log('Update poster successful:', response);
+        this.errorHandler.showSuccess('Movie poster updated');
+
         this.movieChange.emit(response);
       },
       error: (errorResponse: { error: { message: string } }) => {
         if (environment.development) console.error('Error updating poster:', errorResponse);
+        this.errorHandler.showError('An error occurred while updating poster. Please try again later.', 'Poster updating unsuccessful');
       },
     });
   }

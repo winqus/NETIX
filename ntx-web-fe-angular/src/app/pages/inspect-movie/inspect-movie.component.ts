@@ -14,10 +14,11 @@ import { ChangePosterComponent } from './settings/change-poster/change-poster.co
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
 import { ChangeBackdropComponent } from './settings/change-backdrop/change-backdrop.component';
-import { UploadVideoComponent } from './upload-video/upload-video.component';
+import { UploadVideoComponent } from './settings/upload-video/upload-video.component';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { getPoster, getVideoUpload } from '@ntx/app/shared/config/api-endpoints';
+import { getPoster } from '@ntx-shared/config/api-endpoints';
 import { VideoService } from '@ntx-shared/services/videos/video.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -42,6 +43,7 @@ export class InspectMovieComponent implements OnInit {
     private readonly posterService: PosterService,
     private readonly imageService: ImageService,
     private readonly videoService: VideoService,
+    private readonly errorHandler: ErrorHandlerService,
     private readonly router: Router,
     private readonly route: ActivatedRoute
   ) {}
@@ -130,17 +132,18 @@ export class InspectMovieComponent implements OnInit {
     this.videoService
       .uploadVideo(file, this.movie!.id)
       .then(() => {
-        console.log('File uploaded successfull');
+        this.errorHandler.showSuccess('Video uploaded successfully');
         timer(TimeDelays.videoProcessingDelay).subscribe(() => this.getMovieMetadata(this.movie!.id));
         this.isUploadingVideo = false;
       })
       .catch((error) => {
-        console.error('Upload error:', error);
+        if (environment.development) console.error('Upload error:', error);
+        this.errorHandler.showError('An error occurred while uploading your video. Please try again later.', 'Upload unsuccessful');
         this.isUploadingVideo = false;
       });
   }
 
   isVideoAvailable(): boolean {
-    return this.movie?.videoID ? true : false;
+    return !!this.movie?.videoID;
   }
 }

@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { FieldRestrictions, MediaConstants } from '@ntx-shared/config/constants';
 import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { environment } from '@ntx/environments/environment';
 import { Router } from '@angular/router';
 
@@ -31,8 +32,9 @@ export class UploadTitleComponent implements OnInit {
   });
 
   constructor(
-    private uploadMovie: MovieService,
-    private router: Router
+    private readonly uploadMovie: MovieService,
+    private readonly errorHandler: ErrorHandlerService,
+    private readonly router: Router
   ) {}
 
   async ngOnInit(): Promise<any> {
@@ -61,6 +63,7 @@ export class UploadTitleComponent implements OnInit {
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;
           if (environment.development) console.error('Error uploading metadata:', errorResponse);
+          this.errorHandler.showError('An error occurred while importing a movie. Please try again later.', 'Import unsuccessful');
         },
       });
     }

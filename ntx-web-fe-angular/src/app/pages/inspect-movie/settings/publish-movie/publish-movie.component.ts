@@ -3,6 +3,7 @@ import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { ModalService } from '@ntx-shared/services/modal.service';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ModalButton } from '@ntx-shared/ui/modal.component';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { environment } from '@ntx/environments/environment';
 
 @Component({
@@ -20,7 +21,8 @@ export class PublishMovieComponent {
 
   constructor(
     private readonly modalService: ModalService,
-    private readonly movieService: MovieService
+    private readonly movieService: MovieService,
+    private readonly errorHandler: ErrorHandlerService
   ) {}
 
   openPublishedPopup = () => {
@@ -50,20 +52,24 @@ export class PublishMovieComponent {
       this.movieService.publishMovie(this.movie?.id).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Publishing successful:', response);
+          this.errorHandler.showSuccess('Movie published');
           this.movieChange.emit(response);
         },
         error: (errorResponse: any) => {
           if (environment.development) console.error('Error publishing movie:', errorResponse);
+          this.errorHandler.showError('An error occurred while publishing a movie. Please try again later.', 'Publishing unsuccessful');
         },
       });
     } else {
       this.movieService.unpublishMovie(this.movie?.id).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Unpublishing successful:', response);
+          this.errorHandler.showSuccess('Movie unpublished');
           this.movieChange.emit(response);
         },
         error: (errorResponse: any) => {
           if (environment.development) console.error('Error unpublishing movie:', errorResponse);
+          this.errorHandler.showError('An error occurred while unpublishing a movie. Please try again later.', 'Unpublishing unsuccessful');
         },
       });
     }

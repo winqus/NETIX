@@ -54,7 +54,7 @@
               @if (isUploadingVideo) {
                 <progress class="progress progress-error w-24 h-4" [value]="uploadProgress" max="100"></progress>
               } @else {
-                <app-upload-video [movie]="movie" (videoUpload)="onUploadVideo($event)" />
+                <app-upload-video [movie]="movie" (videoUpload)="onUploadVideo($event)" [button]="{ label: 'Add Video', class: 'btn btn-sm btn-outline border-none justify-start text-left' }" />
               }
             }
           </div>
@@ -66,7 +66,6 @@
         <ul class="menu menu-md bg-base-200 rounded-lg w-full">
           <li>
             <a>
-              <!-- <app-svg-icons name="check" color="green" /> -->
               <app-svg-icons name="film" size="25" />
               {{ movie?.name }}
               <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>

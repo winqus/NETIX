@@ -7,19 +7,23 @@ import { VideoService } from '@ntx/app/shared/services/videos/video.service';
 import { ModalButton } from '@ntx/app/shared/ui/modal.component';
 import { environment } from '@ntx/environments/environment';
 
+export interface Button {
+  label: string;
+  class: string;
+}
+
 @Component({
   selector: 'app-upload-video',
   standalone: true,
   imports: [SvgIconsComponent],
   template: `
-    @if (movie?.videoID === null) {
-      <button class="btn btn-sm btn-outline border-none justify-start text-left disabled" type="button" onclick="document.getElementById('videoUploadInput').click()">Add Video</button>
-      <input id="videoUploadInput" type="file" class="hidden" [size]="getVideoMaxSize()" [accept]="getVideoAcceptType()" (change)="onVideoUpload($event)" />
-    }
+    <button [class]="button.class" type="button" onclick="document.getElementById('videoUploadInput').click()">{{ button.label }}</button>
+    <input id="videoUploadInput" type="file" class="hidden" [size]="getVideoMaxSize()" [accept]="getVideoAcceptType()" (change)="onVideoUpload($event)" />
   `,
 })
 export class UploadVideoComponent implements OnInit {
   @Input({ required: true }) movie: MovieDTO | undefined;
+  @Input({ required: true }) button: Button = { label: '', class: '' };
   @Output() videoUpload = new EventEmitter<File>();
 
   videoRequirements?: VideoRequirementDTO;
@@ -67,7 +71,6 @@ export class UploadVideoComponent implements OnInit {
         class: 'btn btn-square btn-primary btn-outline w-fit px-4',
         action: () => {
           this.videoUpload.emit(this.video!);
-          console.log('Uploading video');
         },
         shouldClose: true,
       },
@@ -78,10 +81,10 @@ export class UploadVideoComponent implements OnInit {
 
   getVideoAcceptType(): string {
     if (this.videoRequirements == undefined) return '';
-    return this.videoRequirements!.supportedMimeTypes.join(',');
+    return this.videoRequirements.supportedMimeTypes.join(',');
   }
   getVideoMaxSize(): number {
     if (this.videoRequirements == undefined) return 1;
-    return this.videoRequirements!.maxFileSizeInBytes;
+    return this.videoRequirements.maxFileSizeInBytes;
   }
 }

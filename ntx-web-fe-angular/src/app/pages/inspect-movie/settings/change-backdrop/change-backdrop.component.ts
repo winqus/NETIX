@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MediaConstants } from '@ntx/app/shared/config/constants';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
+import { ErrorHandlerService } from '@ntx/app/shared/services/errorHandler.service';
 import { ModalService, ContentComponent } from '@ntx/app/shared/services/modal.service';
 import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
 import { ImageUploadComponent } from '@ntx/app/shared/ui/image-upload/image-upload.component';
-import { ModalButton } from '@ntx/app/shared/ui/modal.component';
+import { ModalButton } from '@ntx-shared/ui/modal.component';
 import { environment } from '@ntx/environments/environment';
 
 @Component({
@@ -25,7 +26,8 @@ export class ChangeBackdropComponent {
 
   constructor(
     private readonly modalService: ModalService,
-    private readonly movieService: MovieService
+    private readonly movieService: MovieService,
+    private readonly errorHandler: ErrorHandlerService
   ) {}
 
   onBackdropChange(event: any) {
@@ -81,10 +83,13 @@ export class ChangeBackdropComponent {
     this.movieService.updateBackdrop(this.movie?.id, formData).subscribe({
       next: (response) => {
         if (environment.development) console.log('Update backdrop successful:', response);
+        this.errorHandler.showSuccess('Movie backdrop updated');
+
         this.movieChange.emit(response);
       },
       error: (errorResponse: { error: { message: string } }) => {
         if (environment.development) console.error('Error updating backdrop:', errorResponse);
+        this.errorHandler.showError('An error occurred while updating backdrop. Please try again later.', 'Backdrop updating unsuccessful');
       },
     });
   }

@@ -15,7 +15,8 @@ import { UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
+import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons.component';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 @Component({
   selector: 'app-import-title',
@@ -48,6 +49,7 @@ export class ImportTitleComponent implements OnInit {
     private readonly externalMovie: ExternalMovieService,
     private readonly posterService: PosterService,
     private readonly imageService: ImageService,
+    private readonly errorHandler: ErrorHandlerService,
     private readonly router: Router
   ) {}
 
@@ -80,8 +82,13 @@ export class ImportTitleComponent implements OnInit {
         switchMap(() => this.downloadAndUploadBackdrop(movieId))
       )
       .subscribe({
-        next: () => this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } }),
-        error: (errorResponse) => this.handleError(errorResponse),
+        next: () => {
+          this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
+        },
+        error: (errorResponse) => {
+          this.handleError(errorResponse);
+          this.errorHandler.showError('An error occurred while importing a movie. Please try again later.', 'Import unsuccessful');
+        },
       });
   }
 
