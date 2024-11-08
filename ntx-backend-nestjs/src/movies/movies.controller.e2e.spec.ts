@@ -10,7 +10,9 @@ import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX, TEST_PORT } from '@ntx
 import { delayByMs } from '@ntx/common/utils/delay.utils';
 import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
+import { FileStorage } from '@ntx/file-storage/file-storage.abstract';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
+import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { BACKDROP_CACHE_CONTROL_HEADER_VAL } from '@ntx/images/images.constants';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import * as fse from 'fs-extra';
@@ -27,6 +29,7 @@ import { MoviesModule } from './movies.module';
 jest.setTimeout(10000);
 
 const validTestImagePath = 'test/images/1_sm_284x190.webp';
+const validMkvVideoPath = path.resolve('test/videos/500ms-colors_3sec_1280x720_24fps_crf35.mkv');
 const tempStoragePath = path.resolve('.temp-test-data');
 
 describe('Movies API (e2e)', () => {
@@ -83,7 +86,7 @@ describe('Movies API (e2e)', () => {
   });
 
   afterAll(async () => {
-    await delayByMs(100);
+    await delayByMs(1000);
     await app?.close();
     await fse.rm(tempStoragePath, { recursive: true, force: true });
     tmdbFetchMocker.dontMockResponses();
@@ -105,6 +108,30 @@ describe('Movies API (e2e)', () => {
     const createdMovie = response.body;
 
     return createdMovie;
+  }
+
+  async function createRandomMovieWithVideo(): Promise<MovieDTO> {
+    const existingMovie = await createRandomValidMovie();
+    const mkvVideoPath = validMkvVideoPath;
+
+    const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
+    await uploadFileWithTUS(uploadEndpoint, mkvVideoPath, 'video/x-matroska');
+    await delayByMs(100);
+
+    const updatedMovie = await request(app.getHttpServer())
+      .get(`/api/v1/movies/${existingMovie.id}`)
+      .expect(HttpStatus.OK);
+
+    if (updatedMovie.body.videoID == null) {
+      throw new Error('Failed to create movie with video: video ID not set');
+    }
+
+    const videoFilePath = path.resolve(tempStoragePath, 'videos', `${updatedMovie.body.videoID}`);
+    if (!fse.existsSync(videoFilePath)) {
+      throw new Error('Failed to create movie with video: video file not created');
+    }
+
+    return updatedMovie.body;
   }
 
   describe('GET /api/v1/movies/:id', () => {
@@ -354,9 +381,9 @@ describe('Movies API (e2e)', () => {
     it('should upload a video for a movie', async () => {
       const existingMovie = await createRandomValidMovie();
       const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
-      const testMkvVideoPath = path.resolve('test/videos/500ms-colors_3sec_1280x720_24fps_crf35.mkv');
+      const mkvVideoPath = validMkvVideoPath;
 
-      const uploadResult = await uploadFileWithTUS(uploadEndpoint, testMkvVideoPath, 'video/x-matroska');
+      const uploadResult = await uploadFileWithTUS(uploadEndpoint, mkvVideoPath, 'video/x-matroska');
 
       expect(uploadResult).toBe('uploaded');
     });
@@ -369,6 +396,25 @@ describe('Movies API (e2e)', () => {
       const uploadPromise = uploadFileWithTUS(uploadEndpoint, invalidFormatFilePath, 'image/webp');
 
       expect(uploadPromise).rejects.toThrow();
+    });
+  });
+
+  describe('DELETE /api/v1/movies/:id', () => {
+    it('should successfully delete a movie and the video file', async () => {
+      const existingMovie = await createRandomMovieWithVideo();
+
+      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/${existingMovie.id}`);
+      const videoFilePath = path.resolve(tempStoragePath, 'videos', `${existingMovie.videoID}`);
+      await delayByMs(100); /* delay to allow for file deletion processing */
+
+      expect(response.status).toBe(HttpStatus.NO_CONTENT);
+      expect(fse.existsSync(videoFilePath)).toBe(false);
+    });
+
+    it('should return 404 when movie does not exist', async () => {
+      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/12345-not-existing-id`);
+
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
   });
 });
