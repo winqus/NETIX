@@ -55,4 +55,11 @@ export class VideosRepository extends EntityRepository<Video> {
 
     return updated == null ? null : VideosMapper.any2Video(updated);
   }
+
+  public async deleteOneByUUID(uuid: string): Promise<boolean> {
+    const query: FilterQuery<VideoDocument> = { uuid };
+    const deleted = await super.deleteOne(query);
+
+    return deleted;
+  }
 }
