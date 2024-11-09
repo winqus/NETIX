@@ -337,4 +337,57 @@ describe('inspect movie', () => {
       });
     });
   });
+
+  it('should remove a movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const DELETE_MOVIE_REQUEST_TOKEN = 'DELETE_MOVIE_REQUEST_TOKEN';
+      cy.intercept('DELETE', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(DELETE_MOVIE_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Remove').click();
+
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + DELETE_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(204);
+      });
+
+      cy.url().should('include', '/');
+    });
+  });
+
+  it('should fail to remove a movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const DELETE_MOVIE_REQUEST_TOKEN = 'DELETE_MOVIE_REQUEST_TOKEN';
+      cy.intercept('DELETE', `${convertRouteToPath(getMovieUrl())}/${movie.id}`, (req) => {
+        req.reply({
+          statusCode: 500,
+          body: { error: 'Failed to delete movie' },
+        });
+      }).as(DELETE_MOVIE_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Remove').click();
+
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + DELETE_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(500);
+      });
+
+      cy.contains('An error occurred while removing a movie. Please try again later.');
+    });
+  });
 });

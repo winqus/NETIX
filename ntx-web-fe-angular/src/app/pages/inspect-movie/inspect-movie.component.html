@@ -42,6 +42,7 @@
                 <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
                   <app-edit-metadata-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
                   <app-publish-movie-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  <app-remove-movie-option [movie]="movie" />
                   <app-change-poster-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
                   <app-change-backdrop-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
                   @if (isVideoAvailable()) {
