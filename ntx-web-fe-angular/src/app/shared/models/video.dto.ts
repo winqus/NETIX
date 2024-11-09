@@ -3,3 +3,18 @@ export interface VideoRequirementDTO {
   allowedExtentions: string[];
   maxFileSizeInBytes: number;
 }
+
+export interface VideoPropsDTO {
+  id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  name: string;
+  state: VideoState;
+}
+
+export enum VideoState {
+  NOT_READY = 'NOT_READY',
+  PROCESSING = 'PROCESSING',
+  READY = 'READY',
+  FAILED = 'FAILED',
+}

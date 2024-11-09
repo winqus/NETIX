@@ -19,6 +19,7 @@ import { ImageService } from '@ntx-shared/services/image.service';
 import { getPoster } from '@ntx-shared/config/api-endpoints';
 import { VideoService } from '@ntx-shared/services/videos/video.service';
 import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
+import { VideoPropsDTO } from '@ntx/app/shared/models/video.dto';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -29,6 +30,7 @@ import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 })
 export class InspectMovieComponent implements OnInit {
   movie: MovieDTO | undefined;
+  video: VideoPropsDTO | undefined;
   posterUrl: string | null = null;
   backdropUrl: string | null = null;
   backdropColor: string = CssColor.TitleInspectBackgroundColor;
@@ -77,6 +79,18 @@ export class InspectMovieComponent implements OnInit {
         } else {
           this.loadPoster(this.movie.posterID, PosterSize.L);
           this.loadBackdrop(this.movie.backdropID!);
+        }
+
+        if (this.movie?.videoID != null) {
+          this.videoService.getVideoPropsUrl(this.movie?.videoID).subscribe({
+            next: (response) => {
+              if (environment.development) console.log('Video props successful:', response);
+              this.video = response;
+            },
+            error: (errorResponse) => {
+              if (environment.development) console.error('Error video props:', errorResponse);
+            },
+          });
         }
       },
       error: (errorResponse) => {
@@ -145,5 +159,11 @@ export class InspectMovieComponent implements OnInit {
 
   isVideoAvailable(): boolean {
     return !!this.movie?.videoID;
+  }
+
+  getVideoName(): string {
+    if (this.video == null) return this.movie!.name;
+
+    return this.video?.name;
   }
 }
