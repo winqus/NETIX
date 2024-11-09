@@ -78,6 +78,20 @@ export class MovieService implements IMovieService {
     );
   }
 
+  deleteMovie(id: string) {
+    const url = getMovieUrl(id);
+
+    const httpOptions = {};
+
+    return this.http.delete(url, httpOptions).pipe(
+      map(() => {}),
+      catchError((error) => {
+        if (environment.development) console.error('Error removing movie:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   publishMovie(id: string): Observable<MovieDTO> {
     const url = getMoviePublishedUrl(id);
 
