@@ -6,7 +6,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
 import { Provider } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
 import { SearchResultDTOMapper } from '@ntx-shared/mappers/SearchResultDTO.mapper';
 

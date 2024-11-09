@@ -1,14 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PublishMovieComponent } from './publish-movie.component';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { of } from 'rxjs';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('PublishMovieComponent', () => {
   let component: PublishMovieComponent;
   let fixture: ComponentFixture<PublishMovieComponent>;
   let mockMovieService: any;
+  let mockErrorHandlerService: any;
 
   const mockMovie: MovieDTO = {
     id: '1',
@@ -33,7 +35,10 @@ describe('PublishMovieComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [PublishMovieComponent],
-      providers: [{ provide: MovieService, useValue: mockMovieService }],
+      providers: [
+        { provide: MovieService, useValue: mockMovieService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PublishMovieComponent);

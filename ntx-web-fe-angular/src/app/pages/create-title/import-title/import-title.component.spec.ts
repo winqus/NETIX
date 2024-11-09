@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-// Mock services
 import { ImportTitleComponent } from './import-title.component';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
-import { PosterService } from '@ntx/app/shared/services/posters/posters.service';
-import { ExternalMovieService } from '@ntx/app/shared/services/externalMovie/externalMovie.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { PosterService } from '@ntx-shared/services/posters/posters.service';
+import { ExternalMovieService } from '@ntx-shared/services/externalMovie/externalMovie.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('ImportTitleComponent', () => {
   let component: ImportTitleComponent;
@@ -14,8 +14,13 @@ describe('ImportTitleComponent', () => {
   let mockMovieService: any;
   let mockPosterService: any;
   let mockExternalMovieService: any;
+  let mockErrorHandlerService: any;
 
   beforeEach(async () => {
+    mockErrorHandlerService = {
+      showError: jasmine.createSpy('showError'),
+      showSuccess: jasmine.createSpy('showSuccess'),
+    };
     await TestBed.configureTestingModule({
       imports: [ImportTitleComponent],
       providers: [
@@ -23,6 +28,7 @@ describe('ImportTitleComponent', () => {
         { provide: MovieService, useValue: mockMovieService },
         { provide: PosterService, useValue: mockPosterService },
         { provide: ExternalMovieService, useValue: mockExternalMovieService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
       ],
     }).compileComponents();
 

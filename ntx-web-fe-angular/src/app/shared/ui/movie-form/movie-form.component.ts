@@ -3,7 +3,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, On
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FieldRestrictions } from '@ntx-shared/config/constants';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { Subscription } from 'rxjs';
 
 @Component({

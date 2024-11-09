@@ -5,6 +5,7 @@ import { ModalService, ContentComponent } from '@ntx-shared/services/modal.servi
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ModalButton } from '@ntx-shared/ui/modal.component';
 import { MovieFormComponent } from '@ntx-shared/ui/movie-form/movie-form.component';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { environment } from '@ntx/environments/environment.development';
 
 @Component({
@@ -23,7 +24,8 @@ export class EditMetadataComponent {
 
   constructor(
     private readonly modalService: ModalService,
-    private readonly movieService: MovieService
+    private readonly movieService: MovieService,
+    private readonly errorHandler: ErrorHandlerService
   ) {}
 
   openPosterUpdatedModal = () => {
@@ -88,11 +90,14 @@ export class EditMetadataComponent {
       this.movieService.updateMovieMetadata(this.movie?.id, movieData).subscribe({
         next: (response: MovieDTO | undefined) => {
           if (environment.development) console.log('Update successful:', response);
+          this.errorHandler.showSuccess('Movie metadata updated');
+
           this.movieChange.emit(response);
         },
         error: (errorResponse: { error: { message: string } }) => {
           this.errorMessage = errorResponse.error.message;
           if (environment.development) console.error('Error updating metadata:', errorResponse);
+          this.errorHandler.showError('An error occurred while updating a movie. Please try again later.', 'Updating unsuccessful');
         },
       });
     }

@@ -1,14 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditMetadataComponent } from './edit-metadata.component';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { of } from 'rxjs';
+import { EditMetadataComponent } from './edit-metadata.component';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('EditMetadataComponent', () => {
   let component: EditMetadataComponent;
   let fixture: ComponentFixture<EditMetadataComponent>;
   let mockMovieService: any;
+  let mockErrorHandlerService: any;
 
   const mockMovie: MovieDTO = {
     id: '1',
@@ -31,9 +33,17 @@ describe('EditMetadataComponent', () => {
       unpublishMovie: jasmine.createSpy('unpublishMovie').and.returnValue(of({ ...mockMovie, isPublished: false })),
     };
 
+    mockErrorHandlerService = {
+      showError: jasmine.createSpy('showError'),
+      showSuccess: jasmine.createSpy('showSuccess'),
+    };
+
     await TestBed.configureTestingModule({
       imports: [EditMetadataComponent],
-      providers: [{ provide: MovieService, useValue: mockMovieService }],
+      providers: [
+        { provide: MovieService, useValue: mockMovieService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditMetadataComponent);

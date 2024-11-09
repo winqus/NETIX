@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { generateRandomId } from '@ntx-shared/services/utils/utils';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { MediaConstants } from '@ntx-shared/config/constants';
 import { ImageService } from '@ntx-shared/services/image.service';
 import { ImageCropperComponent } from '@ntx-shared/ui/image-upload/image-cropper/image-cropper.component';

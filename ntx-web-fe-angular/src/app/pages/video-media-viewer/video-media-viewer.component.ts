@@ -5,7 +5,7 @@ import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '@ntx-shared/services/layout.service';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { formatTime } from '@ntx-shared/services/utils/utils';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 

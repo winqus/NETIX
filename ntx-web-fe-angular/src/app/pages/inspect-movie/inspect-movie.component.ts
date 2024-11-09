@@ -1,42 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { CssColor, MediaConstants, TimeDelays } from '@ntx-shared/config/constants';
-import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
 import { ChangeBackdropComponent } from './settings/change-backdrop/change-backdrop.component';
+import { UploadVideoComponent } from './settings/upload-video/upload-video.component';
 import { ImageService } from '@ntx-shared/services/image.service';
-import { getPoster } from '@ntx/app/shared/config/api-endpoints';
+import { getPoster } from '@ntx-shared/config/api-endpoints';
+import { VideoService } from '@ntx-shared/services/videos/video.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
+import { VideoDTO } from '@ntx/app/shared/models/video.dto';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent],
+  imports: [SvgIconsComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent, UploadVideoComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
 export class InspectMovieComponent implements OnInit {
   movie: MovieDTO | undefined;
+  video: VideoDTO | undefined;
   posterUrl: string | null = null;
   backdropUrl: string | null = null;
   backdropColor: string = CssColor.TitleInspectBackgroundColor;
   pageBackgroundColor: string = CssColor.TitleInspectBackgroundColor;
   transparentColor: string = CssColor.TransparentColor;
   isFromCreation: boolean = false;
+  uploadProgress: number = 0;
+  isUploadingVideo: boolean = false;
 
   constructor(
     private readonly movieService: MovieService,
     private readonly posterService: PosterService,
     private readonly imageService: ImageService,
+    private readonly videoService: VideoService,
+    private readonly errorHandler: ErrorHandlerService,
     private readonly router: Router,
     private readonly route: ActivatedRoute
   ) {}
@@ -46,6 +53,17 @@ export class InspectMovieComponent implements OnInit {
     const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
 
+    this.getMovieMetadata(movieId);
+
+    this.videoService.uploadProgress$.subscribe({
+      next: (progress) => {
+        this.uploadProgress = progress;
+      },
+      error: (error) => console.error('Error in progress subscription:', error),
+    });
+  }
+
+  getMovieMetadata(movieId: string) {
     this.movieService.getMovieMetadata(movieId).subscribe({
       next: (response) => {
         if (environment.development) console.log('Upload successful:', response);
@@ -59,6 +77,18 @@ export class InspectMovieComponent implements OnInit {
         } else {
           this.loadPoster(this.movie.posterID, PosterSize.L);
           this.loadBackdrop(this.movie.backdropID!);
+        }
+
+        if (this.movie?.videoID != null) {
+          this.videoService.getVideoPropsUrl(this.movie?.videoID).subscribe({
+            next: (response) => {
+              if (environment.development) console.log('Video props successful:', response);
+              this.video = response;
+            },
+            error: (errorResponse) => {
+              if (environment.development) console.error('Error video props:', errorResponse);
+            },
+          });
         }
       },
       error: (errorResponse) => {
@@ -107,5 +137,31 @@ export class InspectMovieComponent implements OnInit {
         this.backdropUrl = null;
       },
     });
+  }
+
+  onUploadVideo(file: File): void {
+    this.isUploadingVideo = true;
+    this.videoService
+      .uploadVideo(file, this.movie!.id)
+      .then(() => {
+        this.errorHandler.showSuccess('Video uploaded successfully');
+        timer(TimeDelays.videoProcessingDelay).subscribe(() => this.getMovieMetadata(this.movie!.id));
+        this.isUploadingVideo = false;
+      })
+      .catch((error) => {
+        if (environment.development) console.error('Upload error:', error);
+        this.errorHandler.showError('An error occurred while uploading your video. Please try again later.', 'Upload unsuccessful');
+        this.isUploadingVideo = false;
+      });
+  }
+
+  isVideoAvailable(): boolean {
+    return !!this.movie?.videoID;
+  }
+
+  getVideoName(): string {
+    if (this.video == null) return this.movie!.name;
+
+    return this.video?.name;
   }
 }
