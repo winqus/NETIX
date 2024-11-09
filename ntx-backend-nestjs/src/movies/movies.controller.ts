@@ -6,6 +6,7 @@ import {
   Delete,
   Get,
   Head,
+  HttpCode,
   HttpException,
   Inject,
   Logger,
@@ -322,6 +323,7 @@ export class MoviesController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   @ApiDocsForDeleteMovie()
   public async delete(@Param('id') id: string): Promise<void> {
     try {
