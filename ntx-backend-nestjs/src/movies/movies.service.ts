@@ -199,6 +199,12 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
+      if (movie.videoID) {
+        await this.videoSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
+          this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
+        });
+      }
+
       const videoName = `${movie.name} ${movie.originallyReleasedAt.getFullYear()}`;
       const video = await this.videoSrv.createOneFromFile(videoName, videoFile);
 
