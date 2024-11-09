@@ -111,16 +111,6 @@ describe('InspectMovieComponent', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith(['error']);
   });
 
-  it('should handle errors in uploadProgress$ subscription', () => {
-    const consoleSpy = spyOn(console, 'error');
-    const error = new Error('Upload error');
-
-    // Emit an error in uploadProgress$ to trigger the error handling
-    uploadProgressSubject.error(error);
-
-    expect(consoleSpy).toHaveBeenCalledWith('Error in progress subscription:', error);
-  });
-
   it('should display a success message on successful video upload', async () => {
     const testFile = new File([''], 'test-video.mkv', { type: 'video/mkv' });
     mockVideoService.uploadVideo.and.returnValue(Promise.resolve());

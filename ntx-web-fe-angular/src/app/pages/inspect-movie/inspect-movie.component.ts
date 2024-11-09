@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
@@ -18,6 +18,7 @@ import { getPoster } from '@ntx-shared/config/api-endpoints';
 import { VideoService } from '@ntx-shared/services/videos/video.service';
 import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { VideoDTO } from '@ntx/app/shared/models/video.dto';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-inspect-movie',
@@ -26,7 +27,7 @@ import { VideoDTO } from '@ntx/app/shared/models/video.dto';
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
-export class InspectMovieComponent implements OnInit {
+export class InspectMovieComponent implements OnInit, OnDestroy {
   movie: MovieDTO | undefined;
   video: VideoDTO | undefined;
   posterUrl: string | null = null;
@@ -37,6 +38,7 @@ export class InspectMovieComponent implements OnInit {
   isFromCreation: boolean = false;
   uploadProgress: number = 0;
   isUploadingVideo: boolean = false;
+  private uploadProgressSubscription: Subscription | null = null;
 
   constructor(
     private readonly movieService: MovieService,
@@ -54,13 +56,10 @@ export class InspectMovieComponent implements OnInit {
     this.isFromCreation = navigation.from === 'creation';
 
     this.getMovieMetadata(movieId);
+  }
 
-    this.videoService.uploadProgress$.subscribe({
-      next: (progress) => {
-        this.uploadProgress = progress;
-      },
-      error: (error) => console.error('Error in progress subscription:', error),
-    });
+  ngOnDestroy(): void {
+    this.uploadProgressSubscription?.unsubscribe();
   }
 
   getMovieMetadata(movieId: string) {
@@ -141,17 +140,32 @@ export class InspectMovieComponent implements OnInit {
 
   onUploadVideo(file: File): void {
     this.isUploadingVideo = true;
+    this.uploadProgress = 0;
+
+    this.uploadProgressSubscription?.unsubscribe();
+
+    this.uploadProgressSubscription = this.videoService.uploadProgress$.subscribe({
+      next: (progress) => {
+        this.uploadProgress = progress;
+      },
+      error: (error) => console.error('Error in progress subscription:', error),
+    });
+
+    console.log(this.uploadProgress);
+
     this.videoService
       .uploadVideo(file, this.movie!.id)
       .then(() => {
         this.errorHandler.showSuccess('Video uploaded successfully');
         timer(TimeDelays.videoProcessingDelay).subscribe(() => this.getMovieMetadata(this.movie!.id));
         this.isUploadingVideo = false;
+        this.uploadProgressSubscription?.unsubscribe();
       })
       .catch((error) => {
         if (environment.development) console.error('Upload error:', error);
         this.errorHandler.showError('An error occurred while uploading your video. Please try again later.', 'Upload unsuccessful');
         this.isUploadingVideo = false;
+        this.uploadProgressSubscription?.unsubscribe();
       });
   }
 

@@ -44,6 +44,12 @@
                   <app-publish-movie-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
                   <app-change-poster-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
                   <app-change-backdrop-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  @if (isVideoAvailable()) {
+                    <app-upload-video
+                      (videoUpload)="onUploadVideo($event)"
+                      [props]="{ id: 'videoReplaceInput', label: 'Replace video', class: 'btn btn-sm btn-outline w-full border-none justify-start text-left' }"
+                    />
+                  }
                 </ul>
               </div>
             </div>
@@ -51,10 +57,12 @@
           <div class="flex flex-row items-center justify-end gap-2">
             @if (!isVideoAvailable()) {
               <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Missing video</div>
-              @if (isUploadingVideo) {
-                <progress class="progress progress-error w-24 h-4" [value]="uploadProgress" max="100"></progress>
-              } @else {
-                <app-upload-video (videoUpload)="onUploadVideo($event)" [button]="{ label: 'Add Video', class: 'btn btn-sm btn-outline border-none justify-start text-left' }" />
+            }
+            @if (isUploadingVideo) {
+              <progress class="progress progress-error w-24 h-4" [value]="uploadProgress" max="100"></progress>
+            } @else {
+              @if (!isVideoAvailable()) {
+                <app-upload-video (videoUpload)="onUploadVideo($event)" [props]="{ id: 'videoUploadInput', label: 'Add Video', class: 'btn btn-sm btn-outline border-none justify-start text-left' }" />
               }
             }
           </div>
@@ -68,7 +76,6 @@
             <a>
               <app-svg-icons name="film" size="25" />
               {{ getVideoName() }}
-              <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
             </a>
           </li>
         </ul>

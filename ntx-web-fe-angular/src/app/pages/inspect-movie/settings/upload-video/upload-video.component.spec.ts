@@ -4,12 +4,14 @@ import { VideoService } from '@ntx-shared/services/videos/video.service';
 import { VideoRequirementDTO } from '@ntx-shared/models/video.dto';
 import { ModalService } from '@ntx-shared/services/modal.service';
 import { BehaviorSubject, of } from 'rxjs';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('UploadVideoComponent', () => {
   let component: UploadVideoComponent;
   let fixture: ComponentFixture<UploadVideoComponent>;
   let mockVideoService: any;
   let mockModalService: any;
+  let mockErrorHandlerService: any;
 
   const mockVideoRequirement: VideoRequirementDTO = {
     allowedExtentions: ['.mkv'],
@@ -30,10 +32,13 @@ describe('UploadVideoComponent', () => {
       openModal: jasmine.createSpy('openModal'),
     };
 
+    mockErrorHandlerService = jasmine.createSpyObj('ErrorHandlerService', ['showError', 'showSuccess']);
+
     await TestBed.configureTestingModule({
       imports: [UploadVideoComponent],
       providers: [
         { provide: VideoService, useValue: mockVideoService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
         { provide: ModalService, useValue: mockModalService },
       ],
     }).compileComponents();

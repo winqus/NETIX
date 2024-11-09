@@ -21,7 +21,7 @@ export interface ModalButton {
           <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
         </button>
       </div>
-      <div class="mb-3">{{ body }}</div>
+      <div class="mb-3 overflow-hidden text-ellipsis whitespace-wrap">{{ body }}</div>
 
       <ng-container #dynamicContent [class]="contentClass"></ng-container>
 
