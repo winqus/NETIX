@@ -43,3 +43,10 @@ function padZero(num: number): string {
 export function generateRandomId(): string {
   return Math.random().toString(36).substring(2, 9);
 }
+
+export function formatFileSize(bytes: number): string {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  if (bytes === 0) return '0 Bytes';
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+}

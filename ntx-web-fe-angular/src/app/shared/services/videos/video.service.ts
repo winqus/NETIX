@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, Subject, throwError } from 'rxjs';
 import { IVideoService } from './IVideo.service.interface';
 import { VideoDTO, VideoRequirementDTO } from '@ntx-shared/models/video.dto';
 import { getVideo, getVideoRequirementsUrl, getVideoUpload } from '@ntx-shared/config/api-endpoints';
@@ -12,9 +12,11 @@ import * as tus from 'tus-js-client';
   providedIn: 'root',
 })
 export class VideoService implements IVideoService {
-  private uploadProgressSubject = new Subject<number>();
+  private uploadProgressSubject = new BehaviorSubject<number>(0); // Start with 0
   uploadProgress$ = this.uploadProgressSubject.asObservable();
+
   constructor(private readonly http: HttpClient) {}
+
   getVideoRequirements(): Observable<VideoRequirementDTO> {
     const url = getVideoRequirementsUrl();
     const httpOptions = {};
@@ -49,6 +51,8 @@ export class VideoService implements IVideoService {
     const endpoint = getVideoUpload(movieId);
     const parallelUploads = 1;
 
+    this.uploadProgressSubject.next(0);
+
     return new Promise((resolve, reject) => {
       const upload = new tus.Upload(file, {
         endpoint,
@@ -68,6 +72,8 @@ export class VideoService implements IVideoService {
         },
         onSuccess: () => {
           this.uploadProgressSubject.complete();
+          this.uploadProgressSubject = new BehaviorSubject<number>(0);
+          this.uploadProgress$ = this.uploadProgressSubject.asObservable();
           resolve(upload.url!);
         },
       });
