@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, throwError } from 'rxjs';
 import { IVideoService } from './IVideo.service.interface';
 import { VideoDTO, VideoRequirementDTO } from '@ntx-shared/models/video.dto';
 import { getVideo, getVideoRequirementsUrl, getVideoUpload } from '@ntx-shared/config/api-endpoints';
@@ -12,7 +12,7 @@ import * as tus from 'tus-js-client';
   providedIn: 'root',
 })
 export class VideoService implements IVideoService {
-  private uploadProgressSubject = new BehaviorSubject<number>(0); // Start with 0
+  private uploadProgressSubject = new BehaviorSubject<number>(0);
   uploadProgress$ = this.uploadProgressSubject.asObservable();
 
   constructor(private readonly http: HttpClient) {}
