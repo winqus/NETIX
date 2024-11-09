@@ -46,6 +46,7 @@ import {
 } from './movies.constants';
 import { MoviesService } from './movies.service';
 import {
+  ApiDocsForDeleteMovie,
   ApiDocsForDeleteMoviePublished,
   ApiDocsForGetMovie,
   ApiDocsForGetMovies,
@@ -311,6 +312,20 @@ export class MoviesController {
       this.clearMoviesCache();
 
       return updatedMovie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Delete(':id')
+  @ApiDocsForDeleteMovie()
+  public async delete(@Param('id') id: string): Promise<void> {
+    try {
+      await this.moviesSrv.deleteOne(id);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

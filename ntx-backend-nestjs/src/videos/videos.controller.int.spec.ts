@@ -1,7 +1,7 @@
 import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Video, VideoState } from './entity/video.entity';
-import { PROCESS_VIDEO_QUEUE } from './videos.constants';
+import { DELETE_VIDEO_QUEUE, PROCESS_VIDEO_QUEUE } from './videos.constants';
 import { VideosController } from './videos.controller';
 import { VideosRepository } from './videos.repository';
 import { VideosService } from './videos.service';
@@ -25,12 +25,17 @@ describe('VideosController Integration', () => {
     add: jest.fn(),
   };
 
+  const deleteVideoQueueMock = {
+    add: jest.fn(),
+  };
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [VideosController],
       providers: [
         { provide: VideosRepository, useValue: videosRepositoryMock },
         { provide: getQueueToken(PROCESS_VIDEO_QUEUE), useValue: videoQueueMock },
+        { provide: getQueueToken(DELETE_VIDEO_QUEUE), useValue: deleteVideoQueueMock },
         VideosService,
       ],
     }).compile();

@@ -66,6 +66,37 @@ export class PosterService {
     }
   }
 
+  public async deleteOne(posterID: string): Promise<void> {
+    const sizes = Object.values(PosterSize);
+    const deletePromises = sizes.map(async (size) => {
+      const fileName = makePosterFileName(posterID, size, POSTER_EXTENTION);
+
+      try {
+        const isDeleted = await this.fileStorageSrv.deleteFile({
+          container: POSTER_FILE_CONTAINER,
+          fileName: fileName,
+        });
+
+        if (isDeleted) {
+          this.logger.log(`Deleted poster size ${size} with filename ${fileName}`);
+        } else {
+          this.logger.warn(`Poster size ${size} with filename ${fileName} was not found for deletion.`);
+        }
+      } catch (error) {
+        if (error.message === 'ENOENT: File does not exist') {
+          this.logger.warn(`Did not find poster ${fileName} for deletion.`);
+        } else {
+          this.logger.error(`Failed to delete poster ${fileName}: ${error.message}`);
+          throw error;
+        }
+      }
+    });
+
+    await Promise.all(deletePromises);
+
+    this.logger.log(`Completed deletion of all poster sizes for posterID ${posterID}`);
+  }
+
   protected generateUUID(): string {
     return generateUniqueID(POSTER_ID_PREFIX, POSTER_ID_LENGTH);
   }

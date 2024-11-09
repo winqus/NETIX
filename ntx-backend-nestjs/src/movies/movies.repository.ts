@@ -67,4 +67,10 @@ export class MoviesRepository extends EntityRepository<Movie> {
 
     return updated == null ? null : MoviesMapper.any2Movie(updated);
   }
+
+  public async deleteOneByUUID(uuid: string): Promise<boolean> {
+    const query: FilterQuery<MovieDocument> = { uuid };
+
+    return super.deleteOne(query);
+  }
 }
