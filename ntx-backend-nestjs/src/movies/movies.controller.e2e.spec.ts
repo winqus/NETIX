@@ -10,9 +10,7 @@ import { DEFAULT_CONTROLLER_VERSION, GLOBAL_ROUTE_PREFIX, TEST_PORT } from '@ntx
 import { delayByMs } from '@ntx/common/utils/delay.utils';
 import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
-import { FileStorage } from '@ntx/file-storage/file-storage.abstract';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
-import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { BACKDROP_CACHE_CONTROL_HEADER_VAL } from '@ntx/images/images.constants';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
 import * as fse from 'fs-extra';

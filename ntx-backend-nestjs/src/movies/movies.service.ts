@@ -327,25 +327,25 @@ export class MoviesService {
 
       if (movie.videoID) {
         await this.videoSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
-          this.logger.error(`Failed to delete video with this (${movie.videoID}): ${error.message}`);
+          this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
         });
       }
 
       if (movie.posterID) {
         this.posterSrv.deleteOne(movie.posterID).catch((error) => {
-          this.logger.error(`Failed to delete poster with this (${movie.posterID}): ${error.message}`);
+          this.logger.error(`Failed to delete poster (${movie.posterID}): ${error.message}`);
         });
       }
 
       if (movie.backdropID) {
         this.backdropSrv.deleteOne(movie.backdropID).catch((error) => {
-          this.logger.error(`Failed to delete backdrop with this (${movie.backdropID}): ${error.message}`);
+          this.logger.error(`Failed to delete backdrop (${movie.backdropID}): ${error.message}`);
         });
       }
 
       await this.moviesRepo.deleteOneByUUID(id);
     } catch (error) {
-      this.logger.error(`Failed to delete movie with this ${id}: ${error.message}`);
+      this.logger.error(`Failed to delete movie (${id}): ${error.message}`);
       throw error;
     }
   }
