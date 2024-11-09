@@ -312,4 +312,41 @@ export class MoviesService {
       throw error;
     }
   }
+
+  public async deleteOne(id: string) {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      const movie = await this.moviesRepo.findOneByUUID(id);
+
+      if (movie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      if (movie.videoID) {
+        await this.videoSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
+          this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
+        });
+      }
+
+      if (movie.posterID) {
+        this.posterSrv.deleteOne(movie.posterID).catch((error) => {
+          this.logger.error(`Failed to delete poster (${movie.posterID}): ${error.message}`);
+        });
+      }
+
+      if (movie.backdropID) {
+        this.backdropSrv.deleteOne(movie.backdropID).catch((error) => {
+          this.logger.error(`Failed to delete backdrop (${movie.backdropID}): ${error.message}`);
+        });
+      }
+
+      await this.moviesRepo.deleteOneByUUID(id);
+    } catch (error) {
+      this.logger.error(`Failed to delete movie (${id}): ${error.message}`);
+      throw error;
+    }
+  }
 }

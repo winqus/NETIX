@@ -3,8 +3,10 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { FileInStorage } from '@ntx/file-storage/types';
 import { VideoDTO } from './dto/video.dto';
 import { Video, VideoState } from './entity/video.entity';
+import { DeleteVideoJobPayload, DeleteVideoQueue } from './queues/delete-video.types';
 import { ProcessVideoJobPayload, ProcessVideoQueue } from './queues/process-video.types';
 import {
+  DELETE_VIDEO_QUEUE,
   PROCESS_VIDEO_JOBNAME,
   PROCESS_VIDEO_QUEUE,
   VIDEOS_ERROR_NO_ID_PROVIDED,
@@ -20,6 +22,7 @@ export class VideosService {
   constructor(
     private readonly videosRepository: VideosRepository,
     @InjectQueue(PROCESS_VIDEO_QUEUE) private readonly videoQueue: ProcessVideoQueue,
+    @InjectQueue(DELETE_VIDEO_QUEUE) private readonly deleteVideoQueue: DeleteVideoQueue,
   ) {}
 
   public async createOneFromFile(videoName: string, videoFile: FileInStorage): Promise<Video> {
@@ -54,6 +57,22 @@ export class VideosService {
     } catch (error) {
       this.logger.error(`Failed to find video with this ${id}: ${error.message}`);
       throw error;
+    }
+  }
+
+  public async addDeleteVideoJob(id: string): Promise<void> {
+    try {
+      if (id == null || id.trim() === '') {
+        throw new BadRequestException(VIDEOS_ERROR_NO_ID_PROVIDED);
+      }
+
+      const payload: DeleteVideoJobPayload = {
+        videoID: id,
+      };
+
+      await this.deleteVideoQueue.add(DELETE_VIDEO_QUEUE, payload);
+    } catch (error) {
+      this.logger.error(`Failed to delete video with this ${id}: ${error.message}`);
     }
   }
 }

@@ -178,3 +178,14 @@ export function ApiDocsForDeleteMoviePublished() {
     ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
   );
 }
+
+export function ApiDocsForDeleteMovie() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Delete movie' }),
+    ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Deleted movie' }),
+    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid id' }),
+    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Requested movie does not exist' }),
+    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}

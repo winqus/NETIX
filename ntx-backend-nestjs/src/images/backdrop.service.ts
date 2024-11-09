@@ -66,6 +66,37 @@ export class BackDropService {
     }
   }
 
+  public async deleteOne(backdropID: string): Promise<void> {
+    const sizes = Object.values(BackdropSize);
+    const deletePromises = sizes.map(async (size) => {
+      const fileName = makeBackdropFileName(backdropID, size, BACKDROP_EXTENTION);
+
+      try {
+        const isDeleted = await this.fileStorageSrv.deleteFile({
+          container: BACKDROP_FILE_CONTAINER,
+          fileName: fileName,
+        });
+
+        if (isDeleted) {
+          this.logger.log(`Deleted backdrop size ${size} with filename ${fileName}`);
+        } else {
+          this.logger.warn(`Backdrop size ${size} with filename ${fileName} was not found for deletion.`);
+        }
+      } catch (error) {
+        if (error.message === 'ENOENT: File does not exist') {
+          this.logger.warn(`Did not find backdrop ${fileName} for deletion.`);
+        } else {
+          this.logger.error(`Failed to delete backdrop ${fileName}: ${error.message}`);
+          throw error;
+        }
+      }
+    });
+
+    await Promise.all(deletePromises);
+
+    this.logger.log(`Completed deletion of all backdrop sizes for backdropID ${backdropID}`);
+  }
+
   protected generateUUID(): string {
     return generateUniqueID(BACKDROP_ID_PREFIX, BACKDROP_ID_LENGTH);
   }
