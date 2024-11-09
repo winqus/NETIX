@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
@@ -9,7 +8,6 @@ import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
 import { CssColor, MediaConstants, TimeDelays } from '@ntx-shared/config/constants';
-import { ImageUploadComponent } from '@ntx-shared/ui/image-upload/image-upload.component';
 import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
 import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
 import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
@@ -19,18 +17,18 @@ import { ImageService } from '@ntx-shared/services/image.service';
 import { getPoster } from '@ntx-shared/config/api-endpoints';
 import { VideoService } from '@ntx-shared/services/videos/video.service';
 import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
-import { VideoPropsDTO } from '@ntx/app/shared/models/video.dto';
+import { VideoDTO } from '@ntx/app/shared/models/video.dto';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule, ImageUploadComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent, UploadVideoComponent],
+  imports: [SvgIconsComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent, UploadVideoComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
 export class InspectMovieComponent implements OnInit {
   movie: MovieDTO | undefined;
-  video: VideoPropsDTO | undefined;
+  video: VideoDTO | undefined;
   posterUrl: string | null = null;
   backdropUrl: string | null = null;
   backdropColor: string = CssColor.TitleInspectBackgroundColor;

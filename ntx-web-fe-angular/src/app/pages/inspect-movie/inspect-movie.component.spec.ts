@@ -66,7 +66,7 @@ describe('InspectMovieComponent', () => {
 
     mockVideoService = {
       uploadVideo: jasmine.createSpy('uploadVideo'),
-      getVideoRequirements: jasmine.createSpy('getVideoRequirements').and.returnValue(of(mockVideoRequirement)), // Ensure this function is defined
+      getVideoRequirements: jasmine.createSpy('getVideoRequirements').and.returnValue(of(mockVideoRequirement)),
       uploadProgress$: uploadProgressSubject.asObservable(),
     };
 

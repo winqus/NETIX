@@ -1,13 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
-import { VideoRequirementDTO } from '@ntx/app/shared/models/video.dto';
-import { ModalService } from '@ntx/app/shared/services/modal.service';
-import { VideoService } from '@ntx/app/shared/services/videos/video.service';
-import { ModalButton } from '@ntx/app/shared/ui/modal.component';
+import { VideoRequirementDTO } from '@ntx-shared/models/video.dto';
+import { ModalService } from '@ntx-shared/services/modal.service';
+import { VideoService } from '@ntx-shared/services/videos/video.service';
+import { ModalButton } from '@ntx-shared/ui/modal.component';
 import { environment } from '@ntx/environments/environment';
 
-export interface Button {
+export interface UploadVideoProps {
   label: string;
   class: string;
 }
@@ -15,15 +13,14 @@ export interface Button {
 @Component({
   selector: 'app-upload-video',
   standalone: true,
-  imports: [SvgIconsComponent],
+  imports: [],
   template: `
     <button [class]="button.class" type="button" onclick="document.getElementById('videoUploadInput').click()">{{ button.label }}</button>
     <input id="videoUploadInput" type="file" class="hidden" [size]="getVideoMaxSize()" [accept]="getVideoAcceptType()" (change)="onVideoUpload($event)" />
   `,
 })
 export class UploadVideoComponent implements OnInit {
-  @Input({ required: true }) movie: MovieDTO | undefined;
-  @Input({ required: true }) button: Button = { label: '', class: '' };
+  @Input({ required: true }) button: UploadVideoProps = { label: '', class: '' };
   @Output() videoUpload = new EventEmitter<File>();
 
   videoRequirements?: VideoRequirementDTO;

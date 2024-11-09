@@ -16,12 +16,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     provideToastr({
-      positionClass: 'toast-top-right', // Position to bottom-left
+      positionClass: 'toast-top-right',
       closeButton: true,
       progressBar: true,
-      maxOpened: 5, // Maximum number of toasts displayed at once
-      autoDismiss: true, // Automatically dismiss old toasts when max is reached
-      preventDuplicates: true, // Prevent duplicate toasts
+      maxOpened: 5,
+      autoDismiss: true,
+      preventDuplicates: true,
     }),
     // provideAuth0({
     //   ...env.auth0,

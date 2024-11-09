@@ -1,4 +1,4 @@
-import { VideoPropsDTO, VideoRequirementDTO, VideoState } from '../models/video.dto';
+import { VideoDTO, VideoRequirementDTO, VideoState } from '../models/video.dto';
 
 export class VideoRequirementDTOMapper {
   static anyToVideoRequirementDTO(item: any): VideoRequirementDTO {
@@ -10,8 +10,8 @@ export class VideoRequirementDTOMapper {
   }
 }
 
-export class VideoPropsDTOMapper {
-  static anyToVideoPropsDTO(item: any): VideoPropsDTO {
+export class VideoDTOMapper {
+  static anyToVideoDTO(item: any): VideoDTO {
     return {
       id: item.id,
       createdAt: new Date(item.createdAt),

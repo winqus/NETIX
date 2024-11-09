@@ -225,7 +225,7 @@ describe('inspect movie', () => {
     });
   });
 
-  it.only('should upload video for movie', () => {
+  it('should upload video for movie', () => {
     cy.createMovieWithPoster().then((movie: MovieDTO) => {
       const UPLOAD_VIDEO_TOKEN = 'UPLOAD_VIDEO_TOKEN';
       const VIDEO_PROPS_TOKEN = 'VIDEO_PROPS_TOKEN';

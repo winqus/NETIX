@@ -4,7 +4,7 @@ export interface VideoRequirementDTO {
   maxFileSizeInBytes: number;
 }
 
-export interface VideoPropsDTO {
+export interface VideoDTO {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;

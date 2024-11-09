@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UploadVideoComponent } from './upload-video.component';
-import { VideoService } from '@ntx/app/shared/services/videos/video.service';
-import { VideoRequirementDTO } from '@ntx/app/shared/models/video.dto';
-import { ModalService } from '@ntx/app/shared/services/modal.service';
+import { VideoService } from '@ntx-shared/services/videos/video.service';
+import { VideoRequirementDTO } from '@ntx-shared/models/video.dto';
+import { ModalService } from '@ntx-shared/services/modal.service';
 import { BehaviorSubject, of } from 'rxjs';
 
 describe('UploadVideoComponent', () => {

@@ -63,7 +63,7 @@ export class UploadTitleComponent implements OnInit {
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;
           if (environment.development) console.error('Error uploading metadata:', errorResponse);
-          this.errorHandler.showError('An error occurred while importing a movie. Please try again later.', 'Import unsuccessful');
+          this.errorHandler.showError('An error occurred while importing a movie. Please try again later.', 'Upload unsuccessful');
         },
       });
     }

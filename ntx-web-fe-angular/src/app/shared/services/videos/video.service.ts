@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, Subject, throwError } from 'rxjs';
 import { IVideoService } from './IVideo.service.interface';
-import { VideoPropsDTO, VideoRequirementDTO } from '@ntx-shared/models/video.dto';
+import { VideoDTO, VideoRequirementDTO } from '@ntx-shared/models/video.dto';
 import { getVideo, getVideoRequirementsUrl, getVideoUpload } from '@ntx-shared/config/api-endpoints';
 import { environment } from '@ntx/environments/environment.development';
-import { VideoPropsDTOMapper, VideoRequirementDTOMapper } from '@ntx-shared/mappers/VideoDTO.mapper';
+import { VideoDTOMapper, VideoRequirementDTOMapper } from '@ntx-shared/mappers/VideoDTO.mapper';
 import * as tus from 'tus-js-client';
 
 @Injectable({
@@ -30,13 +30,13 @@ export class VideoService implements IVideoService {
     );
   }
 
-  getVideoPropsUrl(id: string): Observable<VideoPropsDTO> {
+  getVideoPropsUrl(id: string): Observable<VideoDTO> {
     const url = getVideo(id);
     const httpOptions = {};
 
     return this.http.get(url, httpOptions).pipe(
       map((response: any) => {
-        return VideoPropsDTOMapper.anyToVideoPropsDTO(response);
+        return VideoDTOMapper.anyToVideoDTO(response);
       }),
       catchError((error) => {
         if (environment.development) console.error('Error getting video metadata:', error);

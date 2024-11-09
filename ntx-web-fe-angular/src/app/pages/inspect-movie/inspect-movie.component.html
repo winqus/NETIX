@@ -54,7 +54,7 @@
               @if (isUploadingVideo) {
                 <progress class="progress progress-error w-24 h-4" [value]="uploadProgress" max="100"></progress>
               } @else {
-                <app-upload-video [movie]="movie" (videoUpload)="onUploadVideo($event)" [button]="{ label: 'Add Video', class: 'btn btn-sm btn-outline border-none justify-start text-left' }" />
+                <app-upload-video (videoUpload)="onUploadVideo($event)" [button]="{ label: 'Add Video', class: 'btn btn-sm btn-outline border-none justify-start text-left' }" />
               }
             }
           </div>
