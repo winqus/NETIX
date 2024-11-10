@@ -113,11 +113,6 @@ describe('Movies API (e2e)', () => {
     if (updatedMovie.body.videoID == null) {
       throw new Error('Failed to create movie with video: video ID not set');
     }
-    // Commented for now, problem: video on some devices doesn't proccess and then this part fails
-    // const videoFilePath = path.resolve(tempStoragePath, 'videos', `${updatedMovie.body.videoID}`);
-    // if (!fse.existsSync(videoFilePath)) {
-    //   throw new Error('Failed to create movie with video: video file not created');
-    // }
 
     return updatedMovie.body;
   }
