@@ -26,8 +26,8 @@
     "<rootDir>/../setupJest.js"
   ],
   "ci": true,
-  "silent": true,
-  "bail": true,
+  "silent": false,
+  "bail": false,
   "maxWorkers": 1,
   "detectOpenHandles": true,
   "forceExit": true
