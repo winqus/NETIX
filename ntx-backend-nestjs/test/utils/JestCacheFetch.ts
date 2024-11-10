@@ -70,10 +70,7 @@ export class JestCacheFetch {
       filePath += COMPRESSED_FILE_EXTENSION;
     }
 
-    console.log('[JestCacheFetch.loadCache] will use filePath=', filePath);
-
     if (fs.existsSync(filePath)) {
-      console.log('[JestCacheFetch.loadCache] file exists, will load cache');
       const fileContent = fs.readFileSync(filePath);
 
       let jsonData;

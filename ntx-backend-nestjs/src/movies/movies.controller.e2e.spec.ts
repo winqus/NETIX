@@ -49,7 +49,7 @@ describe('Movies API (e2e)', () => {
           TMDB: {
             enable: true,
             apiKey: 'x',
-            rateLimitMs: 1,
+            rateLimitMs: 0,
           },
         }),
         FileStorageModule.forRoot(storageType, options, true),
