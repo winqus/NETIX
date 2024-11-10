@@ -68,7 +68,6 @@ jobs:
           echo USE_MEMORY_MONGO=${{ vars.USE_MEMORY_MONGO }} >> .env
           echo IN_MEMORY_MONGO_PORT=${{ vars.IN_MEMORY_MONGO_PORT }} >> .env
           echo USE_MEMORY_REDIS=${{ vars.USE_MEMORY_REDIS }} >> .env
-          echo IN_MEMORY_REDIS_PORT=${{ vars.IN_MEMORY_REDIS_PORT }} >> .env
           echo USE_TEMPORARY_FILE_STORAGE=${{ vars.USE_TEMPORARY_FILE_STORAGE }} >> .env
           cat .env
 
