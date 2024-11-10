@@ -58,11 +58,11 @@ jobs:
         run: |
           touch .env
           echo PORT=${{ vars.PORT }} >> .env
-          echo MONGODB_URI='${{ vars.MONGODB_URI }}' >> .env
+          echo MONGODB_URI='${{ secrets.MONGODB_URI }}' >> .env
           echo TMDB_API_KEY='${{ secrets.TMDB_API_KEY }}' >> .env
-          echo REDIS_HOST='${{ vars.REDIS_HOST }}' >> .env
+          echo REDIS_HOST='${{ secrets.REDIS_HOST }}' >> .env
           echo REDIS_PORT=${{ vars.REDIS_PORT }} >> .env
-          echo REDIS_PASSWORD='${{ vars.REDIS_PASSWORD }}' >> .env
+          echo REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}' >> .env
           echo CLIENT_ORIGIN_URL='${{ vars.CLIENT_ORIGIN_URL }}' >> .env
           echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
           echo USE_MEMORY_MONGO=${{ vars.USE_MEMORY_MONGO }} >> .env
