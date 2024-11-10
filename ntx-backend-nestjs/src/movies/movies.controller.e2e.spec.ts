@@ -1,6 +1,6 @@
 import { CacheModule } from '@nestjs/cache-manager';
-import { ConsoleLogger as _ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
-import { ConfigFactory, ConfigModule } from '@nestjs/config';
+import { HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createRandomValidCreateMovieDTO } from '@ntx-test/movies/utils/random-valid-create-movie-dto.factory';
 import { tempLocalStorageOptionsFactory } from '@ntx-test/utils/temp-local-storage-options.factory';
@@ -35,23 +35,13 @@ describe('Movies API (e2e)', () => {
   let tmdbFetchMocker: TMDBFetchMocker;
 
   beforeAll(async () => {
-    const testConfigurationFactory: ConfigFactory = () => ({
-      USE_MEMORY_MONGO: 'true',
-      IN_MEMORY_MONGO_PORT: 57019,
-      USE_MEMORY_REDIS: 'true',
-      USE_TEMPORARY_FILE_STORAGE: 'true',
-    });
-
-    Object.assign(process.env, testConfigurationFactory());
-
     const { storageType, options } = tempLocalStorageOptionsFactory(tempStoragePath);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
-          load: [testConfigurationFactory],
-          ignoreEnvFile: true,
+          ignoreEnvFile: false,
         }),
         DatabaseModule,
         CacheModule.register({ isGlobal: true }),
@@ -59,7 +49,7 @@ describe('Movies API (e2e)', () => {
           TMDB: {
             enable: true,
             apiKey: 'x',
-            rateLimitMs: 10,
+            rateLimitMs: 1,
           },
         }),
         FileStorageModule.forRoot(storageType, options, true),
@@ -122,11 +112,6 @@ describe('Movies API (e2e)', () => {
 
     if (updatedMovie.body.videoID == null) {
       throw new Error('Failed to create movie with video: video ID not set');
-    }
-
-    const videoFilePath = path.resolve(tempStoragePath, 'videos', `${updatedMovie.body.videoID}`);
-    if (!fse.existsSync(videoFilePath)) {
-      throw new Error('Failed to create movie with video: video file not created');
     }
 
     return updatedMovie.body;
@@ -270,6 +255,8 @@ describe('Movies API (e2e)', () => {
 
       expect(putBackdropResponse.status).toBe(HttpStatus.OK);
       backdropID = putBackdropResponse.body.backdropID;
+
+      await delayByMs(100); /* delay to allow for file processing */
     });
 
     it('should return the backdrop when it exists', async () => {

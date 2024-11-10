@@ -8,7 +8,6 @@ import RedisMemoryServer from 'redis-memory-server';
 import {
   DATABASE_CONNECTION,
   IN_MEMORY_MONGO_PORT,
-  IN_MEMORY_REDIS_PORT,
   MONGODB_URI,
   REDIS_CONNECTION_OPTIONS_TOKEN,
   REDIS_DEFAULT_IP,
@@ -80,10 +79,7 @@ async function makeRegularRedis(configSrv: ConfigService): Promise<RedisConnecti
   return { connection };
 }
 
-async function makeInMemoryRedis(configSrv: ConfigService): Promise<RedisConnectionOptions> {
-  let port = configSrv.get(IN_MEMORY_REDIS_PORT);
-  port = port != null ? parseInt(port, 10) : undefined;
-
+async function makeInMemoryRedis(_configSrv: ConfigService): Promise<RedisConnectionOptions> {
   let binaryOptions = undefined;
 
   switch (process.platform) {
@@ -111,7 +107,7 @@ async function makeInMemoryRedis(configSrv: ConfigService): Promise<RedisConnect
   const redisServer = await RedisMemoryServer.create({
     instance: {
       ip: REDIS_DEFAULT_IP,
-      port: port,
+      port: undefined /* get a random port */,
     },
     binary: binaryOptions,
   });

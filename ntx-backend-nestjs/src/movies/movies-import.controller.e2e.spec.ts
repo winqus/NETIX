@@ -1,6 +1,6 @@
 import { CacheModule } from '@nestjs/cache-manager';
-import { ConsoleLogger as _ConsoleLogger, HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
-import { ConfigFactory, ConfigModule } from '@nestjs/config';
+import { HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { tempLocalStorageOptionsFactory } from '@ntx-test/utils/temp-local-storage-options.factory';
 import { TMDBFetchMocker } from '@ntx-test/utils/TMDBFetchResponseMocker';
@@ -23,23 +23,13 @@ describe('Movies API (e2e)', () => {
   let tmdbFetchMocker: TMDBFetchMocker;
 
   beforeAll(async () => {
-    const testConfigurationFactory: ConfigFactory = () => ({
-      USE_MEMORY_MONGO: 'true',
-      IN_MEMORY_MONGO_PORT: 57019,
-      USE_MEMORY_REDIS: 'true',
-      USE_TEMPORARY_FILE_STORAGE: 'true',
-    });
-
-    Object.assign(process.env, testConfigurationFactory());
-
     const { storageType, options } = tempLocalStorageOptionsFactory(tempStoragePath);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
-          load: [testConfigurationFactory],
-          ignoreEnvFile: true,
+          ignoreEnvFile: false,
         }),
         DatabaseModule,
         CacheModule.register({ isGlobal: true }),
@@ -47,7 +37,7 @@ describe('Movies API (e2e)', () => {
           TMDB: {
             enable: true,
             apiKey: 'x',
-            rateLimitMs: 10,
+            rateLimitMs: 1,
           },
         }),
         FileStorageModule.forRoot(storageType, options, true),
