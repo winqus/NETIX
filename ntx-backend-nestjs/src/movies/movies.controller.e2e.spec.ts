@@ -49,7 +49,7 @@ describe('Movies API (e2e)', () => {
           TMDB: {
             enable: true,
             apiKey: 'x',
-            rateLimitMs: 10,
+            rateLimitMs: 1,
           },
         }),
         FileStorageModule.forRoot(storageType, options, true),
@@ -255,6 +255,8 @@ describe('Movies API (e2e)', () => {
 
       expect(putBackdropResponse.status).toBe(HttpStatus.OK);
       backdropID = putBackdropResponse.body.backdropID;
+
+      await delayByMs(100); /* delay to allow for file processing */
     });
 
     it('should return the backdrop when it exists', async () => {
