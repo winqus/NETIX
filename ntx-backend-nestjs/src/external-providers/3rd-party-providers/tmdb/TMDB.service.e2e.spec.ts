@@ -1,5 +1,4 @@
 import { ConsoleLogger, Logger } from '@nestjs/common';
-import { ConfigFactory } from '@nestjs/config';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { Test } from '@nestjs/testing';
 import { TEST_DATA_DIRECTORY, TEST_DIRECTORY } from '@ntx-test/constants';
@@ -23,10 +22,6 @@ describe('TMDBService with TMDB API calls for titles', () => {
   let cacheFilePath;
   let cacheFetch: JestCacheFetch;
   const logger: Logger = ENABLE_LOGGER ? (new ConsoleLogger('TMDBService') as any) : loggerMock;
-
-  const testConfigurationFactory: ConfigFactory = () => ({
-    // Nothing for now
-  });
 
   /********************************************************************************************************************
     Test Case(s)
@@ -80,7 +75,7 @@ describe('TMDBService with TMDB API calls for titles', () => {
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
-          load: [testConfigurationFactory],
+          ignoreEnvFile: false,
         }),
       ],
     }).compile();

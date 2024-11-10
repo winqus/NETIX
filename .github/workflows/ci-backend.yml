@@ -15,6 +15,31 @@ jobs:
     name: NestJS BE APP Build and Test
     runs-on: ubuntu-20.04
     timeout-minutes: 15
+    environment: Development
+
+    services:
+      redis:
+        image: redis:7.2.4-bookworm
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+      
+      mongodb:
+        image: mongo:4.4.16
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27018:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: user_m1
+          MONGO_INITDB_ROOT_PASSWORD: pass_m1
 
     concurrency:
       group: backend-ci-${{ github.ref }}
@@ -27,6 +52,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: 'Create .env file'
+        working-directory: ntx-backend-nestjs
+        run: |
+          touch .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo MONGODB_URI='${{ vars.MONGODB_URI }}' >> .env
+          echo TMDB_API_KEY='${{ secrets.TMDB_API_KEY }}' >> .env
+          echo REDIS_HOST='${{ vars.REDIS_HOST }}' >> .env
+          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> .env
+          echo REDIS_PASSWORD='${{ vars.REDIS_PASSWORD }}' >> .env
+          echo CLIENT_ORIGIN_URL='${{ vars.CLIENT_ORIGIN_URL }}' >> .env
+          echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
+          echo USE_MEMORY_MONGO=${{ vars.USE_MEMORY_MONGO }} >> .env
+          echo IN_MEMORY_MONGO_PORT=${{ vars.IN_MEMORY_MONGO_PORT }} >> .env
+          echo USE_MEMORY_REDIS=${{ vars.USE_MEMORY_REDIS }} >> .env
+          echo IN_MEMORY_REDIS_PORT=${{ vars.IN_MEMORY_REDIS_PORT }} >> .env
+          echo USE_TEMPORARY_FILE_STORAGE=${{ vars.USE_TEMPORARY_FILE_STORAGE }} >> .env
+          cat .env
 
       - name: Cache node modules
         id: cache-node-modules
