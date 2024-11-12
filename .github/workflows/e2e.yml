@@ -42,7 +42,7 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: pass_m1
 
     concurrency:
-      group: backend-ci-${{ github.ref }}
+      group: backend-e2e-${{ github.ref }}
       cancel-in-progress: true
 
     strategy:
@@ -110,7 +110,7 @@ jobs:
     timeout-minutes: 15
 
     concurrency:
-      group: frontend-ci-${{ github.ref }}
+      group: frontend-e2e-${{ github.ref }}
       cancel-in-progress: true
 
     strategy:
@@ -157,24 +157,46 @@ jobs:
       - name: Build
         working-directory: ntx-web-fe-angular
         run: npm run build -- --configuration production
-
-      - name: Install wait-on
-        run: npm install -g wait-on
       
       - name: Run install cypress
         working-directory: ntx-web-fe-angular
         run: npm install cypress --save-dev
 
-
       - name: Run start
         working-directory: ntx-web-fe-angular
         run: nohup npm run start
 
-      # - name: Wait for backend to be ready
-      #   run: wait-on http://[::1]:3055/api
-
       - name: Delay before wait-on
         run: sleep 5s
+
+      - name: Test backend availability
+        run: curl -I http://localhost:3055/api
+
+      - name: Run cypress e2e
+        working-directory: ntx-web-fe-angular
+        run: npm run cypress:run
+
+ e2e:
+    name: E2E
+    runs-on: ubuntu-20.04
+
+    timeout-minutes: 15
+
+    concurrency:
+      group: frontend-e2e-${{ github.ref }}
+      cancel-in-progress: true
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Run install cypress
+        working-directory: ntx-web-fe-angular
+        run: npm install cypress --save-dev
+
+      - name: Delay before wait-on
+        run: sleep 40s
 
       - name: Test backend availability
         run: curl -I http://localhost:3055/api
