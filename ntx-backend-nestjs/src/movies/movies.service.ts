@@ -15,6 +15,21 @@ import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_NO_ID_PROVIDED_ERROR, MOVIES_NOT_
 import { MoviesMapper } from './movies.mapper';
 import { MoviesRepository } from './movies.repository';
 
+export interface IMoviesService {
+  createOne(dto: CreateMovieDTO): Promise<MovieDTO>;
+  createOneWithPoster(dto: CreateMovieDTO, posterFile: FileInStorage): Promise<MovieDTO>;
+  updateOne(id: string, dto: UpdateMovieDTO): Promise<MovieDTO>;
+  updatePosterForOne(id: string, posterFile: FileInStorage): Promise<MovieDTO>;
+  updateBackdropForOne(id: string, backdropFile: FileInStorage): Promise<MovieDTO>;
+  updateVideoForOne(id: string, videoFile: FileInStorage): Promise<MovieDTO>;
+  findOne(id: string): Promise<MovieDTO>;
+  findAll(): Promise<MovieDTO[]>;
+  findAllByName(name: string): Promise<MovieSearchResultDTO[]>;
+  publishOne(id: string): Promise<MovieDTO>;
+  unpublishOne(id: string): Promise<MovieDTO>;
+  deleteOne(id: string): Promise<void>;
+}
+
 @Injectable()
 export class MoviesService {
   private readonly logger = new Logger(this.constructor.name);
