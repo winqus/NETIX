@@ -107,7 +107,6 @@ jobs:
   frontend:
     name: Angular FE APP Build and Test
     runs-on: ubuntu-20.04
-    needs: backend
     timeout-minutes: 15
 
     concurrency:
@@ -175,4 +174,12 @@ jobs:
 
       - name: Run cypress e2e
         working-directory: ntx-web-fe-angular
-        run: npm run cypress:run 
+        run: npm run cypress:run
+
+      # - name: Stop backend server
+      #   run: |
+      #     fuser -k 3055/tcp || echo "Backend not running"
+
+      # - name: Stop frontend server
+      #   run: |
+      #     fuser -k 4200/tcp || echo "Frontend not running" 
