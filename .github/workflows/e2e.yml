@@ -176,7 +176,7 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: npm run cypress:run
 
- e2e:
+  e2e:
     name: E2E
     runs-on: ubuntu-20.04
 
