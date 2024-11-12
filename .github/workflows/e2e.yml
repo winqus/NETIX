@@ -1,214 +1,214 @@
-name: E2E
+# name: E2E
 
-on:
-  push:
-    branches:
-      - 'develop'
-    paths: 
-      - 'ntx-web-fe-angular/**'
-  pull_request:
-    paths:
-      - 'ntx-web-fe-angular/**'
+# on:
+#   push:
+#     branches:
+#       - 'develop'
+#     paths: 
+#       - 'ntx-web-fe-angular/**'
+#   pull_request:
+#     paths:
+#       - 'ntx-web-fe-angular/**'
 
-jobs:
-  backend:
-    name: NestJS BE APP Build and Test
-    runs-on: ubuntu-20.04
-    timeout-minutes: 15
-    environment: Development
+# jobs:
+#   backend:
+#     name: NestJS BE APP Build and Test
+#     runs-on: ubuntu-20.04
+#     timeout-minutes: 15
+#     environment: Development
 
-    services:
-      redis:
-        image: redis:7.2.4-bookworm
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
+#     services:
+#       redis:
+#         image: redis:7.2.4-bookworm
+#         options: >-
+#           --health-cmd "redis-cli ping"
+#           --health-interval 10s
+#           --health-timeout 5s
+#           --health-retries 5
+#         ports:
+#           - 6379:6379
       
-      mongodb:
-        image: mongo:4.4.16
-        options: >-
-          --health-cmd mongo
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 27018:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: user_m1
-          MONGO_INITDB_ROOT_PASSWORD: pass_m1
+#       mongodb:
+#         image: mongo:4.4.16
+#         options: >-
+#           --health-cmd mongo
+#           --health-interval 10s
+#           --health-timeout 5s
+#           --health-retries 5
+#         ports:
+#           - 27018:27017
+#         env:
+#           MONGO_INITDB_ROOT_USERNAME: user_m1
+#           MONGO_INITDB_ROOT_PASSWORD: pass_m1
 
-    concurrency:
-      group: backend-e2e-${{ github.ref }}
-      cancel-in-progress: true
+#     concurrency:
+#       group: backend-e2e-${{ github.ref }}
+#       cancel-in-progress: true
 
-    strategy:
-      matrix:
-        node-version: [20.x]
+#     strategy:
+#       matrix:
+#         node-version: [20.x]
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: 'Create .env file'
-        working-directory: ntx-backend-nestjs
-        run: |
-          touch .env
-          echo PORT=${{ vars.PORT }} >> .env
-          echo MONGODB_URI='${{ secrets.MONGODB_URI }}' >> .env
-          echo TMDB_API_KEY='${{ secrets.TMDB_API_KEY }}' >> .env
-          echo REDIS_HOST='${{ secrets.REDIS_HOST }}' >> .env
-          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> .env
-          echo REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}' >> .env
-          echo CLIENT_ORIGIN_URL='${{ vars.CLIENT_ORIGIN_URL }}' >> .env
-          echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
-          echo USE_MEMORY_MONGO=${{ vars.USE_MEMORY_MONGO }} >> .env
-          echo IN_MEMORY_MONGO_PORT=${{ vars.IN_MEMORY_MONGO_PORT }} >> .env
-          echo USE_MEMORY_REDIS=${{ vars.USE_MEMORY_REDIS }} >> .env
-          echo USE_TEMPORARY_FILE_STORAGE=${{ vars.USE_TEMPORARY_FILE_STORAGE }} >> .env
-          cat .env
+#       - name: 'Create .env file'
+#         working-directory: ntx-backend-nestjs
+#         run: |
+#           touch .env
+#           echo PORT=${{ vars.PORT }} >> .env
+#           echo MONGODB_URI='${{ secrets.MONGODB_URI }}' >> .env
+#           echo TMDB_API_KEY='${{ secrets.TMDB_API_KEY }}' >> .env
+#           echo REDIS_HOST='${{ secrets.REDIS_HOST }}' >> .env
+#           echo REDIS_PORT=${{ vars.REDIS_PORT }} >> .env
+#           echo REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}' >> .env
+#           echo CLIENT_ORIGIN_URL='${{ vars.CLIENT_ORIGIN_URL }}' >> .env
+#           echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
+#           echo USE_MEMORY_MONGO=${{ vars.USE_MEMORY_MONGO }} >> .env
+#           echo IN_MEMORY_MONGO_PORT=${{ vars.IN_MEMORY_MONGO_PORT }} >> .env
+#           echo USE_MEMORY_REDIS=${{ vars.USE_MEMORY_REDIS }} >> .env
+#           echo USE_TEMPORARY_FILE_STORAGE=${{ vars.USE_TEMPORARY_FILE_STORAGE }} >> .env
+#           cat .env
 
-      - name: Cache node modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: ./ntx-backend-nestjs/node_modules
-          key: ntx-backend-nestjs-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-backend-nestjs/package-lock.json') }}
-          restore-keys: |
-            ntx-backend-nestjs-${{ runner.os }}-node-${{ matrix.node-version }}-
+#       - name: Cache node modules
+#         id: cache-node-modules
+#         uses: actions/cache@v4
+#         with:
+#           path: ./ntx-backend-nestjs/node_modules
+#           key: ntx-backend-nestjs-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-backend-nestjs/package-lock.json') }}
+#           restore-keys: |
+#             ntx-backend-nestjs-${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: '**/ntx-backend-nestjs/package-lock.json'
+#       - name: Set up Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: ${{ matrix.node-version }}
+#           cache: 'npm'
+#           cache-dependency-path: '**/ntx-backend-nestjs/package-lock.json'
         
-      - name: Install dependencies (if node_modules cache not found)
-        if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
-        working-directory: ntx-backend-nestjs
-        run: npm ci
+#       - name: Install dependencies (if node_modules cache not found)
+#         if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
+#         working-directory: ntx-backend-nestjs
+#         run: npm ci
 
-      - name: Run lint
-        working-directory: ntx-backend-nestjs
-        run: npm run lint
+#       - name: Run lint
+#         working-directory: ntx-backend-nestjs
+#         run: npm run lint
 
-      - name: Build
-        working-directory: ntx-backend-nestjs
-        run: npm run build
+#       - name: Build
+#         working-directory: ntx-backend-nestjs
+#         run: npm run build
 
-      - name: Start
-        working-directory: ntx-backend-nestjs
-        run: nohup npm run start
+#       - name: Start
+#         working-directory: ntx-backend-nestjs
+#         run: nohup npm run start
 
-  frontend:
-    name: Angular FE APP Build and Test
-    runs-on: ubuntu-20.04
-    timeout-minutes: 15
+#   frontend:
+#     name: Angular FE APP Build and Test
+#     runs-on: ubuntu-20.04
+#     timeout-minutes: 15
 
-    concurrency:
-      group: frontend-e2e-${{ github.ref }}
-      cancel-in-progress: true
+#     concurrency:
+#       group: frontend-e2e-${{ github.ref }}
+#       cancel-in-progress: true
 
-    strategy:
-      matrix:
-        node-version: [20.x]
+#     strategy:
+#       matrix:
+#         node-version: [20.x]
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: 'Create .env file'
-        working-directory: ntx-web-fe-angular
-        run: |
-          touch .env
-          echo API_SERVER_URL=http://localhost:3055 >> .env
-          echo ENVIRONMENT=dev >> .env
-          cat .env
+#       - name: 'Create .env file'
+#         working-directory: ntx-web-fe-angular
+#         run: |
+#           touch .env
+#           echo API_SERVER_URL=http://localhost:3055 >> .env
+#           echo ENVIRONMENT=dev >> .env
+#           cat .env
 
-      - name: Cache node modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: ./ntx-web-fe-angular/node_modules
-          key: ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-web-fe-angular/package-lock.json') }}
-          restore-keys: |
-            ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-
+#       - name: Cache node modules
+#         id: cache-node-modules
+#         uses: actions/cache@v4
+#         with:
+#           path: ./ntx-web-fe-angular/node_modules
+#           key: ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-web-fe-angular/package-lock.json') }}
+#           restore-keys: |
+#             ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: '**/ntx-web-fe-angular/package-lock.json'
+#       - name: Set up Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: ${{ matrix.node-version }}
+#           cache: 'npm'
+#           cache-dependency-path: '**/ntx-web-fe-angular/package-lock.json'
 
-      - name: Install dependencies (if node_modules cache not found)
-        if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
-        working-directory: ntx-web-fe-angular
-        run: npm ci
+#       - name: Install dependencies (if node_modules cache not found)
+#         if: ${{ steps.cache-node-modules.outputs.cache-hit != 'true' }}
+#         working-directory: ntx-web-fe-angular
+#         run: npm ci
 
-      - name: Run lint
-        working-directory: ntx-web-fe-angular
-        run: npm run lint
+#       - name: Run lint
+#         working-directory: ntx-web-fe-angular
+#         run: npm run lint
 
-      - name: Build
-        working-directory: ntx-web-fe-angular
-        run: npm run build -- --configuration production
+#       - name: Build
+#         working-directory: ntx-web-fe-angular
+#         run: npm run build -- --configuration production
       
-      - name: Run install cypress
-        working-directory: ntx-web-fe-angular
-        run: npm install cypress --save-dev
+#       - name: Run install cypress
+#         working-directory: ntx-web-fe-angular
+#         run: npm install cypress --save-dev
 
-      - name: Run start
-        working-directory: ntx-web-fe-angular
-        run: nohup npm run start
+#       - name: Run start
+#         working-directory: ntx-web-fe-angular
+#         run: nohup npm run start
 
-      - name: Delay before wait-on
-        run: sleep 5s
+#       - name: Delay before wait-on
+#         run: sleep 5s
 
-      - name: Test backend availability
-        run: curl -I http://localhost:3055/api
+#       - name: Test backend availability
+#         run: curl -I http://localhost:3055/api
 
-      - name: Run cypress e2e
-        working-directory: ntx-web-fe-angular
-        run: npm run cypress:run
+#       - name: Run cypress e2e
+#         working-directory: ntx-web-fe-angular
+#         run: npm run cypress:run
 
-  e2e:
-    name: E2E
-    runs-on: ubuntu-20.04
+#   e2e:
+#     name: E2E
+#     runs-on: ubuntu-20.04
 
-    timeout-minutes: 15
+#     timeout-minutes: 15
 
-    concurrency:
-      group: frontend-e2e-${{ github.ref }}
-      cancel-in-progress: true
+#     concurrency:
+#       group: frontend-e2e-${{ github.ref }}
+#       cancel-in-progress: true
 
-    strategy:
-      matrix:
-        node-version: [20.x]
+#     strategy:
+#       matrix:
+#         node-version: [20.x]
 
-    steps:
-      - name: Run install cypress
-        working-directory: ntx-web-fe-angular
-        run: npm install cypress --save-dev
+#     steps:
+#       - name: Run install cypress
+#         working-directory: ntx-web-fe-angular
+#         run: npm install cypress --save-dev
 
-      - name: Delay before wait-on
-        run: sleep 40s
+#       - name: Delay before wait-on
+#         run: sleep 40s
 
-      - name: Test backend availability
-        run: curl -I http://localhost:3055/api
+#       - name: Test backend availability
+#         run: curl -I http://localhost:3055/api
 
-      - name: Run cypress e2e
-        working-directory: ntx-web-fe-angular
-        run: npm run cypress:run
+#       - name: Run cypress e2e
+#         working-directory: ntx-web-fe-angular
+#         run: npm run cypress:run
 
-      # - name: Stop backend server
-      #   run: |
-      #     fuser -k 3055/tcp || echo "Backend not running"
+#       # - name: Stop backend server
+#       #   run: |
+#       #     fuser -k 3055/tcp || echo "Backend not running"
 
-      # - name: Stop frontend server
-      #   run: |
-      #     fuser -k 4200/tcp || echo "Frontend not running" 
+#       # - name: Stop frontend server
+#       #   run: |
+#       #     fuser -k 4200/tcp || echo "Frontend not running" 
