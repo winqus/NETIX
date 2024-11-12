@@ -83,7 +83,7 @@ describe('TMDBMovieGatewayAPIv3', () => {
       const result = await gateway.search(options);
 
       expect(result).toBeNull();
-      expect(logger.error).toHaveBeenCalledWith('Failed to fetch movie data from TMDB API: Not Found');
+      expect(logger.error).toHaveBeenCalledWith('Failed to fetch movie data from TMDB API v3: Not Found');
     });
   });
 
