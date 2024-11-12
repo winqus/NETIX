@@ -7,12 +7,6 @@ import { FileInStorage } from '../types';
 import { FileStorageDataStore } from './file-storage-data-store.tus';
 import { FileStorageFileConfigStore } from './file-storage-file-config-store.tus';
 
-export interface ITUSUploadService {
-  getTusServer(args: UploadArgs): Server;
-  isTusRequest(req: Request): boolean;
-  handleUpload(args: UploadArgs, req: Request, res: any): Promise<FileInStorage | null>;
-}
-
 export type UploadArgs = {
   container: string;
   maxSize: number;

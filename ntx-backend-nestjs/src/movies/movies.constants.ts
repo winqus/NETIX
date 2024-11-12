@@ -47,9 +47,6 @@ export const MOVIES_SUMMARY_LENGTH_MAX = 1_000;
 export const MOVIES_RUNTIME_MINS_MIN = 0;
 export const MOVIES_RUNTIME_MINS_MAX = 12_000;
 
-export const MOVIES_SERVICE_TOKEN = Symbol('MOVIES_SERVICE');
-export const TUS_UPLOAD_SERVICE_TOKEN = Symbol('TUS_UPLOAD_SERVICE');
-
 /* Cache */
 export enum MOVIES_CACHE_KEY {
   GET_ALL = 'movies-get-all',

@@ -26,7 +26,7 @@ import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInt
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
 import { FileToStorageContainerInterceptor } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
-import { ITUSUploadService } from '@ntx/file-storage/tus/tus-upload.service';
+import { TusUploadService } from '@ntx/file-storage/tus/tus-upload.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
@@ -42,12 +42,10 @@ import {
   MOVIES_NO_ID_PROVIDED_ERROR,
   MOVIES_NOT_FOUND_ERROR,
   MOVIES_POSTER_FILE_STORAGE_ARGS,
-  MOVIES_SERVICE_TOKEN,
   MOVIES_SWAGGER_TAG,
   MOVIES_VIDEOS_FILE_STORAGE_ARGS,
-  TUS_UPLOAD_SERVICE_TOKEN,
 } from './movies.constants';
-import { IMoviesService } from './movies.service';
+import { MoviesService } from './movies.service';
 import {
   ApiDocsForDeleteMovie,
   ApiDocsForDeleteMoviePublished,
@@ -74,8 +72,8 @@ export class MoviesController {
 
   constructor(
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
-    @Inject(MOVIES_SERVICE_TOKEN) private readonly moviesSrv: IMoviesService,
-    @Inject(TUS_UPLOAD_SERVICE_TOKEN) private readonly tusUploadSrv: ITUSUploadService,
+    private readonly moviesSrv: MoviesService,
+    private readonly tusUploadSrv: TusUploadService,
   ) {}
 
   @Post()
