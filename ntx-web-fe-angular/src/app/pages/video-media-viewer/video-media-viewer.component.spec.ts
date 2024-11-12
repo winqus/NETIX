@@ -168,15 +168,15 @@ describe('VideoMediaViewerComponent', () => {
 
   describe('onMouseMove', () => {
     beforeEach(() => {
-      spyOn(component, 'seek');
+      spyOn(component, 'updateTimelinePosition');
       spyOn<any>(component, 'resetIdleTimer');
       component['idleTimerSubscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
     });
 
-    it('should call seek and resetIdleTimer', () => {
+    it('should call updateTimelinePosition and resetIdleTimer', () => {
       const event = new MouseEvent('mousemove');
       component.onMouseMove(event);
-      expect(component.seek).toHaveBeenCalledWith(event);
+      expect(component.updateTimelinePosition).toHaveBeenCalledWith(event);
       expect(component['resetIdleTimer']).toHaveBeenCalled();
     });
 
@@ -284,7 +284,7 @@ describe('VideoMediaViewerComponent', () => {
 
       jasmine.createSpy('formatTime').and.returnValue('00:00:00');
 
-      spyOn<any>(component, 'seek').and.callThrough();
+      spyOn<any>(component, 'updateTimelinePosition').and.callThrough();
 
       component.duration = 100;
     });
@@ -298,40 +298,42 @@ describe('VideoMediaViewerComponent', () => {
       component.isInTimeline = false;
     });
 
-    it('should set newTime and currentTooltipTime correctly within the 0-100% range', () => {
-      const event = { clientX: 60 } as MouseEvent;
+    describe('updateTimelinePosition method', () => {
+      it('should set newTime and currentTooltipTime correctly within the 0-100% range', () => {
+        const event = { clientX: 60 } as MouseEvent;
 
-      component['seek'](event);
+        component['updateTimelinePosition'](event);
 
-      const expectedProgress = ((event.clientX - 10) * 100) / 200;
-      const expectedNewTime = (expectedProgress * component.duration) / 100;
+        const expectedProgress = ((event.clientX - 10) * 100) / 200;
+        const expectedNewTime = (expectedProgress * component.duration) / 100;
 
-      expect(component.newTime).toBeCloseTo(expectedNewTime);
-      expect(component.currentTooltipTime).toBe(formatTime(expectedNewTime, true));
-    });
+        expect(component.newTime).toBeCloseTo(expectedNewTime);
+        expect(component.currentTooltipTime).toBe(formatTime(expectedNewTime, true));
+      });
 
-    it('should set tooltipPosition to rect.left when clientX is at the left edge', () => {
-      const event = { clientX: 10 } as MouseEvent;
+      it('should set tooltipPosition to rect.left when clientX is at the left edge', () => {
+        const event = { clientX: 10 } as MouseEvent;
 
-      component['seek'](event);
+        component['updateTimelinePosition'](event);
 
-      expect(component.tooltipPosition).toBe(10);
-    });
+        expect(component.tooltipPosition).toBe(10);
+      });
 
-    it('should set tooltipPosition to right edge when clientX is at the right edge', () => {
-      const event = { clientX: 210 } as MouseEvent;
+      it('should set tooltipPosition to right edge when clientX is at the right edge', () => {
+        const event = { clientX: 210 } as MouseEvent;
 
-      component['seek'](event);
+        component['updateTimelinePosition'](event);
 
-      expect(component.tooltipPosition).toBe(190);
-    });
+        expect(component.tooltipPosition).toBe(190);
+      });
 
-    it('should set tooltipPosition to centered value when clientX is within bounds', () => {
-      const event = { clientX: 100 } as MouseEvent;
+      it('should set tooltipPosition to centered value when clientX is within bounds', () => {
+        const event = { clientX: 100 } as MouseEvent;
 
-      component['seek'](event);
+        component['updateTimelinePosition'](event);
 
-      expect(component.tooltipPosition).toBe(90);
+        expect(component.tooltipPosition).toBe(90);
+      });
     });
 
     describe('onMouseDown', () => {
@@ -344,12 +346,12 @@ describe('VideoMediaViewerComponent', () => {
         expect(component.isDragging).toBeTrue();
       });
 
-      it('should call seek with the MouseEvent argument', () => {
+      it('should call updateTimelinePosition with the MouseEvent argument', () => {
         const event = new MouseEvent('mousedown');
 
         component.onMouseDown(event);
 
-        expect(component.seek).toHaveBeenCalledWith(event);
+        expect(component.updateTimelinePosition).toHaveBeenCalledWith(event);
       });
 
       it('should set currentTime to newTime', () => {
@@ -358,7 +360,7 @@ describe('VideoMediaViewerComponent', () => {
 
         component.onMouseDown(event);
 
-        expect(component.currentTime).toBe(100);
+        expect(component.currentTime).toBe(component.newTime);
       });
     });
 
@@ -372,12 +374,12 @@ describe('VideoMediaViewerComponent', () => {
         expect(component.isDragging).toBeFalse();
       });
 
-      it('should call seek with the MouseEvent argument', () => {
+      it('should call updateTimelinePosition with the MouseEvent argument', () => {
         const event = new MouseEvent('mouseup');
 
         component.onMouseUp(event);
 
-        expect(component.seek).toHaveBeenCalledWith(event);
+        expect(component.updateTimelinePosition).toHaveBeenCalledWith(event);
       });
 
       it('should set player currentTime to currentTime', () => {
@@ -410,12 +412,12 @@ describe('VideoMediaViewerComponent', () => {
         expect(component.isInTimeline).toBeFalse();
       });
 
-      it('should call seek with the MouseEvent argument', () => {
+      it('should call updateTimelinePosition with the MouseEvent argument', () => {
         const event = new MouseEvent('mouseleave');
 
         component.onMouseLeave(event);
 
-        expect(component.seek).toHaveBeenCalledWith(event);
+        expect(component.updateTimelinePosition).toHaveBeenCalledWith(event);
       });
     });
 
@@ -435,7 +437,7 @@ describe('VideoMediaViewerComponent', () => {
         expect(component.isInTimeline).toBeTrue();
       });
 
-      it('should call seek with the first touch point if touches are present', () => {
+      it('should call updateTimelinePosition with the first touch point if touches are present', () => {
         const touch = new Touch({
           identifier: 0,
           target: document.createElement('div'),
@@ -446,7 +448,7 @@ describe('VideoMediaViewerComponent', () => {
 
         component.onTouchStart(event);
 
-        expect(component['seek']).toHaveBeenCalledWith(touch);
+        expect(component['updateTimelinePosition']).toHaveBeenCalledWith(touch);
       });
     });
 
@@ -466,7 +468,7 @@ describe('VideoMediaViewerComponent', () => {
         expect(component.isInTimeline).toBeTrue();
       });
 
-      it('should call seek with the first touch point if touches are present', () => {
+      it('should call updateTimelinePosition with the first touch point if touches are present', () => {
         const touch = new Touch({
           identifier: 0,
           target: document.createElement('div'),
@@ -477,7 +479,7 @@ describe('VideoMediaViewerComponent', () => {
 
         component.onTouchMove(event);
 
-        expect(component['seek']).toHaveBeenCalledWith(touch);
+        expect(component['updateTimelinePosition']).toHaveBeenCalledWith(touch);
       });
     });
 
@@ -497,7 +499,7 @@ describe('VideoMediaViewerComponent', () => {
         expect(component.isInTimeline).toBeFalse();
       });
 
-      it('should call seek with the first touch point if touches are present', () => {
+      it('should call updateTimelinePosition with the first touch point if touches are present', () => {
         const touch = new Touch({
           identifier: 0,
           target: document.createElement('div'),
@@ -508,7 +510,7 @@ describe('VideoMediaViewerComponent', () => {
 
         component.onTouchEnd(event);
 
-        expect(component['seek']).toHaveBeenCalledWith(touch);
+        expect(component['updateTimelinePosition']).toHaveBeenCalledWith(touch);
       });
 
       it('should set player currentTime to currentTime', () => {
@@ -551,10 +553,10 @@ describe('VideoMediaViewerComponent', () => {
   describe('onTouch', () => {
     beforeEach(() => {
       spyOn(component, 'toggleFullscreen');
-      spyOn<any>(component, 'seek').and.callThrough();
+      spyOn<any>(component, 'updateTimelinePosition').and.callThrough();
     });
 
-    it('should call seek with the TouchEvent', () => {
+    it('should call updateTimelinePosition with the TouchEvent', () => {
       const touch = new Touch({
         identifier: 0,
         target: document.createElement('div'),
@@ -565,7 +567,7 @@ describe('VideoMediaViewerComponent', () => {
 
       component.onTouch(event);
 
-      expect(component['seek']).toHaveBeenCalledWith(event);
+      expect(component['updateTimelinePosition']).toHaveBeenCalledWith(event);
     });
 
     it('should call toggleFullscreen if touch is within 300ms', () => {

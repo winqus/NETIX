@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, Subscription, debounceTime, firstValueFrom, fromEvent, map, timer } from 'rxjs';
+import { BehaviorSubject, Subscription, debounceTime, filter, firstValueFrom, fromEvent, map, timer } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from '@ntx-shared/services/layout.service';
 import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { formatTime } from '@ntx-shared/services/utils/utils';
-import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
 
 @Component({
   selector: 'app-video-media-viewer',
@@ -23,11 +23,10 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   @ViewChild('thumbTooltip', { static: false }) thumbTooltip!: ElementRef<HTMLElement>;
 
   player!: Player;
-
   mediaData?: MovieDTO;
   streamID: string | null = null;
 
-  private options = {
+  private readonly options = {
     fill: true,
     responsive: true,
     autoplay: true,
@@ -54,10 +53,9 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   isMobile: boolean = false;
 
   constructor(
-    private router: Router,
-
-    private activeRoute: ActivatedRoute,
-    private layoutService: LayoutService
+    private readonly router: Router,
+    private readonly activeRoute: ActivatedRoute,
+    private readonly layoutService: LayoutService
   ) {
     this.resizeSubscription = fromEvent(window, 'resize')
       .pipe(
@@ -71,22 +69,20 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   async ngOnInit(): Promise<void> {
-    await this.getStreamID();
+    await this.loadVideoStreamID();
     this.setupPlayer();
 
     this.isMobile = this.checkScreenSize();
     this.setupActivityTracker();
   }
 
-  private async getStreamID(): Promise<void> {
+  private async loadVideoStreamID(): Promise<void> {
     const params = await firstValueFrom(this.activeRoute.paramMap);
     this.streamID = params!.get('uuid');
 
     if (this.streamID) {
       this.mediaData = history.state.data as MovieDTO;
       this.videoTitle = this.mediaData?.name || 'No title available';
-
-      console.log('streamID', this.streamID);
 
       this.options.sources[0].src = `/api/v1/stream/${this.streamID}/`;
     }
@@ -128,11 +124,9 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    switch (event.key) {
-      case ' ':
-        event.preventDefault();
-        this.togglePlay();
-        break;
+    if (event.key == ' ') {
+      event.preventDefault();
+      this.togglePlay();
     }
   }
 
@@ -141,7 +135,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     if (event.button != 0) {
       return;
     }
-    // Prevent double click from triggering this twice
+
     const currentTime = new Date().getTime();
     if (currentTime - (this.lastClickTime || 0) < 300) {
       return;
@@ -166,7 +160,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    this.seek(event);
+    this.updateTimelinePosition(event);
 
     this.controlsVisible = true;
     if (this.idleTimerSubscription) {
@@ -181,12 +175,13 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private resetIdleTimer() {
-    const idleTimer = timer(this.idleThreshold);
-    this.idleTimerSubscription = idleTimer.subscribe(() => {
-      if (!this.isPlaying() && !this.isMobile) {
+    this.idleTimerSubscription?.unsubscribe();
+
+    this.idleTimerSubscription = timer(this.idleThreshold)
+      .pipe(filter(() => !this.isPlaying() && !this.isMobile))
+      .subscribe(() => {
         this.controlsVisible = false;
-      }
-    });
+      });
   }
 
   goBack() {
@@ -199,33 +194,36 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     if ('maxTouchPoints' in navigator) {
       hasTouchScreen = navigator.maxTouchPoints > 0;
     }
-    // if (window.innerWidth <= 768) {
-    //   return true;
-    // }
 
-    // console.log(hasTouchScreen);
     this.layoutService.setIsMobile(hasTouchScreen);
     return hasTouchScreen;
   }
 
   lastTouchTime!: number;
-  onTouch(event: TouchEvent) {
-    this.seek(event);
-    const currentTime = new Date().getTime();
-    if (currentTime - (this.lastTouchTime || 0) < 300) {
+  onTouch(event: TouchEvent): void {
+    this.updateTimelinePosition(event as TouchEvent);
+
+    const currentTime = Date.now();
+    if (this.isDoubleTap(currentTime)) {
       this.toggleFullscreen();
       this.resetLastTouchTimeout();
     } else {
-      // It's a single touch, potentially
-      this.lastTouchTime = currentTime;
-      this.setSingleTouchTimeout(currentTime);
+      this.handleSingleTouch(currentTime);
     }
+  }
+
+  private isDoubleTap(currentTime: number): boolean {
+    return currentTime - (this.lastTouchTime || 0) < 300;
+  }
+
+  private handleSingleTouch(currentTime: number): void {
+    this.lastTouchTime = currentTime;
+    this.setSingleTouchTimeout(currentTime);
   }
 
   private setSingleTouchTimeout(time: number) {
     setTimeout(() => {
       if (time === this.lastTouchTime) {
-        // No subsequent touch has occurred
         this.controlsVisible = !this.controlsVisible;
       }
     }, 300);
@@ -271,11 +269,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   isMuted(): boolean {
-    if (this.player) {
-      return this.player.muted() || false;
-    }
-
-    return false;
+    return this.player?.muted() || false;
   }
 
   changeVolume(): void {
@@ -294,10 +288,6 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     if (!event.relatedTarget || !(event.relatedTarget as Element).classList.contains('slider')) {
       this.sliderVisible = false;
     }
-  }
-
-  keepSliderVisible(): void {
-    this.sliderVisible = true;
   }
 
   // * FULLSCREEN
@@ -333,23 +323,14 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   previewBufferedProgress(): string {
-    if (this.isDragging) {
+    if (this.isDragging || !this.duration) {
       return '0%';
     }
 
-    const duration = this.duration ?? 0;
-    const currentTime = this.currentTime ?? 0;
+    const duration = this.duration;
+    const progressTime = this.isInTimeline ? this.newTime : this.player?.bufferedEnd() ?? 0;
 
-    if (this.isInTimeline) {
-      return this.calculatePercentage(this.newTime, duration);
-    } else {
-      const passedPercent = currentTime / duration;
-      let bufferedEnd = 0;
-      if (this.player != undefined) {
-        bufferedEnd = this.player.bufferedEnd();
-      }
-      return this.calculatePercentage(passedPercent + bufferedEnd, duration);
-    }
+    return this.calculatePercentage(progressTime, duration);
   }
 
   mediaProgress(): string {
@@ -371,14 +352,14 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
   // * TIMELINE FOR DESKTOP
   onMouseDown(event: MouseEvent): void {
     this.isDragging = true;
-    this.seek(event);
+    this.updateTimelinePosition(event);
     this.currentTime = this.newTime;
   }
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     this.isDragging = false;
-    this.seek(event);
+    this.updateTimelinePosition(event);
     this.player.currentTime(this.currentTime);
   }
 
@@ -388,7 +369,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
 
   onMouseLeave(event: MouseEvent): void {
     this.isInTimeline = false;
-    this.seek(event);
+    this.updateTimelinePosition(event);
   }
 
   @HostListener('document:mouseout', ['$event'])
@@ -402,26 +383,32 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     return event.clientX <= 0 || event.clientX >= window.innerWidth || event.clientY <= 0 || event.clientY >= window.innerHeight;
   }
 
-  seek(event: any): void {
+  updateTimelinePosition(event: any): void {
     const clientX = event.clientX;
 
     const rect = this.videoTimeline.nativeElement.getBoundingClientRect();
     const toolTipRect = this.thumbTooltip.nativeElement.getBoundingClientRect();
 
     const newProgress = ((clientX - rect.left) * 100) / rect.width;
-    if (newProgress >= 0 && newProgress <= 100 && this.duration != undefined) {
-      this.newTime = (newProgress * this.duration) / 100;
-      this.currentTooltipTime = formatTime(this.newTime, true);
+    const clampedProgress = Math.max(0, Math.min(100, newProgress));
 
-      if (clientX <= toolTipRect.width / 2 + rect.left) {
-        this.tooltipPosition = rect.left;
-      } else if (clientX >= rect.width - toolTipRect.width / 2 + rect.left) {
-        this.tooltipPosition = rect.width - toolTipRect.width + rect.left;
-      } else {
-        this.tooltipPosition = clientX - toolTipRect.width / 2;
-      }
-    }
+    this.newTime = (clampedProgress * this.duration) / 100;
+    this.currentTooltipTime = formatTime(this.newTime, true);
+
+    this.tooltipPosition = this.calculateTooltipPosition(clientX, rect, toolTipRect);
   }
+
+  private calculateTooltipPosition(clientX: number, rect: DOMRect, toolTipRect: DOMRect): number {
+    const halfTooltipWidth = toolTipRect.width / 2;
+    const minPosition = rect.left;
+    const maxPosition = rect.left + rect.width - toolTipRect.width;
+
+    let tooltipPosition = clientX - halfTooltipWidth;
+    tooltipPosition = Math.max(minPosition, Math.min(maxPosition, tooltipPosition));
+
+    return tooltipPosition;
+  }
+
   // * TIMELINE FOR MOBILE
   onTouchStart(event: TouchEvent) {
     this.isDragging = true;
@@ -429,7 +416,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     if (event.touches.length > 0) {
       const touch = event.touches[0];
 
-      this.seek(touch);
+      this.updateTimelinePosition(touch);
     }
   }
 
@@ -438,7 +425,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     this.isInTimeline = true;
     if (event.touches.length > 0) {
       const touch = event.touches[0];
-      this.seek(touch);
+      this.updateTimelinePosition(touch);
     }
   }
 
@@ -447,7 +434,7 @@ export class VideoMediaViewerComponent implements OnInit, OnDestroy, AfterViewIn
     this.isInTimeline = false;
     if (event.touches.length > 0) {
       const touch = event.touches[0];
-      this.seek(touch);
+      this.updateTimelinePosition(touch);
     }
     this.player.currentTime(this.currentTime);
   }
