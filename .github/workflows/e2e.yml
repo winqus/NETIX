@@ -103,6 +103,7 @@ jobs:
   frontend:
     name: Angular FE APP Build and Test
     runs-on: ubuntu-20.04
+    needs: backend
     timeout-minutes: 15
 
     concurrency:
@@ -154,9 +155,9 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: npm run build -- --configuration production
 
-      - name: Run start with env
+      - name: Run start
         working-directory: ntx-web-fe-angular
-        run: npm run start-with-env
+        run: npm run start
 
       - name: Run install cypress
         working-directory: ntx-web-fe-angular

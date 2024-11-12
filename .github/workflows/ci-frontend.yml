@@ -60,3 +60,7 @@ jobs:
       - name: Run tests
         working-directory: ntx-web-fe-angular
         run: npm run test-ci
+
+      - name: Run coverage
+        working-directory: ntx-web-fe-angular
+        run: ng test --no-watch --code-coverage
