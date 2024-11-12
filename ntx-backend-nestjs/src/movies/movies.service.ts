@@ -1,9 +1,9 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { FileInStorage } from '@ntx/file-storage/types';
-import { BackDropService } from '@ntx/images/backdrop.service';
+import { BackdropsService } from '@ntx/images/backdrops.service';
 import { PosterSize } from '@ntx/images/images.types';
-import { PosterService } from '@ntx/images/poster.service';
+import { PostersService } from '@ntx/images/posters.service';
 import { VideosService } from '@ntx/videos/videos.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
@@ -21,9 +21,9 @@ export class MoviesService {
 
   constructor(
     private readonly moviesRepo: MoviesRepository,
-    private readonly posterSrv: PosterService,
-    private readonly backdropSrv: BackDropService,
-    private readonly videoSrv: VideosService,
+    private readonly postersSrv: PostersService,
+    private readonly backdropsSrv: BackdropsService,
+    private readonly videosSrv: VideosService,
   ) {}
 
   public async createOne(dto: CreateMovieDTO): Promise<MovieDTO> {
@@ -79,7 +79,7 @@ export class MoviesService {
         throw new ConflictException(`Movie with these contents already exists`);
       }
 
-      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
+      const posterID = await this.postersSrv.addCreatePosterJob(posterFile);
 
       const newMovie = await Movie.create({
         posterID: posterID,
@@ -145,7 +145,7 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
+      const posterID = await this.postersSrv.addCreatePosterJob(posterFile);
 
       movie.posterID = posterID;
       await this.moviesRepo.updateOneByUUID(id, movie);
@@ -172,7 +172,7 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      const backdropID = await this.backdropSrv.addCreateBackdropJob(backdropFile);
+      const backdropID = await this.backdropsSrv.addCreateBackdropJob(backdropFile);
 
       movie.backdropID = backdropID;
       await this.moviesRepo.updateOneByUUID(id, movie);
@@ -200,13 +200,13 @@ export class MoviesService {
       }
 
       if (movie.videoID) {
-        await this.videoSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
+        await this.videosSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
           this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
         });
       }
 
       const videoName = `${movie.name} ${movie.originallyReleasedAt.getFullYear()}`;
-      const video = await this.videoSrv.createOneFromFile(videoName, videoFile);
+      const video = await this.videosSrv.createOneFromFile(videoName, videoFile);
 
       movie.videoID = video.uuid;
       await this.moviesRepo.updateOneByUUID(id, movie);
@@ -332,19 +332,19 @@ export class MoviesService {
       }
 
       if (movie.videoID) {
-        await this.videoSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
+        await this.videosSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
           this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
         });
       }
 
       if (movie.posterID) {
-        this.posterSrv.deleteOne(movie.posterID).catch((error) => {
+        this.postersSrv.deleteOne(movie.posterID).catch((error) => {
           this.logger.error(`Failed to delete poster (${movie.posterID}): ${error.message}`);
         });
       }
 
       if (movie.backdropID) {
-        this.backdropSrv.deleteOne(movie.backdropID).catch((error) => {
+        this.backdropsSrv.deleteOne(movie.backdropID).catch((error) => {
           this.logger.error(`Failed to delete backdrop (${movie.backdropID}): ${error.message}`);
         });
       }

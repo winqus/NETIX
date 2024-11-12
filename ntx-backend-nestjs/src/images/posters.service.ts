@@ -17,7 +17,7 @@ import { CreatePosterQueue } from './queues/create-poster.types';
 import { makePosterFileName } from './utils/images.utils';
 
 @Injectable()
-export class PosterService {
+export class PostersService {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
