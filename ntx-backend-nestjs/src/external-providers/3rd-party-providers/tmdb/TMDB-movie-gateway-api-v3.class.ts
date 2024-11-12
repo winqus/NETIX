@@ -10,6 +10,8 @@ import { TMDBConfig } from './TMDB.service';
 const MAX_RESULT_PAGES_TO_SEARCH_THROUGH = 5;
 const TMDB_API_SEARCH_MOVIE_ROUTE = `${TMDB_API_V3_BASE_URL}/search/movie`;
 const TMDB_API_MOVIE_DETAILS_ROUTE = `${TMDB_API_V3_BASE_URL}/movie`;
+const DEFAULT_LANGUAGE = 'en-US';
+const DEFAULT_INCLUDE_ADULT = 'false';
 
 export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
   constructor(
@@ -22,7 +24,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
   }
 
   public async search(options: TMDBMovieSearchOptions): Promise<TMDBSearchResult<TMDBMovie>[] | null> {
-    const { query, year, language = 'en-US', include_adult = 'false' } = options;
+    const { query, year, language = DEFAULT_LANGUAGE, include_adult = DEFAULT_INCLUDE_ADULT } = options;
 
     if (!query?.trim()) {
       this.logger.error('Movie query is empty or null');
@@ -31,15 +33,14 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
     }
 
     const allResults: TMDBSearchResult<TMDBMovie>[] = [];
-    let currentPage = 1;
     let totalPages = 1;
 
-    while (currentPage <= totalPages && currentPage <= MAX_RESULT_PAGES_TO_SEARCH_THROUGH) {
+    for (let page = 1; page <= totalPages; page++) {
       const params = new URLSearchParams({
         query: encodeURIComponent(query),
         include_adult,
         language,
-        page: currentPage.toString(),
+        page: page.toString(),
       });
 
       if (year) {
@@ -63,9 +64,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
         break;
       }
 
-      const filteredResults = data.results.filter(
-        (movie) => 'popularity' in movie && 'release_date' in movie && movie.release_date.length > 0,
-      );
+      const filteredResults = this.filterValidTMDBMovieResults(data.results);
 
       allResults.push({
         page: data.page,
@@ -74,8 +73,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
         total_results: data.total_results,
       });
 
-      totalPages = data.total_pages;
-      currentPage++;
+      totalPages = Math.min(data.total_pages, MAX_RESULT_PAGES_TO_SEARCH_THROUGH);
       await delayByMs(10);
     }
 
@@ -134,5 +132,9 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
 
       return null;
     }
+  }
+
+  private filterValidTMDBMovieResults(movies: any[]): TMDBMovie[] {
+    return movies.filter((movie) => 'popularity' in movie && 'release_date' in movie && movie.release_date.length > 0);
   }
 }
