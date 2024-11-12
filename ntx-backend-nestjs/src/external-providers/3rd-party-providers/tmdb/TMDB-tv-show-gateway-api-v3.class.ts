@@ -37,56 +37,60 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
       return null;
     }
 
-    const data = await response.json();
+    return response.json();
+  }
 
-    return data;
+  private buildSearchParams(options: TMDBTVShowSearchOptions, currentPage: number): URLSearchParams {
+    const params = new URLSearchParams();
+    params.append('query', encodeURIComponent(options.query));
+    params.append('include_adult', options.include_adult || 'false');
+    params.append('language', options.language || 'en-US');
+    params.append('page', currentPage.toString());
+
+    if (options.year) {
+      params.append('first_air_date_year', options.year);
+    }
+
+    return params;
+  }
+
+  private async fetchSearchPage(params: URLSearchParams): Promise<TMDBSearchResult<TMDBTVShow> | null> {
+    const url = `${TMDB_API_SEARCH_TV_SHOW_ROUTE}?${params.toString()}`;
+
+    return await this._makeApiRequest<TMDBSearchResult<TMDBTVShow>>(url, 'TV show');
+  }
+
+  private filterValidResults(data: TMDBSearchResult<TMDBTVShow>): TMDBTVShow[] {
+    return data.results.filter(
+      (tv_show) => 'popularity' in tv_show && 'first_air_date' in tv_show && tv_show.first_air_date.length > 0,
+    );
   }
 
   public async search(options: TMDBTVShowSearchOptions): Promise<TMDBSearchResult<TMDBTVShow>[] | null> {
-    const query = options.query;
-    if (!query) {
+    if (!options.query) {
       this.logger.error('TV Show query is empty or null');
 
       return null;
     }
-
-    const language = options.language || 'en-US';
-    const include_adult = options.include_adult || 'false';
-    const year = options.year;
 
     const allResults: TMDBSearchResult<TMDBTVShow>[] = [];
     let currentPage = 1;
     let totalPages = 1;
 
     while (currentPage <= totalPages && currentPage <= MAX_RESULT_PAGES_TO_SEARCH_THROUGH) {
-      const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(query));
-      params.append('include_adult', include_adult);
-      params.append('language', language);
-      params.append('page', currentPage.toString());
-      if (year != null && year !== '') {
-        params.append('first_air_date_year', year);
-      }
+      const params = this.buildSearchParams(options, currentPage);
+      const data = await this.fetchSearchPage(params);
 
-      const url = `${TMDB_API_SEARCH_TV_SHOW_ROUTE}?${params.toString()}`;
-
-      const data = await this._makeApiRequest<TMDBSearchResult<TMDBTVShow>>(url, 'TV show');
-      if (data == null) {
-        return null;
-      }
-      if (!('results' in data)) {
+      if (!data || !data.results) {
         this.logger.error('No TV show results in data from TMDB API');
 
         return null;
       }
 
-      if (data.results.length === 0) {
+      const filteredResults = this.filterValidResults(data);
+      if (filteredResults.length === 0) {
         break;
       }
-
-      const filteredResults = data.results.filter(
-        (tv_show) => 'popularity' in tv_show && 'first_air_date' in tv_show && tv_show.first_air_date.length > 0,
-      );
 
       allResults.push({
         page: data.page,
@@ -112,14 +116,10 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
 
     const params = new URLSearchParams();
     params.append('language', 'en-US');
-
     const url = `${TMDB_API_TV_SHOW_DETAILS_ROUTE}/${tvShowID}?${params.toString()}`;
 
     const data = await this._makeApiRequest<TMDBTVShowDetails>(url, 'TV Show');
-    if (data == null) {
-      return null;
-    }
-    if (!('id' in data)) {
+    if (!data || !('id' in data)) {
       this.logger.error('No TV Show results in data from TMDB API');
 
       return null;
