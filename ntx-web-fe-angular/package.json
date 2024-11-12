@@ -9,7 +9,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test-ci": "npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox",
+    "test-ci": "npm run test -- --watch=false --no-progress --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
