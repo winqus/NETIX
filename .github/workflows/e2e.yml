@@ -160,17 +160,24 @@ jobs:
 
       - name: Install wait-on
         run: npm install -g wait-on
+      
+      - name: Run install cypress
+        working-directory: ntx-web-fe-angular
+        run: npm install cypress --save-dev
 
-      - name: Wait for backend to be ready
-        run: wait-on http://[::1]:3055/api
 
       - name: Run start
         working-directory: ntx-web-fe-angular
         run: nohup npm run start
 
-      - name: Run install cypress
-        working-directory: ntx-web-fe-angular
-        run: npm install cypress --save-dev
+      # - name: Wait for backend to be ready
+      #   run: wait-on http://[::1]:3055/api
+
+      - name: Delay before wait-on
+        run: sleep 5s
+
+      - name: Test backend availability
+        run: curl -I http://localhost:3055/api
 
       - name: Run cypress e2e
         working-directory: ntx-web-fe-angular
