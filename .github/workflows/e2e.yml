@@ -162,7 +162,7 @@ jobs:
         run: npm install -g wait-on
 
       - name: Wait for backend to be ready
-        run: wait-on http://localhost:3055/api
+        run: wait-on http://[::1]:3055/api
 
       - name: Run start
         working-directory: ntx-web-fe-angular
