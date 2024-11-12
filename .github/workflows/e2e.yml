@@ -156,7 +156,7 @@ jobs:
 
       - name: Run start with env
         working-directory: ntx-web-fe-angular
-        run: npm run start-with-env & wait-on http://localhost:3055
+        run: npm run start-with-env
 
       - name: Run install cypress
         working-directory: ntx-web-fe-angular
