@@ -100,6 +100,10 @@ jobs:
         working-directory: ntx-backend-nestjs
         run: npm run build
 
+      - name: Start
+        working-directory: ntx-backend-nestjs
+        run: nohup npm run start
+
   frontend:
     name: Angular FE APP Build and Test
     runs-on: ubuntu-20.04
@@ -155,9 +159,15 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: npm run build -- --configuration production
 
+      - name: Install wait-on
+        run: npm install -g wait-on
+
+      - name: Wait for backend to be ready
+        run: wait-on http://localhost:3055
+
       - name: Run start
         working-directory: ntx-web-fe-angular
-        run: npm run start
+        run: nohup npm run start
 
       - name: Run install cypress
         working-directory: ntx-web-fe-angular
