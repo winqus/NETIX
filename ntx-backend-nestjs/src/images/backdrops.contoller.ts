@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { Response } from 'express';
-import { BackDropService } from './backdrop.service';
+import { BackdropsService } from './backdrops.service';
 import {
   BACKDROP_CACHE_CONTROL_HEADER_VAL,
   BACKDROP_CONTROLLER_BASE_PATH,
@@ -36,7 +36,7 @@ import { makeBackdropFileName } from './utils/images.utils';
 export class BackdropsController {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly backdropSrv: BackDropService) {}
+  constructor(private readonly backdropsSrv: BackdropsService) {}
 
   @Get(':id')
   @ApiDocsForGetBackdrop()
@@ -49,7 +49,7 @@ export class BackdropsController {
       const size = BackdropSize.L;
 
       const fileName = makeBackdropFileName(id, size, BACKDROP_EXTENTION);
-      const fileStream = await this.backdropSrv.findOne(id, size);
+      const fileStream = await this.backdropsSrv.findOne(id, size);
 
       res.setHeader('Cache-Control', BACKDROP_CACHE_CONTROL_HEADER_VAL);
 
@@ -61,6 +61,7 @@ export class BackdropsController {
       if (error instanceof HttpException) {
         throw error;
       } else {
+        this.logger.error(`Failed to get backdrop (${id}): `, error.message);
         throw new CustomHttpInternalErrorException(error);
       }
     }

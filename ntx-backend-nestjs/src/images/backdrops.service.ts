@@ -17,7 +17,7 @@ import { CreateBackdropQueue } from './queues/create-backdrop.types';
 import { makeBackdropFileName } from './utils/images.utils';
 
 @Injectable()
-export class BackDropService {
+export class BackdropsService {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(

@@ -26,7 +26,7 @@ import {
   POSTER_NO_ID_PROVIDED_ERROR,
 } from './images.constants';
 import { PosterSize } from './images.types';
-import { PosterService } from './poster.service';
+import { PostersService } from './posters.service';
 import { ApiDocsForGetPoster } from './swagger/api-docs.decorators';
 import { makePosterFileName } from './utils/images.utils';
 
@@ -39,7 +39,7 @@ import { makePosterFileName } from './utils/images.utils';
 export class PostersController {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly posterSrv: PosterService) {}
+  constructor(private readonly postersSrv: PostersService) {}
 
   @Get(':id')
   @ApiDocsForGetPoster()
@@ -55,7 +55,7 @@ export class PostersController {
       }
 
       const fileName = makePosterFileName(id, size, POSTER_EXTENTION);
-      const fileStream = await this.posterSrv.findOne(id, size);
+      const fileStream = await this.postersSrv.findOne(id, size);
 
       res.setHeader('Cache-Control', POSTER_CACHE_CONTROL_HEADER_VAL);
 
@@ -67,6 +67,7 @@ export class PostersController {
       if (error instanceof HttpException) {
         throw error;
       } else {
+        this.logger.error(`Failed to get poster (${id}): `, error.message);
         throw new CustomHttpInternalErrorException(error);
       }
     }
