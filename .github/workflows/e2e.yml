@@ -128,7 +128,6 @@ jobs:
           # build: npm run build
           start: npm run backend:start, npm run start
           wait-on: 'http://localhost:3055'
-          wait-on: 'http://localhost:4200'
 
       # - name: Stop backend server
       #   run: |
