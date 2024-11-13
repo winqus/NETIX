@@ -1,0 +1,1 @@
+export const HUMAN_COGNITIVE_PAUSE = 500;

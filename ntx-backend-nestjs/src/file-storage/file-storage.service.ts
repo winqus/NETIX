@@ -6,6 +6,8 @@ import {
   FileStorageDeleteFileArgs,
   FileStorageDownloadFileArgs,
   FileStorageDownloadStreamArgs,
+  FileStorageGetFileMetadataArgs,
+  FileStorageListFilesArgs,
   FileStorageUploadSingleFileArgs,
   FileStorageUploadStreamArgs,
 } from './file-storage.interfaces';
@@ -47,5 +49,20 @@ export class FileStorageService implements FileStorage {
    */
   public async downloadStream(args: FileStorageDownloadStreamArgs): Promise<Readable> {
     return this.fileStorageStrategy.downloadStream(args);
+  }
+
+  /**
+   * Retrieves the metadata of a file based on the provided arguments.
+   *
+   * @param args - The arguments required to get the file metadata.
+   * @returns A promise that resolves to the file metadata, type of which depends on the FileStorage type.
+   * E. g. for a file stored in the local file system, the metadata would be Stats object.
+   */
+  public async getFileMetadata(args: FileStorageGetFileMetadataArgs): Promise<unknown> {
+    return this.fileStorageStrategy.getFileMetadata(args);
+  }
+
+  public async listFiles(args: FileStorageListFilesArgs): Promise<Array<FileInStorage>> {
+    return this.fileStorageStrategy.listFiles(args);
   }
 }

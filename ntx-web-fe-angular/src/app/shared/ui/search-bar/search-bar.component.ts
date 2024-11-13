@@ -6,9 +6,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LibraryService } from '@ntx-shared/services/librarySearch/library.service';
 import { Provider } from '@ntx-shared/models/librarySearch.dto';
 import { TitleType } from '@ntx-shared/models/titleType.enum';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
-import { SearchResultDTO } from '../../models/searchResult.dto';
-import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
+import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
+import { SearchResultDTOMapper } from '@ntx-shared/mappers/SearchResultDTO.mapper';
 
 @Component({
   selector: 'app-search-bar',
@@ -18,8 +18,9 @@ import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
   imports: [FormsModule, CommonModule, SvgIconsComponent],
 })
 export class SearchBarComponent implements OnInit {
-  private searchSubject = new Subject<string>();
+  private readonly searchSubject = new Subject<string>();
   @Input({ required: true }) providers: string = '';
+  @Input({ required: true }) id: string = '';
   results: SearchResultDTO[] | null = null;
   errorMessage: string | null = null;
   @Output() movieSelected = new EventEmitter<SearchResultDTO>();
@@ -27,8 +28,8 @@ export class SearchBarComponent implements OnInit {
   isLoading: boolean = false;
 
   constructor(
-    private libraryService: LibraryService,
-    private cdr: ChangeDetectorRef
+    private readonly libraryService: LibraryService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   selectMovie(result: any) {

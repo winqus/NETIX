@@ -7,7 +7,7 @@
     <!-- Search bar in the center -->
     <div class="flex-1 flex justify-center">
       <div class="w-full max-w-md">
-        <app-search-bar [providers]="getProviders()" (movieSelected)="onMovieSelected($event)"></app-search-bar>
+        <app-search-bar id="navbarSearchBar" [providers]="getProviders()" (movieSelected)="onMovieSelected($event)"></app-search-bar>
       </div>
     </div>
     <div class="flex-none">

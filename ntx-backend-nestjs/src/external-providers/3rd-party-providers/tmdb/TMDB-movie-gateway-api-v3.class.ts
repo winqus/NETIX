@@ -10,66 +10,51 @@ import { TMDBConfig } from './TMDB.service';
 const MAX_RESULT_PAGES_TO_SEARCH_THROUGH = 5;
 const TMDB_API_SEARCH_MOVIE_ROUTE = `${TMDB_API_V3_BASE_URL}/search/movie`;
 const TMDB_API_MOVIE_DETAILS_ROUTE = `${TMDB_API_V3_BASE_URL}/movie`;
+const DEFAULT_LANGUAGE = 'en-US';
+const DEFAULT_INCLUDE_ADULT = 'false';
 
 export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
   constructor(
     private readonly config: TMDBConfig,
     private readonly logger: Logger,
   ) {
-    if (!config?.apiKey || config.apiKey === '') {
+    if (!config?.apiKey?.trim()) {
       throw new Error('API key is required to use TMDB API Movie Gateway');
     }
   }
 
   public async search(options: TMDBMovieSearchOptions): Promise<TMDBSearchResult<TMDBMovie>[] | null> {
-    if (options.language == null || options.language == '') {
-      options.language = 'en-US';
-    }
+    const { query, year, language = DEFAULT_LANGUAGE, include_adult = DEFAULT_INCLUDE_ADULT } = options;
 
-    if (options.include_adult == null) {
-      options.include_adult = 'false';
-    }
-
-    const { query, year, language, include_adult } = options;
-
-    if (query == '' || query == null) {
+    if (!query?.trim()) {
       this.logger.error('Movie query is empty or null');
 
       return null;
     }
 
     const allResults: TMDBSearchResult<TMDBMovie>[] = [];
-    let currentPage = 1;
     let totalPages = 1;
 
-    while (currentPage <= totalPages && currentPage <= MAX_RESULT_PAGES_TO_SEARCH_THROUGH) {
-      const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(query));
-      params.append('include_adult', include_adult);
-      params.append('language', language);
-      params.append('page', currentPage.toString());
-      if (year != null) {
-        params.append('year', year || '');
+    for (let page = 1; page <= totalPages; page++) {
+      const params = new URLSearchParams({
+        query: encodeURIComponent(query),
+        include_adult,
+        language,
+        page: page.toString(),
+      });
+
+      if (year) {
+        params.append('year', year);
       }
 
       const url = `${TMDB_API_SEARCH_MOVIE_ROUTE}?${params.toString()}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${this.config.apiKey}`,
-        },
-      };
+      const data = await this.makeApiRequest<TMDBSearchResult<TMDBMovie>>(url, 'movie data');
 
-      const response = await fetch(url, options);
-      if (response.ok === false) {
-        this.logger.error(`Failed to fetch movie data from TMDB API: ${response.statusText}`);
-
+      if (data == null) {
         return null;
       }
 
-      const data: TMDBSearchResult<TMDBMovie> = await response.json();
-      if (data == null || 'results' in data === false) {
+      if (!('results' in data)) {
         this.logger.error('No movie results property in response from TMDB API');
 
         return null;
@@ -79,9 +64,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
         break;
       }
 
-      const filteredResults = data.results.filter(
-        (movie) => 'popularity' in movie && 'release_date' in movie && movie.release_date.length > 0,
-      );
+      const filteredResults = this.filterValidTMDBMovieResults(data.results);
 
       allResults.push({
         page: data.page,
@@ -90,8 +73,7 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
         total_results: data.total_results,
       });
 
-      totalPages = data.total_pages;
-      currentPage++;
+      totalPages = Math.min(data.total_pages, MAX_RESULT_PAGES_TO_SEARCH_THROUGH);
       await delayByMs(10);
     }
 
@@ -99,16 +81,33 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
   }
 
   public async getDetailsByID(movieID: string): Promise<TMDBMovieDetails | null> {
-    if (movieID == null || movieID == '') {
+    if (!movieID || movieID.trim() === '') {
       this.logger.error('movieID is empty or null');
 
       return null;
     }
 
-    const params = new URLSearchParams();
-    params.append('language', 'en-US');
+    const params = new URLSearchParams({
+      language: 'en-US',
+    });
 
     const url = `${TMDB_API_MOVIE_DETAILS_ROUTE}/${movieID}?${params.toString()}`;
+    const data = await this.makeApiRequest<TMDBMovieDetails>(url, 'movie details');
+
+    if (data == null) {
+      return null;
+    }
+
+    if (!('id' in data)) {
+      this.logger.error('Failed to fetch movie details from TMDB API v3: Not Found');
+
+      return null;
+    }
+
+    return data;
+  }
+
+  private async makeApiRequest<T>(url: string, errorContext: string): Promise<T | null> {
     const options = {
       method: 'GET',
       headers: {
@@ -117,47 +116,25 @@ export class TMDBMovieGatewayAPIv3 implements TMDBMovieGateway {
       },
     };
 
-    const response = await fetch(url, options);
-    if (response.ok === false) {
-      this.logger.error(`Failed to fetch movie details from TMDB API v3: ${response.statusText}`);
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        this.logger.error(`Failed to fetch ${errorContext} from TMDB API v3: ${response.statusText}`);
+
+        return null;
+      }
+
+      const data: T = await response.json();
+
+      return data;
+    } catch (error) {
+      this.logger.error(`Error while fetching ${errorContext} data from TMDB API v3: ${error}`);
 
       return null;
     }
+  }
 
-    const data: TMDBMovieDetails = await response.json();
-    if (data == null || 'id' in data === false) {
-      this.logger.error('No movie details in response from TMDB API v3');
-
-      return null;
-    }
-
-    return {
-      adult: data.adult,
-      backdrop_path: data.backdrop_path,
-      belongs_to_collection: data.belongs_to_collection,
-      budget: data.budget,
-      genres: data.genres,
-      homepage: data.homepage,
-      id: data.id,
-      imdb_id: data.imdb_id,
-      origin_country: data.origin_country,
-      original_language: data.original_language,
-      original_title: data.original_title,
-      overview: data.overview,
-      popularity: data.popularity,
-      poster_path: data.poster_path,
-      production_companies: data.production_companies,
-      production_countries: data.production_countries,
-      release_date: data.release_date,
-      revenue: data.revenue,
-      runtime: data.runtime,
-      spoken_languages: data.spoken_languages,
-      status: data.status,
-      tagline: data.tagline,
-      title: data.title,
-      video: data.video,
-      vote_average: data.vote_average,
-      vote_count: data.vote_count,
-    };
+  private filterValidTMDBMovieResults(movies: any[]): TMDBMovie[] {
+    return movies.filter((movie) => 'popularity' in movie && 'release_date' in movie && movie.release_date.length > 0);
   }
 }

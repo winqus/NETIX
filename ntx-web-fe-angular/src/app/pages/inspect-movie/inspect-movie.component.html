@@ -1,162 +1,88 @@
-<div class="h-full w-full p-10">
-  <div class="flex w-full flex-col">
-    <div class="h-[400px] flex flex-row flex-auto gap-6">
-      <div class="relative h-full aspect-[2/3] bg-white flex align-middle justify-center items-center">
-        @if (posterUrl) {
-          <img [src]="posterUrl" alt="Poster Image" class="h-full w-auto object-cover" />
-        } @else {
-          <app-svg-icons name="file_image" size="120"></app-svg-icons>
-        }
-      </div>
-      <div class="w-full flex flex-col justify-between">
-        <div class="flex flex-row flex-auto w-full">
-          <div class="flex flex-col flex-auto gap-3">
-            <div class="badge badge-md rounded-md font-bold">MOVIE</div>
-            <div class="flex flex-row items-center justify-start gap-8">
-              <div class="text-4xl">{{ this.movie?.name || 'Unknown' }}</div>
-              <div class="text-xl text-gray-500">{{ this.movie?.originallyReleasedAt?.getFullYear() || 'Unknown Year' }}</div>
-              @if (!this.movie?.isPublished) {
-                <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
-              }
-            </div>
-            <div class="text-1xl text-gray-500">
-              <div>Created at {{ this.movie?.createdAt || 'Unknown' }}</div>
-              <div>Last updated at {{ this.movie?.updatedAt || 'Unknown' }}</div>
-            </div>
-            <div class="flex-grow text-xl overflow-hidden">
-              <p class="text-xl text-balance text-justify leading-snug">
-                {{ this.movie?.summary || 'No summary available.' }}
-              </p>
-            </div>
-          </div>
-          <div class="justify-end">
-            <div class="dropdown dropdown-left">
-              <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
-              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
-                <button class="btn btn-sm btn-outline border-none" type="button" onclick="editModal.showModal()">Edit metadata</button>
-                <button class="btn btn-sm btn-outline border-none" type="button" onclick="publishPopup.showModal()">{{ getPublishedButtonLabel() }}</button>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-row items-center justify-end gap-2">
-          <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Missing video</div>
-          <button class="btn btn-sm btn-outline disabled" disabled="disabled">Add Video</button>
-        </div>
-      </div>
+<div class="h-full w-full relative" [style.background]="pageBackgroundColor">
+  @if (backdropUrl) {
+    <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="pageBackgroundColor">
+      <img [src]="backdropUrl" alt="Backdrop" class="w-full h-full object-contain" />
     </div>
-    <div class="divider"></div>
-    <div class="card bg-base-300 rounded-box grid h-20 place-items-center">No video</div>
-  </div>
-</div>
-
-@if (this.movieTitleEditForm) {
-  <dialog #editModal id="editModal" class="modal modal-middle">
-    <div class="modal-box">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold">Edit</h3>
-        <form method="dialog">
-          <button class="btn-sm btn-circle bg-black flex items-center justify-center">
-            <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
-          </button>
-        </form>
-      </div>
-
-      <form [formGroup]="movieTitleEditForm!" class="w-full h-full" (submit)="onSubmitNewMetadata()">
-        <!-- Title Field -->
-        <label for="title" class="form-control w-full">
-          <div class="label py-0">
-            <span class="label-text font-bold">Title</span>
-          </div>
-          <input formControlName="title" id="title" class="input input-bordered input-sm w-full p-2 rounded-md" [class]="{ 'input-error': isInvalid('title') }" type="text" placeholder="Title" />
-          <div class="label py-0 mb-2">
-            <span class="label-text-alt text-error">{{ getErrorMessage('title') }}</span>
-          </div>
-        </label>
-        <div class="flex flex-row gap-2">
-          <!-- Date Field -->
-          <label for="originallyReleasedAt" class="form-control w-full"
-            ><div class="label py-0">
-              <span class="label-text font-bold">Original release</span>
-            </div>
-            <input
-              formControlName="originallyReleasedAt"
-              id="originallyReleasedAt"
-              class="input input-bordered input-sm w-full p-2 rounded-md"
-              [class]="{ 'input-error': isInvalid('originallyReleasedAt') }"
-              type="date"
-            />
-            <div class="label py-0 mb-2">
-              <span class="label-text-alt text-error">{{ getErrorMessage('originallyReleasedAt') }}</span>
-            </div>
-          </label>
-
-          <!-- Duration Field -->
-          <label for="runtimeMinutes" class="form-control w-full"
-            ><div class="label py-0">
-              <span class="label-text font-bold">Runtime in minutes</span>
-            </div>
-            <input
-              formControlName="runtimeMinutes"
-              id="runtimeMinutes"
-              class="input input-bordered input-sm w-full p-2 rounded-md"
-              [class]="{ 'input-error': isInvalid('runtimeMinutes') }"
-              type="text"
-              placeholder="Runtime"
-            />
-            <div class="label py-0 mb-2">
-              <span class="label-text-alt text-error">{{ getErrorMessage('runtimeMinutes') }}</span>
-            </div>
-          </label>
+    <div class="absolute inset-0" [style.background]="'linear-gradient(15deg, ' + backdropColor + ' 0%, ' + transparentColor + ' 40%, ' + transparentColor + ' 70%, ' + backdropColor + ' 100%)'"></div>
+  }
+  <div class="relative z-10 flex w-full flex-col">
+    <div class="flex w-full p-10 relative">
+      <div class="relative h-[400px] flex flex-row flex-auto gap-6 z-10">
+        <div class="relative h-full aspect-[2/3] bg-white flex align-middle justify-center items-center rounded-xl shadow-lg shadow-black">
+          @if (posterUrl) {
+            <img [src]="posterUrl" (error)="onPosterError()" alt="Poster" class="h-full w-auto object-cover rounded-lg" />
+          } @else {
+            <app-svg-icons name="file_image" size="120"></app-svg-icons>
+          }
         </div>
-
-        <!-- Summary Field -->
-        <label for="summary" class="form-control h-[200px]"
-          ><div class="label py-0">
-            <span class="label-text font-bold">Summary</span>
+        <div class="w-full flex flex-col justify-between">
+          <div class="flex flex-row flex-auto w-full">
+            <div class="flex flex-col flex-auto gap-3">
+              <div class="badge badge-md rounded-md font-bold">MOVIE</div>
+              <div class="flex flex-row items-center justify-start gap-8">
+                <div class="text-4xl">{{ this.movie?.name || 'Unknown' }}</div>
+                <div class="text-xl text-gray-500">{{ this.movie?.originallyReleasedAt?.getFullYear() || 'Unknown Year' }}</div>
+                @if (!this.movie?.isPublished) {
+                  <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Unpublished</div>
+                }
+              </div>
+              <div class="text-1xl text-gray-500">
+                <div>Created at {{ this.movie?.createdAt || 'Unknown' }}</div>
+                <div>Last updated at {{ this.movie?.updatedAt || 'Unknown' }}</div>
+              </div>
+              <div class="flex-grow w-2/3 text-xl overflow-hidden">
+                <p class="text-xl text-balance leading-snug text-white">
+                  {{ this.movie?.summary || 'No summary available.' }}
+                </p>
+              </div>
+            </div>
+            <div class="justify-end">
+              <div class="dropdown dropdown-left">
+                <div tabindex="0" role="button" class="btn btn-sm btn-square btn-outline"><app-svg-icons name="three_dots_vertical" size="15"></app-svg-icons></div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded z-[1] w-52 p-1 shadow outline outline-1 gap-[0px]">
+                  <app-edit-metadata-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  <app-publish-movie-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  <app-remove-movie-option [movie]="movie" />
+                  <app-change-poster-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  <app-change-backdrop-option [movie]="movie" (movieChange)="onMovieLoad($event)" />
+                  @if (isVideoAvailable()) {
+                    <app-upload-video
+                      (videoUpload)="onUploadVideo($event)"
+                      [props]="{ id: 'videoReplaceInput', label: 'Replace video', class: 'btn btn-sm btn-outline w-full border-none justify-start text-left' }"
+                    />
+                  }
+                </ul>
+              </div>
+            </div>
           </div>
-          <textarea
-            formControlName="summary"
-            id="summary"
-            class="textarea textarea-bordered textarea-xs w-full font-mono text-sm p-2 mb-2 rounded-md resize-none read-only:bg-neutral-900 flex-1"
-            [class]="{ 'textarea-error': isInvalid('summary') }"
-            placeholder="Summary..."
-          ></textarea>
-          <div class="label py-0 mb-2">
-            <span class="label-text-alt text-error">{{ getErrorMessage('summary') }}</span>
-          </div>
-        </label>
-        <div class="flex flex-row justify-between items-center p-0">
-          <!-- Left Aligned Error Label -->
-          <div class="flex flex-col p-0 m-0 text-error">
-            @if (errorMessage !== '') {
-              <span class="text-xs">{{ errorMessage }}</span>
+          <div class="flex flex-row items-center justify-end gap-2">
+            @if (!isVideoAvailable()) {
+              <div class="badge badge-warning badge-md rounded-md font-bold gap-1 text-sm"><app-svg-icons name="exclamation_triangle" size="15"></app-svg-icons>Missing video</div>
+            }
+            @if (isUploadingVideo) {
+              <progress class="progress progress-error w-24 h-4" [value]="uploadProgress" max="100"></progress>
+            } @else {
+              @if (!isVideoAvailable()) {
+                <app-upload-video (videoUpload)="onUploadVideo($event)" [props]="{ id: 'videoUploadInput', label: 'Add Video', class: 'btn btn-sm btn-outline border-none justify-start text-left' }" />
+              }
             }
           </div>
-          <!-- Submit Button -->
-          <div class="flex flex-row justify-end gap-2">
-            <button class="btn btn-square btn-outline w-fit px-4" type="button" [disabled]="!isFormValid()" (click)="this.resetEditedForm()">Reset</button>
-            <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="submit" [disabled]="!isFormValid()">SAVE</button>
-          </div>
         </div>
-      </form>
+      </div>
     </div>
-  </dialog>
-}
-<dialog #publishPopup id="publishPopup" class="modal modal-middle">
-  <div class="modal-box">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-bold">{{ getPublishPopupTitle() }}</h3>
-      <form method="dialog">
-        <button class="btn-sm btn-circle bg-black flex items-center justify-center">
-          <app-svg-icons name="x" size="20" color="white"></app-svg-icons>
-        </button>
-      </form>
-    </div>
-    <div class="mb-3">{{ getPublishPopupText() }}</div>
-    <div class="flex flex-row justify-end gap-2">
-      <button class="btn btn-square btn-outline w-fit px-4" type="button" (click)="publishPopup.close()">Cancel</button>
-      <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="button" (click)="onToggleMoviePublish()">Confirm</button>
+    <div class="w-full px-10">
+      @if (isVideoAvailable()) {
+        <ul class="menu menu-md bg-base-200 rounded-lg w-full">
+          <li>
+            <a>
+              <app-svg-icons name="film" size="25" />
+              {{ getVideoName() }}
+            </a>
+          </li>
+        </ul>
+      } @else {
+        <div class="card bg-base-300 rounded-box grid h-20 place-items-center bg-transparent">No video</div>
+      }
     </div>
   </div>
-</dialog>
+</div>

@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { generateRandomId } from '@ntx-shared/services/utils/utils';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { MediaConstants } from '@ntx-shared/config/constants';
 import { ImageService } from '@ntx-shared/services/image.service';
 import { ImageCropperComponent } from '@ntx-shared/ui/image-upload/image-cropper/image-cropper.component';
@@ -11,7 +11,10 @@ export interface InputProps {
   title?: string;
   accept?: string;
   readonly?: boolean;
-  posterUrl?: string | null;
+  originalImage?: File | null;
+  imageUrl?: string | null;
+  aspectRatio?: number;
+  clearImgButton?: boolean | null;
 }
 
 @Component({
@@ -21,7 +24,7 @@ export interface InputProps {
   templateUrl: './image-upload.component.html',
   styleUrl: './image-upload.component.scss',
 })
-export class ImageUploadComponent implements OnInit, OnChanges {
+export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() props: InputProps = {};
   @Output() filePassed = new EventEmitter<File | null>();
   @ViewChild('input') inputElement!: ElementRef<HTMLInputElement>;
@@ -35,7 +38,9 @@ export class ImageUploadComponent implements OnInit, OnChanges {
     title: 'Upload File',
     accept: '',
     readonly: false,
-    posterUrl: null,
+    originalImage: null,
+    imageUrl: null,
+    clearImgButton: true,
   };
 
   originalImage: File | null = null;
@@ -45,23 +50,37 @@ export class ImageUploadComponent implements OnInit, OnChanges {
   imageUrl: string | null = null;
 
   constructor(
-    private imageServ: ImageService,
-    private posterServ: PosterService
+    private readonly imageServ: ImageService,
+    private readonly posterServ: PosterService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     if (!this.fileUploadId) {
       this.fileUploadId = `file-upload-${generateRandomId()}`;
-      console.log(this.fileUploadId);
     }
   }
 
   ngOnChanges(): void {
+    this.updateProps();
+  }
+
+  ngAfterViewInit(): void {
+    this.updateProps();
+  }
+
+  updateProps(): void {
     this.props = { ...this.defaultProps, ...this.props };
 
-    if (this.props.posterUrl != null) {
-      this.imageUrl = this.props.posterUrl;
+    if (this.props.imageUrl != null) {
+      this.imageUrl = this.props.imageUrl;
     }
+
+    if (this.props.originalImage != null) {
+      this.setFile(this.props.originalImage);
+    }
+
+    this.cdr.detectChanges();
   }
 
   onFileChanged(event: any) {
@@ -98,7 +117,7 @@ export class ImageUploadComponent implements OnInit, OnChanges {
 
   private imageProcessing() {
     this.imageServ
-      .autoCropImage(this.imageElement.nativeElement)
+      .autoCropImage(this.imageElement.nativeElement, this.props.aspectRatio)
       .then((blob) => {
         this.setCroppedImage(blob);
       })
@@ -123,8 +142,8 @@ export class ImageUploadComponent implements OnInit, OnChanges {
       this.croppModal.nativeElement.showModal();
     }
 
-    if (this.props.posterUrl != null) {
-      this.posterServ.downloadImage(this.props.posterUrl).subscribe({
+    if (this.props.imageUrl != null) {
+      this.posterServ.downloadImage(this.props.imageUrl).subscribe({
         next: (blob: Blob) => {
           this.setFile(
             new File([blob], 'th.' + MediaConstants.image.exportFileExtension, {
@@ -170,7 +189,7 @@ export class ImageUploadComponent implements OnInit, OnChanges {
 
     const acceptedTypes = this.props.accept.split(',').map((type) => type.trim());
     const fileType = file.type;
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
+    const fileExtension = file.name.split('.').pop()?.toLowerCase() ?? '';
 
     return acceptedTypes.some((acceptType) => {
       if (acceptType.startsWith('.')) {

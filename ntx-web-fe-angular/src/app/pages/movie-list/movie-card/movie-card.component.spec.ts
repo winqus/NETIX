@@ -4,7 +4,7 @@ import { MovieCardComponent } from './movie-card.component';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
 import { getPoster } from '@ntx/app/shared/config/api-endpoints';
-import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 
 describe('MovieCardComponent with MovieDTO', () => {
   let component: MovieCardComponent;
@@ -19,6 +19,7 @@ describe('MovieCardComponent with MovieDTO', () => {
     summary: 'This is a test movie summary.',
     originallyReleasedAt: new Date('2020-01-09'),
     runtimeMinutes: 120,
+    backdropID: '',
     posterID: 'poster123',
     videoID: 'video123',
     isPublished: true,

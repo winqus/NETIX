@@ -8,3 +8,9 @@ export async function import_FileTypeFromFile(): Promise<typeof import('file-typ
 
   return fileTypeFromFile;
 }
+
+export async function import_fileTypeStream(): Promise<typeof import('file-type').fileTypeStream> {
+  const { fileTypeStream } = (await eval('import("file-type")')) as typeof import('file-type');
+
+  return fileTypeStream;
+}

@@ -1,6 +1,7 @@
-import { getMovieUrl, getPoster } from '@ntx/app/shared/config/api-endpoints';
+import { getBackdrop, getMovieBackdropUrl, getMoviePosterUrl, getMovieUrl, getPoster, getVideo, getVideoUpload } from '@ntx-shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
+import { HUMAN_COGNITIVE_PAUSE } from 'cypress/support/constants';
 import convertRouteToPath from 'cypress/support/convertRoute';
 import { makeRandomMovieName, makeRandomMovieReleaseDate, makeRandomMovieRuntime, makeRandomMovieSummary } from 'cypress/support/randomDataFactory';
 
@@ -153,6 +154,240 @@ describe('inspect movie', () => {
       cy.contains('Confirm').click();
 
       cy.get('.badge').contains('Unpublished').should('be.visible');
+    });
+  });
+
+  it('should change poster for movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const PUT_POSTER_REQUEST_TOKEN = 'PUT_POSTER';
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
+      cy.intercept('PUT', `${convertRouteToPath(getMoviePosterUrl(movie.id))}`).as(PUT_POSTER_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+      cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Change poster').click();
+
+      cy.get('#posterInput').selectFile('cypress/files/2_sm_284x190.webp', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + PUT_POSTER_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const newPosterID = body.posterID;
+        expect(newPosterID).to.be.a('string');
+        expect(newPosterID).to.not.eq(movie.posterID);
+
+        const GET_NEW_POSTER_TOKEN = 'GET_NEW_POSTER';
+        cy.intercept(convertRouteToPath(getPoster(newPosterID, PosterSize.L))).as(GET_NEW_POSTER_TOKEN);
+        cy.wait('@' + GET_NEW_POSTER_TOKEN).then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+      });
+    });
+  });
+
+  it('should change backdrop for movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const PUT_BACKDROP_REQUEST_TOKEN = 'PUT_BACKDROP';
+      cy.intercept('PUT', `${convertRouteToPath(getMovieBackdropUrl(movie.id))}`).as(PUT_BACKDROP_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Change backdrop').click();
+
+      cy.get('#backdropInput').selectFile('cypress/files/1_backdrop_190x132.webp', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + PUT_BACKDROP_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const newBackdropID = body.backdropID;
+        expect(newBackdropID).to.be.a('string');
+        expect(newBackdropID).to.not.eq(movie.posterID);
+
+        const GET_NEW_BACKDROP_TOKEN = 'GET_NEW_BACKDROP';
+        cy.intercept(convertRouteToPath(getBackdrop(newBackdropID))).as(GET_NEW_BACKDROP_TOKEN);
+        cy.wait('@' + GET_NEW_BACKDROP_TOKEN).then((interception) => {
+          expect(interception.response!.statusCode).to.eq(200);
+        });
+      });
+    });
+  });
+
+  it('should upload video for movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const UPLOAD_VIDEO_TOKEN = 'UPLOAD_VIDEO_TOKEN';
+      const VIDEO_PROPS_TOKEN = 'VIDEO_PROPS_TOKEN';
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl(movie.id))}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept('POST', `${convertRouteToPath(getVideoUpload(movie.id))}`).as(UPLOAD_VIDEO_TOKEN);
+      cy.intercept('GET', new RegExp(`^${convertRouteToPath(getVideo())}/.*`)).as(VIDEO_PROPS_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.contains('Add Video').click();
+
+      cy.get('#videoUploadInput').selectFile('cypress/files/1_video_3sec_1280x720_24fps_crf35.mkv', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + UPLOAD_VIDEO_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(201);
+      });
+
+      let videoID = '';
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        videoID = body.videoID;
+        expect(videoID).to.be.a('string');
+      });
+
+      cy.wait('@' + VIDEO_PROPS_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const videoName = body.name;
+        expect(videoName).to.be.a('string');
+
+        cy.contains(videoName);
+      });
+    });
+  });
+
+  it('should replace video for movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const UPLOAD_VIDEO_TOKEN = 'UPLOAD_VIDEO_TOKEN';
+      const VIDEO_PROPS_TOKEN = 'VIDEO_PROPS_TOKEN';
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl(movie.id))}`).as(GET_MOVIE_REQUEST_TOKEN);
+      cy.intercept('POST', `${convertRouteToPath(getVideoUpload(movie.id))}`).as(UPLOAD_VIDEO_TOKEN);
+      cy.intercept('GET', new RegExp(`^${convertRouteToPath(getVideo())}/.*`)).as(VIDEO_PROPS_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Replace video').should('not.exist');
+
+      cy.contains('Add Video').click();
+
+      cy.get('#videoUploadInput').selectFile('cypress/files/1_video_3sec_1280x720_24fps_crf35.mkv', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + UPLOAD_VIDEO_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(201);
+      });
+
+      let videoID = '';
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        videoID = body.videoID;
+        expect(videoID).to.be.a('string');
+      });
+
+      cy.wait('@' + VIDEO_PROPS_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const videoName = body.name;
+        expect(videoName).to.be.a('string');
+
+        cy.contains(videoName);
+      });
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Replace video').should('be.visible');
+
+      cy.get('#videoReplaceInput').selectFile('cypress/files/1_video_3sec_1280x720_24fps_crf35.mkv', { force: true });
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + UPLOAD_VIDEO_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(201);
+      });
+
+      let newVideoID = '';
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        newVideoID = body.videoID;
+        expect(newVideoID).to.be.a('string');
+        expect(newVideoID).to.not.be.a(videoID);
+      });
+
+      cy.wait('@' + VIDEO_PROPS_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(200);
+        const body = interception.response!.body;
+        const videoName = body.name;
+        expect(videoName).to.be.a('string');
+
+        cy.contains(videoName);
+      });
+    });
+  });
+
+  it('should remove a movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const DELETE_MOVIE_REQUEST_TOKEN = 'DELETE_MOVIE_REQUEST_TOKEN';
+      cy.intercept('DELETE', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(DELETE_MOVIE_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Remove').click();
+
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + DELETE_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(204);
+      });
+
+      cy.url().should('include', '/');
+    });
+  });
+
+  it('should fail to remove a movie', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const DELETE_MOVIE_REQUEST_TOKEN = 'DELETE_MOVIE_REQUEST_TOKEN';
+      cy.intercept('DELETE', `${convertRouteToPath(getMovieUrl())}/${movie.id}`, (req) => {
+        req.reply({
+          statusCode: 500,
+          body: { error: 'Failed to delete movie' },
+        });
+      }).as(DELETE_MOVIE_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+
+      cy.get('[name="three_dots_vertical"]').click();
+      cy.get('.dropdown-content').should('be.visible');
+      cy.contains('Remove').click();
+
+      cy.get('button').contains('Confirm').wait(HUMAN_COGNITIVE_PAUSE).click();
+
+      cy.wait('@' + DELETE_MOVIE_REQUEST_TOKEN).then((interception) => {
+        expect(interception.response!.statusCode).to.eq(500);
+      });
+
+      cy.contains('An error occurred while removing a movie. Please try again later.');
     });
   });
 });

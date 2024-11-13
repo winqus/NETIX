@@ -4,6 +4,7 @@ import { FileStorageLocal } from './file-storage-local/file-storage-local.class'
 import { FileStorage } from './file-storage.abstract';
 import { FILE_STORAGE_STRATEGY_TOKEN } from './file-storage.constants';
 import { FileStorageService } from './file-storage.service';
+import { TusUploadService } from './tus/tus-upload.service';
 import { FileStorageModuleOptions, StorageType } from './types';
 
 export function getFileStorageStrategy<S extends StorageType, E extends Record<string, unknown>>(
@@ -35,8 +36,8 @@ export class FileStorageModule implements OnApplicationShutdown {
 
     if (process.env.USE_TEMPORARY_FILE_STORAGE === 'true' && storageType === StorageType.LocalFileSystem) {
       const tempDirPath = require('path').resolve(
-        process.env.TEMP_FILE_STORAGE_BASE_DIR_PATH ||
-          options[StorageType.LocalFileSystem]?.setup?.storageBaseDirPath ||
+        process.env.TEMP_FILE_STORAGE_BASE_DIR_PATH ??
+          options[StorageType.LocalFileSystem]?.setup?.storageBaseDirPath ??
           DEFAULT_TEMP_FILE_STORAGE_BASE_DIR_PATH,
       );
 
@@ -49,9 +50,10 @@ export class FileStorageModule implements OnApplicationShutdown {
 
     const fileStorage = getFileStorageStrategy(storageType, options[storageType]!);
 
-    const providers: [Provider<FileStorage>, Provider<FileStorageService>] = [
+    const providers: [Provider<FileStorage>, Provider<FileStorageService>, Provider<TusUploadService>] = [
       { provide: FILE_STORAGE_STRATEGY_TOKEN, useValue: fileStorage },
       FileStorageService,
+      TusUploadService,
     ];
 
     return {

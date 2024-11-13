@@ -15,6 +15,7 @@ export class MovieDTOMapper {
       originallyReleasedAt: new Date(item.originallyReleasedAt),
       runtimeMinutes: item.runtimeMinutes,
       posterID: item.posterID,
+      backdropID: item.backdropID,
       videoID: item.videoID || null,
       isPublished: item.isPublished || false,
     };

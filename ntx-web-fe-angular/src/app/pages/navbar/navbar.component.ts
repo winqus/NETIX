@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { SvgIconsComponent } from '../../../app/shared/ui/svg-icons/svg-icons.component';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 // import { AuthService } from '@auth0/auth0-angular';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from '@ntx-shared/ui/search-bar/search-bar.component';
-import { Provider } from '@ntx/app/shared/models/librarySearch.dto';
-import { SearchResultDTO } from '@ntx/app/shared/models/searchResult.dto';
+import { Provider } from '@ntx-shared/models/librarySearch.dto';
+import { SearchResultDTO } from '@ntx-shared/models/searchResult.dto';
 interface NavbarProps {
   title: string;
 }

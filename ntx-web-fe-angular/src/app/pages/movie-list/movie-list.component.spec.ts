@@ -1,23 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MovieListComponent } from './movie-list.component';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { of, throwError } from 'rxjs';
-import { testMovieFixture } from '@ntx/app/shared/services/movie/movieTestData';
+import { testMovieFixture } from '@ntx-shared/services/movie/movieTestData';
 import { environment } from '@ntx/environments/environment.development';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('MovieListComponent', () => {
   let component: MovieListComponent;
   let fixture: ComponentFixture<MovieListComponent>;
   let mockMovieService: any;
+  let mockErrorHandlerService: any;
 
   beforeEach(async () => {
+    mockErrorHandlerService = {
+      showError: jasmine.createSpy('showError'),
+      showSuccess: jasmine.createSpy('showSuccess'),
+    };
     mockMovieService = {
       getMovies: jasmine.createSpy('getMovies').and.returnValue(of(testMovieFixture)),
     };
 
     await TestBed.configureTestingModule({
       imports: [MovieListComponent],
-      providers: [{ provide: MovieService, useValue: mockMovieService }],
+      providers: [
+        { provide: MovieService, useValue: mockMovieService },
+        { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MovieListComponent);

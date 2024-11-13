@@ -3,7 +3,7 @@
     <div class="h-full flex flex-col rounded-lg">
       <!-- Searchbar field-->
       <div class="h-full flex flex-col pb-2">
-        <app-search-bar [providers]="getProviders()" (movieSelected)="onMovieSelected($event)"> </app-search-bar>
+        <app-search-bar id="importSearchBar" [providers]="getProviders()" (movieSelected)="onMovieSelected($event)"> </app-search-bar>
       </div>
       <div class="flex flex-row h-full pb-2 gap-5">
         <!-- Image field-->
@@ -11,7 +11,7 @@
           <app-image-upload
             class="h-[300px] w-[200px]"
             title="Thumbnail Select"
-            [props]="{ accept: imageAccept, readonly: false, posterUrl: selectedResultPosterURL }"
+            [props]="{ accept: imageAccept, readonly: false, imageUrl: selectedResultPosterURL }"
             (filePassed)="receiveImageFile($event)"
           >
           </app-image-upload>
@@ -94,7 +94,13 @@
     </div>
     <!-- Import -->
     <div class="flex flex-row justify-end">
-      <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="submit" [disabled]="!isFormValid()">Import</button>
+      <button class="btn btn-square btn-primary btn-outline w-fit px-4" type="submit" [disabled]="!isFormValid()">
+        @if (importingTitle) {
+          <app-svg-icons name="throbber"></app-svg-icons>
+        } @else {
+          Import
+        }
+      </button>
     </div>
   </div>
 </form>

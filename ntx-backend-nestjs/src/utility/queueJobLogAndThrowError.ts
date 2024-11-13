@@ -19,3 +19,9 @@ export const jobLogWithTimestamp = async (job: Job<any>, message: string): Promi
   const formattedMessage = `${message} (${timestamp})`;
   await job.log(formattedMessage);
 };
+
+export const jobLogError = async (job: Job<any>, message: string): Promise<void> => {
+  const timestamp = new Date().toISOString();
+  const formattedMessage = `[ERROR] ${message} (${timestamp})`;
+  await job.log(formattedMessage);
+};

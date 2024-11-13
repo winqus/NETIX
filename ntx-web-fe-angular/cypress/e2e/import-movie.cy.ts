@@ -24,7 +24,7 @@ describe('create movie', () => {
     cy.get('[aria-label="Import"]').click();
     const movieName = 'Shrek';
 
-    cy.get('#searchBar').type(movieName);
+    cy.get('#importSearchBar').type(movieName);
     cy.get(SEARCH_RESULTS_ELEMENT)
       .should('be.visible')
       .within(() => {
@@ -40,7 +40,7 @@ describe('create movie', () => {
     cy.get('[aria-label="Import"]').click();
     const searchQuery = 'Sh@#$';
 
-    cy.get('#searchBar').type(searchQuery);
+    cy.get('#importSearchBar').type(searchQuery);
     cy.get('.input > [name="throbber"]').should('be.visible');
     cy.contains('No movies found for the given search query.');
     cy.get('.input > [name="search"]').should('be.visible');
@@ -51,7 +51,7 @@ describe('create movie', () => {
     cy.get('[aria-label="Import"]').click();
     const movieName = 'shrek';
 
-    cy.get('#searchBar').type(movieName);
+    cy.get('#importSearchBar').type(movieName);
     cy.get(SEARCH_RESULTS_ELEMENT).should('be.visible').get(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(makeCaseInsensitiveRegex(movieName)).click();
     cy.get('img#myImage').should('be.visible');
 
@@ -75,7 +75,7 @@ describe('create movie', () => {
     cy.get('[aria-label="Import"]').click();
 
     const movieName = 'shrek';
-    cy.get('#searchBar').type(movieName);
+    cy.get('#importSearchBar').type(movieName);
 
     cy.get(SEARCH_RESULTS_ELEMENT).should('be.visible').find(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(makeCaseInsensitiveRegex(movieName)).click();
 
@@ -92,7 +92,7 @@ describe('create movie', () => {
     cy.get('[aria-label="Import"]').click();
 
     const movieName = 'shrek';
-    cy.get('#searchBar').type(movieName);
+    cy.get('#importSearchBar').type(movieName);
 
     cy.contains('An error occurred while fetching the search results.');
   });
@@ -107,7 +107,7 @@ describe('create movie', () => {
     cy.get('[aria-label="Import"]').click();
 
     const movieName = 'shrek';
-    cy.get('#searchBar').type(movieName);
+    cy.get('#importSearchBar').type(movieName);
 
     cy.get(SEARCH_RESULTS_ELEMENT).should('be.visible').find(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(makeCaseInsensitiveRegex(movieName)).click();
 

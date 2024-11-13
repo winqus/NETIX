@@ -36,7 +36,7 @@ describe('view movies list', () => {
   it('should display unpublished badge', () => {
     cy.visit('/');
     cy.wait('@BE_GetMovies');
-    cy.get('app-movie-card').first().find('.badge').contains('Unpublished').should('be.visible');
+    cy.get('app-movie-card').first().find('#publishedBadge').contains('Unpublished').should('be.visible');
   });
 
   it('should display published card', () => {
@@ -59,7 +59,13 @@ describe('view movies list', () => {
 
     cy.visit('/');
     cy.wait('@BE_GetMovies');
-    cy.get('app-movie-card').find('.card-title').contains(movieName).parents('app-movie-card').find('.badge').should('not.exist');
+    cy.get('app-movie-card').find('.card-title').contains(movieName).parents('app-movie-card').find('#publishedBadge').should('not.exist');
+  });
+
+  it('should display recently updated badge', () => {
+    cy.visit('/');
+    cy.wait('@BE_GetMovies');
+    cy.get('app-movie-card').first().find('#recentlyUpdatedBadge').should('be.visible');
   });
 
   it('should searched movie navigate to a movie inspect page', () => {
@@ -69,7 +75,7 @@ describe('view movies list', () => {
 
     cy.visit('/');
 
-    cy.get('#searchBar').type(movieName);
+    cy.get('#navbarSearchBar').type(movieName);
     cy.get(SEARCH_RESULTS_ELEMENT)
       .should('be.visible')
       .within(() => {

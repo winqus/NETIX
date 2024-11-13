@@ -5,6 +5,8 @@ import {
   Controller,
   Delete,
   Get,
+  Head,
+  HttpCode,
   HttpException,
   Inject,
   Logger,
@@ -13,6 +15,8 @@ import {
   Patch,
   Post,
   Put,
+  Req,
+  Res,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -22,6 +26,7 @@ import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInt
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
 import { FileToStorageContainerInterceptor } from '@ntx/file-storage/interceptors/file-to-storage-container.interceptor';
+import { TusUploadService } from '@ntx/file-storage/tus/tus-upload.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
@@ -38,9 +43,11 @@ import {
   MOVIES_NOT_FOUND_ERROR,
   MOVIES_POSTER_FILE_STORAGE_ARGS,
   MOVIES_SWAGGER_TAG,
+  MOVIES_VIDEOS_FILE_STORAGE_ARGS,
 } from './movies.constants';
 import { MoviesService } from './movies.service';
 import {
+  ApiDocsForDeleteMovie,
   ApiDocsForDeleteMoviePublished,
   ApiDocsForGetMovie,
   ApiDocsForGetMovies,
@@ -49,6 +56,9 @@ import {
   ApiDocsForPutMoviePublished,
   ApiDocsForPutUpdateBackdrop,
   ApiDocsForPutUpdatePoster,
+  ApiDocsForTusHeadMovieVideoUpload,
+  ApiDocsForTusPatchMovieVideoUpload,
+  ApiDocsForTusPostMovieVideoUpload,
 } from './swagger/api-docs.decorators';
 
 @ApiTags(MOVIES_SWAGGER_TAG)
@@ -63,6 +73,7 @@ export class MoviesController {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
+    private readonly tusUploadSrv: TusUploadService,
   ) {}
 
   @Post()
@@ -136,7 +147,7 @@ export class MoviesController {
   @Put(':id/poster')
   @ApiDocsForPutUpdatePoster()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
-  public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -165,7 +176,7 @@ export class MoviesController {
   @Put(':id/backdrop')
   @ApiDocsForPutUpdateBackdrop()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_BACKDROP_FILE_STORAGE_ARGS))
-  public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -189,9 +200,57 @@ export class MoviesController {
     }
   }
 
+  @Post(':id/video')
+  @ApiDocsForTusPostMovieVideoUpload()
+  public async handleTusPostToInitUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
+    await this.moviesSrv.findOne(id);
+
+    await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
+  }
+
+  @Head(':id/video/:uploadId')
+  @ApiDocsForTusHeadMovieVideoUpload()
+  public async handleTusHeadToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
+    await this.moviesSrv.findOne(id);
+
+    res.set({ 'cache-control': 'no-store' });
+
+    await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
+  }
+
+  @Patch(':id/video/:uploadId')
+  @ApiDocsForTusPatchMovieVideoUpload()
+  public async handleTusPatchToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
+    try {
+      if (!id) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      const fileInStorage = await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
+      if (fileInStorage == null) {
+        /* Upload is not yet finished */
+        return;
+      }
+
+      await this.moviesSrv.updateVideoForOne(id, fileInStorage);
+
+      this.logger.log(
+        `video update finished for movie ${id}, file stored ${fileInStorage.fileName} in ${fileInStorage.container}`,
+      );
+
+      this.clearMoviesCache();
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
   @Patch(':id')
   @ApiDocsForPatchMovie()
-  public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO) {
+  public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -254,6 +313,21 @@ export class MoviesController {
       this.clearMoviesCache();
 
       return updatedMovie;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new CustomHttpInternalErrorException(error);
+      }
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiDocsForDeleteMovie()
+  public async delete(@Param('id') id: string): Promise<void> {
+    try {
+      await this.moviesSrv.deleteOne(id);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

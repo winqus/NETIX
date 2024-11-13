@@ -1,238 +1,182 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { timer } from 'rxjs/internal/observable/timer';
 import { environment } from '@ntx/environments/environment.development';
-import { MovieDTO, UpdateMovieDTO } from '@ntx-shared/models/movie.dto';
-import { MovieService } from '@ntx/app/shared/services/movie/movie.service';
-import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons/svg-icons.component';
+import { MovieDTO } from '@ntx-shared/models/movie.dto';
+import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { SvgIconsComponent } from '@ntx/app/shared/ui/svg-icons.component';
 import { PosterSize } from '@ntx-shared/models/posterSize.enum';
 import { PosterService } from '@ntx-shared/services/posters/posters.service';
-import { FieldRestrictions, TimeDelays } from '@ntx-shared/config/constants';
-import { formatDate } from '@ntx/app/shared/services/utils/utils';
+import { CssColor, MediaConstants, TimeDelays } from '@ntx-shared/config/constants';
+import { ChangePosterComponent } from './settings/change-poster/change-poster.component';
+import { EditMetadataComponent } from './settings/edit-metadata/edit-metadata.component';
+import { PublishMovieComponent } from './settings/publish-movie/publish-movie.component';
+import { ChangeBackdropComponent } from './settings/change-backdrop/change-backdrop.component';
+import { UploadVideoComponent } from './settings/upload-video/upload-video.component';
+import { ImageService } from '@ntx-shared/services/image.service';
+import { getPoster } from '@ntx-shared/config/api-endpoints';
+import { VideoService } from '@ntx-shared/services/videos/video.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
+import { VideoDTO } from '@ntx/app/shared/models/video.dto';
+import { Subscription } from 'rxjs';
+import { RemoveMovieComponent } from './settings/remove-movie/remove-movie.component';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ReactiveFormsModule],
+  imports: [SvgIconsComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent, UploadVideoComponent, RemoveMovieComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })
-export class InspectMovieComponent implements OnInit {
-  @ViewChild('editModal') editModal!: ElementRef<HTMLDialogElement>;
-  @ViewChild('publishPopup') publishPopup!: ElementRef<HTMLDialogElement>;
-
+export class InspectMovieComponent implements OnInit, OnDestroy {
   movie: MovieDTO | undefined;
+  video: VideoDTO | undefined;
   posterUrl: string | null = null;
+  backdropUrl: string | null = null;
+  backdropColor: string = CssColor.TitleInspectBackgroundColor;
+  pageBackgroundColor: string = CssColor.TitleInspectBackgroundColor;
+  transparentColor: string = CssColor.TransparentColor;
   isFromCreation: boolean = false;
-  movieTitleEditForm: FormGroup | null = null;
-  errorMessage: string = '';
+  uploadProgress: number = 0;
+  isUploadingVideo: boolean = false;
+  private uploadProgressSubscription: Subscription | null = null;
 
   constructor(
-    private movieService: MovieService,
-    private posterService: PosterService,
-    private route: ActivatedRoute
+    private readonly movieService: MovieService,
+    private readonly posterService: PosterService,
+    private readonly imageService: ImageService,
+    private readonly videoService: VideoService,
+    private readonly errorHandler: ErrorHandlerService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    const movieId = this.route.snapshot.paramMap.get('id') || '';
+    const movieId = this.route.snapshot.paramMap.get('id') ?? '';
     const navigation = window.history.state || {};
     this.isFromCreation = navigation.from === 'creation';
 
+    this.getMovieMetadata(movieId);
+  }
+
+  ngOnDestroy(): void {
+    this.uploadProgressSubscription?.unsubscribe();
+  }
+
+  getMovieMetadata(movieId: string) {
     this.movieService.getMovieMetadata(movieId).subscribe({
       next: (response) => {
         if (environment.development) console.log('Upload successful:', response);
+
         this.movie = response;
-
-        this.populateEditForm(this.movie.name, this.movie.summary, this.movie.originallyReleasedAt, this.movie.runtimeMinutes);
-
-        console.log(this.movie!.posterID);
         if (this.isFromCreation) {
-          timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(this.movie!.posterID, PosterSize.L));
+          timer(TimeDelays.posterProcessingDelay).subscribe(() => {
+            this.loadPoster(this.movie!.posterID, PosterSize.L);
+            this.loadBackdrop(this.movie!.backdropID!);
+          });
         } else {
-          this.loadPoster(this.movie!.posterID, PosterSize.L);
+          this.loadPoster(this.movie.posterID, PosterSize.L);
+          this.loadBackdrop(this.movie.backdropID!);
         }
-        if (environment.development) console.log(this.movie);
+
+        if (this.movie?.videoID != null) {
+          this.videoService.getVideoPropsUrl(this.movie?.videoID).subscribe({
+            next: (response) => {
+              if (environment.development) console.log('Video props successful:', response);
+              this.video = response;
+            },
+            error: (errorResponse) => {
+              if (environment.development) console.error('Error video props:', errorResponse);
+            },
+          });
+        }
       },
       error: (errorResponse) => {
         if (environment.development) console.error('Error uploading metadata:', errorResponse);
+        this.router.navigate(['error']);
       },
     });
+  }
+
+  onMovieLoad(updatedMovie: MovieDTO) {
+    if (this.movie?.posterID != updatedMovie.posterID) {
+      timer(TimeDelays.posterProcessingDelay).subscribe(() => this.loadPoster(updatedMovie.posterID, PosterSize.L));
+    }
+
+    if (this.movie?.backdropID != updatedMovie.backdropID) {
+      timer(TimeDelays.backdropProcessingDelay).subscribe(() => this.loadBackdrop(updatedMovie.backdropID as string));
+    }
+
+    this.movie = updatedMovie;
   }
 
   loadPoster(id: string, size: string): void {
-    this.posterService.getPoster(id, size).subscribe({
-      next: (blob: Blob) => {
-        this.posterUrl = URL.createObjectURL(blob);
+    this.posterUrl = getPoster(id, size);
+  }
+
+  onPosterError(): void {
+    this.posterUrl = null;
+  }
+
+  loadBackdrop(id: string): void {
+    if (id == null) return;
+
+    this.posterService.getBackdrop(id).subscribe({
+      next: async (blob: Blob) => {
+        this.backdropUrl = URL.createObjectURL(blob);
+        const backdropFile = new File([blob], 'backdrop.' + MediaConstants.image.exportFileExtension, {
+          type: MediaConstants.image.exportMimeType,
+          lastModified: Date.now(),
+        });
+        const getData = await this.imageService.getAverageColor(backdropFile);
+
+        this.backdropColor = 'rgba(' + getData.r + ', ' + getData.g + ',  ' + getData.b + ', 0.5)';
       },
       error: (errorResponse) => {
-        if (environment.development) console.error('Error loading poster:', errorResponse);
-        this.posterUrl = null;
+        if (environment.development) console.error('Error loading backdrop:', errorResponse);
+        this.backdropUrl = null;
       },
     });
   }
 
-  onSubmitNewMetadata() {
-    if (this.movieTitleEditForm == null) return;
-    if (this.movie == null) return;
+  onUploadVideo(file: File): void {
+    this.isUploadingVideo = true;
+    this.uploadProgress = 0;
 
-    if (this.movieTitleEditForm.valid) {
-      const movieData: UpdateMovieDTO = {
-        name: this.movieTitleEditForm.get('title')?.value,
-        summary: this.movieTitleEditForm.get('summary')?.value,
-        originallyReleasedAt: this.movieTitleEditForm.get('originallyReleasedAt')?.value,
-        runtimeMinutes: this.movieTitleEditForm.get('runtimeMinutes')?.value,
-      };
+    this.uploadProgressSubscription?.unsubscribe();
 
-      this.movieService.updateMovieMetadata(this.movie?.id, movieData).subscribe({
-        next: (response) => {
-          if (environment.development) console.log('Update successful:', response);
-          this.editModal.nativeElement.close();
-          this.movie = response;
-        },
-        error: (errorResponse) => {
-          this.errorMessage = errorResponse.error.message;
-          if (environment.development) console.error('Error updating metadata:', errorResponse);
-        },
-      });
-    }
-  }
-
-  onToggleMoviePublish() {
-    if (this.movie == null) return;
-
-    if (!this.movie?.isPublished) {
-      this.movieService.publishMovie(this.movie?.id).subscribe({
-        next: (response) => {
-          if (environment.development) console.log('Publishing successful:', response);
-          this.movie = response;
-        },
-        error: (errorResponse) => {
-          if (environment.development) console.error('Error publishing movie:', errorResponse);
-        },
-      });
-    } else {
-      this.movieService.unpublishMovie(this.movie?.id).subscribe({
-        next: (response) => {
-          if (environment.development) console.log('Unpublishing successful:', response);
-          this.movie = response;
-        },
-        error: (errorResponse) => {
-          if (environment.development) console.error('Error unpublishing movie:', errorResponse);
-        },
-      });
-    }
-
-    this.publishPopup.nativeElement.close();
-  }
-
-  getPublishedButtonLabel(): string {
-    if (this.movie?.isPublished) return 'Unpublish';
-
-    return 'Publish';
-  }
-
-  getPublishPopupTitle(): string {
-    if (this.movie == null) return '';
-
-    if (this.movie.isPublished) return 'Unpublish ' + this.movie?.name + '?';
-
-    return 'Publish ' + this.movie?.name + '?';
-  }
-
-  getPublishPopupText(): string {
-    if (this.movie == null) return '';
-
-    if (this.movie.isPublished) return 'Are you sure you want to unpublish?';
-
-    return 'Are you sure you want to publish?';
-  }
-
-  getErrorMessage(controlName: string): string {
-    if (this.movieTitleEditForm == null) return '';
-
-    const control = this.movieTitleEditForm.get(controlName);
-    if (control?.touched && control.invalid) {
-      if (control.errors?.['required']) {
-        return 'This field is required';
-      } else if (control.errors?.['minlength']) {
-        const requiredLength = control.errors['minlength'].requiredLength;
-        return `Minimum length is ${requiredLength}`;
-      } else if (control.errors?.['maxlength']) {
-        const requiredLength = control.errors['maxlength'].requiredLength;
-        return `Maximum length is ${requiredLength}`;
-      } else if (control.errors?.['min']) {
-        const minValue = control.errors['min'].min;
-        return `Minimum value is ${minValue}`;
-      } else if (control.errors?.['max']) {
-        const maxValue = control.errors['max'].max;
-        return `Maximum value is ${maxValue}`;
-      } else if (control.errors?.['pattern']) {
-        return this.getPatternErrorMessage(controlName);
-      }
-    }
-    return '';
-  }
-
-  private getPatternErrorMessage(controlName: string): string {
-    switch (controlName) {
-      case 'runtimeMinutes':
-        return FieldRestrictions.runtimeMinutes.patternError;
-      default:
-        return 'Invalid format';
-    }
-  }
-
-  isInvalid(controlName: string): boolean {
-    if (this.movieTitleEditForm == null) return false;
-
-    const control = this.movieTitleEditForm.get(controlName);
-    return !!(control && control.invalid && control.touched);
-  }
-
-  isFormValid(): boolean {
-    if (this.movieTitleEditForm == null) return false;
-
-    return this.movieTitleEditForm.valid && this.isEdited();
-  }
-
-  isEdited(): boolean {
-    if (this.movie == null) return false;
-
-    if (this.movieTitleEditForm == null) return false;
-
-    const formValues = this.movieTitleEditForm.value;
-
-    if (formValues.title !== this.movie.name) return true;
-
-    if (formValues.summary !== this.movie.summary) return true;
-
-    const formDate = formatDate(new Date(formValues.originallyReleasedAt));
-    const movieDate = formatDate(new Date(this.movie.originallyReleasedAt));
-    if (formDate !== movieDate) return true;
-
-    if (formValues.runtimeMinutes.toString() !== this.movie.runtimeMinutes.toString()) return true;
-
-    return false;
-  }
-
-  resetEditedForm() {
-    if (this.movie == null) return;
-
-    this.populateEditForm(this.movie.name, this.movie.summary, this.movie.originallyReleasedAt, this.movie.runtimeMinutes);
-  }
-
-  populateEditForm(name: string, summary: string, originallyReleasedAt: Date, runtimeMinutes: number) {
-    this.movieTitleEditForm = new FormGroup({
-      title: new FormControl(name, [Validators.required, Validators.minLength(FieldRestrictions.title.minLength), Validators.maxLength(FieldRestrictions.title.maxLength)]),
-      summary: new FormControl(summary, [Validators.required, Validators.minLength(FieldRestrictions.summary.minLength), Validators.maxLength(FieldRestrictions.summary.maxLength)]),
-      originallyReleasedAt: new FormControl(formatDate(originallyReleasedAt), [Validators.required]),
-      runtimeMinutes: new FormControl(runtimeMinutes, [
-        Validators.required,
-        Validators.min(FieldRestrictions.runtimeMinutes.min),
-        Validators.max(FieldRestrictions.runtimeMinutes.max),
-        Validators.pattern(FieldRestrictions.runtimeMinutes.pattern),
-      ]),
+    this.uploadProgressSubscription = this.videoService.uploadProgress$.subscribe({
+      next: (progress) => {
+        this.uploadProgress = progress;
+      },
+      error: (error) => console.error('Error in progress subscription:', error),
     });
+
+    console.log(this.uploadProgress);
+
+    this.videoService
+      .uploadVideo(file, this.movie!.id)
+      .then(() => {
+        this.errorHandler.showSuccess('Video uploaded successfully');
+        timer(TimeDelays.videoProcessingDelay).subscribe(() => this.getMovieMetadata(this.movie!.id));
+        this.isUploadingVideo = false;
+        this.uploadProgressSubscription?.unsubscribe();
+      })
+      .catch((error) => {
+        if (environment.development) console.error('Upload error:', error);
+        this.errorHandler.showError('An error occurred while uploading your video. Please try again later.', 'Upload unsuccessful');
+        this.isUploadingVideo = false;
+        this.uploadProgressSubscription?.unsubscribe();
+      });
+  }
+
+  isVideoAvailable(): boolean {
+    return !!this.movie?.videoID;
+  }
+
+  getVideoName(): string {
+    if (this.video == null) return this.movie!.name;
+
+    return this.video?.name;
   }
 }

@@ -7,7 +7,7 @@ import { TitleType } from '@ntx/app/shared/models/titleType.enum';
 import { Provider } from '@ntx/app/shared/models/librarySearch.dto';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
-import { SearchResultDTOMapper } from '../../mappers/SearchResultDTO.mapper';
+import { SearchResultDTOMapper } from '@ntx-shared/mappers/SearchResultDTO.mapper';
 
 describe('SearchBarComponent', () => {
   let component: SearchBarComponent;

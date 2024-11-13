@@ -1,9 +1,10 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { FileInStorage } from '@ntx/file-storage/types';
-import { BackDropService } from '@ntx/images/backdrop.service';
+import { BackdropsService } from '@ntx/images/backdrops.service';
 import { PosterSize } from '@ntx/images/images.types';
-import { PosterService } from '@ntx/images/poster.service';
+import { PostersService } from '@ntx/images/posters.service';
+import { VideosService } from '@ntx/videos/videos.service';
 import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieSearchResultDTO } from './dto/movie-search-result.dto';
@@ -20,8 +21,9 @@ export class MoviesService {
 
   constructor(
     private readonly moviesRepo: MoviesRepository,
-    private readonly posterSrv: PosterService,
-    private readonly backdropSrv: BackDropService,
+    private readonly postersSrv: PostersService,
+    private readonly backdropsSrv: BackdropsService,
+    private readonly videosSrv: VideosService,
   ) {}
 
   public async createOne(dto: CreateMovieDTO): Promise<MovieDTO> {
@@ -77,7 +79,7 @@ export class MoviesService {
         throw new ConflictException(`Movie with these contents already exists`);
       }
 
-      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
+      const posterID = await this.postersSrv.addCreatePosterJob(posterFile);
 
       const newMovie = await Movie.create({
         posterID: posterID,
@@ -143,7 +145,7 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      const posterID = await this.posterSrv.addCreatePosterJob(posterFile);
+      const posterID = await this.postersSrv.addCreatePosterJob(posterFile);
 
       movie.posterID = posterID;
       await this.moviesRepo.updateOneByUUID(id, movie);
@@ -170,7 +172,7 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      const backdropID = await this.backdropSrv.addCreateBackdropJob(backdropFile);
+      const backdropID = await this.backdropsSrv.addCreateBackdropJob(backdropFile);
 
       movie.backdropID = backdropID;
       await this.moviesRepo.updateOneByUUID(id, movie);
@@ -178,6 +180,40 @@ export class MoviesService {
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
       this.logger.error(`Failed to replace backdrop for movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async updateVideoForOne(id: string, videoFile: FileInStorage): Promise<MovieDTO> {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      if (videoFile == null) {
+        throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
+      }
+
+      const movie = await this.moviesRepo.findOneByUUID(id);
+      if (movie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      if (movie.videoID) {
+        await this.videosSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
+          this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
+        });
+      }
+
+      const videoName = `${movie.name} ${movie.originallyReleasedAt.getFullYear()}`;
+      const video = await this.videosSrv.createOneFromFile(videoName, videoFile);
+
+      movie.videoID = video.uuid;
+      await this.moviesRepo.updateOneByUUID(id, movie);
+
+      return MoviesMapper.Movie2MovieDTO(movie);
+    } catch (error) {
+      this.logger.error(`Failed to update video for the movie ${id}: ${error.message}`);
       throw error;
     }
   }
@@ -279,6 +315,43 @@ export class MoviesService {
       return MoviesMapper.Movie2MovieDTO(updatedMovie!);
     } catch (error) {
       this.logger.error(`Failed to publish movie with this ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  public async deleteOne(id: string) {
+    try {
+      if (id == null) {
+        throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
+      }
+
+      const movie = await this.moviesRepo.findOneByUUID(id);
+
+      if (movie == null) {
+        throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
+      }
+
+      if (movie.videoID) {
+        await this.videosSrv.addDeleteVideoJob(movie.videoID).catch((error) => {
+          this.logger.error(`Failed to delete video (${movie.videoID}): ${error.message}`);
+        });
+      }
+
+      if (movie.posterID) {
+        this.postersSrv.deleteOne(movie.posterID).catch((error) => {
+          this.logger.error(`Failed to delete poster (${movie.posterID}): ${error.message}`);
+        });
+      }
+
+      if (movie.backdropID) {
+        this.backdropsSrv.deleteOne(movie.backdropID).catch((error) => {
+          this.logger.error(`Failed to delete backdrop (${movie.backdropID}): ${error.message}`);
+        });
+      }
+
+      await this.moviesRepo.deleteOneByUUID(id);
+    } catch (error) {
+      this.logger.error(`Failed to delete movie (${id}): ${error.message}`);
       throw error;
     }
   }
