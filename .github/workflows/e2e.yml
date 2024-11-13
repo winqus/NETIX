@@ -125,8 +125,8 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           working-directory: ntx-web-fe-angular
-          build: npm run build
-          start: npm run backend:start && npm run start
+          # build: npm run build
+          start: npm run backend:start, npm run start
 
       # - name: Stop backend server
       #   run: |
