@@ -60,13 +60,3 @@ jobs:
       - name: Run tests
         working-directory: ntx-web-fe-angular
         run: npm run test-ci
-
-      # - name: Install angular cli
-      #   working-directory: ntx-web-fe-angular
-      #   run: npm install -g @angular/cli
-
-      # - name: Run coverage
-      #   working-directory: ntx-web-fe-angular
-      #   run: |
-      #   npm install -g @angular/cli
-      #    ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox

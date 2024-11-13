@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - 'develop'
-    paths: 
-      - 'ntx-web-fe-angular/**'
-  pull_request:
-    paths:
-      - 'ntx-web-fe-angular/**'
 
 jobs:
   e2e:
@@ -125,14 +120,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           working-directory: ntx-web-fe-angular
-          # build: npm run build
           start: npm run backend:start, npm run start
           wait-on: 'http://localhost:4200'
-
-      # - name: Stop backend server
-      #   run: |
-      #     fuser -k 3055/tcp || echo "Backend not running"
-
-      # - name: Stop frontend server
-      #   run: |
-      #     fuser -k 4200/tcp || echo "Frontend not running" 
