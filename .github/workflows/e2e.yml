@@ -1,13 +1,16 @@
-name: E2E
+name: Angular E2E tests
 
 on:
   push:
     branches:
       - 'develop'
+  pull_request:
+    paths:
+      - 'ntx-web-fe-angular/**'
 
 jobs:
   e2e:
-    name: Angular E2E
+    name: Angular E2E tests
     runs-on: ubuntu-20.04
     timeout-minutes: 15
     environment: Development
@@ -70,12 +73,12 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: |
           touch .env
-          echo API_SERVER_URL=http://localhost:3055 >> .env
-          echo ENVIRONMENT=dev >> .env
+          echo API_SERVER_URL='http://localhost:3055' >> .env
+          echo ENVIRONMENT='dev' >> .env
           cat .env
 
-      - name: Cache node modules for backend
-        id: cache-node-modules1
+      - name: Cache backend node modules
+        id: cache-backend-node-modules
         uses: actions/cache@v4
         with:
           path: ./ntx-backend-nestjs/node_modules
@@ -95,8 +98,8 @@ jobs:
         working-directory: ntx-backend-nestjs
         run: npm ci
 
-      - name: Cache node modules for frontend
-        id: cache-node-modules
+      - name: Cache frontend node modules
+        id: cache-frontend-node-modules
         uses: actions/cache@v4
         with:
           path: ./ntx-web-fe-angular/node_modules
@@ -120,5 +123,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           working-directory: ntx-web-fe-angular
-          start: npm run backend:start, npm run start
+          start: npm run backend:start, npm run start-with-env
           wait-on: 'http://localhost:4200'
