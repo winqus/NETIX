@@ -133,7 +133,6 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
-        working-directory: ntx-web-fe-angular
         with:
           build: npm run build
           start: npm backend:start && npm start
