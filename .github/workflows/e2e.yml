@@ -121,19 +121,10 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: npm ci
 
-      # - name: Run lint
-      #   working-directory: ntx-web-fe-angular
-      #   run: npm run lint
-
-      # - name: Delay before wait-on
-      #   run: sleep 80s
-
-      # - name: Test backend availability
-      #   run: curl -I http://localhost:3055/api
-
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
+          working-directory: ntx-web-fe-angular
           build: npm run build
           start: npm backend:start && npm start
 
