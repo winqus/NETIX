@@ -126,7 +126,7 @@ jobs:
         with:
           working-directory: ntx-web-fe-angular
           build: npm run build
-          start: npm backend:start && npm start
+          start: npm run backend:start && npm run start
 
       # - name: Stop backend server
       #   run: |
