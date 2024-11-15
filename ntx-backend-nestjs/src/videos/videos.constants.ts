@@ -27,6 +27,9 @@ export const VIDEOS_SCHEMA_NAME = 'Video';
 /* Errors */
 export const VIDEOS_ERROR_NO_ID_PROVIDED = 'No video ID provided';
 export const VIDEOS_ERROR_NOT_FOUND = 'Video not found';
+export const VIDEOS_ERROR_STREAM_NOT_FOUND = 'Video stream not found';
+export const VIDEOS_ERROR_RANGE_HEADER_REQUIRED = 'Range header is required';
+export const VIDEOS_ERROR_REQUESTED_RANGE_NOT_SATISFIABLE = 'Requested range not satisfiable';
 
 /* Swagger */
 export const VIDEOS_SWAGGER_TAG = 'videos';
