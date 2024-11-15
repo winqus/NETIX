@@ -1,4 +1,9 @@
-import { nanoid } from 'nanoid';
+// import { nanoid } from 'nanoid';
+
+import { customAlphabet } from 'nanoid';
+
+const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const nanoid = customAlphabet(characterSet, 10);
 
 /**
  * Generates a unique identifier string with optional prefix and postfix.

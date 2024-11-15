@@ -54,5 +54,6 @@ describe('VideosController Integration', () => {
     expect(video.id).toBe('123');
     expect(video.name).toBe('some-name');
     expect(video.state).toBe(VideoState.PROCESSING);
+    expect(video.sizeInBytes).toBe(0);
   });
 });

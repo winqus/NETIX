@@ -17,6 +17,9 @@ describe('Video', () => {
       expect(video.state).toBe(props.state);
       expect(video.createdAt).toBeInstanceOf(Date);
       expect(video.updatedAt).toBeInstanceOf(Date);
+      expect(video.sizeInBytes).toBe(0);
+      expect(video.mimeType).toBeDefined();
+      expect(video.fileExtention).toBeDefined();
     });
     it('should generate uuid if not provided', async () => {
       const props: VideoProps = {
