@@ -1,0 +1,47 @@
+<!--Loading chunks into html5 video: https://stackoverflow.com/questions/32789417/loading-chunks-into-html5-video -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming</title>
+
+    <script type="text/javascript">
+        function init() {
+            document.getElementById('sourceInput').value = document.getElementsByTagName('video')[0].currentSrc;
+        }
+
+        function setNewSource() {
+            var newUrl = document.getElementById('sourceInput').value;
+            if (newUrl) {
+                var myVideo = document.getElementById('videoPlayer');
+                myVideo.src = newUrl;
+                myVideo.load();
+                myVideo.play();
+            } else {
+                alert("Please enter a valid URL.");
+            }
+        }
+
+        function onVideoIDInputChange(value) {
+            var newUrl = "http://[::1]:3055/api/v1/videos/" + value + "/stream";
+            document.getElementById('sourceInput').value = newUrl;
+        }
+    </script>
+</head>
+<body onload="init()">
+    <video id="videoPlayer" width="640" height="360" controls>
+        <source src="http://[::1]:3055/api/v1/videos/VD_som3id/stream" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div>
+        <input type="text" id="videoIDInput" placeholder="videoID" style="width: 100px;" oninput="onVideoIDInputChange(this.value)">
+    </div>
+    <div>
+        <input type="text" id="sourceInput" placeholder="Enter new video URL" style="width: 400px;">
+        <button onclick="setNewSource()">Set New Source</button>
+    </div>
+</body>
+</html>
