@@ -10,6 +10,9 @@ export class VideosMapper {
       updatedAt: any.updatedAt,
       name: any.name,
       state: any.state,
+      sizeInBytes: any.sizeInBytes,
+      mimeType: any.mimeType,
+      fileExtention: any.fileExtention,
     });
 
     return video;
@@ -26,6 +29,9 @@ export class VideosMapper {
       updatedAt: video.updatedAt,
       name: video.name,
       state: video.state,
+      sizeInBytes: video.sizeInBytes,
+      mimeType: video.mimeType,
+      fileExtention: video.fileExtention,
     });
 
     return videoDTO;

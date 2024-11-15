@@ -1,5 +1,8 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
+import { FileExt } from '@ntx/common/enums/file-extentions.enum';
+import { MimeType } from '@ntx/common/enums/mime-type.enum';
+import { ensureSingleDotPrefix } from '@ntx/common/utils/string.utils';
 import { FileStorageService } from '@ntx/file-storage/file-storage.service';
 import { FileInStorage } from '@ntx/file-storage/types';
 import { import_fileTypeStream } from '@ntx/utility/importFileType';
@@ -58,14 +61,20 @@ export class ProcessVideoWorker extends WorkerHost {
 
       const fileTypeStream = await import_fileTypeStream();
       const { fileType } = await fileTypeStream(rawVideoReadStreamForTypeCheck);
-      if (fileType == null) {
+      if (fileType == null || fileType.mime == null || fileType.ext == null) {
         rawVideoReadStreamForTypeCheck.destroy();
         await jobLogErrorAndThrowError(job, `Could not determine file type for video: ${videoID}`);
-      } else if (!VIDEOS_FILE_ALLOWED_MIME_TYPES.includes(fileType.mime)) {
-        rawVideoReadStreamForTypeCheck.destroy();
-        await jobLogErrorAndThrowError(job, `Invalid mime type ${fileType.mime} for video: ${videoID}`);
       }
       await job.updateProgress(30);
+
+      const videoMime = fileType!.mime;
+      const videoExt = fileType!.ext;
+
+      if (!VIDEOS_FILE_ALLOWED_MIME_TYPES.includes(videoMime)) {
+        rawVideoReadStreamForTypeCheck.destroy();
+        await jobLogErrorAndThrowError(job, `Invalid mime type ${videoMime} for video: ${videoID}`);
+      }
+      await job.updateProgress(35);
 
       const rawVideoFileReadStream = await this.fileStorageSrv.downloadStream({
         container: file.container,
@@ -91,7 +100,21 @@ export class ProcessVideoWorker extends WorkerHost {
       });
       await job.updateProgress(80);
 
-      const updatedVideo = await this.videosRepository.updateOneByUUID(videoID, { state: VideoState.READY });
+      const metadata: any = await this.fileStorageSrv.getFileMetadata(destinationFile);
+      if (metadata?.size == null || typeof metadata.size !== 'number') {
+        await jobLogErrorAndThrowError(
+          job,
+          `Failed to get file size for video file ${JSON.stringify(destinationFile)}`,
+        );
+      }
+      await job.updateProgress(90);
+
+      const updatedVideo = await this.videosRepository.updateOneByUUID(videoID, {
+        sizeInBytes: metadata.size,
+        fileExtention: Object.values(FileExt).find((ext) => ext === ensureSingleDotPrefix(videoExt)),
+        mimeType: Object.values(MimeType).find((ext) => ext === videoMime),
+        state: VideoState.READY,
+      });
       if (updatedVideo == null) {
         await jobLogErrorAndThrowError(job, `Failed to update video state for video: ${videoID}`);
       }

@@ -5,7 +5,7 @@ export const VIDEOS_FILE_ALLOWED_MIME_TYPES: string[] = [MimeType.VIDEO_X_MATROS
 export const VIDEOS_FILE_ALLOWED_EXTENTIONS: string[] = [FileExt.MKV];
 export const VIDEOS_FILE_MAX_SIZE_IN_BYTES = 10_000_000_000; // 10 GB
 export const VIDEO_FILE_CONTAINER = 'videos';
-export const VIDEOS_ID_PREFIX = 'VD-';
+export const VIDEOS_ID_PREFIX = 'VD_';
 export const VIDEOS_ID_LENGTH = 15;
 export const VIDEOS_NAME_LENGTH_MIN = 1;
 export const VIDEOS_NAME_LENGTH_MAX = 200;
@@ -27,6 +27,9 @@ export const VIDEOS_SCHEMA_NAME = 'Video';
 /* Errors */
 export const VIDEOS_ERROR_NO_ID_PROVIDED = 'No video ID provided';
 export const VIDEOS_ERROR_NOT_FOUND = 'Video not found';
+export const VIDEOS_ERROR_STREAM_NOT_FOUND = 'Video stream not found';
+export const VIDEOS_ERROR_RANGE_HEADER_REQUIRED = 'Range header is required';
+export const VIDEOS_ERROR_REQUESTED_RANGE_NOT_SATISFIABLE = 'Requested range not satisfiable';
 
 /* Swagger */
 export const VIDEOS_SWAGGER_TAG = 'videos';
