@@ -100,11 +100,15 @@ export class FileStorageLocal implements FileStorage {
   }
 
   public async downloadStream(args: FileStorageDownloadStreamArgs): Promise<Readable> {
-    const { container, fileName } = args;
+    const { container, fileName, options } = args;
     const filePath = this.transformToLocalFilePath({ container, fileName });
     this.throwErrorIfFileDoesNotExist(filePath);
 
-    return fse.createReadStream(filePath);
+    if (args.options) {
+      this.validateOptionsOrThrowError(options, this.isValidDownloadStreamOptions);
+    }
+
+    return fse.createReadStream(filePath, options);
   }
 
   public async getFileMetadata(args: FileStorageGetFileMetadataArgs): Promise<Stats> {
@@ -176,5 +180,46 @@ export class FileStorageLocal implements FileStorage {
     }
 
     return 'start' in options && typeof options.start === 'number' && options.start >= 0;
+  }
+
+  private validateOptionsOrThrowError(options: any, validationFn: (options: any) => boolean, errorMessage?: string) {
+    if (!validationFn(options)) {
+      throw new Error(errorMessage ?? 'Invalid options');
+    }
+  }
+
+  private isValidDownloadStreamOptions(options: FileStreamOptions): boolean {
+    if (options && typeof options !== 'object') {
+      return false;
+    }
+
+    if (!('start' in options) && !('end' in options)) {
+      return true;
+    }
+
+    if (options.start == null || options.end == null) {
+      return false;
+    }
+
+    if (
+      'start' in options &&
+      typeof options.start !== 'number' &&
+      options.start < 0 &&
+      parseInt(options.start, 10) !== options.start
+    ) {
+      return false;
+    }
+
+    if (
+      'end' in options &&
+      typeof options.end !== 'number' &&
+      options.end < 0 &&
+      parseInt(options.end, 10) !== options.end &&
+      options.end < options.start
+    ) {
+      return false;
+    }
+
+    return true;
   }
 }

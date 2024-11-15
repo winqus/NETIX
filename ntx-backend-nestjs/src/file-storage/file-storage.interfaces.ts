@@ -20,7 +20,9 @@ export interface FileStorageDeleteFileArgs extends FileStorageArgs {}
 
 export interface FileStorageDownloadFileArgs extends FileStorageArgs {}
 
-export interface FileStorageDownloadStreamArgs extends FileStorageArgs {}
+export interface FileStorageDownloadStreamArgs extends FileStorageArgs {
+  options?: Options;
+}
 
 export interface FileStorageGetFileMetadataArgs extends FileStorageArgs {}
 
