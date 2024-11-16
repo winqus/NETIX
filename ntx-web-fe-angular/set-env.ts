@@ -30,8 +30,9 @@ const envConfigFile = (isProduction = true) => `export const environment = {
 
 (async () => {
   try {
-    await writeFilePromisified(targetEnvPath, envConfigFile(true));
-    await writeFilePromisified(targetDevEnvPath, envConfigFile(false));
+    const isProduction = (process.env['PRODUCTION_ENVIRONMENT'] ?? 'false').toLowerCase() == 'true';
+    await writeFilePromisified(targetEnvPath, envConfigFile(isProduction));
+    await writeFilePromisified(targetDevEnvPath, envConfigFile(isProduction));
   } catch (err) {
     console.error(err);
     throw err;

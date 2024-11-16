@@ -1,0 +1,128 @@
+name: Web E2E 
+
+on:
+  push:
+    branches:
+      - 'develop'
+
+jobs:
+  e2e:
+    name: Angular E2E tests run job
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+    environment: Development
+
+    services:
+      redis:
+        image: redis:7.2.4-bookworm
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+      
+      mongodb:
+        image: mongo:4.4.16
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27018:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: user_m1
+          MONGO_INITDB_ROOT_PASSWORD: pass_m1
+
+    concurrency:
+      group: frontend-e2e-${{ github.ref }}
+      cancel-in-progress: true
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 'Create .env file for backend'
+        working-directory: ntx-backend-nestjs
+        run: |
+          touch .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo MONGODB_URI='${{ secrets.MONGODB_URI }}' >> .env
+          echo TMDB_API_KEY='${{ secrets.TMDB_API_KEY }}' >> .env
+          echo REDIS_HOST='${{ secrets.REDIS_HOST }}' >> .env
+          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> .env
+          echo REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}' >> .env
+          echo CLIENT_ORIGIN_URL='${{ vars.CLIENT_ORIGIN_URL }}' >> .env
+          echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
+          echo USE_MEMORY_MONGO=${{ vars.USE_MEMORY_MONGO }} >> .env
+          echo IN_MEMORY_MONGO_PORT=${{ vars.IN_MEMORY_MONGO_PORT }} >> .env
+          echo USE_MEMORY_REDIS=${{ vars.USE_MEMORY_REDIS }} >> .env
+          echo USE_TEMPORARY_FILE_STORAGE=${{ vars.USE_TEMPORARY_FILE_STORAGE }} >> .env
+          cat .env
+
+      - name: 'Create .env file for frontend'
+        working-directory: ntx-web-fe-angular
+        run: |
+          touch .env
+          echo API_SERVER_URL=${{ vars.API_SERVER_URL }} >> .env
+          echo PRODUCTION_ENVIRONMENT=false >> .env
+          cat .env
+
+      - name: Cache backend node modules
+        id: cache-backend-node-modules
+        uses: actions/cache@v4
+        with:
+          path: ./ntx-backend-nestjs/node_modules
+          key: ntx-backend-nestjs-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-backend-nestjs/package-lock.json') }}
+          restore-keys: |
+            ntx-backend-nestjs-${{ runner.os }}-node-${{ matrix.node-version }}-
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/ntx-backend-nestjs/package-lock.json'
+        
+      - name: Install dependencies (if node_modules cache not found)
+        if: ${{ steps.cache-backend-node-modules.outputs.cache-hit != 'true' }}
+        working-directory: ntx-backend-nestjs
+        run: npm ci
+
+      - name: Cache frontend node modules
+        id: cache-frontend-node-modules
+        uses: actions/cache@v4
+        with:
+          path: ./ntx-web-fe-angular/node_modules
+          key: ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/ntx-web-fe-angular/package-lock.json') }}
+          restore-keys: |
+            ntx-web-fe-angular-${{ runner.os }}-node-${{ matrix.node-version }}-
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/ntx-web-fe-angular/package-lock.json'
+
+      - name: Install dependencies (if node_modules cache not found)
+        if: ${{ steps.cache-frontend-node-modules.outputs.cache-hit != 'true' }}
+        working-directory: ntx-web-fe-angular
+        run: npm ci
+
+      - name: Intall ts-node
+        working-directory: ntx-web-fe-angular
+        run: npm i ts-node
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ntx-web-fe-angular
+          start: npm run backend:start, npm run start-with-env
+          wait-on: '${{ vars.CLIENT_ORIGIN_URL }}'
