@@ -99,3 +99,7 @@ export function getVideo(_id?: string): string {
 
   return url;
 }
+
+export function getVideoStream(_id: string): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.videos.videos}/${_id}/stream`;
+}

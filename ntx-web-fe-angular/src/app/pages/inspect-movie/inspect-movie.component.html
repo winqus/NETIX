@@ -74,10 +74,10 @@
       @if (isVideoAvailable()) {
         <ul class="menu menu-md bg-base-200 rounded-lg w-full">
           <li>
-            <a>
-              <app-svg-icons name="film" size="25" />
+            <button (click)="onWatchMovie()" class="w-full text-left flex items-center">
+              <app-svg-icons name="film" size="25"></app-svg-icons>
               {{ getVideoName() }}
-            </a>
+            </button>
           </li>
         </ul>
       } @else {

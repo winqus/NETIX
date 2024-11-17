@@ -32,12 +32,12 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'watch',
+    path: 'watch/movie',
     component: MainLayoutComponent,
     // canActivateChild: [AuthGuard],
     children: [
       { path: '', redirectTo: '/error/404', pathMatch: 'full' },
-      { path: ':uuid', component: VideoMediaViewerComponent },
+      { path: ':id', component: VideoMediaViewerComponent },
     ],
   },
   {

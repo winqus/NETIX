@@ -16,19 +16,24 @@ export function formatDate(date: Date): string {
  * @param isSeconds - boolean flag to indicate if the input time is in seconds
  * @returns formatted time string
  */
-export function formatTime(time?: number, isSeconds: boolean = false): string {
-  if (time == undefined) {
-    return '00:00:00';
+export function formatTime(time: number, isSeconds: boolean = false): string {
+  if (isNaN(time) || time == undefined || time == null) {
+    return '00:00';
   }
+  let totalSeconds = Math.floor(isSeconds ? time : time * 60);
 
-  let totalSeconds = isSeconds ? time : time * 60;
-
-  const hours = Math.floor(totalSeconds / 3600);
+  const hours: number = Math.floor(totalSeconds / 3600);
   totalSeconds %= 3600;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
+  const minutes: number = Math.floor(totalSeconds / 60);
+  const seconds: number = totalSeconds % 60;
 
-  return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+  let formattedTimeString: string = '';
+
+  if (hours > 0) formattedTimeString += `${padZero(hours)}:`;
+
+  formattedTimeString += `${padZero(minutes)}:${padZero(seconds)}`;
+
+  return formattedTimeString;
 }
 
 /**

@@ -1,0 +1,33 @@
+<div class="absolute bottom-0 left-0 w-full bg-black-to-transparent px-2 pb-2">
+  <app-timeline [currentTime]="getCurrentTime()" [duration]="getDurationTime()" [bufferEndTime]="getBufferEndTime()" (currentTimeChange)="onCurrentTimeChange($event)"></app-timeline>
+
+  <div id="video-controls" class="flex items-center justify-center align-middle">
+    <div class="flex">
+      <div class="flex items-center justify-center gap-2">
+        <button class="btn btn-circle btn-sm bg-transparent border-none" (click)="onTogglePlay()">
+          <app-svg-icons [name]="getTogglePlayIconName()" size="25px" color="white" />
+        </button>
+        <div class="flex items-center justify-start align-middle">
+          <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="onToggleMute()">
+            <app-svg-icons [name]="getVolumeIconName()" size="25px" color="white"></app-svg-icons>
+          </button>
+          <input type="range" min="0" max="1" step="0.01" [value]="currentVolume" class="range range-xs" (input)="onVolumeChange($event)" />
+        </div>
+        <div class="flex items-center justify-center text-white">
+          <div class="flex-1 text-sm">{{ getFormattedCurrentTime() + ' / ' + getFormattedDurationTime() }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 text-right">
+      <div class="flex items-center justify-end align-middle space-x-3">
+        <button class="btn btn-circle btn-xs bg-transparent hover:bg-transparent border-none" (click)="onEnablePictureInPicture()">
+          <app-svg-icons [name]="getPictureInPictureIconName()" size="25px" color="white" />
+        </button>
+        <button class="btn btn-circle btn-xs bg-transparent border-none" (click)="onToggleFullscreen()">
+          <app-svg-icons [name]="getFullscreenIconName()" size="25px" color="white" />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

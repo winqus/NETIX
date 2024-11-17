@@ -117,7 +117,9 @@ export class InspectMovieComponent implements OnInit, OnDestroy {
   onPosterError(): void {
     this.posterUrl = null;
   }
-
+  onWatchMovie(): void {
+    this.router.navigate(['/watch/movie', this.movie?.videoID]);
+  }
   loadBackdrop(id: string): void {
     if (id == null) return;
 
