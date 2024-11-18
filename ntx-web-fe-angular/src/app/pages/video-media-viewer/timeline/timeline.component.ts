@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, HostListener, Renderer2, OnDestroy } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, Renderer2, OnDestroy } from '@angular/core';
 import { formatTime } from '@ntx/app/shared/services/utils/utils';
 
 @Component({
@@ -26,7 +26,6 @@ export class TimelineComponent implements OnDestroy {
   progressPosition: string = '0%';
 
   private mouseUpListener!: () => void;
-  private mouseLeaveListener!: () => void;
   private mouseMoveListener!: () => void;
 
   constructor(private readonly renderer: Renderer2) {}
@@ -41,7 +40,7 @@ export class TimelineComponent implements OnDestroy {
     this.addMouseListeners();
   }
 
-  onMouseEnter(event: MouseEvent): void {
+  onMouseEnter(): void {
     this.isInTimeline = true;
     this.addMouseMoveListener();
   }
@@ -49,6 +48,39 @@ export class TimelineComponent implements OnDestroy {
   onMouseLeave(): void {
     this.isInTimeline = false;
     this.removeMouseMoveListener();
+  }
+
+  mediaProgress(): string {
+    if (this.isDragging && this.currentTime != this.newTime) {
+      this.currentTime = this.newTime;
+    }
+
+    return this.calculatePercentage(this.currentTime, this.duration);
+  }
+
+  previewBufferedProgress(): string {
+    if (this.isDragging || !this.duration) {
+      return '0%';
+    }
+    const duration = this.duration;
+    const progressTime = this.isInTimeline ? this.newTime : this.bufferEndTime;
+
+    return this.calculatePercentage(progressTime, duration);
+  }
+
+  updateTimelinePosition(event: MouseEvent): void {
+    const clientX = event.clientX;
+    const rect = this.videoTimeline.nativeElement.getBoundingClientRect();
+    const toolTipRect = this.thumbTooltip.nativeElement.getBoundingClientRect();
+
+    const newProgress = ((clientX - rect.left) * 100) / rect.width;
+    const clampedProgress = Math.max(0, Math.min(100, newProgress));
+
+    this.newTime = (clampedProgress * this.duration) / 100;
+    this.tooltipPosition = this.calculateTooltipPosition(clientX, rect, toolTipRect);
+  }
+  getTooltipLabel(): string {
+    return formatTime(this.newTime, true);
   }
 
   private addMouseMoveListener(): void {
@@ -73,51 +105,11 @@ export class TimelineComponent implements OnDestroy {
     }
   }
 
-  private onMouseLeaveWhileDragging(event: MouseEvent): void {
-    if (this.isDragging) {
-      this.isDragging = false;
-      this.updateTimelinePosition(event);
-      this.currentTimeChange.emit(this.currentTime);
-      this.removeMouseListeners();
-    }
-  }
-
-  mediaProgress(): string {
-    if (this.isDragging && this.currentTime != this.newTime) {
-      this.currentTime = this.newTime;
-    }
-
-    return this.calculatePercentage(this.currentTime, this.duration);
-  }
-
-  previewBufferedProgress(): string {
-    if (this.isDragging || !this.duration) {
-      return '0%';
-    }
-    const duration = this.duration;
-    const progressTime = this.isInTimeline ? this.newTime : this.bufferEndTime;
-
-    return this.calculatePercentage(progressTime, duration);
-  }
-
   private calculatePercentage(time: number, duration: number): string {
     if (duration === 0) return '0%';
 
     const percentage = (time / duration) * 100;
     return `${percentage.toFixed(3)}%`;
-  }
-
-  updateTimelinePosition(event: MouseEvent): void {
-    const clientX = event.clientX;
-    console.log(clientX);
-    const rect = this.videoTimeline.nativeElement.getBoundingClientRect();
-    const toolTipRect = this.thumbTooltip.nativeElement.getBoundingClientRect();
-
-    const newProgress = ((clientX - rect.left) * 100) / rect.width;
-    const clampedProgress = Math.max(0, Math.min(100, newProgress));
-
-    this.newTime = (clampedProgress * this.duration) / 100;
-    this.tooltipPosition = this.calculateTooltipPosition(clientX, rect, toolTipRect);
   }
 
   private calculateTooltipPosition(clientX: number, rect: DOMRect, toolTipRect: DOMRect): number {
@@ -133,19 +125,11 @@ export class TimelineComponent implements OnDestroy {
 
   private addMouseListeners(): void {
     this.mouseUpListener = this.renderer.listen('document', 'mouseup', this.onMouseUp.bind(this));
-    this.mouseLeaveListener = this.renderer.listen(this.videoTimeline.nativeElement, 'mouseleave', this.onMouseLeaveWhileDragging.bind(this));
   }
 
   private removeMouseListeners(): void {
     if (this.mouseUpListener) {
       this.mouseUpListener();
     }
-    if (this.mouseLeaveListener) {
-      this.mouseLeaveListener();
-    }
-  }
-
-  getTooltipLabel(): string {
-    return formatTime(this.newTime, true);
   }
 }

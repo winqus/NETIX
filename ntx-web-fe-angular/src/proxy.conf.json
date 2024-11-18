@@ -2,6 +2,8 @@
   "/api": {
     "target": "http://localhost:3055",
     "secure": true,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "logLevel": ""
+    }
   }
-}
+  

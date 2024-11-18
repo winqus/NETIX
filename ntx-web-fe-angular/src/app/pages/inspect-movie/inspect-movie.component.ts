@@ -118,7 +118,7 @@ export class InspectMovieComponent implements OnInit, OnDestroy {
     this.posterUrl = null;
   }
   onWatchMovie(): void {
-    this.router.navigate(['/watch/movie', this.movie?.videoID]);
+    this.router.navigate(['/watch/movie', this.movie?.videoID], { state: { data: this.movie?.name } });
   }
   loadBackdrop(id: string): void {
     if (id == null) return;
@@ -153,8 +153,6 @@ export class InspectMovieComponent implements OnInit, OnDestroy {
       },
       error: (error) => console.error('Error in progress subscription:', error),
     });
-
-    console.log(this.uploadProgress);
 
     this.videoService
       .uploadVideo(file, this.movie!.id)

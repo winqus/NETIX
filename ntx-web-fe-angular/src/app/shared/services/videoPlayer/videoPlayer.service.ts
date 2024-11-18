@@ -24,13 +24,14 @@ export class VideoPlayerService {
     sources: [
       {
         src: '',
-        type: 'video/mp4',
+        type: '',
       },
     ],
   };
 
-  initializePlayer(videoElement: HTMLVideoElement, source: string): void {
+  initializePlayer(videoElement: HTMLVideoElement, source: string, type: string): void {
     this.options.sources[0].src = source;
+    this.options.sources[0].type = type;
 
     this.player = videojs(videoElement, this.options);
 

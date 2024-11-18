@@ -1,4 +1,11 @@
-<div #timeline class="timeline-container flex items-center h-[6px] cursor-pointer overflow-visible" (mousedown)="onMouseDown($event)" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
+<div
+  #timeline
+  class="timeline-container flex items-center h-[6px] cursor-pointer overflow-visible"
+  (mousedown)="onMouseDown($event)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  draggable="false"
+>
   <div
     [style.--preview-position]="previewBufferedProgress()"
     [style.--progress-position]="mediaProgress()"

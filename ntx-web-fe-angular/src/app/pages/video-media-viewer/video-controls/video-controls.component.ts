@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Input, OnDestroy } from '@angular/core';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons.component';
 import { formatTime } from '@ntx-shared/services/utils/utils';
 import { fromEvent, Subscription } from 'rxjs';
@@ -76,6 +76,7 @@ export class VideoControlsComponent implements OnDestroy, AfterViewInit {
   getDurationTime(): number {
     return this.videoPlayer.getDuration();
   }
+
   getFormattedDurationTime(): string {
     const contentDuration = this.getDurationTime();
     return formatTime(contentDuration, true);
@@ -106,5 +107,13 @@ export class VideoControlsComponent implements OnDestroy, AfterViewInit {
 
   onCurrentTimeChange(time: number): void {
     this.videoPlayer.setCurrentTime(time);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (event.code === 'Space' || event.key === ' ') {
+      event.preventDefault();
+      this.onTogglePlay();
+    }
   }
 }

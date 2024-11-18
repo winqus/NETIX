@@ -1,7 +1,5 @@
-import { environment } from '@ntx/environments/environment';
-
 export const API_CONFIG = {
-  baseUrl: environment.api.serverUrl + '/api',
+  baseUrl: '/api',
   endpoints: {
     uploadConstraints: '/v1/upload/constraints',
     uploadPermission: '/v1/upload/permission',
@@ -10,7 +8,7 @@ export const API_CONFIG = {
 };
 
 export const SERVER = {
-  baseUrl: environment.api.serverUrl + '/api',
+  baseUrl: '/api',
   endpoints: {
     movies: {
       movies: '/v1/movies',

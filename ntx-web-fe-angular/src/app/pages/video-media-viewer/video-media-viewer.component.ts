@@ -16,6 +16,7 @@ export class VideoMediaViewerComponent implements OnInit {
   @ViewChild('videoContainer') videoContainer!: ElementRef<HTMLDivElement>;
 
   streamID: string = '';
+  titleName: string = '';
 
   constructor(
     private readonly videoPlayerService: VideoPlayerService,
@@ -25,6 +26,16 @@ export class VideoMediaViewerComponent implements OnInit {
   ngOnInit(): void {
     this.loadVideoStreamID();
     this.setupPlayer();
+
+    this.titleName = history.state.data;
+  }
+
+  getVideoPlayer(): VideoPlayerService {
+    return this.videoPlayerService;
+  }
+
+  getVideoTitleLabel(): string {
+    return this.titleName;
   }
 
   private async loadVideoStreamID(): Promise<void> {
@@ -32,10 +43,6 @@ export class VideoMediaViewerComponent implements OnInit {
   }
 
   private setupPlayer(): void {
-    this.videoPlayerService.initializePlayer(this.videoPlayerElement.nativeElement, getVideoStream(this.streamID));
-  }
-
-  getVideoPlayer(): VideoPlayerService {
-    return this.videoPlayerService;
+    this.videoPlayerService.initializePlayer(this.videoPlayerElement.nativeElement, getVideoStream(this.streamID), 'video/mp4');
   }
 }

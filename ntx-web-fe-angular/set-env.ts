@@ -28,10 +28,27 @@ const envConfigFile = (isProduction = true) => `export const environment = {
 };
 `;
 
+const targetProxyPath = './src/proxy.conf.json';
+const targetDevProxyPath = './src/proxy.conf.development.json';
+
+const proxyConfigFile = (isProduction = true) =>
+  `{
+  "/api": {
+    "target": "${process.env['API_SERVER_URL']}",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "${isProduction ? '' : 'debug'}"
+    }
+  }
+  `;
+
 (async () => {
   try {
     await writeFilePromisified(targetEnvPath, envConfigFile(true));
     await writeFilePromisified(targetDevEnvPath, envConfigFile(false));
+
+    await writeFilePromisified(targetProxyPath, proxyConfigFile(true));
+    await writeFilePromisified(targetDevProxyPath, proxyConfigFile(false));
   } catch (err) {
     console.error(err);
     throw err;
