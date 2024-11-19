@@ -7,6 +7,9 @@ import Player from 'video.js/dist/types/player';
 export class VideoPlayerService {
   private player!: Player;
 
+  private readonly playerReadySubject = new BehaviorSubject<boolean>(false);
+  playerReady$ = this.playerReadySubject.asObservable();
+
   private readonly currentTimeSubject = new BehaviorSubject<number>(0);
   currentTime$ = this.currentTimeSubject.asObservable();
 
@@ -49,17 +52,24 @@ export class VideoPlayerService {
       const volume = this.player.volume() ?? 0;
       this.volumeSubject.next(volume);
     });
+
+    this.player.ready(() => {
+      this.playerReadySubject.next(true);
+    });
   }
 
   togglePlay(): void {
+    if (!this.player) return;
     this.player.paused() ? this.player.play() : this.player.pause();
   }
 
   isPaused(): boolean {
+    if (!this.player) return true;
     return this.player.paused();
   }
 
   enablePictureInPicture() {
+    if (!this.player) return;
     this.player.isInPictureInPicture() ? this.player.exitPictureInPicture() : this.player.requestPictureInPicture();
   }
 
@@ -72,6 +82,7 @@ export class VideoPlayerService {
   }
 
   setVolume(volume: number): void {
+    if (!this.player) return;
     this.player.volume(volume);
     this.volumeSubject.next(volume);
   }
@@ -81,21 +92,33 @@ export class VideoPlayerService {
   }
 
   toggleMute(): void {
+    if (!this.player) return;
     const isMuted = this.player.muted();
     this.player.muted(!isMuted);
   }
 
   isMuted(): boolean {
+    if (!this.player) return true;
     return this.player.muted() ?? true;
   }
 
   getBufferEnd(): number {
+    if (!this.player) return 0;
     return this.player.bufferedEnd();
   }
 
   setCurrentTime(time: number): void {
+    if (!this.player) return;
     this.player.currentTime(time);
   }
 
-  // Add other methods like seek, setVolume, etc.
+  getPlaybackRate(): number {
+    if (!this.player) return 1.0;
+    return this.player.playbackRate() ?? 0;
+  }
+
+  setPlaybackRate(rate: number): void {
+    if (!this.player) return;
+    this.player.playbackRate(rate);
+  }
 }

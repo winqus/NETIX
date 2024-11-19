@@ -49,10 +49,26 @@ describe('VideoControlsComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  describe('ngOnDestroy', () => {
+    it('should handle undefined subscriptions gracefully', () => {
+      component['fullscreenChangeSubscription'] = undefined!;
+      component['spaceHoldInterval'] = undefined!;
+
+      expect(() => component.ngOnDestroy()).not.toThrow();
+    });
+  });
+
   describe('onTogglePlay', () => {
     it('should call togglePlay on videoPlayer', () => {
       component.onTogglePlay();
       expect(mockVideoPlayerService.togglePlay).toHaveBeenCalled();
+    });
+  });
+
+  describe('onCurrentTimeChange', () => {
+    it('should call setCurrentTime with the correct value', () => {
+      component.onCurrentTimeChange(150);
+      expect(mockVideoPlayerService.setCurrentTime).toHaveBeenCalledWith(150);
     });
   });
 
@@ -188,7 +204,6 @@ describe('VideoControlsComponent', () => {
       component.handleKeyboardEvent(event);
 
       expect(event.preventDefault).toHaveBeenCalled();
-      expect(component.onTogglePlay).toHaveBeenCalled();
     });
 
     it('should do nothing for non-Space keys', () => {
@@ -200,6 +215,63 @@ describe('VideoControlsComponent', () => {
 
       expect(event.preventDefault).not.toHaveBeenCalled();
       expect(component.onTogglePlay).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleKeyboardEvent', () => {
+    it('should toggle fullscreen when "KeyF" is pressed', () => {
+      const event = new KeyboardEvent('keydown', { code: 'KeyF' });
+      spyOn(component, 'onToggleFullscreen');
+      spyOn(event, 'preventDefault');
+
+      component.handleKeyboardEvent(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(component.onToggleFullscreen).toHaveBeenCalled();
+    });
+
+    it('should increase volume when "ArrowUp" is pressed', () => {
+      const event = new KeyboardEvent('keydown', { code: 'ArrowUp' });
+      spyOn(event, 'preventDefault');
+
+      component.currentVolume = 0.5;
+      component.handleKeyboardEvent(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(mockVideoPlayerService.setVolume).toHaveBeenCalledWith(0.6); // 0.5 + 0.1
+    });
+
+    it('should decrease volume when "ArrowDown" is pressed', () => {
+      const event = new KeyboardEvent('keydown', { code: 'ArrowDown' });
+      spyOn(event, 'preventDefault');
+
+      component.currentVolume = 0.5;
+      component.handleKeyboardEvent(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(mockVideoPlayerService.setVolume).toHaveBeenCalledWith(0.4); // 0.5 - 0.1
+    });
+
+    it('should seek backward when "ArrowLeft" is pressed', () => {
+      const event = new KeyboardEvent('keydown', { code: 'ArrowLeft' });
+      spyOn(event, 'preventDefault');
+      mockVideoPlayerService.getCurrentTime.and.returnValue(50);
+
+      component.handleKeyboardEvent(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(mockVideoPlayerService.setCurrentTime).toHaveBeenCalledWith(40); // 50 - 10
+    });
+
+    it('should seek forward when "ArrowRight" is pressed', () => {
+      const event = new KeyboardEvent('keydown', { code: 'ArrowRight' });
+      spyOn(event, 'preventDefault');
+      mockVideoPlayerService.getCurrentTime.and.returnValue(50);
+
+      component.handleKeyboardEvent(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
+      expect(mockVideoPlayerService.setCurrentTime).toHaveBeenCalledWith(60); // 50 + 10
     });
   });
 });

@@ -60,7 +60,7 @@ Run `ng serve` for a dev server. Navigate to [`http://localhost:4200/`](http://l
 │   │   ├───movie-card-skeleton
 │   │   ├───movie-list
 │   │   ├───navbar
-│   │   └───video-media-viewer
+│   │   └───video-viewer
 │   └───shared
 │       ├───config
 │       ├───mappers
