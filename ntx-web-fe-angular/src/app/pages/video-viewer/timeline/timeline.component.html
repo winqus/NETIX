@@ -1,0 +1,19 @@
+<div
+  #timeline
+  class="timeline-container flex items-center h-[6px] cursor-pointer overflow-visible"
+  (mousedown)="onMouseDown($event)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  draggable="false"
+>
+  <div
+    [style.--preview-position]="previewBufferedProgress()"
+    [style.--progress-position]="mediaProgress()"
+    class="timeline-b h-[3px] hover:h-full w-full bg-slate-600 rounded-md relative before:rounded-md transition-height hover:duration-100 ease-in-out"
+  >
+    <div class="thumb-indicator"></div>
+  </div>
+  <div #thumbTooltip class="absolute bottom-[4rem] text-center w-auto rounded-md bg-black text-xs p-1" [style.visibility]="isInTimeline ? 'visible' : 'hidden'" [style.left.px]="tooltipPosition">
+    <div class="text-white" [innerText]="getTooltipLabel()"></div>
+  </div>
+</div>

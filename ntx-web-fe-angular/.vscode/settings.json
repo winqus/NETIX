@@ -36,5 +36,6 @@
   "editor.rulers": [120],
   "material-icon-theme.files.associations": {
     "*.interface.ts": "angular"
-  }
+  },
+  "cSpell.words": ["videojs"]
 }
