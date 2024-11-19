@@ -20,6 +20,7 @@ Create a **.env** file in the **ntx-web-fe-angular** repository folder with the 
 # AUTH0_AUDIENCE=<none for now>
 # AUTH0_CALLBACK_URL=http://localhost:4200
 API_SERVER_URL=http://localhost:3055
+PRODUCTION_ENVIRONMENT=false
 ```
 
 ## Logging
