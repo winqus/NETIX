@@ -79,6 +79,7 @@ export class TimelineComponent implements OnDestroy {
     this.newTime = (clampedProgress * this.duration) / 100;
     this.tooltipPosition = this.calculateTooltipPosition(clientX, rect, toolTipRect);
   }
+
   getTooltipLabel(): string {
     return formatTime(this.newTime, true);
   }

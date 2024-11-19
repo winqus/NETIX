@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, HostListener, Input, OnDestroy } from '@angular/core';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons.component';
 import { formatTime } from '@ntx-shared/services/utils/utils';
-import { filter, fromEvent, interval, Subject, Subscription, switchMap, takeWhile, timer } from 'rxjs';
+import { fromEvent, interval, Subject, Subscription, switchMap, takeWhile, timer } from 'rxjs';
 import { VideoPlayerService } from '@ntx-shared/services/videoPlayer/videoPlayer.service';
 import { TimelineComponent } from '../timeline/timeline.component';
 
