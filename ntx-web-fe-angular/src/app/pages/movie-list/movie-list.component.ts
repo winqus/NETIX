@@ -4,6 +4,7 @@ import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
 import { environment } from '@ntx/environments/environment.development';
 import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-example',
@@ -13,17 +14,22 @@ import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 })
 export class MovieListComponent implements OnInit {
   title = 'netix';
-
+  redirectUrl = '';
   skeletonNumber: number[] = Array.from({ length: 20 }, (_, i) => i);
   movies: MovieDTO[] = [];
 
   isLoadingMovies: boolean = true;
   constructor(
     private readonly movieService: MovieService,
+    private readonly route: ActivatedRoute,
     private readonly errorHandler: ErrorHandlerService
   ) {}
 
   ngOnInit() {
+    this.route.data.subscribe((data) => {
+      this.redirectUrl = data['movieCardRedirect'] ?? '';
+    });
+
     this.movieService.getMovies().subscribe({
       next: (response) => {
         if (environment.development) console.log('Get movies:', response);
@@ -37,5 +43,15 @@ export class MovieListComponent implements OnInit {
         this.isLoadingMovies = false;
       },
     });
+  }
+
+  getRedirectUrl(): string {
+    return this.redirectUrl;
+  }
+
+  isMoviePublished(movie: MovieDTO): boolean {
+    if (this.redirectUrl == 'inspect/movie' || movie.isPublished) return true;
+
+    return false;
   }
 }

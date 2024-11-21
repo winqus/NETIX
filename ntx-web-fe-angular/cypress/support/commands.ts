@@ -52,7 +52,7 @@ Cypress.Commands.add('createMovieWithPoster', (args: any): Cypress.Chainable<Mov
   const CREATE_MOVIE_REQUEST_TOKEN = 'create-movie-request';
   cy.intercept('POST', convertRouteToPath(getMovieUrl())).as(CREATE_MOVIE_REQUEST_TOKEN);
 
-  cy.visit('/createTitle');
+  cy.visit('/create/title');
   cy.get('[aria-label="Create"]').click();
 
   cy.get('#title').type(name || makeRandomMovieName(), { delay: 0 });

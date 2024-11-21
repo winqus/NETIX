@@ -111,7 +111,7 @@ describe('ImportTitleComponent', () => {
         externalID: 'test',
         externalProviderID: 'provider',
       });
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/inspect/movies', '123'], { state: { from: 'creation' } });
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/inspect/movie', '123'], { state: { from: 'creation' } });
     });
 
     it('should handle error and show error message on failure', () => {
@@ -150,7 +150,7 @@ describe('ImportTitleComponent', () => {
       spyOn(component, 'isFormValid').and.returnValue(true);
       component.onSubmit();
       expect(mockExternalMovieService.uploadExternalMovieMetadata).toHaveBeenCalled();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/inspect/movies', '123'], { state: { from: 'creation' } });
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/inspect/movie', '123'], { state: { from: 'creation' } });
     });
 
     it('should handle error and show error message on failure', () => {

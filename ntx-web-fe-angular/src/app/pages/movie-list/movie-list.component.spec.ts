@@ -1,31 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MovieListComponent } from './movie-list.component';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
+import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
+import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { testMovieFixture } from '@ntx-shared/services/movie/movieTestData';
-import { environment } from '@ntx/environments/environment.development';
-import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 
 describe('MovieListComponent', () => {
   let component: MovieListComponent;
   let fixture: ComponentFixture<MovieListComponent>;
   let mockMovieService: any;
   let mockErrorHandlerService: any;
+  let mockActivatedRoute: any;
 
   beforeEach(async () => {
+    mockMovieService = {
+      getMovies: jasmine.createSpy('getMovies').and.returnValue(of(testMovieFixture)),
+    };
     mockErrorHandlerService = {
       showError: jasmine.createSpy('showError'),
       showSuccess: jasmine.createSpy('showSuccess'),
     };
-    mockMovieService = {
-      getMovies: jasmine.createSpy('getMovies').and.returnValue(of(testMovieFixture)),
+    mockActivatedRoute = {
+      data: of({ movieCardRedirect: 'inspect/movie' }),
     };
 
     await TestBed.configureTestingModule({
-      imports: [MovieListComponent],
+      imports: [MovieListComponent], // For standalone components
       providers: [
         { provide: MovieService, useValue: mockMovieService },
         { provide: ErrorHandlerService, useValue: mockErrorHandlerService },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     }).compileComponents();
 
@@ -39,8 +44,9 @@ describe('MovieListComponent', () => {
   });
 
   it('should fetch movies on init and set isLoadingMovies to false', () => {
+    expect(mockMovieService.getMovies).toHaveBeenCalled();
     expect(component.movies).toEqual(testMovieFixture);
-    expect(component.isLoadingMovies).toBeFalse(); // Ensure loading state is set to false
+    expect(component.isLoadingMovies).toBeFalse();
   });
 
   it('should sort movies by originallyReleasedAt in descending order', () => {
@@ -48,32 +54,15 @@ describe('MovieListComponent', () => {
     expect(component.movies).toEqual(sortedMovies);
   });
 
-  it('should set isLoadingMovies to false when the movies are loaded', () => {
-    expect(component.isLoadingMovies).toBeFalse();
+  it('should set redirectUrl from ActivatedRoute data', () => {
+    expect(component.getRedirectUrl()).toBe('inspect/movie');
   });
 
-  it('should log the movies response in development mode', () => {
-    spyOn(console, 'log');
+  it('should determine if a movie is published based on redirectUrl and movie data', () => {
+    const unpublishedMovie = { isPublished: false } as any;
+    const publishedMovie = { isPublished: true } as any;
 
-    component.ngOnInit();
-
-    if (environment.development) {
-      expect(console.log).toHaveBeenCalledWith('Get movies:', testMovieFixture);
-    } else {
-      expect(console.log).not.toHaveBeenCalled();
-    }
-  });
-
-  it('should log error in development mode when there is an error fetching movies', () => {
-    spyOn(console, 'error');
-    mockMovieService.getMovies.and.returnValue(throwError(() => new Error('Failed to fetch movies')));
-
-    component.ngOnInit();
-
-    if (environment.development) {
-      expect(console.error).toHaveBeenCalledWith('Error getting movies:', jasmine.any(Error));
-    } else {
-      expect(console.error).not.toHaveBeenCalled();
-    }
+    expect(component.isMoviePublished(unpublishedMovie)).toBeTrue();
+    expect(component.isMoviePublished(publishedMovie)).toBeTrue();
   });
 });

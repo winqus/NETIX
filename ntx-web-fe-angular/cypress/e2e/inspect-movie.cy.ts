@@ -15,13 +15,13 @@ describe('inspect movie', () => {
     cy.createMovieWithPoster().then((movie: MovieDTO) => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
       cy.log('Inspecting movie:', movie);
 
-      cy.url().should('include', `/inspect/movies/${movie.id}`);
+      cy.url().should('include', `/inspect/movie/${movie.id}`);
     });
   });
 
@@ -30,8 +30,8 @@ describe('inspect movie', () => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
       cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
 
-      cy.visit('/');
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit('/manage/titles');
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.log('Inspecting movie:', movie);
 
@@ -51,7 +51,7 @@ describe('inspect movie', () => {
     cy.createMovieWithPoster().then((movie: MovieDTO) => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
@@ -65,7 +65,7 @@ describe('inspect movie', () => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
       cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
@@ -81,7 +81,7 @@ describe('inspect movie', () => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
       cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
@@ -114,7 +114,7 @@ describe('inspect movie', () => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
       cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
@@ -136,7 +136,7 @@ describe('inspect movie', () => {
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
       cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
@@ -164,7 +164,7 @@ describe('inspect movie', () => {
       cy.intercept(convertRouteToPath(getPoster(movie.posterID, PosterSize.L))).as(GET_POSTER_REQUEST_TOKEN);
       cy.intercept('PUT', `${convertRouteToPath(getMoviePosterUrl(movie.id))}`).as(PUT_POSTER_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_POSTER_REQUEST_TOKEN);
@@ -198,7 +198,7 @@ describe('inspect movie', () => {
       cy.intercept('PUT', `${convertRouteToPath(getMovieBackdropUrl(movie.id))}`).as(PUT_BACKDROP_REQUEST_TOKEN);
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
@@ -233,7 +233,7 @@ describe('inspect movie', () => {
       cy.intercept('POST', `${convertRouteToPath(getVideoUpload(movie.id))}`).as(UPLOAD_VIDEO_TOKEN);
       cy.intercept('GET', new RegExp(`^${convertRouteToPath(getVideo())}/.*`)).as(VIDEO_PROPS_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
@@ -273,7 +273,7 @@ describe('inspect movie', () => {
       cy.intercept('POST', `${convertRouteToPath(getVideoUpload(movie.id))}`).as(UPLOAD_VIDEO_TOKEN);
       cy.intercept('GET', new RegExp(`^${convertRouteToPath(getVideo())}/.*`)).as(VIDEO_PROPS_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
@@ -344,7 +344,7 @@ describe('inspect movie', () => {
       cy.intercept('DELETE', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(DELETE_MOVIE_REQUEST_TOKEN);
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 
@@ -358,7 +358,7 @@ describe('inspect movie', () => {
         expect(interception.response!.statusCode).to.eq(204);
       });
 
-      cy.url().should('include', '/');
+      cy.url().should('include', '/manage/titles');
     });
   });
 
@@ -373,7 +373,7 @@ describe('inspect movie', () => {
       }).as(DELETE_MOVIE_REQUEST_TOKEN);
       cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 

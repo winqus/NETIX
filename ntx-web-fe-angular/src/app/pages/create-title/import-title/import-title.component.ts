@@ -87,7 +87,7 @@ export class ImportTitleComponent implements OnInit {
       )
       .subscribe({
         next: (movieId) => {
-          this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
+          this.router.navigate(['/inspect/movie', movieId], { state: { from: 'creation' } });
         },
         error: (errorResponse) => {
           this.handleError(errorResponse);
