@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { getPoster } from '@ntx/app/shared/config/api-endpoints';
 import { CssColor, TimeDelays, MediaConstants } from '@ntx/app/shared/config/constants';
@@ -20,7 +20,7 @@ import { timer } from 'rxjs';
   templateUrl: './view-movie.component.html',
   styleUrl: './view-movie.component.scss',
 })
-export class ViewMovieComponent {
+export class ViewMovieComponent implements OnInit {
   movie: MovieDTO | undefined;
   video: VideoDTO | undefined;
   posterUrl: string | null = null;

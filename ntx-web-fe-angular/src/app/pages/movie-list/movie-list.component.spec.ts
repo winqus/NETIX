@@ -3,7 +3,7 @@ import { MovieListComponent } from './movie-list.component';
 import { MovieService } from '@ntx-shared/services/movie/movie.service';
 import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { ActivatedRoute } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { testMovieFixture } from '@ntx-shared/services/movie/movieTestData';
 
 describe('MovieListComponent', () => {

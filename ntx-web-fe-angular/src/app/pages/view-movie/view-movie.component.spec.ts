@@ -32,7 +32,6 @@ describe('ViewMovieComponent', () => {
   };
 
   beforeEach(async () => {
-    // Mocking dependencies
     mockMovieService = {
       getMovieMetadata: jasmine.createSpy('getMovieMetadata').and.returnValue(of(mockMovie)),
     };
@@ -59,9 +58,8 @@ describe('ViewMovieComponent', () => {
 
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-    // TestBed configuration
     await TestBed.configureTestingModule({
-      imports: [ViewMovieComponent], // Standalone component
+      imports: [ViewMovieComponent],
       providers: [
         { provide: MovieService, useValue: mockMovieService },
         { provide: PosterService, useValue: mockPosterService },
@@ -72,7 +70,6 @@ describe('ViewMovieComponent', () => {
       ],
     }).compileComponents();
 
-    // Component initialization
     fixture = TestBed.createComponent(ViewMovieComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
