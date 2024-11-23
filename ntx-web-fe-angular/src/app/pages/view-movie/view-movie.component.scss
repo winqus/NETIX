@@ -1,0 +1,19 @@
+.vignette-overlay img {
+  border-radius: 0%;
+  display: block;
+  filter: grayscale(40%);
+}
+
+.vignette-overlay:after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse 70% 150% at center, rgba(255, 255, 255, 0) 0%, var(--gradient-color, rgba(21, 28, 36, 1)) 70%, var(--gradient-color, rgba(21, 28, 36, 1)) 100%),
+    radial-gradient(ellipse 150% 70% at center, rgba(255, 255, 255, 0) 0%, var(--gradient-color, rgba(21, 28, 36, 1)) 70%, var(--gradient-color, rgba(21, 28, 36, 1)) 100%);
+
+  border-radius: 0%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}

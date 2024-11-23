@@ -7,34 +7,46 @@ import { MovieListComponent } from '@ntx-pages/movie-list/movie-list.component';
 import { VideoViewerComponent } from './pages/video-viewer/video-viewer.component';
 import { CreateTitleComponent } from '@ntx-pages/create-title/create-title.component';
 import { InspectMovieComponent } from './pages/inspect-movie/inspect-movie.component';
+import { ViewMovieComponent } from './pages/view-movie/view-movie.component';
 // import { AuthGuard } from '@auth0/auth0-angular';
 
 export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    // canActivateChild: [AuthGuard],
     children: [{ path: '', component: MovieListComponent }],
+    data: { movieCardRedirect: 'view/movie' },
   },
   {
-    path: 'createTitle',
+    path: 'manage/titles',
     component: MainLayoutComponent,
-    // canActivateChild: [AuthGuard],
+    children: [{ path: '', component: MovieListComponent }],
+    data: { movieCardRedirect: 'inspect/movie' },
+  },
+  {
+    path: 'create/title',
+    component: MainLayoutComponent,
     children: [{ path: '', component: CreateTitleComponent }],
   },
   {
-    path: 'inspect/movies',
+    path: 'inspect/movie',
     component: MainLayoutComponent,
-    // canActivateChild: [AuthGuard],
     children: [
       { path: '', redirectTo: '/error/404', pathMatch: 'full' },
       { path: ':id', component: InspectMovieComponent },
     ],
   },
   {
+    path: 'view/movie',
+    component: MainLayoutComponent,
+    children: [
+      { path: '', redirectTo: '/error/404', pathMatch: 'full' },
+      { path: ':id', component: ViewMovieComponent },
+    ],
+  },
+  {
     path: 'watch/movie',
     component: MainLayoutComponent,
-    // canActivateChild: [AuthGuard],
     children: [
       { path: '', redirectTo: '/error/404', pathMatch: 'full' },
       { path: ':id', component: VideoViewerComponent },
@@ -54,7 +66,7 @@ export const routes: Routes = [
           errorMessage: appMessages.http.error403Forbidden.shortMessage,
           infoMessage: appMessages.redirection.toHome,
           redirectAfter: 1000,
-          redirectTo: '/',
+          redirectTo: '/manage/titles',
         },
       },
       {
@@ -66,7 +78,7 @@ export const routes: Routes = [
           errorMessage: appMessages.http.error404NotFound.shortMessage,
           infoMessage: appMessages.redirection.toHome,
           redirectAfter: 2000,
-          redirectTo: '/',
+          redirectTo: '/manage/titles',
         },
       },
     ],

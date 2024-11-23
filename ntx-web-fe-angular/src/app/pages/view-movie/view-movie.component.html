@@ -1,0 +1,45 @@
+<div class="h-full w-full relative" [style.background]="pageBackgroundColor">
+  @if (backdropUrl) {
+    <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="pageBackgroundColor">
+      <img [src]="backdropUrl" alt="Backdrop" class="w-full h-full object-contain" />
+    </div>
+    <div class="absolute inset-0" [style.background]="'linear-gradient(15deg, ' + backdropColor + ' 0%, ' + transparentColor + ' 40%, ' + transparentColor + ' 70%, ' + backdropColor + ' 100%)'"></div>
+  }
+  <div class="relative z-10 flex w-full flex-col">
+    <div class="flex w-full p-10 relative">
+      <div class="relative h-[400px] flex flex-row flex-auto gap-6 z-10">
+        <div class="relative h-full aspect-[2/3] bg-white flex align-middle justify-center items-center rounded-xl shadow-lg shadow-black">
+          @if (posterUrl) {
+            <img [src]="posterUrl" (error)="onPosterError()" alt="Poster" class="h-full w-auto object-cover rounded-lg" />
+          } @else {
+            <app-svg-icons name="file_image" size="120"></app-svg-icons>
+          }
+        </div>
+        <div class="w-full flex flex-col justify-between">
+          <div class="flex flex-row flex-auto w-full">
+            <div class="flex flex-col flex-auto gap-3">
+              <div class="badge badge-md rounded-md font-bold">MOVIE</div>
+              <div class="flex flex-row items-center justify-start gap-8">
+                <div class="text-4xl">{{ this.movie?.name || 'Unknown' }}</div>
+                <div class="text-xl text-gray-500">{{ this.movie?.originallyReleasedAt?.getFullYear() || 'Unknown Year' }}</div>
+                <div class="text-xl text-gray-500">{{ getRuntimeLabel() }}</div>
+              </div>
+              <div class="flex-grow w-2/3 text-xl overflow-hidden">
+                <p class="text-xl text-balance leading-snug text-white">
+                  {{ this.movie?.summary || 'No summary available.' }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-row items-center justify-start gap-2">
+            @if (isVideoAvailable()) {
+              <button class="btn btn-success" (click)="onWatchMovie()"><app-svg-icons name="play" size="20"></app-svg-icons>Play</button>
+            } @else {
+              <div class="btn btn-outline">unavailable</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

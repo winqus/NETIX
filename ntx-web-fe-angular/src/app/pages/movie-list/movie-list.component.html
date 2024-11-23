@@ -2,7 +2,9 @@
   <div class="h-screen grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
     @if (!isLoadingMovies) {
       @for (movie of movies; track movie.id) {
-        <app-movie-card [movie]="movie"></app-movie-card>
+        @if (isMoviePublished(movie)) {
+          <app-movie-card [movie]="movie" [redirectPath]="getRedirectUrl()"></app-movie-card>
+        }
       }
     } @else {
       @for (skeleton of skeletonNumber; track skeleton; let count = $count) {

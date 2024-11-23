@@ -53,7 +53,7 @@ export class RemoveMovieComponent {
       next: () => {
         if (environment.development) console.log('Publishing successful');
         this.errorHandler.showSuccess('Movie removed');
-        this.router.navigate(['/']);
+        this.router.navigate(['/manage/titles']);
       },
       error: (errorResponse: any) => {
         if (environment.development) console.error('Error publishing movie:', errorResponse);
