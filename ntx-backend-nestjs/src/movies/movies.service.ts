@@ -12,9 +12,16 @@ import { MovieSearchResultDTO } from './dto/movie-search-result.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
 import { Movie } from './entities/movie.entity';
-import { MovieCreatedEvent, MovieUpdatedEvent } from './events/movies.events';
+import {
+  MovieBackdropUpdatedEvent,
+  MovieCreatedEvent,
+  MovieDeletedEvent,
+  MovieEvent,
+  MoviePosterUpdatedEvent,
+  MovieUpdatedEvent,
+} from './events/movies.events';
+import { MoviesMapper } from './mappers/movies.mapper';
 import { MOVIES_NO_FILE_PROVIDED_ERROR, MOVIES_NO_ID_PROVIDED_ERROR, MOVIES_NOT_FOUND_ERROR } from './movies.constants';
-import { MoviesMapper } from './movies.mapper';
 import { MoviesRepository } from './movies.repository';
 
 @Injectable()
@@ -54,7 +61,7 @@ export class MoviesService {
       });
 
       await this.moviesRepo.createOne(newMovie);
-      this.eventEmitter.emit('movie.created', new MovieCreatedEvent(newMovie.uuid));
+      this.eventEmitter.emit(MovieEvent.Created, new MovieCreatedEvent(newMovie.uuid));
 
       return MoviesMapper.Movie2MovieDTO(newMovie);
     } catch (error) {
@@ -95,7 +102,7 @@ export class MoviesService {
 
       await this.moviesRepo.createOne(newMovie);
 
-      this.eventEmitter.emit('movie.created', new MovieCreatedEvent(newMovie.uuid));
+      this.eventEmitter.emit(MovieEvent.Created, new MovieCreatedEvent(newMovie.uuid));
 
       return MoviesMapper.Movie2MovieDTO(newMovie);
     } catch (error) {
@@ -129,7 +136,7 @@ export class MoviesService {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
 
-      this.eventEmitter.emit('movie.updated', new MovieUpdatedEvent(id, dto));
+      this.eventEmitter.emit(MovieEvent.Updated, new MovieUpdatedEvent(id, dto));
 
       return MoviesMapper.Movie2MovieDTO(updatedMovie);
     } catch (error) {
@@ -158,7 +165,7 @@ export class MoviesService {
       movie.posterID = posterID;
       await this.moviesRepo.updateOneByUUID(id, movie);
 
-      this.eventEmitter.emit('movie.posterUpdated', { id, posterID: movie.posterID });
+      this.eventEmitter.emit(MovieEvent.PosterUpdated, new MoviePosterUpdatedEvent(id, movie.posterID));
 
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
@@ -187,7 +194,7 @@ export class MoviesService {
       movie.backdropID = backdropID;
       await this.moviesRepo.updateOneByUUID(id, movie);
 
-      this.eventEmitter.emit('movie.backdropUpdated', { id, backdropID: movie.backdropID });
+      this.eventEmitter.emit(MovieEvent.BackdropUpdated, new MovieBackdropUpdatedEvent(id, movie.backdropID));
 
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
@@ -223,7 +230,7 @@ export class MoviesService {
       movie.videoID = video.uuid;
       await this.moviesRepo.updateOneByUUID(id, movie);
 
-      this.eventEmitter.emit('movie.videoUpdated', { id, videoID: movie.videoID });
+      this.eventEmitter.emit(MovieEvent.VideoUpdated, new MovieUpdatedEvent(id, { videoID: movie.videoID }));
 
       return MoviesMapper.Movie2MovieDTO(movie);
     } catch (error) {
@@ -325,7 +332,9 @@ export class MoviesService {
 
       movie.isPublished = isPublished;
       const updatedMovie = await this.moviesRepo.updateOneByUUID(id, movie);
-      this.eventEmitter.emit(isPublished ? 'movie.published' : 'movie.unpublished', { id });
+
+      const eventType = isPublished ? MovieEvent.Published : MovieEvent.Unpublished;
+      this.eventEmitter.emit(eventType, { id });
 
       return MoviesMapper.Movie2MovieDTO(updatedMovie!);
     } catch (error) {
@@ -365,7 +374,7 @@ export class MoviesService {
       }
 
       await this.moviesRepo.deleteOneByUUID(id);
-      this.eventEmitter.emit('movie.deleted', { id });
+      this.eventEmitter.emit(MovieEvent.Deleted, new MovieDeletedEvent(id));
     } catch (error) {
       this.logger.error(`Failed to delete movie (${id}): ${error.message}`);
       throw error;

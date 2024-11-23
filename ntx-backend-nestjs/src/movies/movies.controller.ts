@@ -31,6 +31,9 @@ import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
+
+import { MoviesAuditLogMapper } from './mappers/movie-audit-log.mapper';
+import { MovieAuditLogsRepository } from './movie-audit-logs.repository';
 import {
   MOVIES_BACKDROP_FILE_STORAGE_ARGS,
   MOVIES_CACHE_KEY,
@@ -45,12 +48,11 @@ import {
   MOVIES_SWAGGER_TAG,
   MOVIES_VIDEOS_FILE_STORAGE_ARGS,
 } from './movies.constants';
-import { MoviesAuditLogMapper } from './movies.events.mapper';
-import { AuditLogRepository } from './movies.events.repository';
 import { MoviesService } from './movies.service';
 import {
   ApiDocsForDeleteMovie,
   ApiDocsForDeleteMoviePublished,
+  ApiDocsForGetLogs,
   ApiDocsForGetMovie,
   ApiDocsForGetMovies,
   ApiDocsForPatchMovie,
@@ -76,7 +78,7 @@ export class MoviesController {
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
     private readonly tusUploadSrv: TusUploadService,
-    private readonly auditLogRepo: AuditLogRepository,
+    private readonly auditLogRepo: MovieAuditLogsRepository,
   ) {}
 
   @Post()
@@ -148,14 +150,15 @@ export class MoviesController {
   }
 
   @Get(':id/logs')
+  @ApiDocsForGetLogs()
   public async getLogs(@Param('id') id: string) {
     const logs = await this.auditLogRepo.findByMovieId(id);
 
     if (!logs || logs.length === 0) {
-      throw new NotFoundException(`No logs found for movie: ${id}`);
+      return [];
     }
 
-    return MoviesAuditLogMapper.toAuditLogDTOs(logs);
+    return await MoviesAuditLogMapper.MovieAuditLog2MovieAuditLogDTOs(logs);
   }
 
   @Put(':id/poster')

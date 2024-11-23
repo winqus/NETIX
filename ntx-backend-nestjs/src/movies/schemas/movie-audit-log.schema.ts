@@ -1,17 +1,16 @@
 import { Document, Schema } from 'mongoose';
 
-export const AuditLogSchema = new Schema(
+export const MovieAuditLogSchema = new Schema(
   {
     uuid: { type: String, required: true, unique: true },
     event: { type: String, required: true },
     movieId: { type: String, required: true },
     changes: { type: Object, required: true },
-    createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );
 
-export interface AuditLogDocument extends Document {
+export interface MovieAuditLogDocument extends Document {
   uuid: string;
   event: string;
   movieId: string;

@@ -3,8 +3,8 @@ import { makeCaseInsensitiveRegex } from '@ntx/common/utils/regex.utils';
 import { EntityRepository } from '@ntx/database/entity.repository';
 import { FilterQuery, Model } from 'mongoose';
 import { Movie } from './entities/movie.entity';
+import { MoviesMapper } from './mappers/movies.mapper';
 import { MOVIES_MODEL_TOKEN } from './movies.constants';
-import { MoviesMapper } from './movies.mapper';
 import { MovieDocument } from './schemas/movie.schema';
 
 @Injectable()

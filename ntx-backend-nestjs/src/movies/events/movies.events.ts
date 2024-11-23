@@ -1,3 +1,14 @@
+export enum MovieEvent {
+  Created = 'movie.created',
+  Updated = 'movie.updated',
+  PosterUpdated = 'movie.posterUpdated',
+  BackdropUpdated = 'movie.backdropUpdated',
+  VideoUpdated = 'movie.videoUpdated',
+  Published = 'movie.published',
+  Unpublished = 'movie.unpublished',
+  Deleted = 'movie.deleted',
+}
+
 export class MovieCreatedEvent {
   constructor(
     public readonly id: string,
@@ -37,7 +48,7 @@ export class MovieDeletedEvent {
 export class MoviePosterUpdatedEvent {
   constructor(
     public readonly id: string,
-    public readonly posterID: string, // Identifier for the new poster
+    public readonly posterID: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
@@ -45,7 +56,7 @@ export class MoviePosterUpdatedEvent {
 export class MovieBackdropUpdatedEvent {
   constructor(
     public readonly id: string,
-    public readonly backdropID: string, // Identifier for the new backdrop
+    public readonly backdropID: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
@@ -53,7 +64,7 @@ export class MovieBackdropUpdatedEvent {
 export class MovieVideoUpdatedEvent {
   constructor(
     public readonly id: string,
-    public readonly videoID: string, // Identifier for the new video
+    public readonly videoID: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }

@@ -9,6 +9,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { CreateMovieDTO } from '../dto/create-movie.dto';
+import { MovieAuditLogDTO } from '../dto/movie-audit-log.dto';
 import { MovieDTO } from '../dto/movie.dto';
 
 export function ApiDocsForPostMovie() {
@@ -187,5 +188,18 @@ export function ApiDocsForDeleteMovie() {
     ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid id' }),
     ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Requested movie does not exist' }),
     ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
+  );
+}
+export function ApiDocsForGetLogs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Get audit logs for a specific movie by ID' }),
+    ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Retrieved audit logs for the specified movie',
+      type: [MovieAuditLogDTO],
+    }),
+    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No logs found for the specified movie ID' }),
+    ApiResponse({ description: 'Server internal error. Check server logs' }),
   );
 }

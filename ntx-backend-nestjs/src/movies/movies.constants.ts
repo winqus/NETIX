@@ -17,8 +17,10 @@ export const MOVIES_BACKDROP_MAX_SIZE_IN_BYTES = 10_024_000; // 10 MB
 export const MOVIES_BACKDROP_INPUT_MIME_TYPES = ['image/webp', 'application/octet-stream'];
 export const MOVIES_VIDEO_TEMP_STORAGE_CONTAINER = 'raw-uploads';
 export const MOVIES_VIDEO_FILE_FIELD_NAME = 'video';
-export const MOVIES_ID_PREFIX = 'MT-';
+export const MOVIES_ID_PREFIX = 'MT_';
 export const MOVIES_ID_LENGTH = 15;
+export const AUDIT_LOG_ID_PREFIX = 'LOG_';
+export const AUDIT_LOG_ID_LENGTH = 20;
 
 export const MOVIES_POSTER_FILE_STORAGE_ARGS: FileToStorageContainerInterceptorArgs = {
   container: MOVIES_POSTER_TEMP_STORAGE_CONTAINER,
@@ -61,8 +63,8 @@ export const MOVIES_CACHE_OPTS = {
 /* Mongoose */
 export const MOVIES_MODEL_TOKEN = 'MOVIES_MODEL';
 export const MOVIES_SCHEMA_NAME = 'Movie';
-export const EVENTS_MODEL_TOKEN = 'EVENTS_MODEL';
-export const EVENTS_SCHEMA_NAME = 'Evenmt';
+export const EVENTS_MODEL_TOKEN = 'AUDIT_LOG_MODEL';
+export const EVENTS_SCHEMA_NAME = 'AuditLog';
 
 /* Errors */
 export const MOVIES_EMPTY_DTO_ERROR = 'Empty DTO provided';
