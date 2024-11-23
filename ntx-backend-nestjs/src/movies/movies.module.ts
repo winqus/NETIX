@@ -4,15 +4,24 @@ import { ExternalProvidersModule } from '@ntx/external-providers/external-provid
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { ImagesModule } from '@ntx/images/images.module';
 import { VideosModule } from '@ntx/videos/videos.module';
+import { MovieEventSubscriber } from './events/movies.subscriber';
 import { MoviesImportController } from './movies-import.controller';
 import { MoviesController } from './movies.controller';
-import { moviesProviders } from './movies.providers';
+import { AuditLogRepository } from './movies.events.repository';
+import { auditLogProviders, moviesProviders } from './movies.providers';
 import { MoviesRepository } from './movies.repository';
 import { MoviesService } from './movies.service';
 
 @Module({
   controllers: [MoviesController, MoviesImportController],
-  providers: [...moviesProviders, MoviesRepository, MoviesService],
+  providers: [
+    ...moviesProviders,
+    MoviesRepository,
+    MoviesService,
+    MovieEventSubscriber,
+    AuditLogRepository,
+    ...auditLogProviders,
+  ],
   imports: [DatabaseModule, FileStorageModule, ImagesModule, ExternalProvidersModule, VideosModule],
   exports: [MoviesService],
 })

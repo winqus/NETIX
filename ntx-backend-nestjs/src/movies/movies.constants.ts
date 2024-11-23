@@ -61,6 +61,8 @@ export const MOVIES_CACHE_OPTS = {
 /* Mongoose */
 export const MOVIES_MODEL_TOKEN = 'MOVIES_MODEL';
 export const MOVIES_SCHEMA_NAME = 'Movie';
+export const EVENTS_MODEL_TOKEN = 'EVENTS_MODEL';
+export const EVENTS_SCHEMA_NAME = 'Evenmt';
 
 /* Errors */
 export const MOVIES_EMPTY_DTO_ERROR = 'Empty DTO provided';

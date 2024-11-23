@@ -45,6 +45,8 @@ import {
   MOVIES_SWAGGER_TAG,
   MOVIES_VIDEOS_FILE_STORAGE_ARGS,
 } from './movies.constants';
+import { MoviesAuditLogMapper } from './movies.events.mapper';
+import { AuditLogRepository } from './movies.events.repository';
 import { MoviesService } from './movies.service';
 import {
   ApiDocsForDeleteMovie,
@@ -74,6 +76,7 @@ export class MoviesController {
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
     private readonly tusUploadSrv: TusUploadService,
+    private readonly auditLogRepo: AuditLogRepository,
   ) {}
 
   @Post()
@@ -142,6 +145,17 @@ export class MoviesController {
         throw new CustomHttpInternalErrorException(error);
       }
     }
+  }
+
+  @Get(':id/logs')
+  public async getLogs(@Param('id') id: string) {
+    const logs = await this.auditLogRepo.findByMovieId(id);
+
+    if (!logs || logs.length === 0) {
+      throw new NotFoundException(`No logs found for movie: ${id}`);
+    }
+
+    return MoviesAuditLogMapper.toAuditLogDTOs(logs);
   }
 
   @Put(':id/poster')
