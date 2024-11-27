@@ -20,11 +20,12 @@ import { ErrorHandlerService } from '@ntx-shared/services/errorHandler.service';
 import { VideoDTO } from '@ntx/app/shared/models/video.dto';
 import { Subscription } from 'rxjs';
 import { RemoveMovieComponent } from './settings/remove-movie/remove-movie.component';
+import { AuditLogsComponent } from './audit-logs/audit-logs.component';
 
 @Component({
   selector: 'app-inspect-movie',
   standalone: true,
-  imports: [SvgIconsComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent, UploadVideoComponent, RemoveMovieComponent],
+  imports: [SvgIconsComponent, ChangePosterComponent, ChangeBackdropComponent, PublishMovieComponent, EditMetadataComponent, UploadVideoComponent, RemoveMovieComponent, AuditLogsComponent],
   templateUrl: './inspect-movie.component.html',
   styleUrl: './inspect-movie.component.scss',
 })

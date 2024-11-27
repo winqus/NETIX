@@ -1,0 +1,17 @@
+<div class="w-full p-10 h-[600px]">
+  <h2 class="text-xl font-bold mb-4">Audit Logs</h2>
+  <div class="w-full h-full overflow-y-auto auditLogs">
+    <ul class="timeline timeline-vertical timeline-compact w-full">
+      @for (log of auditLogs; track auditLogs) {
+        <li>
+          <hr />
+          <div class="timeline-middle">
+            <app-svg-icons [name]="getEventIconName(log.event)" color="white"></app-svg-icons>
+          </div>
+          <div class="timeline-end timeline-box">{{ getEventLabel(log.event) }} by {{ log.username || 'user' }} at {{ getAuditLogTimestamp(log.timestamp) }}</div>
+          <hr />
+        </li>
+      }
+    </ul>
+  </div>
+</div>
