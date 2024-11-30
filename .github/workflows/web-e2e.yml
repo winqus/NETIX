@@ -64,6 +64,7 @@ jobs:
           echo IN_MEMORY_MONGO_PORT=${{ vars.IN_MEMORY_MONGO_PORT }} >> .env
           echo USE_MEMORY_REDIS=${{ vars.USE_MEMORY_REDIS }} >> .env
           echo USE_TEMPORARY_FILE_STORAGE=${{ vars.USE_TEMPORARY_FILE_STORAGE }} >> .env
+          echo USE_FAKE_AUTH=${{ vars.USE_FAKE_AUTH }} >> .env
           cat .env
 
       - name: 'Create .env file for frontend'
