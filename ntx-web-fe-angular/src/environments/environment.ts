@@ -1,15 +1,18 @@
+import { OAuth2ServiceConfig } from '@ntx/app/auth/classes/oauth2.service';
+
 export const environment = {
   production: true,
   development: false,
-  auth0: {
-    domain: 'dev-wno8epqaenp8sdwi.eu.auth0.com',
-    clientId: 'ZBmEG0e0JOiSAnNyAeD2BHvGrpuDI7QW',
-    authorizationParams: {
-      audience: 'https://mynappapi.example.com',
-      redirect_uri: 'http://localhost:4200',
-    },
-    // errorPath: '',
-  },
+  useFakeAuth: false,
+  fakeAuthConfig: {},
+  oAuth2Config: {
+    clientId: 'x',
+    issuerUri: 'x',
+    redirectUri: window.location.origin + '/auth/callback',
+    responseType: 'code',
+    scope: 'openid profile email offline_access',
+    useDebugLogging: false,
+  } satisfies Partial<OAuth2ServiceConfig>,
   api: {
     serverUrl: 'http://localhost:3055',
   },

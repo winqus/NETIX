@@ -8,7 +8,8 @@
       "@ntx-app/*": ["./src/app/*"],
       "@ntx-core/*": ["./src/app/core/*"],
       "@ntx-pages/*": ["./src/app/pages/*"],
-      "@ntx-shared/*": ["./src/app/shared/*"]
+      "@ntx-shared/*": ["./src/app/shared/*"],
+      "@ntx-auth/*": ["./src/app/auth/*"]
     },
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,

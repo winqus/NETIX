@@ -7,6 +7,7 @@ import { getVideo, getVideoRequirementsUrl, getVideoUpload } from '@ntx-shared/c
 import { environment } from '@ntx/environments/environment.development';
 import { VideoDTOMapper, VideoRequirementDTOMapper } from '@ntx-shared/mappers/VideoDTO.mapper';
 import * as tus from 'tus-js-client';
+import { JwtService } from '@ntx/app/auth/jwt.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,10 @@ export class VideoService implements IVideoService {
   private uploadProgressSubject = new BehaviorSubject<number>(0);
   uploadProgress$ = this.uploadProgressSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly jwt: JwtService
+  ) {}
 
   getVideoRequirements(): Observable<VideoRequirementDTO> {
     const url = getVideoRequirementsUrl();
@@ -55,6 +59,9 @@ export class VideoService implements IVideoService {
 
     return new Promise((resolve, reject) => {
       const upload = new tus.Upload(file, {
+        headers: {
+          Authorization: `Bearer ${this.jwt.getToken()}`,
+        },
         endpoint,
         chunkSize,
         retryDelays: [0, 1000, 3000, 5000],
