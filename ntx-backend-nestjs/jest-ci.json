@@ -25,6 +25,8 @@
   "setupFiles": [
     "<rootDir>/../setupJest.js"
   ],
+  "globalSetup": "<rootDir>/../globalSetupJest.js",
+  "globalTeardown": "<rootDir>/../globalTeardownJest.js",
   "ci": true,
   "silent": true,
   "bail": false,

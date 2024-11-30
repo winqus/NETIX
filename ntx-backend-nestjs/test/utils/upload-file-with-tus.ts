@@ -2,7 +2,12 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as tus from 'tus-js-client';
 
-export function uploadFileWithTUS(endpoint: string, filePath: string, fileType: string): Promise<'uploaded'> {
+export function uploadFileWithTUS(
+  endpoint: string,
+  filePath: string,
+  fileType: string,
+  headers?: Record<string, string>,
+): Promise<'uploaded'> {
   const file = fse.createReadStream(filePath);
 
   return new Promise((resolve, reject) => {
@@ -12,6 +17,7 @@ export function uploadFileWithTUS(endpoint: string, filePath: string, fileType: 
         filename: path.basename(filePath),
         filetype: fileType,
       },
+      headers: headers,
       onError(error) {
         reject(error);
       },

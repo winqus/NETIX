@@ -31,6 +31,7 @@ export const SWAGGER_ROUTE = 'swagger';
 export const SWAGGER_JSON_ROUTE = 'swagger/json';
 export const SWAGGER_YAML_ROUTE = 'swagger/yaml';
 export const SWAGGER_TITLE = 'NETIX BE API';
+export const SWAGGER_JWT_TOKEN = 'jwt-token';
 export const SWAGGER_DESCRIPTION =
   'NETIX backend API specification. Go to ' +
   '<a href="/swagger/json">/swagger/json</a> or ' +

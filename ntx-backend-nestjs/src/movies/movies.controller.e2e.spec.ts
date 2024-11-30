@@ -33,6 +33,9 @@ const tempStoragePath = path.resolve('.temp-test-data');
 describe('Movies API (e2e)', () => {
   let app: INestApplication;
   let tmdbFetchMocker: TMDBFetchMocker;
+  const headers = {
+    Authorization: 'Bearer faketoken',
+  };
 
   beforeAll(async () => {
     const { storageType, options } = tempLocalStorageOptionsFactory(tempStoragePath);
@@ -76,7 +79,6 @@ describe('Movies API (e2e)', () => {
   afterAll(async () => {
     await delayByMs(1000);
     await app?.close();
-    await fse.rm(tempStoragePath, { recursive: true, force: true });
     tmdbFetchMocker.dontMockResponses();
   });
 
@@ -86,6 +88,7 @@ describe('Movies API (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .post('/api/v1/movies')
+      .set(headers)
       .field('name', createMovieDto.name)
       .field('summary', createMovieDto.summary)
       .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
@@ -103,7 +106,7 @@ describe('Movies API (e2e)', () => {
     const mkvVideoPath = validMkvVideoPath;
 
     const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
-    await uploadFileWithTUS(uploadEndpoint, mkvVideoPath, 'video/x-matroska');
+    await uploadFileWithTUS(uploadEndpoint, mkvVideoPath, 'video/x-matroska', headers);
     await delayByMs(100);
 
     const updatedMovie = await request(app.getHttpServer())
@@ -157,6 +160,7 @@ describe('Movies API (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/movies')
+        .set(headers)
         .field('name', createMovieDto.name)
         .field('summary', createMovieDto.summary)
         .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
@@ -173,6 +177,7 @@ describe('Movies API (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/movies')
+        .set(headers)
         .field('name', createMovieDto.name)
         .field('summary', createMovieDto.summary)
         .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
@@ -188,6 +193,7 @@ describe('Movies API (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/movies')
+        .set(headers)
         .field('summary', createMovieDto.summary)
         .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
         .field('runtimeMinutes', createMovieDto.runtimeMinutes)
@@ -203,6 +209,7 @@ describe('Movies API (e2e)', () => {
       const createMovie = async () => {
         return await request(app.getHttpServer())
           .post('/api/v1/movies')
+          .set(headers)
           .field('name', createMovieDto.name)
           .field('summary', createMovieDto.summary)
           .field('originallyReleasedAt', createMovieDto.originallyReleasedAt.toString())
@@ -227,6 +234,7 @@ describe('Movies API (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .put(`/api/v1/movies/${existingMovie.id}/poster`)
+        .set(headers)
         .attach(MOVIES_POSTER_FILE_FIELD_NAME, testImagePath);
 
       expect(response.status).toBe(HttpStatus.OK);
@@ -235,7 +243,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 400 when no poster file is provided', async () => {
-      const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/poster`);
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/poster`).set(headers);
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
       expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);
@@ -251,6 +259,7 @@ describe('Movies API (e2e)', () => {
       const testImagePath = validTestImagePath;
       const putBackdropResponse = await request(app.getHttpServer())
         .put(`/api/v1/movies/${createdMovie.id}/backdrop`)
+        .set(headers)
         .attach(MOVIES_BACKDROP_FILE_FIELD_NAME, testImagePath);
 
       expect(putBackdropResponse.status).toBe(HttpStatus.OK);
@@ -282,6 +291,7 @@ describe('Movies API (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .put(`/api/v1/movies/${existingMovie.id}/backdrop`)
+        .set(headers)
         .attach(MOVIES_BACKDROP_FILE_FIELD_NAME, testImagePath);
 
       expect(response.status).toBe(HttpStatus.OK);
@@ -290,7 +300,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 400 when no backdrop file is provided', async () => {
-      const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/backdrop`);
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/random-id/backdrop`).set(headers);
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
       expect(response.body.message).toBe(MOVIES_NO_FILE_PROVIDED_ERROR);
@@ -304,6 +314,7 @@ describe('Movies API (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .patch(`/api/v1/movies/${existingMovie.id}`)
+        .set(headers)
         .send({ name: newName });
 
       expect(existingMovie.updatedAt).not.toEqual(response.body.updatedAt);
@@ -314,7 +325,10 @@ describe('Movies API (e2e)', () => {
     it('should return 400 when empty DTO is provided', async () => {
       const existingMovie = await createRandomValidMovie();
 
-      const response = await request(app.getHttpServer()).patch(`/api/v1/movies/${existingMovie.id}`).send({});
+      const response = await request(app.getHttpServer())
+        .patch(`/api/v1/movies/${existingMovie.id}`)
+        .set(headers)
+        .send({});
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
@@ -322,6 +336,7 @@ describe('Movies API (e2e)', () => {
     it('should return 404 when movie does not exist', async () => {
       const response = await request(app.getHttpServer())
         .patch(`/api/v1/movies/123456789012345`)
+        .set(headers)
         .send({ name: 'New name' });
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
@@ -332,14 +347,16 @@ describe('Movies API (e2e)', () => {
     it('should successfully set the movie to be published', async () => {
       const existingMovie = await createRandomValidMovie();
 
-      const response = await request(app.getHttpServer()).put(`/api/v1/movies/${existingMovie.id}/published`);
+      const response = await request(app.getHttpServer())
+        .put(`/api/v1/movies/${existingMovie.id}/published`)
+        .set(headers);
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.isPublished).toBe(true);
     });
 
     it('should return 404 when movie does not exist', async () => {
-      const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`);
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`).set(headers);
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
@@ -349,14 +366,16 @@ describe('Movies API (e2e)', () => {
     it('should successfully set the movie to be unpublished', async () => {
       const existingMovie = await createRandomValidMovie();
 
-      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/${existingMovie.id}/published`);
+      const response = await request(app.getHttpServer())
+        .delete(`/api/v1/movies/${existingMovie.id}/published`)
+        .set(headers);
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.isPublished).toBe(false);
     });
 
     it('should return 404 when movie does not exist', async () => {
-      const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`);
+      const response = await request(app.getHttpServer()).put(`/api/v1/movies/123456789012345/published`).set(headers);
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
@@ -368,7 +387,7 @@ describe('Movies API (e2e)', () => {
       const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
       const mkvVideoPath = validMkvVideoPath;
 
-      const uploadResult = await uploadFileWithTUS(uploadEndpoint, mkvVideoPath, 'video/x-matroska');
+      const uploadResult = await uploadFileWithTUS(uploadEndpoint, mkvVideoPath, 'video/x-matroska', headers);
 
       expect(uploadResult).toBe('uploaded');
     });
@@ -378,7 +397,7 @@ describe('Movies API (e2e)', () => {
       const uploadEndpoint = `${await app.getUrl()}/api/v1/movies/${existingMovie.id}/video`;
       const invalidFormatFilePath = path.resolve('test/images/1_sm_284x190.webp');
 
-      const uploadPromise = uploadFileWithTUS(uploadEndpoint, invalidFormatFilePath, 'image/webp');
+      const uploadPromise = uploadFileWithTUS(uploadEndpoint, invalidFormatFilePath, 'image/webp', headers);
 
       expect(uploadPromise).rejects.toThrow();
     });
@@ -388,7 +407,7 @@ describe('Movies API (e2e)', () => {
     it('should successfully delete a movie and the video file', async () => {
       const existingMovie = await createRandomMovieWithVideo();
 
-      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/${existingMovie.id}`);
+      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/${existingMovie.id}`).set(headers);
       const videoFilePath = path.resolve(tempStoragePath, 'videos', `${existingMovie.videoID}`);
       await delayByMs(100); /* delay to allow for file deletion processing */
 
@@ -397,7 +416,7 @@ describe('Movies API (e2e)', () => {
     });
 
     it('should return 404 when movie does not exist', async () => {
-      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/12345-not-existing-id`);
+      const response = await request(app.getHttpServer()).delete(`/api/v1/movies/12345-not-existing-id`).set(headers);
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
