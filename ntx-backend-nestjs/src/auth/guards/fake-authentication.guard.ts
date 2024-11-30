@@ -72,15 +72,15 @@ export class FakeAuthenticationGuard implements CanActivate {
           const fakeToken = authorizationHeader.split(' ')[1];
           tokenPayload = this.decodeBase64Token(fakeToken);
         } catch (error) {
-          this.logger.error('Malformed token', error.message);
-
-          return false;
+          this.logger.warn('Malformed token. Will use default fake user.', error.message);
         }
 
-        try {
-          user = FakePayloadMapper.payload2User(tokenPayload as any);
-        } catch (error) {
-          this.logger.error(`Error mapping payload to user: ${error.message}`);
+        if (tokenPayload) {
+          try {
+            user = FakePayloadMapper.payload2User(tokenPayload as any);
+          } catch (error) {
+            this.logger.error(`Error mapping payload to user. Will use default fake user. ${error.message}`);
+          }
         }
       } else if (!this.options.authorizeIfNoToken) {
         return false;

@@ -38,7 +38,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         if (env !== ENVIRONMENTS.PRODUCTION && useFakeAuth === 'true') {
           return new FakeAuthenticationGuard({
             isAuthorized: true,
-            authorizeIfNoToken: true,
+            authorizeIfNoToken: false,
           });
         }
 

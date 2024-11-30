@@ -15,6 +15,7 @@ export enum Permission {
   ReadTitleDetails = 'read:title-details',
   UpdateTitle = 'update:title',
   CreateTitle = 'create:title',
+  ImportTitle = 'import:title',
   DeleteTitle = 'delete:title',
   ReadTitles = 'read:titles',
 }
@@ -22,7 +23,13 @@ export enum Permission {
 export type PermissionStrings = keyof typeof Permission;
 
 const ROLES: Record<Role, Array<Permission>> = {
-  [Role.Manager]: [Permission.ReadTitleDetails, Permission.UpdateTitle, Permission.CreateTitle, Permission.DeleteTitle],
+  [Role.Manager]: [
+    Permission.ReadTitleDetails,
+    Permission.UpdateTitle,
+    Permission.CreateTitle,
+    Permission.ImportTitle,
+    Permission.DeleteTitle,
+  ],
   [Role.Viewer]: [Permission.ReadTitles],
 } as const;
 
