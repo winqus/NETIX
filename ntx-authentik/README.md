@@ -13,8 +13,8 @@ OAuth2 provider Authentik is used for Netix authentication.
 Create a **.env** file in the **ntx-authentik** repository folder with the following content:
 
 ```bash
-PG_PASS=ddddddddddddddddddddddddddddddddd
-AUTHENTIK_SECRET_KEY=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+PG_PASS=ddddddddddddddddddddddddddddddddd # Replace with the password for the Postgres database
+AUTHENTIK_SECRET_KEY=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee # Replace with the secret key for Authentik
 AUTHENTIK_ERROR_REPORTING__ENABLED=true
 COMPOSE_PORT_HTTP=80
 COMPOSE_PORT_HTTPS=443
