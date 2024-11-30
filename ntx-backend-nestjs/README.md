@@ -1,5 +1,4 @@
 ## Description
-
 Netix backend with NestJS.
 
 # NETIX
@@ -20,22 +19,28 @@ Streaming platform designed for tailored home entertainment within a home networ
 ## Development .env file
 Create a **.env** file in the **netix-backend-node** repository folder with the following content:
 ```bash
+### APP ###
+NODE_ENV='development'
 PORT=3055
+### DB ###
 MONGODB_URI='mongodb://user_m1:pass_m1@127.0.0.1:27018?authMechanism=DEFAULT'
-TMDB_API_KEY=<your TMDB API KEY (READ ACCESS) (https://developer.themoviedb.org/reference/intro/getting-started)>
 REDIS_HOST='127.0.0.1'
 REDIS_PORT=6379
 REDIS_PASSWORD='pass_r1'
+### CLIENT ###
 CLIENT_ORIGIN_URL='http://localhost:4200'
-# AUTH0_AUDIENCE=<none for now>
-# AUTH0_DOMAIN=<none for now>
-
-### DEVELOPMENT ONLY ###
-NODE_ENV='development'
+### 3rd party API ###
+TMDB_API_KEY=<your TMDB API KEY (READ ACCESS) (https://developer.themoviedb.org/reference/intro/getting-started)>
+### TEST ###
 USE_MEMORY_MONGO=true # set to true for a temporary in-memory database (will log to console the connection string)
 IN_MEMORY_MONGO_PORT=57017 # if commented, port will be random
 USE_MEMORY_REDIS=true # set to true for a temporary in-memory database (will log to console the connection string)
 USE_TEMPORARY_FILE_STORAGE=true # set to true to use a temp file storage (its destroyed on server shutdown with Ctrl+C)
+### AUTH ###
+USE_FAKE_AUTH=true
+OAUTH2_ISSUER_URL='http://localhost/application/o/netix/' # check if Authentik app's name is 'netix'
+OAUTH2_JWKS_URL='http://localhost/application/o/netix/jwks/' # check if Authentik app's name is 'netix'
+OAUTH2_CLIEND_ID='xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx' # your Authentik app's provider's Client ID
 ```
 
 
