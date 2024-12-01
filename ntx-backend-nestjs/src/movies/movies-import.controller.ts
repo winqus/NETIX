@@ -1,6 +1,20 @@
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Body, Controller, HttpException, Inject, Logger, NotFoundException, Post, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpException,
+  Inject,
+  Logger,
+  NotFoundException,
+  Post,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { HasPermission } from '@ntx/auth/auth.decorators';
+import { AuthenticationGuard } from '@ntx/auth/guards/authentication.guard';
+import { PermissionGuard } from '@ntx/auth/guards/permission.guard';
+import { Permission } from '@ntx/auth/user.entity';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
@@ -34,6 +48,8 @@ export class MoviesImportController {
   ) {}
 
   @Post()
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.ImportTitle)
   @ApiDocsForImportMovie()
   public async import(@Body() dto: ImportMovieDTO): Promise<MovieDTO> {
     try {

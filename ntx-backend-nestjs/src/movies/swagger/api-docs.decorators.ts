@@ -1,5 +1,6 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiExtraModels,
@@ -8,6 +9,7 @@ import {
   ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { SWAGGER_JWT_TOKEN } from '@ntx/app.constants';
 import { CreateMovieDTO } from '../dto/create-movie.dto';
 import { MovieDTO } from '../dto/movie.dto';
 
@@ -16,6 +18,7 @@ export function ApiDocsForPostMovie() {
     ApiOperation({ summary: 'Create a new movie with custom details' }),
     ApiConsumes('multipart/form-data'),
     ApiExtraModels(CreateMovieDTO),
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiBody({
       schema: {
         type: 'object',
@@ -55,6 +58,7 @@ export function ApiDocsForPutUpdatePoster() {
     ApiOperation({ summary: 'Replace poster for a movie' }),
     ApiConsumes('multipart/form-data'),
     ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiBody({
       schema: {
         type: 'object',
@@ -77,6 +81,7 @@ export function ApiDocsForPutUpdateBackdrop() {
     ApiOperation({ summary: 'Replace backdrop for a movie' }),
     ApiConsumes('multipart/form-data'),
     ApiParam({ name: 'id', description: 'Movie ID', required: true }),
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiBody({
       schema: {
         type: 'object',
@@ -96,7 +101,11 @@ export function ApiDocsForPutUpdateBackdrop() {
 
 export function ApiDocsForTusPostMovieVideoUpload() {
   return applyDecorators(
-    ApiOperation({ summary: 'Must be only used by tus protocol for initial POST request for creating an upload' }),
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
+    ApiOperation({
+      summary: 'Must be only used by TUS protocol for initial POST request for creating an upload.',
+      description: "<b>Don't forget to include 'authorization' header with JWT token in TUS client.</b>",
+    }),
     ApiResponse({ status: HttpStatus.CREATED, description: 'Upload started successfully' }),
     ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request (e.g. invalid ID, tus protocol error)' }),
     ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Movie does not exist' }),
@@ -107,7 +116,11 @@ export function ApiDocsForTusPostMovieVideoUpload() {
 
 export function ApiDocsForTusHeadMovieVideoUpload() {
   return applyDecorators(
-    ApiOperation({ summary: 'Must be only used by tus protocol for HEAD request to resume an upload' }),
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
+    ApiOperation({
+      summary: 'Must be only used by TUS protocol for HEAD request to resume an upload',
+      description: "<b>Don't forget to include 'authorization' header with JWT token in TUS client.</b>",
+    }),
     ApiResponse({ status: HttpStatus.OK, description: 'Upload resumed successfully' }),
     ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Upload resumed successfully' }),
     ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request (e.g. invalid ID, tus protocol error)' }),
@@ -121,7 +134,11 @@ export function ApiDocsForTusHeadMovieVideoUpload() {
 
 export function ApiDocsForTusPatchMovieVideoUpload() {
   return applyDecorators(
-    ApiOperation({ summary: 'Must be only used by tus protocol for PATCH requests to upload content chunks' }),
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
+    ApiOperation({
+      summary: 'Must be only used by TUS protocol for PATCH requests to upload content chunks',
+      description: "<b>Don't forget to include 'authorization' header with JWT token in TUS client.</b>",
+    }),
     ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Chunk uploaded' }),
     ApiResponse({
       status: HttpStatus.UNSUPPORTED_MEDIA_TYPE,
@@ -135,6 +152,7 @@ export function ApiDocsForTusPatchMovieVideoUpload() {
 
 export function ApiDocsForPatchMovie() {
   return applyDecorators(
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiOperation({ summary: 'Update movie by ID' }),
     ApiResponse({ status: HttpStatus.OK, description: 'Updated movie', type: MovieDTO }),
     ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request (e.g. invalid ID or DTO)' }),
@@ -145,6 +163,7 @@ export function ApiDocsForPatchMovie() {
 
 export function ApiDocsForImportMovie() {
   return applyDecorators(
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiOperation({ summary: 'Import movie from external provider' }),
     ApiResponse({ status: HttpStatus.CREATED, description: 'When movie successfully imported', type: MovieDTO }),
     ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'When external title not found' }),
@@ -154,6 +173,7 @@ export function ApiDocsForImportMovie() {
 
 export function ApiDocsForPutMoviePublished() {
   return applyDecorators(
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiOperation({ summary: 'Set a movie as published' }),
     ApiParam({ name: 'id', description: 'Movie ID', required: true }),
     ApiResponse({ status: HttpStatus.OK, description: 'Changed movie state to published', type: MovieDTO }),
@@ -165,6 +185,7 @@ export function ApiDocsForPutMoviePublished() {
 
 export function ApiDocsForDeleteMoviePublished() {
   return applyDecorators(
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiOperation({ summary: 'Set a movie as unpublished' }),
     ApiParam({ name: 'id', description: 'Movie ID', required: true }),
     ApiResponse({
@@ -181,6 +202,7 @@ export function ApiDocsForDeleteMoviePublished() {
 
 export function ApiDocsForDeleteMovie() {
   return applyDecorators(
+    ApiBearerAuth(SWAGGER_JWT_TOKEN),
     ApiOperation({ summary: 'Delete movie' }),
     ApiParam({ name: 'id', description: 'Movie ID', required: true }),
     ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Deleted movie' }),
