@@ -8,7 +8,8 @@ import { VideoViewerComponent } from './pages/video-viewer/video-viewer.componen
 import { CreateTitleComponent } from '@ntx-pages/create-title/create-title.component';
 import { InspectMovieComponent } from './pages/inspect-movie/inspect-movie.component';
 import { ViewMovieComponent } from './pages/view-movie/view-movie.component';
-// import { AuthGuard } from '@auth0/auth0-angular';
+import { canActivateWithRole } from './auth/auth.guard';
+import { Role } from './auth/user.entity';
 
 export const routes: Routes = [
   {
@@ -18,19 +19,28 @@ export const routes: Routes = [
     data: { movieCardRedirect: 'view/movie' },
   },
   {
-    path: 'manage/titles',
+    path: 'manage',
     component: MainLayoutComponent,
-    children: [{ path: '', component: MovieListComponent }],
-    data: { movieCardRedirect: 'inspect/movie' },
+    canActivate: [canActivateWithRole([Role.Manager])],
+    children: [
+      { path: '', redirectTo: '/manage/titles', pathMatch: 'full' },
+      {
+        path: 'titles',
+        component: MovieListComponent,
+        data: { movieCardRedirect: 'inspect/movie' },
+      },
+    ],
   },
   {
     path: 'create/title',
     component: MainLayoutComponent,
+    canActivate: [canActivateWithRole([Role.Manager])],
     children: [{ path: '', component: CreateTitleComponent }],
   },
   {
     path: 'inspect/movie',
     component: MainLayoutComponent,
+    canActivate: [canActivateWithRole([Role.Manager])],
     children: [
       { path: '', redirectTo: '/error/404', pathMatch: 'full' },
       { path: ':id', component: InspectMovieComponent },
@@ -66,7 +76,7 @@ export const routes: Routes = [
           errorMessage: appMessages.http.error403Forbidden.shortMessage,
           infoMessage: appMessages.redirection.toHome,
           redirectAfter: 1000,
-          redirectTo: '/manage/titles',
+          redirectTo: '/',
         },
       },
       {
@@ -78,7 +88,7 @@ export const routes: Routes = [
           errorMessage: appMessages.http.error404NotFound.shortMessage,
           infoMessage: appMessages.redirection.toHome,
           redirectAfter: 2000,
-          redirectTo: '/manage/titles',
+          redirectTo: '/',
         },
       },
     ],
