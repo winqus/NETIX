@@ -30,8 +30,6 @@ export const canActivateWithAuth: CanActivateFn = (_route, state): Observable<bo
 };
 
 export const canActivateWithRole: (allowedRoles: Role[]) => CanActivateFn = (allowedRoles) => (_route: ActivatedRouteSnapshot) => {
-  console.log('called canActivateWithRole');
-
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -52,8 +50,6 @@ export const canActivateWithRole: (allowedRoles: Role[]) => CanActivateFn = (all
 };
 
 export const canActivateWithPermission: (requiredPermissions: Permission[]) => CanActivateFn = (requiredPermissions) => (_route: ActivatedRouteSnapshot) => {
-  console.log('called canActivateWithPermission');
-
   const auth = inject(AuthService);
   const router = inject(Router);
 
