@@ -9,7 +9,6 @@ import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
-import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
 import { MoviesModule } from './movies.module';

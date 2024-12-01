@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { FakePayloadMapper } from '../mappings/fake-payload.mapper';
 import { hasPermission, Permission, PermissionStrings, Role, User } from '../user.entity';
+import { decodeBase64StringToObject } from '../utils/encoding.utils';
 
 export interface FakeAuthenticationGuardOptions {
   /**
@@ -70,7 +71,7 @@ export class FakeAuthenticationGuard implements CanActivate {
         let tokenPayload;
         try {
           const fakeToken = authorizationHeader.split(' ')[1];
-          tokenPayload = this.decodeBase64Token(fakeToken);
+          tokenPayload = decodeBase64StringToObject(fakeToken);
         } catch (error) {
           this.logger.warn('Malformed token. Will use default fake user.', error.message);
         }
@@ -98,13 +99,5 @@ export class FakeAuthenticationGuard implements CanActivate {
     }
 
     return false;
-  }
-
-  /**
-   * @param token A base64 encoded JSON string
-   * @returns Object
-   */
-  private decodeBase64Token(token: string): unknown {
-    return JSON.parse(Buffer.from(token, 'base64').toString());
   }
 }
