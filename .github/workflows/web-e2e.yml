@@ -71,8 +71,13 @@ jobs:
         working-directory: ntx-web-fe-angular
         run: |
           touch .env
-          echo API_SERVER_URL=${{ vars.API_SERVER_URL }} >> .env
           echo PRODUCTION_ENVIRONMENT=false >> .env
+          echo API_SERVER_URL=${{ vars.API_SERVER_URL }} >> .env
+          echo USE_FAKE_AUTH=${{ vars.USE_FAKE_AUTH }} >> .env
+          echo OAUTH2_SERVER_URL=${{ secrets.OAUTH2_SERVER_URL }} >> .env
+          echo OAUTH2_CLIENT_ID=${{ vars.OAUTH2_CLIENT_ID }} >> .env
+          echo OAUTH2_ISSUER_URI=${{ vars.OAUTH2_ISSUER_URI }} >> .env
+          echo OAUTH2_REDIRECT_URI=${{ vars.OAUTH2_REDIRECT_URI }} >> .env
           cat .env
 
       - name: Cache backend node modules
