@@ -9,7 +9,7 @@ import { IAuditLogs } from './IAuditLogs.service.interface';
 @Injectable({
   providedIn: 'root',
 })
-export class AuditLogService implements IAuditLogs {
+export class AuditLogsService implements IAuditLogs {
   constructor(private readonly http: HttpClient) {}
   getMovieAuditLogs(id: string): Observable<AuditLogDTO[]> {
     const url = getAuditLogs(id);

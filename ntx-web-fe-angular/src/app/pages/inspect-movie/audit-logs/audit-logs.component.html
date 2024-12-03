@@ -8,7 +8,9 @@
           <div class="timeline-middle">
             <app-svg-icons [name]="getEventIconName(log.event)" color="white"></app-svg-icons>
           </div>
-          <div class="timeline-end timeline-box bg-transparent border-none outline-none shadow-none">{{ getEventLabel(log.event) }} by {{ log.username || 'user' }} at {{ getAuditLogTimestamp(log.timestamp) }}</div>
+          <div class="timeline-end timeline-box bg-transparent border-none outline-none shadow-none">
+            {{ getEventLabel(log.event) }} by {{ log.username || 'user' }} at {{ getAuditLogTimestamp(log.timestamp) }}
+          </div>
           <hr />
         </li>
       }

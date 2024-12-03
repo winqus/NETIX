@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { AuditLogDTO, MovieEvent } from '@ntx-shared/models/auditLog.dto';
 import { MovieDTO } from '@ntx-shared/models/movie.dto';
-import { AuditLogService } from '@ntx-shared/services/auditLogs/auditLogs.service';
+import { AuditLogsService } from '@ntx-shared/services/auditLogs/auditLogs.service';
 import { formatTimestamp } from '@ntx-shared/services/utils/utils';
 import { SvgIconsComponent } from '@ntx-shared/ui/svg-icons.component';
 import { environment } from '@ntx/environments/environment';
@@ -17,7 +17,7 @@ export class AuditLogsComponent implements OnChanges {
   @Input({ required: true }) movie: MovieDTO | undefined;
   auditLogs: AuditLogDTO[] = [];
 
-  constructor(private readonly auditLogService: AuditLogService) {}
+  constructor(private readonly auditLogService: AuditLogsService) {}
   ngOnChanges(): void {
     if (this.movie?.id) {
       this.getMovieAuditLogs();
