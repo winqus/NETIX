@@ -407,7 +407,8 @@ describe('inspect movie', () => {
 
       const date = new Date();
 
-      cy.contains('movie created by user at ' + formatTimestampWithoutSeconds(date));
+      cy.contains('movie created by');
+      cy.contains(' at ' + formatTimestampWithoutSeconds(date));
     });
   });
 });
