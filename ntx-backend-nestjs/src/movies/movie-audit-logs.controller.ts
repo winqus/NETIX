@@ -1,7 +1,7 @@
 import { Controller, Get, HttpException, Logger, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
-import { MovieAuditLogService } from './movie-audit-log.service';
+import { MovieAuditLogsService } from './movie-audit-logs.service';
 import { MOVIES_CONTROLLER_BASE_PATH, MOVIES_CONTROLLER_VERSION, MOVIES_SWAGGER_TAG } from './movies.constants';
 import { ApiDocsForGetLogs } from './swagger/api-docs.decorators';
 
@@ -13,7 +13,7 @@ import { ApiDocsForGetLogs } from './swagger/api-docs.decorators';
 export class MoviesAuditLogController {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly auditLogService: MovieAuditLogService) {}
+  constructor(private readonly auditLogService: MovieAuditLogsService) {}
 
   @Get(':id/logs')
   @ApiDocsForGetLogs()

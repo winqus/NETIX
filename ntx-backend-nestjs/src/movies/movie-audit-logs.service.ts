@@ -4,7 +4,7 @@ import { MoviesAuditLogMapper } from './mappers/movie-audit-log.mapper';
 import { MovieAuditLogsRepository } from './movie-audit-logs.repository';
 
 @Injectable()
-export class MovieAuditLogService {
+export class MovieAuditLogsService {
   constructor(private readonly auditLogRepo: MovieAuditLogsRepository) {}
 
   async findAllByMovieId(movieID: string): Promise<MovieAuditLogDTO[]> {
