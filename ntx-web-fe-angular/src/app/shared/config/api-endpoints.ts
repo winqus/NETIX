@@ -101,3 +101,7 @@ export function getVideo(_id?: string): string {
 export function getVideoStream(_id: string): string {
   return `${SERVER.baseUrl}${SERVER.endpoints.videos.videos}/${_id}/stream`;
 }
+
+export function getAuditLogs(_id: string): string {
+  return `${SERVER.baseUrl}${SERVER.endpoints.movies.movies}/${_id}/logs`;
+}

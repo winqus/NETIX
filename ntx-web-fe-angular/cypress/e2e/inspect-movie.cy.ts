@@ -1,9 +1,10 @@
-import { getBackdrop, getMovieBackdropUrl, getMoviePosterUrl, getMovieUrl, getPoster, getVideo, getVideoUpload } from '@ntx-shared/config/api-endpoints';
+import { getAuditLogs, getBackdrop, getMovieBackdropUrl, getMoviePosterUrl, getMovieUrl, getPoster, getVideo, getVideoUpload } from '@ntx-shared/config/api-endpoints';
 import { MovieDTO } from '@ntx/app/shared/models/movie.dto';
 import { PosterSize } from '@ntx/app/shared/models/posterSize.enum';
 import { HUMAN_COGNITIVE_PAUSE } from 'cypress/support/constants';
 import convertRouteToPath from 'cypress/support/convertRoute';
 import { makeRandomMovieName, makeRandomMovieReleaseDate, makeRandomMovieRuntime, makeRandomMovieSummary } from 'cypress/support/randomDataFactory';
+import { formatTimestampWithoutSeconds } from 'cypress/support/timestamp';
 
 const GET_MOVIE_REQUEST_TOKEN = 'GET_MOVIE_REQUEST';
 const GET_POSTER_REQUEST_TOKEN = 'GET_POSTER_REQUEST';
@@ -388,6 +389,26 @@ describe('inspect movie', () => {
       });
 
       cy.contains('An error occurred while removing a movie. Please try again later.');
+    });
+  });
+
+  it('should display audit logs', () => {
+    cy.createMovieWithPoster().then((movie: MovieDTO) => {
+      const GET_AUDIT_LOGS_REQUEST_TOKEN = 'GET_AUDIT_LOGS_REQUEST_TOKEN';
+      cy.intercept('GET', `${convertRouteToPath(getAuditLogs(movie.id))}`).as(GET_AUDIT_LOGS_REQUEST_TOKEN);
+      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
+
+      cy.visit(`/inspect/movies/${movie.id}`);
+
+      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
+      cy.wait('@' + GET_AUDIT_LOGS_REQUEST_TOKEN);
+
+      cy.contains('Audit Logs');
+
+      const date = new Date();
+
+      cy.contains('movie created by');
+      cy.contains(' at ' + formatTimestampWithoutSeconds(date));
     });
   });
 });

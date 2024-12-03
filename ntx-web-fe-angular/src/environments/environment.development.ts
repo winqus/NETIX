@@ -1,5 +1,5 @@
-import { FakeAuthServiceConfig } from '@ntx/app/auth/classes/fake-auth.service';
-import { OAuth2ServiceConfig } from '@ntx/app/auth/classes/oauth2.service';
+import { FakeAuthServiceConfig } from '@ntx-auth/classes/fake-auth.service';
+import { OAuth2ServiceConfig } from '@ntx-auth/classes/oauth2.service';
 
 export const environment = {
   production: false,
@@ -9,14 +9,14 @@ export const environment = {
     loggedIn: true,
     userOverrides: {
       /* Usage example: */
-      // username: 'somename'
+      // username: 'some_name'
       // roles: [Role.Viewer],
     },
   } satisfies FakeAuthServiceConfig,
   oAuth2Config: {
     clientId: 'NIC1m9rgpXsmX4jXaC13qFAsIaMFv2TmQxSrgLsF' /* OK to expose */,
     issuerUri: 'http://localhost/application/o/netix/',
-    redirectUri: window.location.origin + '/auth/callback',
+    redirectUri: 'http://localhost:4200/auth/callback',
     responseType: 'code',
     scope: 'openid profile email offline_access',
     useDebugLogging: true,

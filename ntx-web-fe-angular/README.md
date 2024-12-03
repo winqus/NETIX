@@ -15,12 +15,16 @@ The env command will set the environment variables for the Angular app in the **
 Create a **.env** file in the **ntx-web-fe-angular** repository folder with the following content:
 
 ```bash
-# AUTH0_DOMAIN=<none for now>
-# AUTH0_CLIENT_ID=<none for now>
-# AUTH0_AUDIENCE=<none for now>
-# AUTH0_CALLBACK_URL=http://localhost:4200
-API_SERVER_URL=http://localhost:3055
+### APP ###
 PRODUCTION_ENVIRONMENT=false
+### API ###
+API_SERVER_URL=http://localhost:3055
+### AUTH ###
+USE_FAKE_AUTH=true
+OAUTH2_SERVER_URL=http://localhost:80
+OAUTH2_CLIENT_ID=xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx
+OAUTH2_ISSUER_URI=http://localhost/application/o/netix/
+OAUTH2_REDIRECT_URI=http://localhost:4200/auth/callback
 ```
 
 ## Logging

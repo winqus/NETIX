@@ -1,4 +1,4 @@
-<div class="h-full w-full relative" [style.background]="pageBackgroundColor">
+<div class="w-full h-full relative" [style.background]="pageBackgroundColor">
   @if (backdropUrl) {
     <div class="absolute right-0 top-0 h-1/2 vignette-overlay" [style.--gradient-color]="pageBackgroundColor">
       <img [src]="backdropUrl" alt="Backdrop" class="w-full h-full object-contain" />
@@ -85,4 +85,5 @@
       }
     </div>
   </div>
+  <app-audit-logs [movie]="movie"></app-audit-logs>
 </div>
