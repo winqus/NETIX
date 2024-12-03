@@ -10,11 +10,13 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
 import { HasPermission } from '@ntx/auth/auth.decorators';
+import { CurrentUser } from '@ntx/auth/decorators/user.decorator';
 import { AuthenticationGuard } from '@ntx/auth/guards/authentication.guard';
 import { PermissionGuard } from '@ntx/auth/guards/permission.guard';
-import { Permission } from '@ntx/auth/user.entity';
+import { Permission, User } from '@ntx/auth/user.entity';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { TitleType } from '@ntx/common/interfaces/TitleType.enum';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
@@ -23,6 +25,7 @@ import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { ImportMovieDTO } from './dto/import-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
+import { MovieCreatedEvent, MovieEvent } from './events/movies.events';
 import {
   MOVIES_CACHE_KEY,
   MOVIES_IMPORT_CONTROLLER_BASE_PATH,
@@ -45,13 +48,14 @@ export class MoviesImportController {
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
     private readonly externalTitles: ExternalTitleService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
   @UseGuards(AuthenticationGuard, PermissionGuard)
   @HasPermission(Permission.ImportTitle)
   @ApiDocsForImportMovie()
-  public async import(@Body() dto: ImportMovieDTO): Promise<MovieDTO> {
+  public async import(@Body() dto: ImportMovieDTO, @CurrentUser() user: User): Promise<MovieDTO> {
     try {
       await validateOrReject(dto);
 
@@ -72,6 +76,8 @@ export class MoviesImportController {
       createMovieDTO.runtimeMinutes = externalTitleMetadata.metadata.runtime;
 
       const newMovie = await this.moviesSrv.createOne(createMovieDTO);
+
+      this.eventEmitter.emit(MovieEvent.Created, new MovieCreatedEvent(newMovie.id, user.id, user.username));
 
       this.logger.log(`Created new movie ${newMovie.id} with poster ${newMovie.posterID}`);
 
