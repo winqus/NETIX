@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from '@ntx/auth/auth.module';
 import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
@@ -24,7 +25,7 @@ import { MoviesService } from './movies.service';
     MovieEventSubscriber,
     MovieAuditLogsRepository,
   ],
-  imports: [DatabaseModule, FileStorageModule, ImagesModule, ExternalProvidersModule, VideosModule],
+  imports: [AuthModule, DatabaseModule, FileStorageModule, ImagesModule, ExternalProvidersModule, VideosModule],
   exports: [MoviesService, MovieAuditLogService],
 })
 export class MoviesModule {}

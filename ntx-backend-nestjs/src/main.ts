@@ -14,6 +14,7 @@ import {
   PORT,
   SWAGGER_DESCRIPTION,
   SWAGGER_JSON_ROUTE,
+  SWAGGER_JWT_TOKEN,
   SWAGGER_ROUTE,
   SWAGGER_TAGS,
   SWAGGER_TITLE,
@@ -27,7 +28,19 @@ async function bootstrapSwagger(app: INestApplication<any>) {
   const swaggerDocBuilder = new DocumentBuilder()
     .setTitle(SWAGGER_TITLE)
     .setDescription(SWAGGER_DESCRIPTION)
-    .setVersion(SWAGGER_VERSION);
+    .setVersion(SWAGGER_VERSION)
+    .addBearerAuth(
+      {
+        description:
+          'JWT access token in the format `Bearer <token>`.' +
+          '<p><b>If using development Fake auth, use any value.</b></p>',
+        name: 'Authorization',
+        scheme: 'Bearer',
+        type: 'http',
+        in: 'Header',
+      },
+      SWAGGER_JWT_TOKEN,
+    );
 
   SWAGGER_TAGS.forEach((tag) => {
     swaggerDocBuilder.addTag(tag);

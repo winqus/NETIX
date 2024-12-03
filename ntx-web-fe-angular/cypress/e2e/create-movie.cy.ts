@@ -8,15 +8,15 @@ describe('create movie', () => {
   });
 
   it('should navigate to create title page', () => {
-    cy.visit('/createTitle');
-    cy.url().should('include', '/createTitle');
+    cy.visit('/create/title');
+    cy.url().should('include', '/create/title');
     cy.get('[aria-label="Create"]').click();
     cy.contains('Title');
     cy.get('button').contains('CREATE').should('be.disabled');
   });
 
   it('should allow creating with valid fields', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Create"]').click();
 
     cy.get('#title').type(makeRandomMovieName(), { delay: 3 });
@@ -30,7 +30,7 @@ describe('create movie', () => {
   });
 
   it('should create a movie', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Create"]').click();
 
     cy.get('#title').type(makeRandomMovieName(), { delay: 3 });
@@ -47,7 +47,7 @@ describe('create movie', () => {
   });
 
   it('should throw error label', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Create"]').click();
 
     cy.get('#title').type(makeLongRandomMovieName(), { delay: 3 });

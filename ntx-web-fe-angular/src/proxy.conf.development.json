@@ -4,6 +4,10 @@
     "secure": true,
     "changeOrigin": true,
     "logLevel": "debug"
-    }
+  },
+  "/application": {
+    "target": "http://localhost:80",
+    "secure": false,
+    "changeOrigin": true
   }
-  
+}

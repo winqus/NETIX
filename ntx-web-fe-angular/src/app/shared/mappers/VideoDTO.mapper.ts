@@ -4,7 +4,7 @@ export class VideoRequirementDTOMapper {
   static anyToVideoRequirementDTO(item: any): VideoRequirementDTO {
     return {
       supportedMimeTypes: item.supportedMimeTypes,
-      allowedExtentions: item.allowedExtentions,
+      allowedExtensions: item.allowedExtensions,
       maxFileSizeInBytes: item.maxFileSizeInBytes,
     };
   }

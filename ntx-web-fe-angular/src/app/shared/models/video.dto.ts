@@ -1,6 +1,6 @@
 export interface VideoRequirementDTO {
   supportedMimeTypes: string[];
-  allowedExtentions: string[];
+  allowedExtensions: string[];
   maxFileSizeInBytes: number;
 }
 

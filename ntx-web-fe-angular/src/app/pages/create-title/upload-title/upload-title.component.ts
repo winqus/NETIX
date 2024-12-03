@@ -58,7 +58,7 @@ export class UploadTitleComponent implements OnInit {
         next: (response) => {
           if (environment.development) console.log('Upload successful:', response);
           const movieId = response.id;
-          this.router.navigate(['/inspect/movies', movieId], { state: { from: 'creation' } });
+          this.router.navigate(['/inspect/movie', movieId], { state: { from: 'creation' } });
         },
         error: (errorResponse) => {
           this.errorMessage = errorResponse.error.message;

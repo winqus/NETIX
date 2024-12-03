@@ -61,7 +61,7 @@ describe('MovieCardComponent with MovieDTO', () => {
     component.navigateToMovie();
 
     expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/inspect/movies', mockMovie.id]);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['', mockMovie.id]);
   });
 
   it('should not navigate if movie is null', () => {

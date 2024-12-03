@@ -12,15 +12,15 @@ describe('create movie', () => {
   });
 
   it('should load the import title page with the disabled Import button', () => {
-    cy.visit('/createTitle');
-    cy.url().should('include', '/createTitle');
+    cy.visit('/create/title');
+    cy.url().should('include', '/create/title');
     cy.get('[aria-label="Import"]').click();
     cy.contains('Title');
     cy.get('button').contains('Import').should('be.disabled');
   });
 
   it('should display external movie search results when a movie title is entered', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Import"]').click();
     const movieName = 'Shrek';
 
@@ -36,7 +36,7 @@ describe('create movie', () => {
   });
 
   it('should display an error message for a non-existent movie search', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Import"]').click();
     const searchQuery = 'Sh@#$';
 
@@ -47,7 +47,7 @@ describe('create movie', () => {
   });
 
   it('should successfully import a selected movie', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Import"]').click();
     const movieName = 'shrek';
 
@@ -71,7 +71,7 @@ describe('create movie', () => {
   });
 
   it('should display a validation error for exceeding maximum movie name length', () => {
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Import"]').click();
 
     const movieName = 'shrek';
@@ -88,7 +88,7 @@ describe('create movie', () => {
 
   it('should display an error message when the search request fails', () => {
     cy.intercept('GET', '/api/v1/library/search*', { statusCode: 500 });
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Import"]').click();
 
     const movieName = 'shrek';
@@ -103,7 +103,7 @@ describe('create movie', () => {
       body: { message: 'Failed to fetch movie from external data source.' },
     }).as('fetchMovieError');
 
-    cy.visit('/createTitle');
+    cy.visit('/create/title');
     cy.get('[aria-label="Import"]').click();
 
     const movieName = 'shrek';

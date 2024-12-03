@@ -14,7 +14,7 @@ describe('UploadVideoComponent', () => {
   let mockErrorHandlerService: any;
 
   const mockVideoRequirement: VideoRequirementDTO = {
-    allowedExtentions: ['.mkv'],
+    allowedExtensions: ['.mkv'],
     maxFileSizeInBytes: 10485760, // 10 MB
     supportedMimeTypes: ['video/mkv'],
   };

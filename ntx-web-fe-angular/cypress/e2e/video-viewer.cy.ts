@@ -8,7 +8,7 @@ const GET_MOVIE_REQUEST_TOKEN = 'GET_MOVIE_REQUEST';
 describe('video viewer', () => {
   beforeEach(() => {});
 
-  it('should upload video for movie', () => {
+  it('should see uploaded video for movie', () => {
     cy.createMovieWithPoster().then((movie: MovieDTO) => {
       const UPLOAD_VIDEO_TOKEN = 'UPLOAD_VIDEO_TOKEN';
       const VIDEO_PROPS_TOKEN = 'VIDEO_PROPS_TOKEN';
@@ -16,7 +16,7 @@ describe('video viewer', () => {
       cy.intercept('POST', `${convertRouteToPath(getVideoUpload(movie.id))}`).as(UPLOAD_VIDEO_TOKEN);
       cy.intercept('GET', new RegExp(`^${convertRouteToPath(getVideo())}/.*`)).as(VIDEO_PROPS_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
+      cy.visit(`/inspect/movie/${movie.id}`);
 
       cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
 

@@ -9,7 +9,6 @@ import { DatabaseModule } from '@ntx/database/database.module';
 import { ExternalProvidersModule } from '@ntx/external-providers/external-providers.module';
 import { FileStorageModule } from '@ntx/file-storage/file-storage.module';
 import { JobQueueModule } from '@ntx/job-queue/job-queue.module';
-import * as fse from 'fs-extra';
 import { resolve } from 'path';
 import * as request from 'supertest';
 import { MoviesModule } from './movies.module';
@@ -21,6 +20,9 @@ const tempStoragePath = resolve('.temp-test-data');
 describe('Movies API (e2e)', () => {
   let app: INestApplication;
   let tmdbFetchMocker: TMDBFetchMocker;
+  const headers = {
+    Authorization: 'Bearer faketoken',
+  };
 
   beforeAll(async () => {
     const { storageType, options } = tempLocalStorageOptionsFactory(tempStoragePath);
@@ -61,7 +63,6 @@ describe('Movies API (e2e)', () => {
   });
 
   afterAll(async () => {
-    await fse.rm(tempStoragePath, { recursive: true });
     await app?.close();
     tmdbFetchMocker.dontMockResponses();
   });
@@ -70,6 +71,7 @@ describe('Movies API (e2e)', () => {
     it('should import a movie from an external provider', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/movies-import')
+        .set(headers)
         .send({ externalProviderID: 'TMDB', externalID: '808' })
         .expect(HttpStatus.CREATED);
 
@@ -81,9 +83,17 @@ describe('Movies API (e2e)', () => {
       expect(response.body.name).toEqual(foundMovie.body.name);
     });
 
+    it('should return 403 when not auth token provided', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/movies-import')
+        .send({ externalProviderID: 'TMDB', externalID: '808' })
+        .expect(HttpStatus.FORBIDDEN);
+    });
+
     it('should return 404 when external title not found', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/movies-import')
+        .set(headers)
         .send({ externalProviderID: 'TMDB', externalID: 'non-existing-id-123456789' })
         .expect(HttpStatus.NOT_FOUND);
     });
@@ -91,11 +101,13 @@ describe('Movies API (e2e)', () => {
     it('should fail to import same movie twice', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/movies-import')
+        .set(headers)
         .send({ externalProviderID: 'TMDB', externalID: '809' })
         .expect(HttpStatus.CREATED);
 
       await request(app.getHttpServer())
         .post('/api/v1/movies-import')
+        .set(headers)
         .send({ externalProviderID: 'TMDB', externalID: '809' })
         .expect(HttpStatus.CONFLICT);
     });

@@ -15,6 +15,7 @@ export const titleUpdateBadgeThresholdDays = 7;
 })
 export class MovieCardComponent implements OnInit, OnDestroy {
   @Input() movie: MovieDTO | null = null;
+  @Input() redirectPath: string = '';
   posterLoaded = true;
   recentlyUpdatedLabel: string = '';
   private updateInterval: any;
@@ -62,7 +63,7 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   navigateToMovie(): void {
     if (this.movie == null) return;
 
-    this.router.navigate(['/inspect/movies', this.movie.id]);
+    this.router.navigate([this.redirectPath, this.movie.id]);
   }
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -72,6 +73,8 @@ export class MovieCardComponent implements OnInit, OnDestroy {
 
   isMovieRecentlyUpdated(): boolean {
     if (this.movie == null) return false;
+
+    if (this.redirectPath == 'view/movie') return false;
 
     const currentDate = new Date();
     const sevenDaysAgo = new Date(currentDate);

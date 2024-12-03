@@ -195,7 +195,7 @@ export class ImageUploadComponent implements OnInit, OnChanges, AfterViewInit {
       if (acceptType.startsWith('.')) {
         return fileExtension === acceptType.substring(1).toLowerCase();
       } else {
-        return fileType === acceptType || fileType.startsWith(`${acceptType.split('/')[0]}/`);
+        return fileType === acceptType || fileType.startsWith(`${acceptType.split('/manage/titles')[0]}/`);
       }
     });
   }

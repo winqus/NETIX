@@ -18,10 +18,15 @@ import {
   Req,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { HasPermission } from '@ntx/auth/auth.decorators';
+import { AuthenticationGuard } from '@ntx/auth/guards/authentication.guard';
+import { PermissionGuard } from '@ntx/auth/guards/permission.guard';
+import { Permission } from '@ntx/auth/user.entity';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
@@ -77,6 +82,8 @@ export class MoviesController {
   ) {}
 
   @Post()
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.CreateTitle)
   @ApiDocsForPostMovie()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
   public async create(@UploadedFile() file: Express.Multer.File, @Body() dto: CreateMovieDTO): Promise<MovieDTO> {
@@ -145,6 +152,8 @@ export class MoviesController {
   }
 
   @Put(':id/poster')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPutUpdatePoster()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
   public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
@@ -174,6 +183,8 @@ export class MoviesController {
   }
 
   @Put(':id/backdrop')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPutUpdateBackdrop()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_BACKDROP_FILE_STORAGE_ARGS))
   public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
@@ -201,6 +212,8 @@ export class MoviesController {
   }
 
   @Post(':id/video')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForTusPostMovieVideoUpload()
   public async handleTusPostToInitUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
     await this.moviesSrv.findOne(id);
@@ -209,6 +222,8 @@ export class MoviesController {
   }
 
   @Head(':id/video/:uploadId')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForTusHeadMovieVideoUpload()
   public async handleTusHeadToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
     await this.moviesSrv.findOne(id);
@@ -219,6 +234,8 @@ export class MoviesController {
   }
 
   @Patch(':id/video/:uploadId')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForTusPatchMovieVideoUpload()
   public async handleTusPatchToUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
     try {
@@ -249,6 +266,8 @@ export class MoviesController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPatchMovie()
   public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO): Promise<MovieDTO> {
     try {
@@ -283,6 +302,8 @@ export class MoviesController {
   }
 
   @Put(':id/published')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPutMoviePublished()
   public async publish(@Param('id') id: string): Promise<MovieDTO> {
     try {
@@ -303,6 +324,8 @@ export class MoviesController {
   }
 
   @Delete(':id/published')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.UpdateTitle)
   @ApiDocsForDeleteMoviePublished()
   public async unpublish(@Param('id') id: string): Promise<MovieDTO> {
     try {
@@ -323,6 +346,8 @@ export class MoviesController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthenticationGuard, PermissionGuard)
+  @HasPermission(Permission.DeleteTitle)
   @HttpCode(204)
   @ApiDocsForDeleteMovie()
   public async delete(@Param('id') id: string): Promise<void> {
