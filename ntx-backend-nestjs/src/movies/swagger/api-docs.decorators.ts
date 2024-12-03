@@ -190,6 +190,7 @@ export function ApiDocsForDeleteMovie() {
     ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server internal error. Check server logs' }),
   );
 }
+
 export function ApiDocsForGetLogs() {
   return applyDecorators(
     ApiOperation({ summary: 'Get audit logs for a specific movie by ID' }),

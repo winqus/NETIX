@@ -12,8 +12,8 @@ export class MovieAuditLogsRepository extends EntityRepository<MovieAuditLog> {
     super(model);
   }
 
-  public async findByMovieId(movieId: string): Promise<MovieAuditLog[]> {
-    const query: FilterQuery<MovieAuditLogDocument> = { movieId };
+  public async findByMovieId(movieID: string): Promise<MovieAuditLog[]> {
+    const query: FilterQuery<MovieAuditLogDocument> = { movieID };
     const logs = await this.model.find(query).sort({ createdAt: -1 }).exec();
 
     return await MoviesAuditLogMapper.any2MovieAuditLogs(logs);

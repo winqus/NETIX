@@ -24,9 +24,11 @@ export class MovieEventSubscriber {
   async handleMovieCreatedEvent(event: MovieCreatedEvent) {
     try {
       const log = await MovieAuditLog.create({
-        event: 'movie.created',
-        movieId: event.id,
+        event: MovieEvent.Created,
+        movieID: event.movieID,
         changes: {},
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -34,14 +36,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.updated')
+  @OnEvent(MovieEvent.Updated)
   async handleMovieUpdatedEvent(event: MovieUpdatedEvent) {
     try {
-      this.logger.log(`Handling 'movie.updated' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.updated' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.updated',
-        movieId: event.id,
+        event: MovieEvent.Updated,
+        movieID: event.movieID,
         changes: event.changes,
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -49,14 +53,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.published')
+  @OnEvent(MovieEvent.Published)
   async handleMoviePublishedEvent(event: MoviePublishedEvent) {
     try {
-      this.logger.log(`Handling 'movie.published' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.published' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.published',
-        movieId: event.id,
+        event: MovieEvent.Published,
+        movieID: event.movieID,
         changes: {},
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -64,14 +70,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.unpublished')
+  @OnEvent(MovieEvent.Unpublished)
   async handleMovieUnpublishedEvent(event: MovieUnpublishedEvent) {
     try {
-      this.logger.log(`Handling 'movie.unpublished' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.unpublished' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.unpublished',
-        movieId: event.id,
+        event: MovieEvent.Unpublished,
+        movieID: event.movieID,
         changes: {},
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -79,14 +87,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.deleted')
+  @OnEvent(MovieEvent.Deleted)
   async handleMovieDeletedEvent(event: MovieDeletedEvent) {
     try {
-      this.logger.log(`Handling 'movie.deleted' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.deleted' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.deleted',
-        movieId: event.id,
+        event: MovieEvent.Deleted,
+        movieID: event.movieID,
         changes: {},
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -94,14 +104,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.posterUpdated')
+  @OnEvent(MovieEvent.PosterUpdated)
   async handleMoviePosterUpdatedEvent(event: MoviePosterUpdatedEvent) {
     try {
-      this.logger.log(`Handling 'movie.posterUpdated' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.posterUpdated' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.posterUpdated',
-        movieId: event.id,
+        event: MovieEvent.PosterUpdated,
+        movieID: event.movieID,
         changes: { posterID: event.posterID },
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -109,14 +121,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.backdropUpdated')
+  @OnEvent(MovieEvent.BackdropUpdated)
   async handleMovieBackdropUpdatedEvent(event: MovieBackdropUpdatedEvent) {
     try {
-      this.logger.log(`Handling 'movie.backdropUpdated' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.backdropUpdated' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.backdropUpdated',
-        movieId: event.id,
+        event: MovieEvent.BackdropUpdated,
+        movieID: event.movieID,
         changes: { backdropID: event.backdropID },
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {
@@ -124,14 +138,16 @@ export class MovieEventSubscriber {
     }
   }
 
-  @OnEvent('movie.videoUpdated')
+  @OnEvent(MovieEvent.VideoUpdated)
   async handleMovieVideoUpdatedEvent(event: MovieVideoUpdatedEvent) {
     try {
-      this.logger.log(`Handling 'movie.videoUpdated' event for movie ${event.id}`);
+      this.logger.log(`Handling 'movie.videoUpdated' event for movie ${event.movieID}`);
       const log = await MovieAuditLog.create({
-        event: 'movie.videoUpdated',
-        movieId: event.id,
+        event: MovieEvent.VideoUpdated,
+        movieID: event.movieID,
         changes: { videoID: event.videoID },
+        userID: event.userID,
+        username: event.username,
       });
       await this.auditLogRepo.createLog(log);
     } catch (error) {

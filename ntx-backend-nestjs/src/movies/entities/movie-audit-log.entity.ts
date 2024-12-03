@@ -1,25 +1,28 @@
 import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
 import { generateUniqueID } from '@ntx/common/utils/ID.utils';
-import { IsDate, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import { MovieEvent } from '../events/movies.events';
 import { AUDIT_LOG_ID_LENGTH, AUDIT_LOG_ID_PREFIX } from '../movies.constants';
 
 export interface MovieAuditLogProps {
   uuid?: string;
-  event: string;
-  movieId: string;
+  event: MovieEvent;
+  movieID: string;
   changes: Record<string, any>;
   createdAt?: Date;
+  userID: string;
+  username: string;
 }
 
 export class MovieAuditLog {
   @IsString()
   uuid: string;
 
-  @IsString()
-  event: string;
+  @IsEnum(MovieEvent)
+  event: MovieEvent;
 
   @IsString()
-  movieId: string;
+  movieID: string;
 
   @IsObject()
   @IsOptional()
@@ -28,13 +31,21 @@ export class MovieAuditLog {
   @IsDate()
   createdAt: Date;
 
+  @IsString()
+  userID: string;
+
+  @IsString()
+  username: string;
+
   public static async create(props: MovieAuditLogProps): Promise<MovieAuditLog> {
     const log = {
       uuid: generateUniqueID(AUDIT_LOG_ID_PREFIX, AUDIT_LOG_ID_LENGTH),
       event: props.event,
-      movieId: props.movieId,
+      movieID: props.movieID,
       changes: props.changes,
       createdAt: props.createdAt || new Date(),
+      userID: props.userID,
+      username: props.username,
     };
 
     return await createValidatedObject(MovieAuditLog, log);

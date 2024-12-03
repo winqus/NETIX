@@ -7,9 +7,11 @@ export class MoviesAuditLogMapper {
     const auditLog = await createValidatedObject(MovieAuditLog, {
       uuid: any.uuid,
       event: any.event,
-      movieId: any.movieId,
+      movieID: any.movieID,
       changes: any.changes,
       createdAt: any.createdAt,
+      userID: any.userID,
+      username: any.username,
     });
 
     return auditLog;
@@ -23,9 +25,11 @@ export class MoviesAuditLogMapper {
     const auditLogDTO = await createValidatedObject(MovieAuditLogDTO, {
       id: auditLog.uuid,
       event: auditLog.event,
-      movieId: auditLog.movieId,
+      movieID: auditLog.movieID,
       changes: auditLog.changes,
-      timestamp: auditLog.createdAt.toISOString(),
+      timestamp: auditLog.createdAt,
+      userID: auditLog.userID,
+      username: auditLog.username,
     });
 
     return auditLogDTO;

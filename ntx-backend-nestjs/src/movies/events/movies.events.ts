@@ -11,60 +11,76 @@ export enum MovieEvent {
 
 export class MovieCreatedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MovieUpdatedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
     public readonly changes: Record<string, any>,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MoviePublishedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MovieUnpublishedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MovieDeletedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MoviePosterUpdatedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
     public readonly posterID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MovieBackdropUpdatedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
     public readonly backdropID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }
 
 export class MovieVideoUpdatedEvent {
   constructor(
-    public readonly id: string,
+    public readonly movieID: string,
     public readonly videoID: string,
+    public readonly userID: string,
+    public readonly username: string,
     public readonly timestamp: Date = new Date(),
   ) {}
 }

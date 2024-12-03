@@ -1,19 +1,26 @@
-import { IsObject, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import { MovieEvent } from '../events/movies.events';
 
 export class MovieAuditLogDTO {
   @IsString()
   id: string;
 
-  @IsString()
-  event: string;
+  @IsEnum(MovieEvent)
+  event: MovieEvent;
 
   @IsString()
-  movieId: string;
+  movieID: string;
 
   @IsObject()
   @IsOptional()
   changes: Record<string, any>;
 
+  @IsDate()
+  timestamp: Date;
+
   @IsString()
-  timestamp: string;
+  userID: string;
+
+  @IsString()
+  username: string;
 }
