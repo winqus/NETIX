@@ -1,6 +1,7 @@
 import { CacheModule } from '@nestjs/cache-manager';
 import { HttpStatus, INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
 import { tempLocalStorageOptionsFactory } from '@ntx-test/utils/temp-local-storage-options.factory';
 import { TMDBFetchMocker } from '@ntx-test/utils/TMDBFetchResponseMocker';
@@ -44,6 +45,7 @@ describe('Movies API (e2e)', () => {
         }),
         FileStorageModule.forRoot(storageType, options, true),
         JobQueueModule.forRootAsync(),
+        EventEmitterModule.forRoot(),
         MoviesModule,
       ],
     }).compile();

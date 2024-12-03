@@ -22,11 +22,13 @@ import {
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
 import { HasPermission } from '@ntx/auth/auth.decorators';
+import { CurrentUser } from '@ntx/auth/decorators/user.decorator';
 import { AuthenticationGuard } from '@ntx/auth/guards/authentication.guard';
 import { PermissionGuard } from '@ntx/auth/guards/permission.guard';
-import { Permission } from '@ntx/auth/user.entity';
+import { Permission, User } from '@ntx/auth/user.entity';
 import { CustomHttpInternalErrorException } from '@ntx/common/exceptions/HttpInternalError.exception';
 import { SimpleValidationPipe } from '@ntx/common/pipes/simple-validation.pipe';
 import { fileInStorageFromRaw } from '@ntx/file-storage/factories/file-in-store-from-raw.factory';
@@ -36,6 +38,16 @@ import { validateOrReject } from 'class-validator';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { MovieDTO } from './dto/movie.dto';
 import { UpdateMovieDTO } from './dto/update-movie.dto';
+import {
+  MovieBackdropUpdatedEvent,
+  MovieCreatedEvent,
+  MovieDeletedEvent,
+  MovieEvent,
+  MoviePosterUpdatedEvent,
+  MoviePublishedEvent,
+  MovieUnpublishedEvent,
+  MovieUpdatedEvent,
+} from './events/movies.events';
 import {
   MOVIES_BACKDROP_FILE_STORAGE_ARGS,
   MOVIES_CACHE_KEY,
@@ -79,6 +91,7 @@ export class MoviesController {
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
     private readonly moviesSrv: MoviesService,
     private readonly tusUploadSrv: TusUploadService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
@@ -86,7 +99,11 @@ export class MoviesController {
   @HasPermission(Permission.CreateTitle)
   @ApiDocsForPostMovie()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
-  public async create(@UploadedFile() file: Express.Multer.File, @Body() dto: CreateMovieDTO): Promise<MovieDTO> {
+  public async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateMovieDTO,
+    @CurrentUser() user: User,
+  ): Promise<MovieDTO> {
     try {
       if (file == null) {
         throw new BadRequestException(MOVIES_NO_FILE_PROVIDED_ERROR);
@@ -95,6 +112,8 @@ export class MoviesController {
       await validateOrReject(dto);
 
       const newMovie = await this.moviesSrv.createOneWithPoster(dto, fileInStorageFromRaw(file));
+
+      this.eventEmitter.emit(MovieEvent.Created, new MovieCreatedEvent(newMovie.id, user.id, user.username));
 
       this.logger.log(`Created new movie ${newMovie.id} with poster ${newMovie.posterID}`);
 
@@ -156,7 +175,11 @@ export class MoviesController {
   @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPutUpdatePoster()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_POSTER_FILE_STORAGE_ARGS))
-  public async updatePoster(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
+  public async updatePoster(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -167,6 +190,11 @@ export class MoviesController {
       }
 
       const updatedMovie = await this.moviesSrv.updatePosterForOne(id, fileInStorageFromRaw(file));
+
+      this.eventEmitter.emit(
+        MovieEvent.PosterUpdated,
+        new MoviePosterUpdatedEvent(id, updatedMovie.id, user.id, user.username),
+      );
 
       this.logger.log(`Updated poster for movie ${id}`);
 
@@ -187,7 +215,11 @@ export class MoviesController {
   @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPutUpdateBackdrop()
   @UseInterceptors(FileToStorageContainerInterceptor(MOVIES_BACKDROP_FILE_STORAGE_ARGS))
-  public async updateBackdrop(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<MovieDTO> {
+  public async updateBackdrop(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -198,6 +230,11 @@ export class MoviesController {
       }
 
       const updatedMovie = await this.moviesSrv.updateBackdropForOne(id, fileInStorageFromRaw(file));
+
+      this.eventEmitter.emit(
+        MovieEvent.BackdropUpdated,
+        new MovieBackdropUpdatedEvent(id, updatedMovie.backdropID!, user.id, user.username),
+      );
 
       this.logger.log(`Updated backdrop for movie ${id}`);
 
@@ -215,8 +252,15 @@ export class MoviesController {
   @UseGuards(AuthenticationGuard, PermissionGuard)
   @HasPermission(Permission.UpdateTitle)
   @ApiDocsForTusPostMovieVideoUpload()
-  public async handleTusPostToInitUploadVideo(@Param('id') id: string, @Req() req: any, @Res() res: any) {
+  public async handleTusPostToInitUploadVideo(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Res() res: any,
+    @CurrentUser() user: User,
+  ) {
     await this.moviesSrv.findOne(id);
+
+    this.eventEmitter.emit(MovieEvent.VideoUpdated, new MovieUpdatedEvent(id, { videoID: id }, user.id, user.username));
 
     await this.tusUploadSrv.handleUpload(MOVIES_VIDEOS_FILE_STORAGE_ARGS, req, res);
   }
@@ -269,7 +313,11 @@ export class MoviesController {
   @UseGuards(AuthenticationGuard, PermissionGuard)
   @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPatchMovie()
-  public async update(@Param('id') id: string, @Body() dto: UpdateMovieDTO): Promise<MovieDTO> {
+  public async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateMovieDTO,
+    @CurrentUser() user: User,
+  ): Promise<MovieDTO> {
     try {
       if (!id) {
         throw new BadRequestException(MOVIES_NO_ID_PROVIDED_ERROR);
@@ -286,6 +334,8 @@ export class MoviesController {
       if (updatedMovie == null) {
         throw new NotFoundException(MOVIES_NOT_FOUND_ERROR);
       }
+
+      this.eventEmitter.emit(MovieEvent.Updated, new MovieUpdatedEvent(id, dto, user.id, user.username));
 
       this.logger.log(`Updated movie ${id}`);
 
@@ -305,11 +355,13 @@ export class MoviesController {
   @UseGuards(AuthenticationGuard, PermissionGuard)
   @HasPermission(Permission.UpdateTitle)
   @ApiDocsForPutMoviePublished()
-  public async publish(@Param('id') id: string): Promise<MovieDTO> {
+  public async publish(@Param('id') id: string, @CurrentUser() user: User): Promise<MovieDTO> {
     try {
       const updatedMovie = await this.moviesSrv.publishOne(id);
 
       this.logger.log(`Published movie ${id}`);
+
+      this.eventEmitter.emit(MovieEvent.Published, new MoviePublishedEvent(id, user.id, user.username));
 
       this.clearMoviesCache();
 
@@ -327,9 +379,11 @@ export class MoviesController {
   @UseGuards(AuthenticationGuard, PermissionGuard)
   @HasPermission(Permission.UpdateTitle)
   @ApiDocsForDeleteMoviePublished()
-  public async unpublish(@Param('id') id: string): Promise<MovieDTO> {
+  public async unpublish(@Param('id') id: string, @CurrentUser() user: User): Promise<MovieDTO> {
     try {
       const updatedMovie = await this.moviesSrv.unpublishOne(id);
+
+      this.eventEmitter.emit(MovieEvent.Unpublished, new MovieUnpublishedEvent(id, user.id, user.username));
 
       this.logger.log(`Unpublished movie ${id}`);
 
@@ -350,9 +404,10 @@ export class MoviesController {
   @HasPermission(Permission.DeleteTitle)
   @HttpCode(204)
   @ApiDocsForDeleteMovie()
-  public async delete(@Param('id') id: string): Promise<void> {
+  public async delete(@Param('id') id: string, @CurrentUser() user: User): Promise<void> {
     try {
       await this.moviesSrv.deleteOne(id);
+      this.eventEmitter.emit(MovieEvent.Deleted, new MovieDeletedEvent(id, user.id, user.username));
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

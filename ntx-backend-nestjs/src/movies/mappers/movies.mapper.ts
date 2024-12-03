@@ -1,10 +1,10 @@
 import { createValidatedObject } from '@ntx/common/utils/class-validation.utils';
-import { MovieDTO } from './dto/movie.dto';
-import { Movie } from './entities/movie.entity';
+import { MovieDTO } from '../dto/movie.dto';
+import { Movie } from '../entities/movie.entity';
 
 export class MoviesMapper {
   public static async any2Movie(any: any): Promise<Movie> {
-    const movie = createValidatedObject(Movie, {
+    const movie = await createValidatedObject(Movie, {
       uuid: any.uuid,
       createdAt: any.createdAt,
       updatedAt: any.updatedAt,
@@ -24,11 +24,11 @@ export class MoviesMapper {
   }
 
   public static async any2Movies(any: any[]): Promise<Movie[]> {
-    return Promise.all(any.map((a) => MoviesMapper.any2Movie(a)));
+    return await Promise.all(any.map((a) => MoviesMapper.any2Movie(a)));
   }
 
   public static async Movie2MovieDTO(movie: Movie): Promise<MovieDTO> {
-    const movieDTO = createValidatedObject(MovieDTO, {
+    const movieDTO = await createValidatedObject(MovieDTO, {
       id: movie.uuid,
       createdAt: movie.createdAt,
       updatedAt: movie.updatedAt,
@@ -46,6 +46,6 @@ export class MoviesMapper {
   }
 
   public static async Movies2MovieDTOs(movies: Movie[]): Promise<MovieDTO[]> {
-    return Promise.all(movies.map((m) => MoviesMapper.Movie2MovieDTO(m)));
+    return await Promise.all(movies.map((m) => MoviesMapper.Movie2MovieDTO(m)));
   }
 }
