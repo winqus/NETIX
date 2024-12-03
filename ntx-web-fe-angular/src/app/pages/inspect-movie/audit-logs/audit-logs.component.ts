@@ -17,7 +17,7 @@ export class AuditLogsComponent implements OnChanges {
   @Input({ required: true }) movie: MovieDTO | undefined;
   auditLogs: AuditLogDTO[] = [];
 
-  constructor(private readonly auditLogService: AuditLogsService) {}
+  constructor(private readonly auditLogsService: AuditLogsService) {}
   ngOnChanges(): void {
     if (this.movie?.id) {
       this.getMovieAuditLogs();
@@ -27,7 +27,7 @@ export class AuditLogsComponent implements OnChanges {
   getMovieAuditLogs() {
     if (this.movie?.id == null) return;
 
-    this.auditLogService.getMovieAuditLogs(this.movie?.id).subscribe({
+    this.auditLogsService.getMovieAuditLogs(this.movie?.id).subscribe({
       next: (response) => {
         this.auditLogs = response;
         console.log(this.auditLogs);
