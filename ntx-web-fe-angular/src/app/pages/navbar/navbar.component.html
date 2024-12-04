@@ -2,7 +2,7 @@
   <div class="container mx-auto flex flex-row items-center">
     <!-- Title -->
     <div class="flex-none">
-      <a href="/" class="btn btn-ghost normal-case text-2xl">{{ props.title }}</a>
+      <button [routerLink]="redirectMain()" class="btn btn-ghost normal-case text-2xl" type="button">{{ props.title }}</button>
     </div>
     <!-- Search bar in the center -->
     <div class="flex-1 flex justify-center">
@@ -11,16 +11,28 @@
       </div>
     </div>
     <div class="flex-none">
-      @if (!isCreateTitleRoute) {
+      @if (isCreateMovieEnabled()) {
         <button [routerLink]="['/create/title']" [disabled]="isCreateTitleRoute" class="btn btn-ghost rounded-md hover:bg-black">
           <app-svg-icons name="plus_square" size="20" color="white"></app-svg-icons>
         </button>
       }
     </div>
-    <!-- @if (auth.isAuthenticated$ | async; as isAuthenticated) {
-    <button class="btn" (click)="logout()">Logout</button>
-  } @else {
-    <button class="btn" (click)="auth.loginWithPopup()">Login</button>
-  } -->
+    @if (isLoggedIn()) {
+      <button role="button" class="dropdown dropdown-end" for="profileDropdownSmallScreen">
+        <div class="avatar placeholder">
+          <div class="btn bg-neutral text-neutral-content w-12 rounded-full">
+            <span>{{ getUserNameLetter() }}</span>
+          </div>
+        </div>
+        <ul id="profileDropdownSmallScreen" class="dropdown-content menu bg-base-100 rounded z-[50] w-52 p-1 shadow outline outline-1 gap-[0px]">
+          @if (isManager()) {
+            <div class="justify-between text-left btn btn-sm btn-outline w-full border-none">
+              Viewer mode <input type="checkbox" class="toggle toggle-error" [checked]="isViewerMode()" (change)="toggleViewerMode($event)" />
+            </div>
+          }
+          <button class="btn btn-sm btn-outline w-full border-none justify-start text-left" type="button" (click)="logout()">Log out</button>
+        </ul>
+      </button>
+    }
   </div>
 </nav>

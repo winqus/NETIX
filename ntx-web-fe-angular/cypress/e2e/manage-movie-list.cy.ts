@@ -30,7 +30,7 @@ describe('manage movies list', () => {
     cy.visit('/manage/titles');
     cy.wait('@BE_GetMovies');
     cy.get('app-movie-card').first().click();
-    cy.url().should('include', '/inspect/movie/MT-');
+    cy.url().should('include', '/inspect/movie/MT_');
   });
 
   it('should display unpublished badge', () => {
@@ -84,6 +84,6 @@ describe('manage movies list', () => {
         cy.get(SEARCH_RESULTS_ITEM_ELEMENT).first().contains('MOVIE');
         cy.get(SEARCH_RESULTS_ITEM_ELEMENT).first().contains(movieName).click();
       });
-    cy.url().should('include', '/inspect/movie/MT-');
+    cy.url().should('include', '/inspect/movie/MT_');
   });
 });
