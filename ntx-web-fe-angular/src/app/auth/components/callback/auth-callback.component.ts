@@ -13,7 +13,7 @@ import { AuthService } from '../../auth.service';
           <progress class="progress progress-error w-56"></progress>
         </div>
 
-        <p class="text-sm mt-4 text-base-content">
+        <p class="mt-4 text-base-content">
           {{ infoMessage }}
         </p>
       </div>
@@ -26,8 +26,8 @@ export class AuthCallbackComponent implements OnInit, OnDestroy {
   private timeoutId: any;
 
   constructor(
-    private router: Router,
-    private auth: AuthService
+    private readonly router: Router,
+    private readonly auth: AuthService
   ) {}
 
   ngOnInit() {

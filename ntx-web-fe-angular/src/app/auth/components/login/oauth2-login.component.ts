@@ -15,12 +15,12 @@ import { Router, RouterLink } from '@angular/router';
           </div>
         }
 
-        <p class="text-sm mt-4 text-base-content">
+        <p class="mt-4 text-base-content">
           {{ infoMessage }}
         </p>
 
         @if (errorMessage) {
-          <p class="text-sm mt-4 text-error">
+          <p class="mt-4 text-error">
             {{ errorMessage }}
           </p>
           <a routerLink="{{ onErrorGoToPath }}">Go Home ({{ redirectInSecs }})</a>

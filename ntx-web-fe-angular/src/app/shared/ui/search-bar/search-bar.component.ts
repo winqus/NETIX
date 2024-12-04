@@ -44,18 +44,18 @@ export class SearchBarComponent implements OnInit {
     }
   }
 
-  getAdditionalInfo(searchResultitem: SearchResultDTO): string {
-    let info = searchResultitem.type + ' · ' + searchResultitem.year;
+  getAdditionalInfo(searchResultItem: SearchResultDTO): string {
+    let info = searchResultItem.type + ' · ' + searchResultItem.year;
 
-    if (searchResultitem.provider != null) {
-      info += ' · ' + searchResultitem.provider;
+    if (searchResultItem.provider != null) {
+      info += ' · ' + searchResultItem.provider;
     }
 
     return info;
   }
 
-  getName(searchResultitem: SearchResultDTO): string {
-    return searchResultitem.name;
+  getName(searchResultItem: SearchResultDTO): string {
+    return searchResultItem.name;
   }
 
   searchTermFilter(searchTerm: string) {
@@ -113,7 +113,7 @@ export class SearchBarComponent implements OnInit {
     }
 
     this.results = SearchResultDTOMapper.anyToSearchResultDTOArray(tempResult);
-
+    console.log(this.results);
     this.errorMessage = null;
   }
 
