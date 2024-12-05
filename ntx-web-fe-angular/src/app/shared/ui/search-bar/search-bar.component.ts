@@ -113,7 +113,6 @@ export class SearchBarComponent implements OnInit {
     }
 
     this.results = SearchResultDTOMapper.anyToSearchResultDTOArray(tempResult);
-    console.log(this.results);
     this.errorMessage = null;
   }
 
