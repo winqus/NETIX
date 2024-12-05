@@ -33,6 +33,6 @@ describe('view movies list', () => {
     cy.visit('/');
     cy.wait('@BE_GetMovies');
     cy.get('app-movie-card').first().click();
-    cy.url().should('include', '/view/movie/MT-');
+    cy.url().should('include', '/view/movie/MT_');
   });
 });

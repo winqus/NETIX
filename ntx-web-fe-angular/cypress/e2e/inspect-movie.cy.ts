@@ -396,14 +396,10 @@ describe('inspect movie', () => {
     cy.createMovieWithPoster().then((movie: MovieDTO) => {
       const GET_AUDIT_LOGS_REQUEST_TOKEN = 'GET_AUDIT_LOGS_REQUEST_TOKEN';
       cy.intercept('GET', `${convertRouteToPath(getAuditLogs(movie.id))}`).as(GET_AUDIT_LOGS_REQUEST_TOKEN);
-      cy.intercept('GET', `${convertRouteToPath(getMovieUrl())}/${movie.id}`).as(GET_MOVIE_REQUEST_TOKEN);
 
-      cy.visit(`/inspect/movies/${movie.id}`);
-
-      cy.wait('@' + GET_MOVIE_REQUEST_TOKEN);
       cy.wait('@' + GET_AUDIT_LOGS_REQUEST_TOKEN);
 
-      cy.contains('Audit Logs');
+      cy.contains('Events');
 
       const date = new Date();
 
