@@ -21,18 +21,53 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
     }
   }
 
+  private async _makeApiRequest<T>(url: string, errorContext: string): Promise<T | null> {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${this.config.apiKey}`,
+      },
+    };
+
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      this.logger.error(`Failed to fetch ${errorContext} data from TMDB API: ${response.statusText}`);
+
+      return null;
+    }
+
+    return response.json();
+  }
+
+  private buildSearchParams(options: TMDBTVShowSearchOptions, currentPage: number): URLSearchParams {
+    const params = new URLSearchParams();
+    params.append('query', encodeURIComponent(options.query));
+    params.append('include_adult', options.include_adult || 'false');
+    params.append('language', options.language || 'en-US');
+    params.append('page', currentPage.toString());
+
+    if (options.year) {
+      params.append('first_air_date_year', options.year);
+    }
+
+    return params;
+  }
+
+  private async fetchSearchPage(params: URLSearchParams): Promise<TMDBSearchResult<TMDBTVShow> | null> {
+    const url = `${TMDB_API_SEARCH_TV_SHOW_ROUTE}?${params.toString()}`;
+
+    return await this._makeApiRequest<TMDBSearchResult<TMDBTVShow>>(url, 'TV show');
+  }
+
+  private filterValidResults(data: TMDBSearchResult<TMDBTVShow>): TMDBTVShow[] {
+    return data.results.filter(
+      (tv_show) => 'popularity' in tv_show && 'first_air_date' in tv_show && tv_show.first_air_date.length > 0,
+    );
+  }
+
   public async search(options: TMDBTVShowSearchOptions): Promise<TMDBSearchResult<TMDBTVShow>[] | null> {
-    if (options.language == null || options.language == '') {
-      options.language = 'en-US';
-    }
-
-    if (options.include_adult == null) {
-      options.include_adult = 'false';
-    }
-
-    const { query, year, language, include_adult } = options;
-
-    if (query == '' || query == null) {
+    if (!options.query) {
       this.logger.error('TV Show query is empty or null');
 
       return null;
@@ -43,45 +78,19 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
     let totalPages = 1;
 
     while (currentPage <= totalPages && currentPage <= MAX_RESULT_PAGES_TO_SEARCH_THROUGH) {
-      const params = new URLSearchParams();
-      params.append('query', encodeURIComponent(query));
-      params.append('include_adult', include_adult);
-      params.append('language', language);
-      params.append('page', currentPage.toString());
-      if (year != null) {
-        params.append('first_air_date_year', year || '');
-      }
+      const params = this.buildSearchParams(options, currentPage);
+      const data = await this.fetchSearchPage(params);
 
-      const url = `${TMDB_API_SEARCH_TV_SHOW_ROUTE}?${params.toString()}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${this.config.apiKey}`,
-        },
-      };
-
-      const response = await fetch(url, options);
-      if (response.ok === false) {
-        this.logger.error(`Failed to fetch TV show data from TMDB API: ${response.statusText}`);
-
-        return null;
-      }
-
-      const data: TMDBSearchResult<TMDBTVShow> = await response.json();
-      if (data == null || 'results' in data === false) {
+      if (!data || !data.results) {
         this.logger.error('No TV show results in data from TMDB API');
 
         return null;
       }
 
-      if (data.results.length === 0) {
+      const filteredResults = this.filterValidResults(data);
+      if (filteredResults.length === 0) {
         break;
       }
-
-      const filteredResults = data.results.filter(
-        (tv_show) => 'popularity' in tv_show && 'first_air_date' in tv_show && tv_show.first_air_date.length > 0,
-      );
 
       allResults.push({
         page: data.page,
@@ -99,7 +108,7 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
   }
 
   public async getDetailsByID(tvShowID: string): Promise<TMDBTVShowDetails | null> {
-    if (tvShowID == null || tvShowID == '') {
+    if (!tvShowID) {
       this.logger.error('tvShowID is empty or null');
 
       return null;
@@ -107,63 +116,15 @@ export class TMDBTVShowGatewayAPIv3 implements TMDBTVShowGateway {
 
     const params = new URLSearchParams();
     params.append('language', 'en-US');
-
     const url = `${TMDB_API_TV_SHOW_DETAILS_ROUTE}/${tvShowID}?${params.toString()}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${this.config.apiKey}`,
-      },
-    };
 
-    const response = await fetch(url, options);
-    if (response.ok === false) {
-      this.logger.error(`Failed to fetch TV Show data from TMDB API: ${response.statusText}`);
-
-      return null;
-    }
-
-    const data: TMDBTVShowDetails = await response.json();
-    if (data == null || 'id' in data === false) {
+    const data = await this._makeApiRequest<TMDBTVShowDetails>(url, 'TV Show');
+    if (!data || !('id' in data)) {
       this.logger.error('No TV Show results in data from TMDB API');
 
       return null;
     }
 
-    return {
-      adult: data.adult,
-      backdrop_path: data.backdrop_path,
-      created_by: data.created_by,
-      episode_run_time: data.episode_run_time,
-      first_air_date: data.first_air_date,
-      genres: data.genres,
-      homepage: data.homepage,
-      id: data.id,
-      in_production: data.in_production,
-      languages: data.languages,
-      last_air_date: data.last_air_date,
-      last_episode_to_air: data.last_episode_to_air,
-      name: data.name,
-      next_episode_to_air: data.next_episode_to_air,
-      networks: data.networks,
-      number_of_episodes: data.number_of_episodes,
-      number_of_seasons: data.number_of_seasons,
-      origin_country: data.origin_country,
-      original_language: data.original_language,
-      original_name: data.original_name,
-      overview: data.overview,
-      popularity: data.popularity,
-      poster_path: data.poster_path,
-      production_companies: data.production_companies,
-      production_countries: data.production_countries,
-      seasons: data.seasons,
-      spoken_languages: data.spoken_languages,
-      status: data.status,
-      tagline: data.tagline,
-      type: data.type,
-      vote_average: data.vote_average,
-      vote_count: data.vote_count,
-    };
+    return data;
   }
 }
